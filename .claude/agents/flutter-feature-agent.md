@@ -7,8 +7,8 @@ color: purple
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: roles/flutter-feature-agent.md + .claude/bindings/flutter-feature-agent.yml -->
-<!-- Rebuild: scripts/build-agents.sh -->
+<!-- Source: agent/roles/flutter-feature-agent.md + .claude/bindings/flutter-feature-agent.yml -->
+<!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST
 

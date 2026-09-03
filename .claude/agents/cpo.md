@@ -6,8 +6,8 @@ effort: low
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: roles/cpo.md + .claude/bindings/cpo.yml -->
-<!-- Rebuild: scripts/build-agents.sh -->
+<!-- Source: agent/roles/cpo.md + .claude/bindings/cpo.yml -->
+<!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST
 

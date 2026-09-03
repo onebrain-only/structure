@@ -6,8 +6,8 @@ effort: low
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: roles/task-auditor.md + .claude/bindings/task-auditor.yml -->
-<!-- Rebuild: scripts/build-agents.sh -->
+<!-- Source: agent/roles/task-auditor.md + .claude/bindings/task-auditor.yml -->
+<!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST
 

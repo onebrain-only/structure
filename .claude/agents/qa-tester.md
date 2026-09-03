@@ -7,8 +7,8 @@ color: teal
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: roles/qa-tester.md + .claude/bindings/qa-tester.yml -->
-<!-- Rebuild: scripts/build-agents.sh -->
+<!-- Source: agent/roles/qa-tester.md + .claude/bindings/qa-tester.yml -->
+<!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST
 

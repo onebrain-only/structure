@@ -7,8 +7,8 @@ color: blue
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: roles/app-store-submission-fixer.md + .claude/bindings/app-store-submission-fixer.yml -->
-<!-- Rebuild: scripts/build-agents.sh -->
+<!-- Source: agent/roles/app-store-submission-fixer.md + .claude/bindings/app-store-submission-fixer.yml -->
+<!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST
 

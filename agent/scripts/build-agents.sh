@@ -1,7 +1,7 @@
 #!/bin/sh
 # Build .claude/agents/<name>.md from a tool-neutral role + a Claude-specific binding.
 #
-#   roles/<name>.md                  neutral markdown, no frontmatter — the ROLE
+#   agent/roles/<name>.md            neutral markdown, no frontmatter — the ROLE
 #   .claude/bindings/<name>.yml      YAML frontmatter body           — the BINDING
 #   .claude/agents/<name>.md         generated: fence + binding + fence + banner + role
 #
@@ -9,13 +9,13 @@
 # .claude/agents/ is left untouched.
 #
 # Usage:
-#   scripts/build-agents.sh          regenerate
-#   scripts/build-agents.sh --check  verify regeneration is a no-op (exit 1 if not)
+#   agent/scripts/build-agents.sh          regenerate
+#   agent/scripts/build-agents.sh --check  verify regeneration is a no-op (exit 1 if not)
 set -eu
 
-ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 BINDINGS="$ROOT/.claude/bindings"
-ROLES="$ROOT/roles"
+ROLES="$ROOT/agent/roles"
 AGENTS="$ROOT/.claude/agents"
 
 CHECK=0
@@ -43,9 +43,9 @@ for binding in "$BINDINGS"/*.yml; do
   printf -- '---\n'  >  "$tmp"
   cat "$binding"     >> "$tmp"
   printf -- '---\n'  >> "$tmp"
-  printf -- '<!-- GENERATED FILE — do not edit. -->\n'                                 >> "$tmp"
-  printf -- '<!-- Source: roles/%s.md + .claude/bindings/%s.yml -->\n' "$name" "$name" >> "$tmp"
-  printf -- '<!-- Rebuild: scripts/build-agents.sh -->\n'                              >> "$tmp"
+  printf -- '<!-- GENERATED FILE — do not edit. -->\n'                                       >> "$tmp"
+  printf -- '<!-- Source: agent/roles/%s.md + .claude/bindings/%s.yml -->\n' "$name" "$name" >> "$tmp"
+  printf -- '<!-- Rebuild: agent/scripts/build-agents.sh -->\n'                              >> "$tmp"
   printf -- '\n'                                                                >> "$tmp"
   cat "$role"        >> "$tmp"
 
