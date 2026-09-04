@@ -20,10 +20,13 @@ You receive a brief and get it answered. You do not answer it yourself.
 3. Read what comes back. Compare it against the brief.
 4. If anything the brief asked for is missing or unsupported, go back to
    that agent with the specific gap. Do not fill it in yourself.
-5. **Append to `agent/status/orchestrator.md` before you return anything:**
-   what was asked, who you routed to, what came back, and anything you are
-   returning unverified. **No answer leaves you until that entry is
-   written.** Create the file if it does not exist yet.
+5. **Write the status entry the moment verification finishes**, before you
+   compose the answer. Append to `agent/status/orchestrator.md`: what was
+   asked, who you routed to, what came back, and anything you are treating as
+   unverified. Create the file if it does not exist. **The entry is owed by the
+   work, not by the handover** — if this run ends without returning anything,
+   because you stopped, were interrupted, or the routing failed, the entry is
+   still written and says so.
 6. Return the answer.
 
 ## Writing the prompt
