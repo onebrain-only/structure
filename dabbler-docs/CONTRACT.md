@@ -73,7 +73,7 @@ Agents: **MA** master-analyst · **NS** notifications-specialist · **VC** versi
 
 **`BO` and `FA` added 2026-08-28 (`DECISIONS.md` G-003).** The PO filled the two seats this
 table had named vacant — the same two the audit identified when it found every database path
-and 23 of 25 code slices UNOWNED. Both are **executives: they author, they do not apply.**
+and 23 of 25 code slices UNOWNED (**the tree is 20 slices as of `c46b5c5`** — `34f9a6d` deleted five). Both are **executives: they author, they do not apply.**
 Neither gains any production-write authority; that stays exactly where `019` and `G-002` put
 it, with `cto` or the PO. **A new agent starts from the read-only posture and is granted `W`
 only on the rows named in G-003** — the columns were not filled in by analogy with an
@@ -158,7 +158,7 @@ in this matrix where "no write access anywhere" is the design rather than a gap.
 |---|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|:--:|---|
 | `lib/features/notifications/**` | R | **W** | — | — | R | R | R | R | R | R | notifications-specialist |
 | `lib/services/notifications/**` | R | **W** | — | — | R | R | R | R | R | R | notifications-specialist |
-| `lib/features/<any other slice>/**` | R | — | — | — | R | R | R | R | **W** | R | **flutter-feature-agent** (G-003, 2026-08-28). 23 of the 25 slices this table previously marked UNOWNED. **Authors only — it applies nothing to production and touches no Supabase migration**; schema needs route to `backend-owner`. Notification slices stay with NS. |
+| `lib/features/<any other slice>/**` | R | — | — | — | R | R | R | R | **W** | R | **flutter-feature-agent** (G-003, 2026-08-28). 23 of the 25 slices this table previously marked UNOWNED (**20 slices as of `c46b5c5`**). **Authors only — it applies nothing to production and touches no Supabase migration**; schema needs route to `backend-owner`. Notification slices stay with NS. |
 | `lib/core/**` (except the four contended files) | R | R | — | — | R | R | R | R | **W** | R | **flutter-feature-agent** (G-003). Cross-cutting — changing it changes every slice, so a change here needs `cto`'s sign-off on shape before it lands. The four contended files are still §4. |
 | `lib/data/**` | R | R | — | — | R | R | R | R | **W** | R | **flutter-feature-agent** (G-003). Holds the live repositories; see the audit finding that three parallel profile stacks exist here. |
 | `lib/app/app_router.dart` | R | R | — | R | R | R | R | R | R | R | **CONTENDED — see §4.** |
@@ -271,7 +271,7 @@ They have a protocol instead.
 
 | File | Why every agent needs it |
 |---|---|
-| `lib/app/app_router.dart` | 1,745 LOC. Every new screen adds an import and a route. |
+| `lib/app/app_router.dart` | 1,712 LOC, 85 `GoRoute`, 1 `StatefulShellRoute.indexedStack` (`:746`). Every new screen adds an import and a route. **Re-measured 2026-09-04 at `dabbler-code` `c46b5c5`; was 1,745.** |
 | `lib/providers.dart` | CLAUDE.md requires every new provider to be exported here. |
 | `lib/core/config/feature_flags.dart` | CLAUDE.md requires every new feature to be gated here. |
 | `lib/core/config/supabase_config.dart` | Every table, bucket and RPC name lives here; hardcoding them is forbidden. |
@@ -292,10 +292,15 @@ They have a protocol instead.
 5. **`supabase_config.dart` is add-only for constants.** Changing an existing constant's
    *value* changes which table the whole app talks to. That needs a `DECISIONS.md` entry.
    The audit found two constants pointing at buckets that do not exist
-   (`venueImagesBucket = 'venue-images'`); fixing those is KAN-27's job, not yours.
+   (`venueImagesBucket = 'venue-images'`, plus a hardcoded `'avatars'`). **Both are fixed as of
+   `c46b5c5`** — `avatarsBucket = 'Avatar'`, `venueImagesBucket = 'venue'`
+   (`supabase_config.dart:3-4`). The rule stands; the example is now history.
 
 **Why this is strict.** The audit measured what happens without it: 98 dead feature flags,
-54 unreferenced route constants, and 1,745 lines in one router. That is what a year of
+54 unreferenced route constants, and 1,745 lines in one router. **All three were since cleaned
+up** — KAN-32 deleted the 98 flags (17 remain) and 75 route constants (1 unused remains), KAN-31
+deleted 5 dead feature slices, and the router is 1,712 LOC. The numbers here are the evidence for
+the protocol, not the current state. That is what a year of
 "while I'm in here" produces.
 
 ---

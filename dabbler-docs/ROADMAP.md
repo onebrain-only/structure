@@ -3,6 +3,25 @@
 **Owner:** master-analyst (write, from PO direction) · all agents (read)
 **Last updated:** 2026-08-26
 
+> ## ⚠️ SECTIONS 1–3 ARE EXECUTED HISTORY, NOT A PLAN
+>
+> **Annotated 2026-09-04 against `dabbler-code` `c46b5c5`.** The 113-flag analysis below was
+> acted on and is now a record of work already done. Do not read it as outstanding.
+>
+> - **KAN-32 deleted 98 flags.** `feature_flags.dart` carries **17 `static const bool`** today,
+>   not 113 — **12 `true`, 5 `false`** (`messaging`, `enableEarlyBirdCheckIn`, `enableDataExport`,
+>   `enablePayments`, `enableCommunityMobileNav`). "112 of 113 are `true`" is no longer the case.
+> - **`enableRewards` no longer exists.** `0b32cc6` renamed it `enableEarlyBirdCheckIn` and cut
+>   the rewards slice from 20,545 to 690 LOC.
+> - **KAN-32 also deleted 75 unreferenced route constants** (unused: 54 → 1) and **KAN-31 deleted
+>   5 dead feature slices** (25 → 20).
+> - **The §3 tally's outcome was reached.** It projected ~49 surviving flags; the actual result
+>   is 17.
+>
+> **What still holds:** §4's rule — *"Never read a flag as evidence something is gated"* — and
+> the `enablePlayerGameCreation` / `enableOrganiserGameJoining` comment contradictions, which
+> were not part of the deletion pass. Current build state is `PROJECT_STATE.md` §3 and §24.
+
 Scope buckets, not dated plans. A wave is done when its **exit criterion** passes, not when
 its list is ticked.
 
@@ -187,6 +206,9 @@ six of those features need **only client work**, their backends already exist.
 
 ## 2. THE FLAG TABLE — all 113, grouped by slice
 
+> **EXECUTED.** 98 of these were deleted by KAN-32; 17 remain. Table kept as the record of
+> what was cut and why. See the banner at the top of this file.
+
 **Legend** · `LIVE` gates something · `SNAPSHOT` read only by the `main.dart:80-92` analytics
 event · `DEAD` read nowhere.
 **Recommendation** · `KEEP` · `CUT` (delete the flag; the feature exists and is permanent, or
@@ -344,6 +366,11 @@ not exist — the flags are `const`, so runtime override is impossible by constr
 
 Acting on this reduces `feature_flags.dart` from 113 boolean flags to **~49** — 11 kept and
 38 deferred — and every one of those 49 would then mean something.
+
+> **OUTCOME, 2026-09-04.** This was acted on. KAN-32 deleted 98 flags and the file now carries
+> **17**, below the ~49 projected here — the CUT and DEFER categories were applied more
+> aggressively than the recommendation. The tally above is the record of the decision, not
+> outstanding work.
 
 **The `CUT` majority is the finding.** 62 flags describe features that already ship. They
 were never switches; they were a checklist someone kept ticking, and the file became a
