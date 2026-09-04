@@ -201,7 +201,9 @@ The two GitHub Actions workflows that remain are **gates, not deploy targets**. 
 
 Neither one deploys anything. Cloudflare builds from its own trigger, independently of Actions — **a red Actions check does not stop a Cloudflare deploy**, so a green Cloudflare build is not evidence that the gates passed.
 
-**`ci.yml` is currently red on every run and has never passed** (12/12 failures as of 2026-08-30) — `flutter analyze` exits non-zero on 55 warnings and 160 infos. Until that is fixed it gates nothing. Do not read its red X as noise, and do not treat "CI exists" as "CI passes."
+**`ci.yml` passes as of 2026-09-04** (`dabbler-code` `c46b5c5`). Verified by running both steps directly: `flutter analyze --no-pub --no-fatal-infos` exits 0 on **0 errors, 0 warnings, 56 infos**, and `flutter test` exits 0 on **103 tests across 9 files**. It had failed 12/12 runs through 2026-08-30 on 55 warnings and 160 infos; KAN-112 resolved all of them.
+
+**Green here is not green by construction.** The workflow pins `channel: stable` unpinned, so a future SDK bump can make a new lint fatal with no code change — the same mechanism that killed `deploy-web.yml`. Treat a red X as a real signal to investigate, not as the known-broken state it used to be.
 
 ### Supabase Project
 
