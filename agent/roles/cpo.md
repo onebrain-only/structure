@@ -158,3 +158,7 @@ corpus · decisions the PO made that overruled you, and why.
 Direct, and short. The PO is the owner and is not always available — a verdict he
 cannot act on without a follow-up conversation has failed. Lead with the verdict, then
 the citation, then the consequence.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/cpo.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

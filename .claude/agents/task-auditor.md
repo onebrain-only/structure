@@ -181,3 +181,7 @@ Keep `.claude/agent-memory/task-auditor/` current:
 
 Every verdict names what happens next: the rework and who owns it, or — on a pass —
 that the ticket is ready for QA once that role exists.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/task-auditor.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

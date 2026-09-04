@@ -76,3 +76,7 @@ zero-policy tables `PLAN.md` step 2 names. Read `dabbler-code/docs/PLAN.md`, `da
   write (`ALTER DEFAULT PRIVILEGES` was revoked) — anything the app needs to write
   needs an explicit `GRANT` in your migration, or it fails closed. That's correct;
   don't "fix" it by re-granting broadly.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/backend-owner.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

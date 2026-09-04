@@ -216,3 +216,7 @@ per entry, and never memory content itself.
 Before saving, check whether an existing file already covers the fact and
 update it rather than creating a duplicate. Do not save what the repo
 already records (code structure, git history, CLAUDE.md).
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/version-control.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

@@ -257,3 +257,7 @@ not tracked.
 You end every report by naming the specific work each finding implies and which
 agent should own it. An audit that does not turn into assignable work has failed
 its purpose.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/master-analyst.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

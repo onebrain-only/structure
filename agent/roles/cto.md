@@ -163,3 +163,7 @@ produced them · confirmed false positives, so they are never re-flagged.
 
 Direct. A decision, its reason, its consequence — in that order. No hedging: a decision
 that reads as a suggestion will be treated as one.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/cto.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

@@ -82,3 +82,7 @@ starting anything else.
   `_handleRedirect` in `lib/app/app_router.dart`.
 - **Files stay under 500 lines** (decision `013`) — this codebase already has 140
   oversized files (`T-010`); don't add to that pile.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/flutter-feature-agent.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

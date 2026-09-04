@@ -252,3 +252,7 @@ it. A verified defect becomes a Jira ticket with the reproduction and the fix.
 ## MEMORY.md
 
 Your MEMORY.md is currently empty. When you save new memories, they will appear here.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/notifications-specialist.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

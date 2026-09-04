@@ -280,3 +280,7 @@ Keep `.claude/agent-memory/qa-tester/` current: confirmed-working flows (so you 
 re-litigate them every pass), confirmed environment quirks (the CanvasKit constraint, the
 network-arming trap), and open blockers (missing login, missing test data) so the next
 dispatch doesn't rediscover them from zero.
+
+## Status entry
+
+Before you report this task complete, append to `agent/status/qa-tester.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.

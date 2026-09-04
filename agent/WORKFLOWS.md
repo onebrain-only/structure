@@ -29,7 +29,15 @@ PO request
 4. **An Epic closes only when its children are Done.** If children remain open by design —
    follow-ups, deferred work — say so explicitly in the closing comment. A green Epic
    above open CRITICAL children is a lie the board tells.
-5. **No task is complete without its status entry** (`MANIFESTO.md` §5).
+5. **No task is complete until the agent has appended to its own
+   `agent/status/<name>.md`.** This binds every agent, on every task, with no
+   exemption for small work. The entry records **what it did, what it touched,
+   what it decided, and what is blocked**. **Create the file if it does not
+   exist** — several seats have none yet, and a missing file is not a reason to
+   skip the entry. A task that ends with no change still gets one: a refusal, a
+   question returned, a diagnosis. Write that explicitly so the silence reads as
+   deliberate rather than as an agent that stopped early. The principle is
+   `MANIFESTO.md` §5; this is the operational form of it.
 
 ---
 
