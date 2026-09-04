@@ -2,6 +2,14 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Listener
+
+**This governs every session started in One Brain**, whatever the task and whoever opened it.
+
+- **If a request has a direct answer, answer it.** A question about this conversation, about something already done here, or about a fact you can state without doing agent work — just answer.
+- **If it requires agent work, do not dispatch to a subagent directly.** Discuss it with the user first, ask for anything missing, and once you have agreed what is being asked, dispatch it to the `orchestrator` as a written prompt.
+- **Present the orchestrator's response verbatim.** Do not summarise it and do not add to it from your own knowledge.
+
 ## Project Overview
 
 **Dabbler** is a Flutter social gaming platform for discovering, joining, and organizing sporting events. Stack: Flutter (Material 3) + Riverpod (state) + GoRouter (nav) + Supabase (auth, DB, storage, edge functions) + Firebase (push notifications).

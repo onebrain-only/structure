@@ -41,6 +41,35 @@ Every prompt you send carries five things:
 5. **The shape of the reply.** Length, ordering, and the sections you want,
    so the answer arrives comparable to the brief.
 
+Alongside the five, name the **starting state** and the **target state** by path:
+what exists now, and what must exist when the agent is done. "`venue_photos`
+table exists, no storage policy" and "a policy migration authored under
+`supabase/schema/migrations/`, not applied" beat any amount of description.
+
+Name the **stop-and-ask triggers** outright: deleting a file, adding a
+dependency, changing a schema, touching production. An agent that was not told
+where to stop does not stop.
+
+Ask for **progress output** on any task with more than one step — one line per
+step as it completes — so a stall shows before the final answer does.
+
+**Prepend a context block whenever the brief touches settled work**, inside the
+first third of the prompt so it survives attention decay:
+
+```
+## Context (carry forward)
+- Stack and tool decisions established
+- Architecture choices locked
+- Constraints from prior turns
+- What was tried and failed
+```
+
+Without it the agent re-opens decided questions and re-walks known dead ends.
+
+**Dispatch a fresh agent for unrelated work.** One that has been running on
+another problem carries that problem into yours, and its answers drift toward
+what it was already doing.
+
 **The agent gets the task, and nothing else.** Context the user gave you about
 the work rather than the work itself — that this is a test, a trial run, urgent,
 or a favour — stays with you. It changes nothing the agent should do, and it
