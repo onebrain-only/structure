@@ -1,71 +1,83 @@
 # Dabbler — Project State
 
-**Audit run:** 2026-09-01 (run 4, launch-readiness refresh — see **§22**) · **Branch:** `Canary` · **HEAD:** `fd4df5a`
-**Prior runs:** 2026-08-26 (baseline) · 2026-08-27 (inventory) · 2026-08-28 (hygiene)
+**Audit run:** 2026-09-04 (run 6, staleness refresh — see **§24**) · **Branch:** `Canary` · **HEAD:** `c46b5c5`
+**Prior runs:** 2026-08-26 (baseline) · 2026-08-27 (inventory) · 2026-08-28 (hygiene) · 2026-09-01 (runs 4 & 5, launch-readiness)
 **Owner:** `master-analyst` · **Scope:** whole repo + Supabase project `wtncuzcskpigqpmnxwws`
-**Verification (2026-09-01):** `flutter analyze --no-pub` → **0 errors**, 37 warnings, 93 issues total.
-`flutter test` → **103 tests, all pass.** (Run 1 read 55 warnings / 157 total / 66 tests.)
+**Verification (2026-09-04):** `flutter analyze --no-pub` → **0 errors, 0 warnings, 56 infos.**
+`flutter analyze --no-fatal-infos` (the exact CI step) → **exit 0.** `flutter test` → **103 tests, all pass.**
+Working tree **clean**; HEAD is **1 commit ahead of `origin/Canary`** (`c46b5c5`, unpushed).
 
-> **Read §22 first.** As of 2026-09-01 the working tree carries **109 uncommitted files in
-> `lib/`** (594 insertions, 30,762 deletions). Measurements taken from the tree describe a
-> build that is **not committed, not on `Canary`, and not deployed.** §22a states the gap.
-
-This is a living document. Every concrete claim below carries a `file:line` or a number
-produced by a scan in this run. Nothing here is estimated.
+> **Read §24 first.** **47 commits landed between run 4's `fd4df5a` and this run's `c46b5c5`.**
+> Six of them are deletion passes (KAN-31/KAN-32) that invalidate the counts in §1, §3, §14 and
+> §20b wholesale: **`lib/features/` holds 20 slices, not 25**, **17 boolean feature flags, not
+> 113**, and **no slice in `lib/features/` is DEAD any more.** Sections below this line are
+> preserved as the historical record of runs 1–5; where §24 disagrees with them, **§24 wins.**
 
 ---
 
 ## 1. Executive summary
 
-Ranked by impact.
+> **Status banner added run 6, 2026-09-04.** Every numbered item below is a run-1 finding. The
+> `[RESOLVED]` / `[OPEN]` / `[CHANGED]` tag on each is a run-6 re-measurement against `c46b5c5`.
+> The original text is left intact — the point of this document is the trajectory, not a clean slate.
 
-1. **Unauthenticated cross-tenant data leak.** `public.v_notifications_feed` and
-   `v_notifications_ranked` are `SECURITY DEFINER` views over `notifications` with **no
-   `WHERE to_user_id = auth.uid()`**. Queried as the `anon` role — the key that ships inside
-   the public web bundle — they return **609 rows across 49 distinct recipients**, exposing
-   `to_user_id`, `title`, `body`, `action_route`, `context`. No login required. **CRITICAL.**
-2. **The moderation surface is open to `anon` too.** `v_mod_queue_open` returns 9 open
-   moderation tickets and `v_safety_overview` returns admin metrics to an unauthenticated
-   caller. The app gates the *screens* correctly via `rpc('is_admin')`
-   (`lib/features/admin/presentation/screens/moderation_queue_screen.dart:24`) — the
-   database does not gate the *data*. **CRITICAL.**
-2b. **The definer-view problem is ~2× larger than first reported.** 71 views, **49** `SECURITY DEFINER`, **19** anon-readable with no uid predicate — corrected 2026-08-27 after the original figures took an advisor's finding count for a population count. 5 confirmed leaking, 12 never examined. **CRITICAL.** See `SCHEMA.md` §2 for a per-view position.
-3. **The rewards slice is 20,545 LOC of unreachable code.** Its entry point,
-   `lib/features/rewards/presentation/providers/rewards_providers.dart`, has **zero
-   importers**. Every rewards controller is watched only from inside that same file. The
-   only live rewards code is daily check-in (~985 LOC). `FeatureFlags.enableRewards` gates
-   a stub.
-4. **The `games` clean-architecture stack is dead and would be broken if it weren't.**
-   `supabase_games_datasource.dart` issues 20 direct `.from(games)` queries; `public.games`
-   has RLS enabled with **zero policies**, so `select count(*) from games` as `authenticated`
-   returns **0**. Nothing watches `gamesControllerProvider` outside `games_providers.dart`.
-   The live game path uses `v_game_card` + RPCs in
-   `lib/features/games/presentation/controllers/game_view_controller.dart:399`.
-5. **113 feature flags, 10 of which gate anything.** 98 are read nowhere outside
-   `feature_flags.dart`; 5 more exist only to be logged into an analytics snapshot at
-   `lib/main.dart:80-92`. `FeatureFlags.squads` is snapshot-only while `lib/features/squads/`
-   (136 LOC) has zero importers — the flag promises a feature that does not exist.
-6. **Every test covers dead code.** All 5 test files and all 66 passing tests target the
-   games clean-arch usecases and `RegisterUseCase` — none of which any screen reaches.
-   Zero tests touch the live path: `game_view_controller`, the notification stack,
-   `auth_service`, or `profiles_repository_impl`.
-7. **`SettingsRepositoryImpl` is 26 methods of `UnimplementedError`**
-   (`lib/features/profile/data/repositories/settings_repository_impl.dart:111-237`) and it is
-   *wired live* into `privacy_controller.dart:60`. `settings_screen.dart:1194` catches
-   `on UnimplementedError` — the author knows and is swallowing it.
-8. **6,213 LOC of orphan screens** across 10 files nothing imports, plus a 632-LOC
-   `.broken` file still in the tree, plus `_PlaceholderScreen` rendering "Coming Soon" on
-   6 registered routes.
-9. **Two live bucket-name traps.** `SupabaseConfig.venueImagesBucket = 'venue-images'`
-   (`lib/core/config/supabase_config.dart:4`) — no such bucket exists; the real one is
-   `venue`, and it has **zero storage policies**, so nothing can be written to it.
-   `supabase_profile_datasource.dart:16` hardcodes `'avatars'` — also non-existent.
-10. **Documentation is stale but not lying.** `docs/LOCATION.md` and `docs/NOTIFICATIONS.md`
-    were last touched 2026-07-12; `lib/features/notifications/` last changed 2026-08-14 and
-    was substantially rewritten in between (`c74d6e1`, `3b7fd50`, `09ca8fe`).
-    `docs/AGENTS.md` describes a 10-agent roster; 4 agents exist.
+Ranked by impact **as first reported (2026-08-26)**.
 
----
+1. **[RESOLVED 2026-09-04]** ~~Unauthenticated cross-tenant data leak.~~ `v_notifications_feed`
+   and `v_notifications_ranked` now carry **`security_invoker=on`** (`pg_class.reloptions`,
+   verified 2026-09-04) and `public.notifications` has `relrowsecurity = true`. Probed as `anon`:
+   **0 rows, 0 distinct recipients** (was 609 rows / 49 recipients). See §24c for the caveat that
+   §23c attached to this probe method.
+2. **[RESOLVED 2026-09-04]** ~~The moderation surface is open to `anon` too.~~
+   `has_table_privilege('anon', 'v_mod_queue_open', 'SELECT')` and the same for
+   `v_safety_overview` both return **false**. The grant is gone, not merely predicated.
+2b. **[CHANGED — materially smaller]** The definer-view population re-measured 2026-09-04:
+   **72 views · 32 `security_invoker` · 40 definer · 41 anon-readable · 11 both definer *and*
+   anon-readable.** Run 1 read 71/49/19. Of the 11, **2 are PostGIS system views**
+   (`geography_columns`, `geometry_columns` — known false positive), **6 carry an `auth.uid()`
+   predicate**, and **3 do not**: `username_registry_public`, `v_potential_vibes_default`,
+   `v_recreate_quickpicks` — all three return **0 rows to `anon`**. **MEDIUM**, not CRITICAL.
+   Full listing in §24c.
+3. **[RESOLVED 2026-09-04]** ~~The rewards slice is 20,545 LOC of unreachable code.~~ Commit
+   `0b32cc6` deleted it. `lib/features/rewards/` is now **4 files / 690 LOC**, all Early Bird
+   check-in, with **6 external importers**. `FeatureFlags.enableRewards` **no longer exists**;
+   it was renamed to `enableEarlyBirdCheckIn` and is `false`. **The residue moved, it did not
+   vanish:** `lib/data/models/rewards/` is 15 files / **5,209 LOC with zero importers** — new
+   finding DEAD-24 in §24d.
+4. **[OPEN — unchanged]** The `games` clean-architecture stack is still dead.
+   `gamesControllerProvider` has **0 call sites outside `lib/features/games/providers/games_providers.dart`**
+   (grep, 2026-09-04). `supabase_games_datasource.dart` still issues 42 `.from(` calls.
+   `lib/features/games/{data,domain/usecases,domain/repositories}` = **8,608 LOC**. This is now
+   the single largest dead structure in the repo.
+5. **[RESOLVED 2026-09-04]** ~~113 feature flags, 10 of which gate anything.~~ `474c8d3` deleted
+   98. `feature_flags.dart` now declares **17 `static const bool` flags — 12 true, 5 false** —
+   plus one mutable `static bool isAllSportsInInterests`. **`FeatureFlags.squads` survives as an
+   analytics-snapshot flag while `lib/features/squads/` is deleted** — the mismatch run 1 named
+   is still there, in the opposite direction. See §24d, FLAG-04.
+6. **[RESOLVED 2026-09-04]** ~~Every test covers dead code.~~ **9 test files, 103 tests, all
+   pass**, and four of them target the live path: `profiles_repository_impl_test.dart`,
+   `game_view_controller_test.dart`, `game_view_controller_network_test.dart`,
+   `notifications_repository_impl_test.dart`, `notifications_controller_test.dart`.
+7. **[RESOLVED 2026-09-04]** ~~`SettingsRepositoryImpl` is 26 methods of `UnimplementedError`.~~
+   The file is now **99 LOC with 0 `UnimplementedError`**. Repo-wide the count fell from ~78 sites
+   to **5**, of which 2 are commented out and 1 is a `catch` clause. Only 2 are live throws, both
+   in `auth_providers.dart:271,290`, both unwatched.
+8. **[RESOLVED 2026-09-04]** ~~6,213 LOC of orphan screens · a 632-LOC `.broken` file · 6
+   placeholder routes.~~ `2c89e4d` deleted 9 unreachable screens, `3723860` two orphan classes,
+   `ba039d6` more. **`find . -name '*.broken'` returns nothing.** Every one of the nine classes
+   run 1 named (`CreatePostScreen`, `ExploreNearbyScreen`, `FavoriteVenuesScreen`, `PaymentSheet`,
+   `BookingSummaryModal`, `VenuesNearbyScreen`, `SportsHistoryScreen`,
+   `RewardsAnalyticsDashboard`, `CreateGameScreen`) now has **zero references in `lib/`** — the
+   classes are gone, not orphaned. **6 `_PlaceholderScreen` routes remain** plus the inline
+   "Language Selection - Coming Soon" at `app_router.dart:603`; none is reachable from a button
+   (§24b).
+9. **[RESOLVED 2026-09-04]** ~~Two live bucket-name traps.~~ `supabase_config.dart:3-4` now reads
+   `avatarsBucket = 'Avatar'` and `venueImagesBucket = 'venue'`. The hardcoded `'avatars'` in
+   `supabase_profile_datasource.dart` is gone — `grep -rn "'avatars'" lib` returns nothing.
+10. **[OPEN — and now worse]** Documentation is stale. Run 6 is itself the evidence: this
+    document, `CONTRACT.md`, `ROADMAP.md` and `CLAUDE.md` all described a tree that stopped
+    existing 47 commits ago, and two downstream analyses inherited it. §24e lists what each
+    document must change.
 
 ## 2. Mental model
 
@@ -96,40 +108,49 @@ overstates coverage of anything that ships.
 
 ## 3. Feature completion table
 
-All 25 slices in `lib/features/`. "Routed" = screen class appears in `lib/app/app_router.dart`.
-Status is judged on **reachability**, not file count.
+> **Superseded and rewritten 2026-09-04 (run 6).** The 25-slice table this section carried was
+> measured on 2026-08-26. Commit `34f9a6d` (KAN-31) deleted five slices — `squads`, `payments`,
+> `audit_safety`, `display_names`, `bench_mode` — every one of which this table had already
+> marked **DEAD**. The deletions were this document's own findings being executed. The old table
+> is not reproduced; its verdicts are in the changelog and in §20b's history.
 
-| Feature | LOC | Screen files | Routed | Tests | Status | Evidence |
-|---|---:|---:|---|---|---|---|
-| `profile` | 40,854 | 19 | 18/18 classes | 1 file | **PARTIAL** | Live via `lib/data/repositories/profiles_repository_impl.dart` (221 LOC). `data/repositories/settings_repository_impl.dart:111-237` = 26× `UnimplementedError`; `data/repositories/profile_stats_repository.dart:7-69` = 8× `UnimplementedError` |
-| `social` | 28,827 | 6 | 5/6 | none | **SHIPPED** | 1 orphan: `CreatePostScreen` (`presentation/screens/create_post_screen.dart`, 1,196 LOC, 0 importers) |
-| `rewards` | 20,545 | 1 | 0 | none | **SCAFFOLD** | `presentation/providers/rewards_providers.dart` has 0 importers; all 7 dashboard classes in `presentation/screens/rewards_analytics_dashboard.dart` orphaned. Only check-in is live |
-| `auth_onboarding` | 17,471 | 16 | 14/14 classes | 1 file | **SHIPPED** | Fully routed. `presentation/providers/auth_providers.dart:265,289` throw `UnimplementedError` but are never watched |
-| `games` | 16,792 | 3 | 1/3 | 3 files | **PARTIAL** | Only `join_game/game_detail_screen.dart` routed. `data/` + `domain/usecases/` = 5,674 LOC with 0 external consumers |
-| `misc` | 8,260 | 12 files / 6 classes | 5/6 | none | **PARTIAL** | `create_game_screen.dart` (763) orphan + `create_game_screen.dart.broken` (632) still tracked |
-| `explore` | 7,664 | 8 files / 7 classes | 3/7 | none | **PARTIAL** | Orphans: `ExploreNearbyScreen`, `FavoriteVenuesScreen`, `PaymentSheet`, `BookingSummaryModal` |
-| `notifications` | 4,204 | 1 | 1/1 | none | **SHIPPED** | Every non-generated file has an importer; `NotificationsScreenV2` routed at `app_router.dart:95` |
-| `location` | 3,602 | 1 | 0 (widget lib) | none | **PARTIAL** | 18 external importers for its widgets; `saved_locations_screen.dart` reached via push, not routed |
-| `venues` | 3,528 | 2 | 1/2 | none | **PARTIAL** | `VenuesNearbyScreen` (619 LOC) orphan |
-| `home` | 3,461 | 2 | 2/2 | none | **SHIPPED** | 6 external importers |
-| `venue_submissions` | 1,670 | 3 | 3/3 | none | **SHIPPED** | 3 router imports |
-| `news` | 1,604 | 1 | 1/1 | none | **SHIPPED** | routed; recent feature (`a24cf1b`) |
-| `admin` | 889 | 2 | 2/2 | none | **SHIPPED** | screens correctly gated on `rpc('is_admin')` |
-| `activities` | 622 | 0 | n/a | none | **SHIPPED** | widget-only slice, 3 external importers |
-| `payments` | 503 | 0 | n/a | none | **DEAD** | 0 external importers across all 6 files |
-| `moderation` | 285 | 0 | n/a | none | **SHIPPED** | provider-only, 2 external importers |
-| `audit_safety` | 145 | 0 | n/a | none | **DEAD** | single `providers.dart`, 0 importers |
-| `squads` | 136 | 0 | n/a | none | **DEAD** | 0 importers; `FeatureFlags.squads` is snapshot-only |
-| `app_boot` | 117 | 0 | n/a | none | **SHIPPED** | 1 importer |
-| `username_engine` | 114 | 0 | n/a | none | **SHIPPED** | 1 importer; `username_consumer.dart:19` has a `dead_null_aware_expression` warning |
-| `display_names` | 90 | 0 | n/a | none | **DEAD** | 0 importers |
-| `bench_mode` | 84 | 0 | n/a | none | **DEAD** | 0 importers |
-| `error` | 53 | 0 | routed | none | **SHIPPED** | `ErrorPage` at `app_router.dart:1706` |
-| `core` | 18 | 0 | n/a | none | **SHIPPED** | 1 importer |
+All **20** slices in `lib/features/`, measured at `c46b5c5` on 2026-09-04.
+`LOC` excludes `*.g.dart` and `*.freezed.dart`. `Ext imp` = references to `features/<slice>/`
+from outside that slice. `Router` = references to the slice in `lib/app/app_router.dart`.
 
-**Counts:** SHIPPED 12 · PARTIAL 6 · SCAFFOLD 1 · DEAD 6.
+| Feature | LOC | Screen files | Ext imp | Router | Status | Evidence / what changed |
+|---|---:|---:|---:|---:|---|---|
+| `profile` | 36,600 | 16 | 56 | 18 | **SHIPPED** | Was PARTIAL. Both `UnimplementedError` clusters are gone: `data/repositories/settings_repository_impl.dart` is 99 LOC / 0 throws; `profile_stats_repository.dart` no longer exists |
+| `social` | 27,593 | 5 | 58 | 6 | **SHIPPED** | `CreatePostScreen` deleted (`2c89e4d`), so the one orphan is gone. Still the largest churn surface |
+| `games` | 15,470 | 1 | 12 | 1 | **PARTIAL** | Unchanged verdict, unchanged cause: `data/` + `domain/usecases/` + `domain/repositories/` = **8,608 LOC**, `gamesControllerProvider` has 0 external call sites |
+| `auth_onboarding` | 12,125 | 21 | 43 | 25 | **SHIPPED** | Was 17,471 LOC; `f932c8a` collapsed the profile onboarding flow. `auth_providers.dart:271,290` still throw `UnimplementedError`, still never watched |
+| `misc` | 7,458 | 5 | 45 | 5 | **PARTIAL** | `create_game_screen.dart` and its `.broken` twin both deleted. Remaining concern is `transactions_screen.dart` (INV-05, fabricated money) |
+| `explore` | 5,598 | 5 | 7 | 3 | **SHIPPED** | Was PARTIAL on 4 orphans; all 4 deleted (`2c89e4d`). No orphan class remains |
+| `location` | 3,602 | 1 | 18 | 0 | **SHIPPED** | Widget library, 18 external importers. Not routed by design |
+| `home` | 3,403 | 2 | 7 | 2 | **SHIPPED** | — |
+| `notifications` | 3,197 | 1 | 7 | 1 | **SHIPPED** | Now has 2 dedicated test files. NAV-01a (`/games/<id>` dead push) needs re-verification — see §24f |
+| `venues` | 2,287 | 1 | 11 | 1 | **SHIPPED** | Was PARTIAL on `VenuesNearbyScreen`; deleted |
+| `venue_submissions` | 1,670 | 3 | 4 | 3 | **SHIPPED** | — |
+| `news` | 1,604 | 1 | 7 | 1 | **SHIPPED** | — |
+| `admin` | 889 | 2 | 2 | 2 | **SHIPPED** | Screens gated on `rpc('is_admin')`; the DB now gates the data too (§1 item 2) |
+| `rewards` | **690** | 0 | 6 | 0 | **SHIPPED** | **Was 20,545 LOC / SCAFFOLD.** `0b32cc6` deleted the unbuilt rewards system. What is left is 4 files of Early Bird check-in, gated `false` by `enableEarlyBirdCheckIn` |
+| `activities` | 623 | 0 | 6 | 0 | **SHIPPED** | Widget-only slice |
+| `moderation` | 285 | 0 | 2 | 0 | **SHIPPED** | Provider-only |
+| `app_boot` | 117 | 0 | 2 | 0 | **SHIPPED** | — |
+| `username_engine` | 114 | 0 | 1 | 0 | **SHIPPED** | The `dead_null_aware_expression` warning is gone (0 analyze warnings repo-wide) |
+| `error` | 53 | 1 | 1 | 1 | **SHIPPED** | `ErrorPage` routed |
+| `core` | 18 | 0 | 1 | 0 | **SHIPPED** | — |
 
----
+**Counts: SHIPPED 18 · PARTIAL 2 · SCAFFOLD 0 · DEAD 0.** (Run 1: 12 · 6 · 1 · 6.)
+
+**The load-bearing fact: there is no DEAD slice left in `lib/features/`.** Every one of the 20
+has at least one external importer. That is not a re-rating — the six DEAD slices were deleted
+and the SCAFFOLD one was cut to its live core.
+
+**Total non-generated Dart in `lib/`: 196,756 LOC** (210,275 including generated). Run 1 read
+~226,000. The reachability problem has not moved to zero — §24d lists **6,239 LOC** of
+confirmed-dead code the deletion passes left behind outside `lib/features/`, on top of the
+**8,608 LOC** dead `games` clean-arch stack inside it — **14,847 LOC total.**
 
 ## 4. Findings
 
@@ -535,6 +556,7 @@ Do not open tickets for these.
 
 | Date | Run | Summary |
 |---|---|---|
+| 2026-09-04 | 6 (staleness refresh) | **47 commits landed between run 4's `fd4df5a` and `c46b5c5`; six are deletion passes, and they invalidated most of this document's counts.** `lib/features/` is **20 slices, not 25** (`34f9a6d` deleted the five §3 had marked DEAD). `feature_flags.dart` declares **17 boolean flags — 12 true, 5 false — not 113** (`474c8d3`); **`enableRewards` no longer exists.** `rewards` fell **20,545 → 690 LOC** (`0b32cc6`). **No slice in `lib/features/` is DEAD any more** — every one of the 20 has an external importer. **Seven run-1 headline findings RESOLVED:** both `anon` CRITICALs (notification views now `security_invoker=on` over an RLS'd base table, moderation views' `anon` SELECT grant revoked — 0 rows on both), the 26-method `SettingsRepositoryImpl` (now 99 LOC / 0 throws), the orphan screens and the `.broken` file (all deleted), the bucket-name traps, the dead-code-only test suite (**103 tests, 5 files now on the live path**), and **INV-01/WIRE-09** — the Message button is hidden at `user_profile_screen.dart:1113` behind `messaging = false`. **CI is green**: `flutter analyze --no-fatal-infos` exits 0 on **0 errors / 0 warnings / 56 infos**, contradicting `CLAUDE.md`'s "never passed". **§20b is retired**: `cpo` was right that it and §3 shared only 15 of 25 names — **§20b was a *capability* census labelled a *slice* census**, and the matching total was a coincidence nobody checked. **New: 6,239 LOC of residue the deletion passes left behind** (`lib/data/models/rewards/` 5,209 LOC / 0 importers; four orphan repository pairs 829 LOC; `models/payments/` 201 LOC), plus **two undeclared navigation targets** — `/bookings/<id>` at `notifications_screen_v2.dart:543` (one line below the NAV-01a fix) and `/phone-input` from two live screens. **Self-correction inside this run:** my first definer-view query tested `security_invoker=true`; the stored value is `security_invoker=on`, and the wrong predicate would have reported the fixed notification views as still leaking. Caught by reading `reloptions` raw before publishing. |
 | 2026-08-29 | 1z (**backlog close-out — both NAV findings withdrawn, one real dead end found in their place**) | **Correcting my own run-1x navigation graph, which over-reported in the direction of alarm.** **NAV-02 withdrawn:** `onboarding_sports_screen.dart:194` reads `context.go(RoutePaths.createUserInfo)`, a declared route — `onboardingBasicInfo` appears nowhere in `lib/` outside `route_constants.dart` and left that file at `2523def`. **And it was never launch-critical:** `onboardingSports`→`onboardingPreferences`→`onboardingPrivacy`→`onboardingCompletion` is a closed four-screen cluster whose only inbound edges come from inside itself; the live chain runs `intent_selection`→`interests_selection`→`onboardingPrimarySport` and never enters it. Flagged by `flutter-feature-agent-5` and `task-auditor-11`, verified independently here. **NAV-01 withdrawn:** `social_search_screen.dart:1811` reads `context.push(RoutePaths.gameDetail(game.id))` and resolves. **NAV-01a is new and real:** `notifications_screen_v2.dart:518` pushes `/games/<id>` — the only remaining `/games/` literal in `lib/`, matching no route, on a live bottom-nav screen. Slice verdicts: `search` returns to **SHIPPED**, `notifications` moves to **PARTIAL**; totals unchanged at 12/6/1/6. **Root cause of both bad rows: the constant-name match and the `file:line` came from separate passes, so the cited line was never re-read.** Same class as the 14 false positives §14e already documents, but failing the other way. Also this run: §2a's three `CRITICAL/OPEN` labels struck (KAN-56 closed them; the resolution note was present but the rows still read OPEN). |
 | 2026-08-29 | 1y (SEC-02/SEC-03 resolved · two loops closed) | **Both moderation-surface leaks are closed, and my urgent flag turned out to be a third confirmation of a fix already live.** KAN-56 shipped before my message landed. Re-verified as `anon`: **`v_mod_queue_open` and `v_safety_overview` raise `42501 permission denied`** — grant revoked, a stronger closure than zero rows; **`v_circle_feed` 0 rows** (was 6, private-circle posts) and `v_circle_feed_visible` 0, both invoker. Controls unchanged — `v_game_card` 216, `v_comments` 66. **The pre-flight I sent — revoke `v_mod_queue_open` rather than flip it, because both policies on `moderation_reports` deny SELECT — matched the ruling that had already shipped.** Recorded as independent confirmation. **It was still worth running:** had the migration flipped instead of revoked, the admin queue would have gone blank and the check would have caught it. **`kan27a`'s "applied by an unidentified actor" is closed too** — it was `cto` under `G-002`, traced through the Jira history by `team-lead` (KAN-27 comment 10166). Nothing for me to reconcile; the handoff in that file's header is discharged. **PO decision recorded: `INDEX.md` stays at `.claude/agent-memory/master-analyst/INDEX.md`** and is not moved or duplicated under `docs/`. KAN-44's acceptance criterion cites a path that does not exist and should be read as citing this one. |
 | 2026-08-29 | 1x (inventory rework — KAN-40/41/42/44) | **Four inventory tickets reworked against `task-auditor`'s briefs.** **§14d** — full census of **102** screen/page/view classes with `file:line` and a per-class label: **73 ROUTED · 3 REACHED-BY-PUSH · 4 ORPHAN · 6 TRANSITIVELY DEAD · 16 PRIVATE HELPER**, method and script recorded. **102, not §13's 101** — the earlier matcher's definition was never written down, so the two are not comparable and I did not reconcile them by picking one. **§14e** — navigation graph diffed both directions. 90 declared routes vs 186 call sites. **31 declared-never-navigated** (URL-reachable on web, so discovery-bounded not access-bounded). **A naive name-based diff reported 16 dead ends; 14 were false positives** — path-builder functions, nested child routes, interpolation. **Two are genuine and both are live tap targets: NAV-01** (`social_search_screen.dart:1811` → `/games/<id>`, no such route) and **NAV-02** (`onboarding_sports_screen.dart:194` back button → `/onboarding-basic-info`, undeclared, on the launch-critical path). Bottom nav documented: **4 shell branches, 3 rendered** — the `community` branch has no item, and `RealFriendsScreen` is a working feature the bar cannot reach. **§15b** — hop-by-hop traces for the remaining 18 flows, entry → screen → provider → RPC/table. Three terminate in a placeholder and the trace says so rather than inventing a hop. **§20b** — slice verdicts re-judged: **12 SHIPPED · 6 PARTIAL · 1 SCAFFOLD · 6 DEAD**, three moved (`community` and `search` to PARTIAL on the new graph evidence). Nine SHIPPED slices re-checked and held. **`docs/INDEX.md` deliberately not created** — the artefact is `.claude/agent-memory/master-analyst/INDEX.md`; the AC cites the wrong path, and a second index would be a second authority. |
@@ -1469,7 +1491,31 @@ trap because moderation is a corpus commitment; the App Store requirement is the
 report/block mechanism, which exists and is live.
 
 
-## 20b. SLICE VERDICTS — the 25 slices re-judged against the 2026-08-29 evidence
+## 20b. SLICE VERDICTS — superseded 2026-09-04
+
+> **RETIRED, run 6.** This section is preserved as history. **Do not cite its counts.** Two
+> things broke it, and the second is a defect in the section itself, not in the code:
+>
+> 1. **The population is gone.** `34f9a6d` deleted five of the slices it judges. There are 20
+>    slices, not 25. **§3 (rewritten 2026-09-04) is the current authority.**
+> 2. **It never counted `lib/features/` in the first place.** `cpo` found that §3 and §20b both
+>    claimed "25 slices" while sharing only **15 names**. That is not a rounding difference —
+>    §20b's list contains `settings`, `search`, `comments`, `onboarding`, `community`/friends,
+>    `chat`, `circles`, `analytics`, `data_export` and "the 7-step game wizard", **none of which
+>    is a directory in `lib/features/`**. They are *user-facing capabilities*. §3's list is
+>    *directories*. Both were labelled "the 25 slices" and the coincidence of the number is
+>    exactly that — a coincidence, never noticed and never stated.
+>
+> **The correction, stated plainly: §20b was a capability census wearing a slice census's label.**
+> Its per-capability verdicts (chat is a placeholder, the game wizard is dead, the community tab
+> has no mobile door) were mostly *right about the capability* and should not be discarded —
+> they are re-verified in §24b. What must be discarded is the framing that let a reader add
+> §3's `payments` and §20b's `data_export` into one total. **Never again publish a count without
+> naming the unit it counts.**
+
+---
+
+### 20b (historical) — the 25 "slices" re-judged against the 2026-08-29 evidence
 
 *Added for KAN-44. §3's feature table classified the 25 slices on 2026-08-26 from LOC, screen
 count and routing. This section re-judges them against evidence that did not exist then — the
@@ -2187,3 +2233,185 @@ defect that survived my confident root-cause AND a shipped fix."* **That is the 
 `T-026` in one sentence, and it applies to every surface in §23e that is still unverified** —
 native, CI, and everything behind login. KAN-117 should be read as evidence for why those must be
 verified, not merely as a defect of its own.
+
+---
+
+## 24. Run 6 — staleness refresh, 2026-09-04
+
+**Trigger:** the team lead found six stale claims by hand and asked for a reconciliation.
+**What the measurement found: the staleness is roughly ten times what was reported.** Not six
+items — **47 commits**, six of them deletion passes, invalidating the counts in §1, §3, §14 and
+§20b, plus `CONTRACT.md`, `ROADMAP.md` and `CLAUDE.md`.
+
+**Baseline:** run 4/5 measured working tree `fd4df5a` on 2026-09-01. This run measures
+**committed HEAD `c46b5c5`**, working tree clean, 1 commit ahead of `origin/Canary`.
+
+### 24a. What moved — the six deletion passes
+
+| Commit | Ticket | What it removed | Effect on this document |
+|---|---|---|---|
+| `2c89e4d` | KAN-31 | 9 unreachable screens, 0 importers each | §1 item 8, §3 orphan column, §14a |
+| `34f9a6d` | KAN-31 | 5 dead feature slices: `squads`, `payments`, `audit_safety`, `display_names`, `bench_mode` | **§3 population: 25 → 20** |
+| `3723860` | KAN-31 | 2 orphan classes never instantiated | §14d census |
+| `474c8d3` | KAN-32 | 98 dead feature flags | **§1 item 5: 113 → 17** |
+| `4403597` | KAN-32 | 75 unreferenced route constants | **FLAG-02: 54 unused → 1** |
+| `b2adfba` | KAN-32 | deps `dabbler_design_system`, `cupertino_icons` | §21 hygiene |
+| `0b32cc6` | — | the unbuilt rewards system, keeping Early Bird check-in | **§1 item 3, rewards 20,545 → 690 LOC** |
+| `ba039d6` | — | unreferenced repositories, screens, theme JSON | §3, §21 |
+| `f932c8a` | — | collapsed profile onboarding, `hoster` → `host` | `auth_onboarding` 17,471 → 12,125 LOC |
+| `9bbab27` | P-029 | **reverses P-025** — restores PDPL data export | §20b `data_export` DEAD verdict void |
+| `f89f1d3`, `6ee2111` | KAN-112 | resolved all 55 analyze warnings, floated the SDK | **CI is green** — see §24g |
+
+**Every one of those deletion passes executed a finding from this document.** `34f9a6d` deleted
+exactly the five slices §3 marked DEAD. That is the audit working as intended, and it is worth
+saying so before the rest of this section says what it missed.
+
+### 24b. Capability verdicts, re-verified — replacing §20b
+
+§20b's per-capability verdicts, re-measured at `c46b5c5`:
+
+| Capability | §20b verdict | Now | Evidence |
+|---|---|---|---|
+| `chat` | DEAD (placeholder with a live button) | **DEAD — correctly gated** | `user_profile_screen.dart:1113` now reads `if (FeatureFlags.messaging) ...[` and `feature_flags.dart:20 messaging = false`. **The Message button is hidden.** Route guard at `app_router.dart:1563,1577` bounces to `/home` as a second layer. **INV-01 / WIRE-09 RESOLVED** |
+| the 7-step game wizard | DEAD | **DELETED** | `lib/features/games/presentation/screens/` now contains only `join_game/game_detail_screen.dart`. Live creation is `GameComposerScreen` (`misc`), routed 3× at `app_router.dart:1177,1202,1215` |
+| `data_export` | DEAD | **BUILT, flag-gated `false`** | P-029 reversed P-025. `lib/features/profile/services/data_export_service.dart` + 5 KAN-52 migrations + `supabase/functions/send-export-email`. Entry point gated at `account_management_screen.dart:217` |
+| `analytics` | DEAD (DEAD-22) | **LIVE** | `c1dd795` dropped local batching for the server-authoritative sink; `rpc_track_event` writes to `analytics_events` (verified 2026-08-29/31, re-affirmed by the KAN-32 judgment call at `feature_flags.dart:66-72`) |
+| `community` / friends | PARTIAL — "no bottom-nav door" | **PARTIAL — now a deliberate, documented gate** | `main_navigation_screen.dart:599` `if (FeatureFlags.enableCommunityMobileNav)`, flag `false` at `feature_flags.dart:61` with a comment naming KAN-85. Reachable via desktop side-nav. The door is closed on purpose, not by omission |
+| `notifications` game tap (NAV-01a) | PARTIAL | **RESOLVED** | `notifications_screen_v2.dart:540` now reads `context.push(RoutePaths.gameDetail(activity.subjectId))`. **`grep -rn "'/games/" lib` returns nothing** |
+| `circles`, `comments` | no consumer / just secured | **not re-measured this run** | Out of scope for a staleness pass; flagged in §24f |
+
+### 24c. Security — re-measured against production, 2026-09-04
+
+Read-only queries against `wtncuzcskpigqpmnxwws`. **No write was issued.**
+
+| Metric | Run 1 (2026-08-26/27) | Now | Verdict |
+|---|---|---|---|
+| Views, total | 71 | **72** | — |
+| `security_invoker` views | — | **32** | — |
+| Definer views | 49 | **40** | improving |
+| `anon`-readable views | — | **41** | — |
+| **Definer AND `anon`-readable** | 19 | **11** | **the number that matters** |
+| `anon` write grants (`INSERT`/`UPDATE`/`DELETE`) | 5 leaking views | **3 tables, all PostGIS** (`geography_columns`, `geometry_columns`, `spatial_ref_sys`) | **SEC-15 RESOLVED** |
+
+**The two CRITICALs are closed.**
+- `v_notifications_feed` and `v_notifications_ranked` both carry `reloptions = {security_invoker=on}`
+  and `public.notifications` has `relrowsecurity = true`. Probed as `anon`: **0 rows** (was 609
+  rows / 49 recipients).
+- `v_mod_queue_open` and `v_safety_overview`: `has_table_privilege('anon', …, 'SELECT')` = **false**.
+  The grant was revoked, which is stronger than a predicate.
+
+**The 11 remaining definer + anon-readable views, itemised:**
+
+| View | `auth.uid()` in body | Rows to `anon` | Read |
+|---|---|---:|---|
+| `geography_columns`, `geometry_columns` | no | — | **PostGIS system views. Known false positive — do not re-flag.** |
+| `v_challenge_card`, `v_meetup_list`, `v_my_games`, `v_rateable_after_game`, `v_recreate_candidates` | **yes** | — | predicate present; low risk |
+| `v_game_card` | yes | **217** | **not a leak** — public game discovery is the product. Named here so the next audit does not re-flag it |
+| `username_registry_public` | no | **0** | name asserts intent; 0 rows to `anon` |
+| `v_potential_vibes_default` | no | **0** | — |
+| `v_recreate_quickpicks` | no | **0** | — |
+
+**Method caveat, carried forward from §23c.** §23c retracted `set local role anon` as a
+*sufficient* control — it does not reproduce PostgREST's request path. The row counts above are
+**corroborating, not dispositive.** What *is* dispositive here is structural and does not depend
+on the probe: `security_invoker=on` plus `relrowsecurity=true` on the base table, and the absence
+of the `SELECT` grant on the moderation views. **A correction to my own run-6 first pass:** my
+initial query tested `'security_invoker=true' = any(reloptions)` and returned 24 invoker views.
+The actual stored value is **`security_invoker=on`**. That query was wrong and would have
+reported the notification views as still definer. Caught before publication by reading
+`reloptions` raw. **Test the encoding of a flag before counting on it.**
+
+### 24d. New findings — the residue the deletion passes left behind
+
+The KAN-31/KAN-32 passes deleted `lib/features/<slice>/` directories but not the code those
+slices owned elsewhere in the tree.
+
+| ID | Finding | LOC | Evidence |
+|---|---|---:|---|
+| **DEAD-24** | `lib/data/models/rewards/` — 15 files, **zero importers**. The only reference anywhere is a comment in `feature_flags.dart:26` that already calls it *"unreferenced dead code"* | **5,209** | `grep -rn "models/rewards" lib` returns one hit, and it is that comment |
+| **DEAD-25** | Four orphaned repository pairs left by `34f9a6d`. Each `_impl` is imported only by nothing, and each abstract only by its own `_impl`: `wallet_repository` (21+58), `bench_mode_repository` (25+178), `display_name_repository` (39+220), `audit_safety_repository` (54+234) | **829** | `grep -rn "<name>.dart" lib` — the only external hit for each is its sibling |
+| **DEAD-26** | `lib/data/models/payments/` — 2 files reachable only through the `lib/data/models/models.dart` barrel export (`:71-72`). A barrel export is not a consumer | **201** | no other reference in `lib/` |
+| **DEAD-27 (carried, unchanged)** | The `games` clean-arch stack: `lib/features/games/{data,domain/usecases,domain/repositories}`. `gamesControllerProvider` still has **0 call sites outside `games_providers.dart`**; `supabase_games_datasource.dart` still issues **42** `.from(` calls against `public.games` | **8,608** | grep, 2026-09-04 |
+| **NAV-02a** | **`notifications_screen_v2.dart:543` pushes `/bookings/<id>`, which matches no route and no constant.** Same file and same class of defect as NAV-01a, which was fixed one line above it at `:540` | — | `grep -rn "bookings" lib/app/app_router.dart lib/utils/constants/route_constants.dart` → **no output** |
+| **NAV-03** | **`/phone-input` matches no route and no constant**, and two live screens navigate to it: `transactions_screen.dart:837` and `activities_screen_v2.dart:608`, both `context.go` | — | `grep -rn "phone" lib/utils/constants/route_constants.dart` → no output; no `path:` in the router matches |
+| **FLAG-04** | **`FeatureFlags.squads = true`** (`feature_flags.dart:75`) survives as an analytics-snapshot dimension while `lib/features/squads/` is deleted. Run 1 flagged the same mismatch; the deletion made it worse, not better — the snapshot now reports a slice that does not exist. **But `squads` is not fully dead:** `data/repositories/squads_repository{,_impl}.dart` (874 LOC) is live via `lib/features/social/providers.dart:8-9` | — | see §24e |
+
+**Total confirmed dead: 6,239 LOC outside `lib/features/` + 8,608 inside it = 14,847 LOC.**
+
+### 24e. Corrections owed to downstream analyses
+
+The lead flagged that a CPO feature census and a CTO stack proposal inherited run-4 figures.
+**Every one of the claims below is now wrong.** Stated as replace-this-with-that:
+
+| Claim in the downstream analysis | Replace with |
+|---|---|
+| "25 feature slices" | **20**, at `c46b5c5` (`34f9a6d`) |
+| "113 flags, 112 true, exactly one false (`enableRewards`)" | **17 `static const bool` flags — 12 true, 5 false.** `enableRewards` **does not exist**; `0b32cc6` renamed it `enableEarlyBirdCheckIn`. The five false: `messaging`, `enableEarlyBirdCheckIn`, `enableDataExport`, `enablePayments`, `enableCommunityMobileNav`. **The "24 flag declarations" figure the lead cited over-counts** — it adds 6 predicate *methods* (`isSportEnabled`, `isLanguageEnabled`, `isProfileTypeEnabled`, `isGameTypeEnabled`, `getFeatureFlag`, `isMvpReady`) and one mutable `static bool isAllSportsInInterests` to the flag count. Those are helpers, not flags |
+| "`payments` slice DEAD at 503 LOC" | **The slice is deleted.** What remains is `lib/data/models/payments/` (201 LOC, barrel-only) and `data/repositories/wallet_repository{,_impl}.dart` (79 LOC, orphaned). **A `wallet` repository does remain in `lib/data/` — it is dead, but it exists.** Do not state "no payment repository remains" |
+| "`squads` DEAD" | **The slice is deleted, the repository is live.** `squads_repository_impl.dart` (762 LOC) is consumed by `lib/features/social/providers.dart`, which has 3 importers. And `FeatureFlags.squads` is still `true` |
+| "`rewards` SCAFFOLD, 14 RPCs live and unreachable" | **The slice is 690 LOC of Early Bird check-in and is SHIPPED-but-flag-gated.** The 20,545-LOC scaffold is deleted. The 14 RPCs were **not re-measured this run** — if the proposal leans on them, that number needs its own check (§24f) |
+| "`data_export` DEAD" | **Built, gated `false`.** P-029 reversed P-025 |
+| "the §3-vs-§20b slice populations" | **They were never the same unit.** §3 counts directories; §20b counted user-facing capabilities. See the §20b banner. Any figure derived by combining them is void |
+| "`SettingsRepositoryImpl` is 26 methods of `UnimplementedError`" | **99 LOC, 0 throws.** Repo-wide `UnimplementedError` count: **5 sites**, 2 commented, 1 a `catch` |
+| "6,213 LOC of orphan screens + a `.broken` file" | **Zero.** All nine named classes are deleted; `find . -name '*.broken'` returns nothing |
+| "two live bucket-name traps" | **Fixed.** `avatarsBucket = 'Avatar'`, `venueImagesBucket = 'venue'` (`supabase_config.dart:3-4`) |
+| "every test covers dead code" | **9 files, 103 tests, 5 of them on the live path** |
+| "49 definer views, 19 anon-readable with no uid predicate" | **40 definer, 11 definer-and-anon-readable, of which 2 are PostGIS and 6 carry a uid predicate** |
+
+### 24f. What this run did NOT measure
+
+Stated so nobody reads silence as a clean bill.
+
+- **The 14 rewards RPCs.** §20b claimed they are live and unreachable. Not re-checked.
+- **`circles` and `comments`** as capabilities.
+- **The §14d class census (102 classes) and the §14e navigation graph.** Both predate six
+  deletion passes. Their populations are certainly wrong; only the two NAV findings above were
+  re-derived. **A full census re-run is its own ticket.**
+- **§15b's 21 flow traces** — same reason.
+- **INV-03/04/05/06/07/08.** Only INV-01 was re-verified (resolved).
+- **§21's hygiene inventory** — `b2adfba` removed two dependencies; the rest is unre-measured.
+- **Anything behind login, on native, or in the live Cloudflare build.** §23g's lesson stands:
+  a measurement of the source is not a measurement of the app.
+
+### 24g. CI — a reversal worth naming
+
+**`CLAUDE.md` states `ci.yml` "is currently red on every run and has never passed"
+(12/12 failures as of 2026-08-30) and that it "gates nothing." That is no longer true.**
+
+Measured locally at `c46b5c5`:
+- `flutter analyze --no-pub` → **0 errors, 0 warnings, 56 infos.** (Run 4: 37 warnings / 93 total.
+  Run 1: 55 warnings / 157 total.)
+- `flutter analyze --no-fatal-infos` — **the exact command in `ci.yml`'s Analyze step** — **exit 0.**
+- `flutter test` → **103 tests, all pass, exit 0.**
+
+`f89f1d3` resolved the 55 warnings and floated the SDK to match `scripts/cloudflare-build.sh`;
+`6ee2111` cleaned up what the resolved SDK then surfaced. **Both CI steps pass on this HEAD.**
+Caveat: this is a local run on the developer's SDK. `ci.yml` deliberately floats `channel: stable`
+unpinned, so a future SDK bump can turn a new lint fatal without any code change — the same
+mechanism that killed `deploy-web.yml`. **Green today is not green by construction.**
+
+### 24h. Handoff
+
+| Finding | Work | Owner |
+|---|---|---|
+| DEAD-24, DEAD-25, DEAD-26 | Delete 6,239 LOC: `lib/data/models/rewards/`, the four orphan repository pairs, `lib/data/models/payments/` and their `models.dart` exports. Zero-importer deletions — the same shape as KAN-31 | `flutter-feature-agent` |
+| NAV-02a | `notifications_screen_v2.dart:543` — `/bookings/<id>` resolves to nothing. Either declare the route or remove the branch | `flutter-feature-agent` |
+| NAV-03 | `/phone-input` — two live `context.go` call sites to an undeclared route | `flutter-feature-agent` |
+| FLAG-04 | Decide `FeatureFlags.squads`: the snapshot dimension now reports a deleted slice. Either rename it to what it actually measures or drop it and accept the telemetry break | `cpo` decides, `flutter-feature-agent` executes |
+| DEAD-27 | The 8,608-LOC dead `games` clean-arch stack — the largest remaining dead structure. Delete or adopt; it cannot stay ambiguous | `cto` decides |
+| §24c, the 3 no-predicate definer views | `username_registry_public`, `v_potential_vibes_default`, `v_recreate_quickpicks` — confirm the 0-row result is by design, not by empty tables | `backend-owner` |
+| §24f | Re-run the §14d census, the §14e graph and the §15b traces against `c46b5c5`. They are six deletion passes stale | `master-analyst` (me) — own ticket |
+| §24g | Correct `CLAUDE.md`'s CI paragraph. **I do not write `CLAUDE.md`** — recommendation only | PO / `cto` |
+| §24e | Re-issue the CPO census and the CTO stack proposal against §3 and §24e | `cpo`, `cto` |
+
+### 24i. The lesson
+
+**A count is only true at a commit.** §3's "25 slices", §1's "113 flags" and §20b's "25 slices"
+were all correct when measured and all wrong within a week, and two downstream analyses spent
+real effort on them. The header of this document now carries the HEAD it was measured at, and
+**every count in §3 and §24 is stated with the commit it was taken from.** A number without a
+commit is a rumour with a decimal point.
+
+The second lesson is §20b's: **it labelled a capability census a slice census, and the two
+happened to total 25.** Nobody noticed for a week. **Name the unit, every time.**
+
