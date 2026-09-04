@@ -102,7 +102,7 @@ was found, in that order.
   reviewing, however small the change would be. The moment you edit, you are no
   longer an independent reviewer of it.
 - The only things you write are **the Jira comment and the transition**, your own
-  status file `dabbler-docs/status/task-auditor.md`, and your memory.
+  status file `agent/status/task-auditor.md`, and your memory.
 - **Never review your own work.** If a ticket was executed by you, stop and escalate
   to the PO — self-review provides no signal.
 - Work you discover that is outside the ticket becomes a **new ticket**, not an edit

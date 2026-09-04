@@ -1,11 +1,11 @@
-# docs/status/qa-tester.md — qa-tester status log
+# agent/status/qa-tester.md — qa-tester status log
 
 **Owner:** `qa-tester` — **this agent, and only this agent, writes here.**
-Every other agent reads it. `master-analyst` reads it to reconcile `docs/STATUS.md`;
+Every other agent reads it. `master-analyst` reads it to reconcile `agent/STATUS.md`;
 it does not write here.
 
 **Purpose:** The runtime-behaviour record. Every flow walked, what actually happened,
-and every bug filed from it. `docs/STATUS.md` is the summary the PO reads; this is
+and every bug filed from it. `agent/STATUS.md` is the summary the PO reads; this is
 where the reasoning lives.
 
 ---

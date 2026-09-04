@@ -1,7 +1,7 @@
-# docs/status/cpo.md — cpo status log
+# agent/status/cpo.md — cpo status log
 
 **Owner:** `cpo` — **this agent, and only this agent, writes here.**
-Every other agent reads it. master-analyst reads it to reconcile `docs/STATUS.md`;
+Every other agent reads it. master-analyst reads it to reconcile `agent/STATUS.md`;
 it does not write here.
 
 **Purpose:** The product judgement record. Every verdict on every idea, with the

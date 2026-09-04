@@ -1,4 +1,4 @@
-# docs/WORKFLOWS.md — Workflows and Handoffs
+# agent/WORKFLOWS.md — Workflows and Handoffs
 
 **Owner:** master-analyst (write) · all agents (read)
 **Last updated:** 2026-08-26

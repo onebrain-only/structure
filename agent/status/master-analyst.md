@@ -1,10 +1,10 @@
-# docs/status/master-analyst.md — master-analyst status log
+# agent/status/master-analyst.md — master-analyst status log
 
 **Owner:** `master-analyst` — **this agent, and only this agent, writes here.**
 Every other agent reads it. The master-analyst reads the other agents' files to reconcile
-`docs/STATUS.md`; it does not write into them.
+`agent/STATUS.md`; it does not write into them.
 
-**Purpose:** The detail behind this agent's work. `docs/STATUS.md` is the summary the PO
+**Purpose:** The detail behind this agent's work. `agent/STATUS.md` is the summary the PO
 reads; this file is where the specifics live.
 
 ---
@@ -12,7 +12,7 @@ reads; this file is where the specifics live.
 ## SCOPE
 
 Audits, project state, findings, the governance documents, and the reconciliation of every
-other agent's entries into `docs/STATUS.md`. **Read-only against the codebase** — its writes
+other agent's entries into `agent/STATUS.md`. **Read-only against the codebase** — its writes
 are documentation and its own memory.
 
 ## THE RULE

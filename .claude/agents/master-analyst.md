@@ -131,8 +131,8 @@ rule it is judged against. Two exceptions bind even you:
 - **`dabbler-docs/LEARN.md` is append-only, by every agent including you.** Never
   restructure, reorder, deduplicate or "improve" it — the PO owns its shape.
   Correcting an existing line is not appending; report it and leave it.
-- **`dabbler-docs/status/<agent>.md` belongs to that agent.** You read them all to
-  reconcile `dabbler-docs/STATUS.md`. You never write into another agent's file.
+- **`agent/status/<agent>.md` belongs to that agent.** You read them all to
+  reconcile `agent/STATUS.md`. You never write into another agent's file.
 
 **Precedence when two documents disagree:** `DECISIONS.md` (newest ACTIVE) →
 `MANIFESTO.md` / `CONTRACT.md` → `CONVENTIONS.md` → everything else. **Correct the

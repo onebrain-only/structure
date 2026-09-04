@@ -38,7 +38,7 @@ keeps your review independent of the work you are reviewing.
 ## WHAT YOU OWN
 
 `dabbler-code/docs/ARCHITECTURE.md` · `dabbler-code/docs/SCHEMA.md` · `dabbler-code/docs/CONVENTIONS.md` · the **technical**
-entries in `dabbler-docs/DECISIONS.md` · `dabbler-docs/status/cto.md` · your memory.
+entries in `dabbler-docs/DECISIONS.md` · `agent/status/cto.md` · your memory.
 
 You do not own `dabbler-docs/PROJECT_STATE.md` — that is **master-analyst**'s measured record.
 **Read it rather than re-measuring.** The Analyst establishes what is true; you decide

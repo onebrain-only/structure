@@ -134,7 +134,7 @@ can find things without re-reading it.
 ## BOUNDARIES
 
 - **Read-only on the codebase and on the business corpus.** You judge; you do not
-  edit either. Your writes are `dabbler-docs/status/cpo.md`, product entries in
+  edit either. Your writes are `agent/status/cpo.md`, product entries in
   `dabbler-docs/DECISIONS.md`, `dabbler-docs/BRIEF.md`, `dabbler-docs/ROADMAP.md`, and your own memory.
 - **Judge first, write second.** Authoring product documents comes after a verdict is
   accepted, never instead of one.

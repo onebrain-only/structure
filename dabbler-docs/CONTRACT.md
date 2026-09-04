@@ -41,8 +41,8 @@ These belong to master-analyst and to no one else:
 | `docs/CONTRACT.md` | An agent editing the permission matrix can grant itself a path. |
 | `docs/MANIFESTO.md` | An agent editing the rules can remove the rule it just broke. |
 | `docs/DECISIONS.md` | The tie-breaker. An agent that can edit it wins every disagreement. |
-| `docs/AGENTS.md` | The roster. Same reasoning as `.claude/agents/**`. |
-| `docs/WORKFLOWS.md` | Defines the handoffs an agent is judged against. |
+| `agent/AGENTS.md` | The roster. Same reasoning as `.claude/agents/**`. |
+| `agent/WORKFLOWS.md` | Defines the handoffs an agent is judged against. |
 | `docs/CONVENTIONS.md` | An agent that violated a convention could delete the convention. |
 | Everything, for `task-auditor` | It reviews all of it. Write access anywhere would let the reviewer author what it later approves. |
 
@@ -103,7 +103,7 @@ yet hired.
 writes no code, no SQL, no docs and no governance file; its output is Jira bugs and comments.
 Four cells depart from `R`, each for a stated reason:
 
-- **`docs/status/qa-tester.md` → `W`.** Its own status file, same as every other seat.
+- **`agent/status/qa-tester.md` → `W`.** Its own status file, same as every other seat.
 - **`.claude/agent-memory/<self>/**` → `W`.** Same rule as every other seat.
 - **Every Supabase row → `—`, including the "reading" row that is `R` for everyone else.**
   `G-010` gives it *no database access at all*. This is the one place where copying the
@@ -147,7 +147,7 @@ needs schema routes the schema need to `backend-owner` rather than writing SQL i
 and their triggers stay with `notifications-specialist`, whose row is unchanged.
 
 **On `task-auditor`:** it reads everything and writes **one file** —
-`docs/status/task-auditor.md`. Its column is `R` on every other row in this document, and
+`agent/status/task-auditor.md`. Its column is `R` on every other row in this document, and
 that is not an oversight to be corrected later. **A reviewer that can edit what it reviews
 is not a reviewer.** Its independence is the entire mechanism, so its row is the one place
 in this matrix where "no write access anywhere" is the design rather than a gap.
@@ -234,17 +234,17 @@ database ledger; the repo cannot rebuild the schema. KAN-33's original premise w
 | `docs/SCHEMA.md` §11 — **target state and standards** | R | R | R | R | R | R | **W** | R | R | R | **cto.** What the schema *should* be: the RLS standard, the `security_invoker` default, which `nearby` generation is canonical, whether the 30 zero-policy tables are intentional  **BO/FA are `R` here: G-003 grants them code and schema paths, not this file. Not an oversight — a grant nobody made.** |
 | `docs/CONVENTIONS.md` | R | R | R | R | R | R | **W** | R | R | R | **cto**, with a guard — see §9. A convention change requires a numbered `DECISIONS.md` entry so a loosened standard is visible as a dated decision, not a silent edit  **BO/FA are `R` here: G-003 grants them code and schema paths, not this file. Not an oversight — a grant nobody made.** |
 | `docs/LEARN.md` | **A** | **A** | **A** | **A** | **R** | **A** | **A** | **A** | **A** | R | **Append-only by every agent — with one exception: `task-auditor` is `R`.** `LEARN.md` is a governance document it reviews (it graded KAN-15, a `LEARN.md` ticket). Appending there would make the reviewer an author of what it later approves — the failure §2 names. **When it has a lesson, it hands the append-ready text to master-analyst, who appends it.** That is not a workaround; the content lands and the boundary holds. See §6. **CP/CT corrected from `R` to `A` on 2026-08-28: the rule in this cell said "append-only by every agent" while the cells said otherwise, and `cpo`/`cto` had both been appending all along. The text was right.** |
-| `docs/STATUS.md` | **W** | R | R | R | R | R | R | R | R | R | master-analyst reconciles it. **This is the channel the PO reads.** |
-| `docs/status/master-analyst.md` | **W** | R | R | R | R | R | R | R | R | R | Own status only |
-| `docs/status/notifications-specialist.md` | R | **W** | R | R | R | R | R | R | R | R | Own status only |
-| `docs/status/version-control.md` | R | R | **W** | R | R | R | R | R | R | R | Own status only |
-| `docs/status/app-store-submission-fixer.md` | R | R | R | **W** | R | R | R | R | R | R | Own status only |
-| `docs/status/task-auditor.md` | R | R | R | R | **W** | R | R | R | R | R | **The only file `task-auditor` writes in this repo.** Own status only |
-| `docs/status/cpo.md` | R | R | R | R | R | **W** | R | R | R | R | Own status only |
-| `docs/status/cto.md` | R | R | R | R | R | R | **W** | R | R | R | Own status only  **No agent writes another agent's status file.** |
-| `docs/status/backend-owner.md` | R | R | R | R | R | R | R | **W** | R | R | Its own agent, and nobody else. Added with G-003. |
-| `docs/status/flutter-feature-agent.md` | R | R | R | R | R | R | R | R | **W** | R | Its own agent, and nobody else. Added with G-003. |
-| `docs/status/qa-tester.md` | R | R | R | R | R | R | R | R | R | **W** | Its own agent, and nobody else. Added with G-010, 2026-08-29. |
+| `agent/STATUS.md` | **W** | R | R | R | R | R | R | R | R | R | master-analyst reconciles it. **This is the channel the PO reads.** |
+| `agent/status/master-analyst.md` | **W** | R | R | R | R | R | R | R | R | R | Own status only |
+| `agent/status/notifications-specialist.md` | R | **W** | R | R | R | R | R | R | R | R | Own status only |
+| `agent/status/version-control.md` | R | R | **W** | R | R | R | R | R | R | R | Own status only |
+| `agent/status/app-store-submission-fixer.md` | R | R | R | **W** | R | R | R | R | R | R | Own status only |
+| `agent/status/task-auditor.md` | R | R | R | R | **W** | R | R | R | R | R | **The only file `task-auditor` writes in this repo.** Own status only |
+| `agent/status/cpo.md` | R | R | R | R | R | **W** | R | R | R | R | Own status only |
+| `agent/status/cto.md` | R | R | R | R | R | R | **W** | R | R | R | Own status only  **No agent writes another agent's status file.** |
+| `agent/status/backend-owner.md` | R | R | R | R | R | R | R | **W** | R | R | Its own agent, and nobody else. Added with G-003. |
+| `agent/status/flutter-feature-agent.md` | R | R | R | R | R | R | R | R | **W** | R | Its own agent, and nobody else. Added with G-003. |
+| `agent/status/qa-tester.md` | R | R | R | R | R | R | R | R | R | **W** | Its own agent, and nobody else. Added with G-010, 2026-08-29. |
 | `docs/NOTIFICATIONS.md` | R | **W** | R | R | R | R | R | R | R | R | notifications-specialist. Drifted — its subject was rewritten after it was written |
 | `docs/LOCATION.md` | R | — | — | — | R | R | R | R | R | R | **UNOWNED — nobody writes it.** |
 | `docs/RESEARCH.md` | **W** | R | R | R | R | **A** | **A** | R | R | R | **UNOWNED-BY-DEFAULT → master-analyst curates.** The single living research file; `docs/research/` was removed by the PO. `cpo`/`cto` append findings in their domain  **BO/FA are `R` here: G-003 grants them code and schema paths, not this file. Not an oversight — a grant nobody made.** |
@@ -314,7 +314,7 @@ writing it anyway is how a living document becomes noise nobody reads.
 |---|---|---|
 | `docs/LEARN.md` | A lesson that generalises past the task that produced it — a bug class, a trap that cost a session, a preference discovered by being corrected, a rule that turned out to have an exception. | **"Would reading this before starting have saved time?"** If no, it does not belong. |
 | `docs/DECISIONS.md` | A choice with reasoning, where a different choice was genuinely available. | **"Could a reasonable agent have chosen otherwise?"** If there was only one option, it is not a decision — it is just what happened, and it goes to STATUS. |
-| `docs/STATUS.md` and `docs/status/<agent>.md` | What happened in a task: what changed, what was verified, what is left. | **"Does the PO need to know this happened?"** Every completed task passes this. Write it as part of the task, never as an afterthought. |
+| `agent/STATUS.md` and `agent/status/<agent>.md` | What happened in a task: what changed, what was verified, what is left. | **"Does the PO need to know this happened?"** Every completed task passes this. Write it as part of the task, never as an afterthought. |
 | `docs/PROJECT_STATE.md` | Measured state of the codebase, with a `file:line` or a scanner number. | **"Did I measure it?"** If it was estimated, inferred, or remembered, it does not go in. master-analyst only. |
 | `.claude/agent-memory/<self>/` | What *you* need to not re-derive next session — schema facts, confirmed false positives, PO decisions in your area. | **"Will I waste time re-deriving this?"** Not for anything the repo already records. |
 
@@ -355,7 +355,7 @@ entry stays. Knowing that we once believed something false, and when we stopped,
 information — and an agent that silently rewrites history takes that away from everyone
 who reads the file later.
 
-`docs/status/<agent>.md` files are append-only within themselves: newest entry at the
+`agent/status/<agent>.md` files are append-only within themselves: newest entry at the
 top, older entries never edited.
 
 ---

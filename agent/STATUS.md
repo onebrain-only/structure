@@ -1,4 +1,4 @@
-# docs/STATUS.md — Master Status Log
+# agent/STATUS.md — Master Status Log
 
 **Owner:** master-analyst (write) · all agents (read)
 
@@ -39,7 +39,7 @@
 
 ## RELATIONSHIP TO THE PER-AGENT FILES
 
-`docs/status/<agent>.md` holds the detail. **This file must stand alone** — it summarises
+`agent/status/<agent>.md` holds the detail. **This file must stand alone** — it summarises
 the outcome and points at the agent files by Jira id, so the PO never has to open five files
 to find out what happened.
 
@@ -58,7 +58,7 @@ of them to reconcile this one, and **never writes into another agent's file.**
 > decisions were recorded, none of which a PO reading this file would know about.
 >
 > **It is not a reconciliation backlog on my side — the source files are empty too.** Entries
-> dated 2026-08-28 or later, counted across `docs/status/`: `cpo` 1, `version-control` 1,
+> dated 2026-08-28 or later, counted across `agent/status/`: `cpo` 1, `version-control` 1,
 > **`cto` 0, `task-auditor` 0, `notifications-specialist` 0, `app-store-submission-fixer` 0,
 > and `master-analyst` 0 until this entry.** Rule 1 above says no task is finished until its
 > entry is saved; on those two days the rule was not followed by anyone, including me.
@@ -69,14 +69,14 @@ of them to reconcile this one, and **never writes into another agent's file.**
 > Reconstructing them from Jira would produce plausible entries nobody can vouch for, which is
 > worse than the silence.
 >
-> **What each agent owes:** its own `docs/status/<agent>.md` entries for 2026-08-28/29, in the
+> **What each agent owes:** its own `agent/status/<agent>.md` entries for 2026-08-28/29, in the
 > FORMAT block above, `Not verified` filled in. I will reconcile them into this file on the next
 > pass, once they exist. **PO decision needed on one thing only:** whether the missing two days
 > get backfilled at all, or whether the log simply resumes from 2026-08-29 with this notice as
 > the record of the gap. Backfill is honest only if each agent writes its own.
 >
-> **Two further gaps, structural rather than behavioural:** `docs/status/backend-owner.md` and
-> `docs/status/flutter-feature-agent.md` **do not exist**, though both seats were filled on
+> **Two further gaps, structural rather than behavioural:** `agent/status/backend-owner.md` and
+> `agent/status/flutter-feature-agent.md` **do not exist**, though both seats were filled on
 > 2026-08-28 under `G-003`. Those agents have nowhere to log. Creating them is each agent's
 > first act, not mine.
 

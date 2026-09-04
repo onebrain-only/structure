@@ -1,10 +1,10 @@
-# docs/status/version-control.md — version-control status log
+# agent/status/version-control.md — version-control status log
 
 **Owner:** `version-control` — **this agent, and only this agent, writes here.**
 Every other agent reads it. The master-analyst reads it to reconcile
-`docs/STATUS.md`; it does not write here.
+`agent/STATUS.md`; it does not write here.
 
-**Purpose:** The detail behind this agent's work. `docs/STATUS.md` is the summary
+**Purpose:** The detail behind this agent's work. `agent/STATUS.md` is the summary
 the PO reads; this file is where the specifics live.
 
 ---

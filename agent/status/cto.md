@@ -1,4 +1,4 @@
-# docs/status/cto.md — CTO status
+# agent/status/cto.md — CTO status
 
 **Last run:** 2026-08-28 · **Branch:** `Canary` · **Epic:** KAN-39
 

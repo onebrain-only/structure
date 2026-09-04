@@ -1,11 +1,11 @@
-# docs/status/task-auditor.md — task-auditor status log
+# agent/status/task-auditor.md — task-auditor status log
 
 **Owner:** `task-auditor` — **this agent, and only this agent, writes here.**
 Every other agent reads it. The master-analyst reads it to reconcile
-`docs/STATUS.md`; it does not write here.
+`agent/STATUS.md`; it does not write here.
 
 **Purpose:** The review record. Every verdict, with what was checked and what was
-found. `docs/STATUS.md` is the summary the PO reads; this is where the reasoning
+found. `agent/STATUS.md` is the summary the PO reads; this is where the reasoning
 lives.
 
 ---

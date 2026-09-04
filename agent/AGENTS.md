@@ -1,4 +1,4 @@
-# docs/AGENTS.md — The Agent Constitution
+# agent/AGENTS.md — The Agent Constitution
 
 **Owner:** master-analyst (write) · all agents (read)
 **Version:** v0.6 — `G-010`: `qa-tester` hired; the `task-auditor` pause is **superseded** — it was never paused
@@ -99,7 +99,7 @@ not that they come from `master-analyst`.
 | | |
 |---|---|
 | **Charter** | Establish what is *true* about the codebase so every other agent and every PO decision starts from reality. Finds problems; does not fix them |
-| **Owns** | `docs/**` (governance, project truth, STATUS) · `.claude/agents/**` · `.claude/skills/**` · its own memory |
+| **Owns** | `dabbler-docs/**` (project truth) · `agent/**` (roster, STATUS, workflows, roles) · `.claude/agents/**` · `.claude/skills/**` · its own memory |
 | **Owns in Supabase** | Nothing. Read-only |
 | **Skills** | `project-audit` (its five-phase protocol and scanner). **`task-review` removed 2026-08-29** — `task-auditor` owns review exclusively (`CONTRACT.md` §2), and a measurer that also grades is the closed loop this file exists to prevent |
 | **Memory** | `.claude/agent-memory/master-analyst/` — 4 files: run-1 baseline, confirmed false positives, dead-code register, Jira convention |
@@ -114,7 +114,7 @@ a finding and fix it, nobody would review either (decision 017).
 | | |
 |---|---|
 | **Charter** | Decide technical direction and hold the standard. Architecture, schema shape, stack, engineering standards, build-vs-buy |
-| **Owns** | `ARCHITECTURE.md` · `CONVENTIONS.md` · `SCHEMA.md` **§11 only** (target state) · `T-nnn` entries in `DECISIONS.md` · `docs/status/cto.md` |
+| **Owns** | `ARCHITECTURE.md` · `CONVENTIONS.md` · `SCHEMA.md` **§11 only** (target state) · `T-nnn` entries in `DECISIONS.md` · `agent/status/cto.md` |
 | **Does NOT own** | `PROJECT_STATE.md`, and `SCHEMA.md` §§1–8/§10 — the measured census. Its own definition says *read it rather than re-measuring* |
 | **In Supabase** | **Reads freely; never writes** (decision 019). Decides the fix, does not apply it |
 | **Escalation** | The PO |
@@ -134,7 +134,7 @@ standard visible instead of silent.
 | | |
 |---|---|
 | **Charter** | **Product and protect.** Judge every idea, feature, scope change or pivot against committed strategy — the **26 business documents in Notion** — and say whether it serves the business, contradicts something already committed, or is a distraction |
-| **Owns** | `BRIEF.md` · `ROADMAP.md` · `P-nnn` entries in `DECISIONS.md` · `docs/status/cpo.md` |
+| **Owns** | `BRIEF.md` · `ROADMAP.md` · `P-nnn` entries in `DECISIONS.md` · `agent/status/cpo.md` |
 | **Source of truth** | The Notion business corpus. **Reads it; never edits it** |
 | **Escalation** | The PO, who may overrule — *"he owns the product; you own the reasoning"* |
 | **Done when** | The verdict names the document the proposal serves or conflicts with, and a rejection carries the alternative |
@@ -172,7 +172,7 @@ take to decide and hands it to the PO.
 | | |
 |---|---|
 | **Charter** | Decide whether a ticket claiming completion is actually complete. Moves it to Done, or back to To Do with a written verdict |
-| **Owns** | The `In Review` column on the KAN board. **In the repo: `docs/status/task-auditor.md` and its own memory. Nothing else** |
+| **Owns** | The `In Review` column on the KAN board. **In the repo: `agent/status/task-auditor.md` and its own memory. Nothing else** |
 | **Owns in Supabase** | Nothing. Read-only |
 | **Skills** | `task-review` |
 | **Memory** | `.claude/agent-memory/task-auditor/` |
@@ -213,7 +213,7 @@ reality**, not only prose.
 |---|---|
 | **Charter** | Functional/behavioural QA against the **running app**. Walk each flow the way a real user would — page to page, action to action — and report what actually happened against what was supposed to happen |
 | **Surface** | **Chrome only, against the Flutter web build**, driven via this session's `mcp__claude-in-chrome__*` tools. Functionality is identical across platforms; the PO tests iOS/Android on simulator/emulator themselves. **It does not attempt native testing** |
-| **Owns** | Jira bugs and comments. **In the repo: `docs/status/qa-tester.md` and its own memory. Nothing else** |
+| **Owns** | Jira bugs and comments. **In the repo: `agent/status/qa-tester.md` and its own memory. Nothing else** |
 | **Owns in Supabase** | Nothing — **no database access at all**, not even read. This is the one place `CONTRACT.md`'s read-open default does not apply |
 | **Memory** | `.claude/agent-memory/qa-tester/` |
 | **Hired** | 2026-08-29, `G-010` |
@@ -440,8 +440,14 @@ is a much smaller job than it was at v0.1.
 
 ## 9. PER-AGENT DETAIL FILES
 
-`docs/agents/<agent-name>.md` — long-form definitions. **Currently empty**; §2 above is the
-working record until it is populated.
+`agent/roles/<agent-name>.md` — the long-form definition each agent is dispatched with. All ten
+exist. §2 above is the roster view: charter, ownership and escalation, in the third person.
+`agent/roles/` is the instruction the agent itself reads, in the second person. The two are
+complementary, not duplicates — §2 says what a seat *is*, the role file says how it *works*.
+
+`agent/roles/` is tool-neutral. `.claude/agents/<name>.md` is generated from it plus
+`.claude/bindings/<name>.yml` by `agent/scripts/build-agents.sh`. **Never hand-edit
+`.claude/agents/`** — it is regenerated, and `build-agents.sh --check` fails if it has drifted.
 
 ---
 

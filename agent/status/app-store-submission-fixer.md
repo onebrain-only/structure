@@ -4,13 +4,13 @@ Created with its specification but no content. Filled by its owning agent.
 Delete this banner when the file is first genuinely filled.
 ============================================================ -->
 
-# docs/status/app-store-submission-fixer.md — app-store-submission-fixer status log
+# agent/status/app-store-submission-fixer.md — app-store-submission-fixer status log
 
 **Owner:** `app-store-submission-fixer` — **this agent, and only this agent, writes here.**
 Every other agent reads it. The master-analyst reads it to reconcile
-`docs/STATUS.md`; it does not write here.
+`agent/STATUS.md`; it does not write here.
 
-**Purpose:** The detail behind this agent's work. `docs/STATUS.md` is the summary
+**Purpose:** The detail behind this agent's work. `agent/STATUS.md` is the summary
 the PO reads; this file is where the specifics live.
 
 ---
