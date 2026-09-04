@@ -4948,3 +4948,165 @@ finding, and expanding this migration's blast radius to cover it was rejected in
 flagging it as a follow-up.
 
 **Status:** ACTIVE
+
+---
+
+### P-034 — `11b` §F.1 and §F.2 are wrong by their own rows; superseded here on numbers, with `11b` left as the sole source for the 650
+**Date:** 2026-09-04
+**Source:** `cpo`, feature census run 2026-09-03/04. **Status: PROPOSED — awaiting PO ruling.**
+
+**The defect.** `11b` ("dabbler complete features list and persona comparison", Notion page
+`367d4c6dd86d800da438d24eb0928d38`) publishes summary tables in §F.1 and §F.2 that do not match
+its own Section B rows. Parsed at section granularity, all 650 IDs present, no gaps and no
+duplicates:
+
+| Phase | §F.1 claims | Actual rows | Delta |
+|---|---:|---:|---:|
+| 1A | ~410 (63%) | **340 (52.3%)** | −70 |
+| 1B | ~80 (12%) | **43 (6.6%)** | −37 |
+| 2 | ~120 (18%) | **202 (31.1%)** | **+82** |
+| 3 | ~40 (6%) | **65 (10.0%)** | +25 |
+
+Only the total survives. §F.1's stated takeaway — *"63% of features ship in Phase 1A. This is
+the community foundation."* — is wrong by its own data: it is 52%, and **Phase 2 is 1.7× larger
+than advertised.** Anyone sizing the 1A build from §F.1 over-counts 1A by 70 features and
+under-counts Phase 2 by 82.
+
+§F.2 is inverted on type: it claims ~50/50 Basic vs Added Value and warns *"too much Added Value
+= community friction."* The rows are **42/58 toward commerce.** The document states the risk
+condition and then, unnoticed, satisfies it. This bears on `01 brand bible`'s community-first
+positioning.
+
+Separately, §C/D/E are **127 persona-differentiator rows that are references to master IDs, not
+additional features.** They do not add to the 650; universal features are 523, not §F.3's "~510".
+
+**Decision proposed.** Record the measured figures here and mark §F.1/§F.2 **superseded on
+numbers**. `11b` remains the sole source for the 650 rows themselves.
+
+**Rejected alternatives.**
+1. **Correct `11b` in place.** Requires the PO (Notion is not in `CONTRACT.md`'s matrix at all —
+   not an UNOWNED cell, outside the matrix's scope entirely), and it destroys the record: a
+   reader who has quoted "63% ships in 1A" gets no signal it ever said otherwise.
+2. **Annotate `11b` in place.** Same PO bottleneck, and it leaves the wrong numbers legible
+   beside the right ones.
+3. **Mirror the 650 rows into the repo.** Rejected as the trap it is. `master-analyst` refused
+   this exact shape over `INDEX.md`: *"A second index would be a second authority for the same
+   facts."* A repo-side copy rots the moment either side is edited.
+
+A supersession entry corrects the derived claims, keeps one authority for the underlying data,
+survives without the PO, and is citable by every agent. If the PO later edits Notion, this entry
+becomes history rather than a competing table.
+
+**Status:** PROPOSED
+
+---
+
+### P-035 — Cut `FeatureFlags.squads`; do not rename it. It asserts a deleted slice to a now-live analytics sink
+**Date:** 2026-09-04
+**Source:** `cpo`, FLAG-04 verdict, on a finding raised by `master-analyst` (`PROJECT_STATE.md`
+§24d). **Status: PROPOSED — awaiting PO ruling.**
+
+**Decision proposed.** Delete `FeatureFlags.squads` (`feature_flags.dart:75`, `static const bool
+squads = true`) and accept the telemetry break. **Blast radius is one line:**
+`lib/main.dart:88` — `'squads': FeatureFlags.squads,` — the analytics startup snapshot. No other
+call site exists in `lib/`.
+
+**Why now, and not at run 1.** Run 1 flagged the same mismatch and it was harmless: the analytics
+sink was dead, so a wrong dimension went nowhere. `PROJECT_STATE.md` §24b changed that —
+analytics is **LIVE**, `rpc_track_event` writes to `analytics_events`. The flag is `true`, so
+every snapshot now asserts to a real, queryable sink that a slice exists which `34f9a6d` deleted.
+That is no longer a stale constant; it is **a false row in production data.** The deletion made
+it worse rather than better.
+
+**Why cut rather than rename.** A rename asks what the dimension actually measures, and no answer
+is available: **the word "squad" appears in none of the 650 features in `11b`** (see `STACKS.md`
+§7a). Any name would encode a scope decision the PO has not made, and would encode it in
+telemetry — the worst place to record an unmade decision, because it then looks like evidence.
+
+**What the break costs: nothing.** A boolean dimension constant `true` for its entire life has
+never varied, so it has never carried information. There is no analysis to preserve.
+
+**What must not travel with it.** Cutting the flag is **not** cutting squads.
+`squads_repository.dart` (112) + `_impl` (762) = **874 LOC** is live via
+`lib/features/social/providers.dart:8-9`, which has 3 importers. The schema is complete. Cut the
+flag, keep the repository, leave the scope question open.
+
+**Why this does not pre-empt the scope question.** If the PO later rules squads **in scope**, the
+correct state is not the flag restored to `true` — it is a flag set **`false`**, tracking an
+unbuilt client, which is what `ROADMAP.md`'s DEFER category always meant. If the PO rules squads
+**out**, the repository and schema go too and the flag was right to be gone. **Either ruling
+leaves "delete it now" correct; only "leave it `true`" is wrong under both.**
+
+If squad telemetry is genuinely wanted later, it is an event emitted from the repository when a
+squad operation runs, not a compile-time constant in a startup snapshot. A `static const bool`
+can only ever report what the source says about itself — which is precisely how this dimension
+came to assert a deleted slice.
+
+**Note.** Under `ROADMAP.md` §5 a CUT needs a decision id on approval; that column is currently
+empty (*"Nothing has been formally cut yet"*). This would be the first.
+
+**Status:** PROPOSED
+
+---
+
+### G-012 — Seven ownership stacks (S1–S7), their collision surface, and the two gates that must land before any parallel work
+**Date:** 2026-09-04
+**Source:** `cto` stack analysis, 2026-09-03/04, measured against `dabbler-code` `c46b5c5`. Full
+document at `dabbler-docs/STACKS.md`. **Status: PROPOSED — awaiting PO ruling.**
+
+**Decision proposed.** Adopt seven ownership stacks — **S1** Identity & Access · **S2** Profile,
+Social & Feed · **S3** Play & Places (absorbing B.9) · **S4** Notifications (unchanged) · **S5**
+Platform & Foundations · **S6** Backend & Data (unchanged, existing `backend-owner`) · **S7**
+Commerce (dormant until `enablePayments` opens) — with the file, directory and table ownership
+set out in `STACKS.md` §1, and the eleven-item collision surface and its rulings in §2.
+
+**Two gates bind before any stack does feature work.**
+- **Phase 0, S5 alone.** Move `misc/data/datasources/**` into `lib/core/` (13 of 20 feature
+  directories import it today — cheapest high-value unblock); split `app_router.dart` (1,712 LOC,
+  85 `GoRoute`) into per-stack route modules, S5 keeping `_handleRedirect`; relocate the five
+  game-composer screens out of `misc/`; establish a `version-control`-owned `build_runner`
+  regeneration step.
+- **Phase 1, S1+S2 jointly, one ticket.** Break up
+  `lib/features/profile/presentation/providers/profile_providers.dart` — **870 lines holding
+  three stacks' concerns**, consumed by `social` (10 providers) and `home` (5). Until it lands,
+  S1 and S2 edit the same file and are not parallel.
+
+**Why the router split is not optional.** `CONTRACT.md` §4 serialises edits to the contended
+files — *"one agent in one of these files at a time."* That rule was written for a single
+`flutter-feature-agent`. **At six stacks it stops being a safety rule and becomes the schedule.**
+
+**Rejected alternatives.**
+1. **Cluster by Supabase table family** (the D1–D11 census shape). Rejected: shared tables do not
+   mean shared ownership. `profile`↔`social` are fused at 5 files out / 10 in while `profile`↔
+   `auth_onboarding` have a thin directional seam — **table-family grouping puts the loose pair
+   together and the tight pair apart.** `STACKS.md` §6 has the five specific breaks.
+2. **Split S2 into Feed and Profile now.** Rejected: not available until Phase 1's gate lands.
+   Proposing it would put two teams in the same 870-line file on day one. Recorded rather than
+   promised.
+3. **Give B.9 (organiser, 40 features) its own stack.** Rejected: organiser is a persona, not a
+   domain — no organiser table, no slice, no screen, and `organiser_benefits_repository` has zero
+   consumers. ~30 of the 40 are game/venue operations, so it goes to S3. `STACKS.md` §4.
+4. **Give D8 (moderation) a team.** Rejected: 13 tables, zero corpus features, no client-side
+   existence as a cluster — a team here would be a phantom. Controls follow the surface they
+   attach to; the staff console goes to S5; enforcement and the tables to S6. **The security
+   rulings, T-016 in particular, serve as the acceptance criteria the missing feature list would
+   have provided.** `STACKS.md` §5.
+5. **Hand D4 (Commerce, 110 features) to S3 or S5 as a side quest.** Rejected: a 110-feature
+   domain half-built inside somebody else's mental model is how a fourth parallel profile stack
+   gets created. S7 is created with its own lead or not at all.
+6. **Restructure `lib/data/` into per-slice directories.** Rejected: re-homing ~160 files would
+   collide with every in-flight branch at once. Ownership is by filename instead.
+
+**Sequencing note that inverts the default assumption.** For squads, circles, ratings, venue
+bookings, payments and the rewards RPCs **there is no backend work to sequence before the client
+work — S6 is not on the critical path for any of them.** A plan that schedules S6 ahead of S2/S3
+for those domains idles two stacks waiting for something already built. S6's actual queue is
+security remediation, gating S2/S3 at two named edges only (T-016 for `contentHitsBlocklist`,
+T-024 for new write paths through definer views over zero-policy base tables).
+
+**Caveat carried from `STACKS.md` §0a.** The mapping of the 650 corpus features onto these stacks
+was produced against a prose summary of this proposal relayed in-session, **not against
+`STACKS.md`, which did not exist at the time.** Two boundary assignments there are judgment calls
+(B.2 → S2, B.16 → S3) worth 30 and 25 features. Re-derive before planning from it.
+
+**Status:** PROPOSED
