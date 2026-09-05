@@ -225,3 +225,21 @@ until Phase 0 lands (`G-015` Ruling 1).
 
 **Not verified:** nothing was run. No `flutter analyze`, no `flutter test`, no app, no database
 query. Every number is static analysis of the tree at `c46b5c5`.
+
+## 2026-09-05 — T-048: corrected `STACKS.md` §10.2 blast-radius counts
+
+**Task:** from `team-lead` — two numbers in my own `STACKS.md` §10.2 did not reproduce.
+**Effort:** low, as briefed. Read-only against `Dabbler/dabbler-code/`; no code, no commit.
+
+**Measured** at `c46b5c5`: `grep -rl 'misc/data/datasources' lib/ test/ | wc -l` → **39**
+(not 38). By location: `lib/features/` **26** across 13 of 20 dirs · `lib/data/repositories/`
+**10** (not 11) · `lib/providers.dart` + `lib/core/providers/geo_providers.dart` **2** ·
+`test/` **1** — `test/data/repositories/profiles_repository_impl_test.dart`, two import lines
+(`:7`, `:8`), covered by `G-019`.
+
+**Changed:** `STACKS.md:486` (§9b correction row), `:551-563` (§10.2 — now a by-location table
+plus the named test file), `:582` ("any of the 39 files"). No other occurrence of the figures
+exists in the document — `:184` G0a and `:156` state only the 13-of-20 directory count, which
+reproduces.
+
+**Recorded:** `DECISIONS.md` T-048. Phase 0 plan, partition and acceptance criteria untouched.
