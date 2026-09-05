@@ -87,6 +87,8 @@ def parse(path):
     events, dispatches, messages = [], [], []
     files = collections.Counter()
     tools = collections.Counter()
+    use = {"in": 0, "out": 0, "cache_read": 0, "cache_write": 0, "think": 0, "msgs": 0}
+    model_seen = collections.Counter()
     turns = 0
     first = last = None
 
@@ -108,6 +110,18 @@ def parse(path):
             typ = d.get("type")
             msg = d.get("message") or {}
             content = msg.get("content")
+
+            u = msg.get("usage")
+            if isinstance(u, dict):
+                use["msgs"] += 1
+                use["in"] += u.get("input_tokens", 0) or 0
+                use["out"] += u.get("output_tokens", 0) or 0
+                use["cache_read"] += u.get("cache_read_input_tokens", 0) or 0
+                use["cache_write"] += u.get("cache_creation_input_tokens", 0) or 0
+                det = u.get("output_tokens_details") or {}
+                use["think"] += det.get("thinking_tokens", 0) or 0
+                if msg.get("model"):
+                    model_seen[msg["model"]] += 1
 
             if typ == "user" and isinstance(content, str) and content.strip():
                 txt = content.strip()
@@ -208,7 +222,17 @@ def parse(path):
                 if r["end"] is None:
                     r["tools"] += 1
 
+    # Claude Opus 5 list price, verified: $5.00 / MTok in, $25.00 / MTok out.
+    # Cache read and write are deliberately NOT priced here — the rate depends on
+    # the cache TTL in use and guessing it would put a wrong number on screen.
+    model = model_seen.most_common(1)[0][0] if model_seen else "—"
+    RATE = {"claude-opus-5": (5.0, 25.0)}.get(model)
+    use["model"] = model
+    use["priced"] = bool(RATE)
+    use["cost"] = round(use["in"] / 1e6 * RATE[0] + use["out"] / 1e6 * RATE[1], 2) if RATE else None
+
     return {"events": events, "dispatches": dispatches, "messages": messages, "runs": runs,
+            "usage": use,
             "tools": tools.most_common(14), "files": files.most_common(16),
             "turns": turns, "first": first, "last": last}
 
