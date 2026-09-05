@@ -160,6 +160,7 @@ what failed rather than reporting done.
 | Writing tests for what you built | **`tdd`** |
 | A brief carrying a question you cannot settle by looking | **`grill-peer`** back to your lead |
 | You need the real state of a slice before building against it | ask **`analyst`** |
+| Any call site that writes money — D4, or any RPC touching the ledger tables | **`money-write-invariants`** — money writes are **this seat's**, never a junior's (`DECISIONS.md` T-049), and the call site must name the constraint that makes it safe |
 
 ## MEMORY
 

@@ -101,6 +101,7 @@ zero-policy tables `PLAN.md` step 2 names. Read `Dabbler/dabbler-code/docs/PLAN.
 | Every task, with one carve-out | **`supabase`** — its security checklist is the written form of the traps this seat hits: a view bypasses RLS unless `security_invoker = true`; UPDATE returns 0 rows with no SELECT policy; `user_metadata` is user-editable and unsafe in a policy |
 | Writing or reviewing the SQL itself | **`supabase-postgres-best-practices`** — 64 lines and **34 reference files**. Open `security-rls-performance.md`, `security-privileges.md`, `security-rls-basics.md`, `schema-foreign-key-indexes.md` by name. Wired to no seat until 2026-09-06, while `supabase` was wired to 18 — of which 17 never write SQL |
 | A policy behaves differently from how it reads | **`diagnosing-bugs`** — build the pass/fail signal first (`set local role anon; select …`), then theorise |
+| DDL, an RPC or a trigger touching `wallet_ledger`, `financial_ledger`, `payment_intents`, `wallets`, `payouts` or `game_settlements` | **`money-write-invariants`** — carries the ruled unique keys and why `IF EXISTS (SELECT …)` is a race, not idempotency (`DECISIONS.md` T-049). This seat executes that ruling |
 
 ## WHO YOU TALK TO
 

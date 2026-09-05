@@ -105,6 +105,7 @@ mechanism before your first change; do not assume it from this paragraph.
 | A store listing — App Store or Play | **`aso`** (P) — audits metadata against ASO practice and scores it |
 | Revising existing strings rather than drafting new ones | **`copy-editing`** (P) — most of the day-to-day work; nothing else covered an edit pass |
 | Notification and lifecycle copy — push, in-app, email | **`emails`** (P) |
+| Any string going into an Arabic screen, or a bug report of garbled/reversed/misaligned Arabic text | **`rtl-arabic-checklist`** — icon direction, EN→AR expansion, number/date formatting, mixed-direction strings; flags widget-level fixes to a developer rather than attempting them |
 
 ## MEMORY
 

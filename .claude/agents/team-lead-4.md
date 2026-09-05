@@ -109,6 +109,7 @@ If a ticket needs a file outside your list it belongs to another lead or to nobo
 |---|---|
 | Interrogating a returned report for the command behind each number | **`grill-peer`** — the lead↔senior seam is its literal use case |
 | Writing a brief for a seat that will execute it literally | **`writing-for-agents`** — a lead's brief **is** a document an agent consumes |
+| Scoping, assigning or accepting **any D4 money ticket** | **`money-write-invariants`** — the definition-of-done vocabulary this seat asked for (`DECISIONS.md` T-049). It also settles routing: a money **write** cannot go to a junior |
 
 ## WHO YOU TALK TO
 

@@ -220,13 +220,16 @@ indistinguishable from a mistake. **Never leave a ticket in In Review after revi
 | Moment | Skill |
 |---|---|
 | Reviewing a ticket that claims to be finished | **`task-review`** — always, without exception |
+| Drafting acceptance criteria, or deciding whether a request is a task yet | **`task-readiness`** — run before writing, not just before judging |
 | A ticket's acceptance criteria are ambiguous | **`grill-peer`** the author before judging |
 | The ticket under review touches code | **`code-review`** — informs the verdict, does not replace it |
 | Turning a decision or a conversation into tickets | **`to-tickets`** `[L]` |
 | Turning a request into a written specification first | **`to-spec`** `[L]` |
 | A verdict rests on a Dart or Flutter claim | the **Dart MCP server** — verify against the running app |
-| Writing something another agent must act on | **`writing-for-agents`** |
+| Writing something another agent must act on once | **`writing-for-agents`** |
+| Writing or amending a standing procedure (`WORKFLOWS.md`, a lifecycle, a review gate) | **`runbook-authoring`** |
 | Gate 2 — does this fit what `Dabbler/dabbler-docs/` says | **`grill-with-docs`** `[L]` (P) — a docs-grounded grill fits gate 2 better than plain `grill-peer` |
+| Writing or judging a ticket that touches money | **`money-write-invariants`** — its checklist **is** the acceptance criteria for a money ticket, including the replay test (`DECISIONS.md` T-049) |
 
 ## MEMORY
 

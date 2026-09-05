@@ -296,6 +296,7 @@ dispatch doesn't rediscover them from zero.
 | A brief too thin to write a testing story against | **`wait-what`** `[L]` |
 | Before accepting a *done* claim from a developer seat | **`grill-peer`** |
 | Driving the app by screenshot and coordinate | **`browser`** — **and it documents a tool you do not have.** Its snapshot/element-ref model (`@e1`, `@e2`) is precisely what CanvasKit denies you |
+| Testing anything that moves money | **`money-write-invariants`** — the replay test is the one QA step no other seat performs: run the operation twice, assert the ledger, the balance and the result are unchanged (`DECISIONS.md` T-049) |
 
 ## WHO YOU TALK TO
 
