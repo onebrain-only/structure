@@ -487,6 +487,7 @@ svg#stage{position:fixed;inset:0;width:100%;height:100%;z-index:1}
   <span class="brand">One Brain</span>
   <span class="meta" id="live"><span class="pulse"></span>connecting</span>
   <select id="sess"></select>
+  <button id="vflow" class="vbtn on">flow</button><button id="vorg" class="vbtn">org</button>
   <span class="spacer"></span>
   <span class="meta" id="hdr">—</span>
 </div>
@@ -506,7 +507,7 @@ svg#stage{position:fixed;inset:0;width:100%;height:100%;z-index:1}
 <div class="hint">drag to pan · scroll to zoom · click a node</div>
 
 <script>
-var NS="http://www.w3.org/2000/svg",S=null,sel=null,misses=0,picked=null;
+var NS="http://www.w3.org/2000/svg",S=null,sel=null,misses=0,picked=null,VIEW="flow";
 var view={x:0,y:0,k:1},placed=false;
 
 function esc(s){return (s||"").replace(/[<>&"]/g,function(c){
@@ -643,6 +644,120 @@ function cx0(nx,rr){return nx}
 function hueName(lv){return lv==="company"?"teal":lv==="product"?"green":lv==="project"?"amber":"violet"}
 
 /* ---------- detail ---------- */
+
+/* ---- org tree: everyone visible, lit only when they work ---------- */
+var LEADS=[
+ {n:1,stacks:"D1 Identity · D5 Social · D11 Platform"},
+ {n:2,stacks:"D2 Games · D8 Moderation"},
+ {n:3,stacks:"D3 Venues · D10 Sports ref"},
+ {n:4,stacks:"D4 Money · D7 Rewards"},
+ {n:5,stacks:"D6 Notifications · D9 Discovery"}];
+
+function stateOf(name){
+  var runs=(S&&S.runs)||[];
+  var live=runs.some(function(r){return r.seat===name && !r.end});
+  var seat=((S&&S.seats)||[]).filter(function(x){return x.name===name})[0];
+  var tools=runs.filter(function(r){return r.seat===name&&r.inner})
+                .reduce(function(a,r){return a+r.inner.tool_total},0);
+  return {live:live, ran:seat?seat.dispatched>0:false, n:seat?seat.dispatched:0,
+          tools:tools, model:seat?seat.model:"", effort:seat?seat.effort:""};
+}
+function hueName2(h){return h.indexOf("teal")>0?"teal":h.indexOf("green")>0?"green":
+  h.indexOf("amber")>0?"amber":"violet"}
+
+function orgNode(scene,x,y,w,name,label,hue,big){
+  var st=stateOf(name), lit=st.ran||st.live, h=big?34:26;
+  var g=el("g",{}); g.style.cursor="pointer";
+  var box={x:x-w/2,y:y-h/2,width:w,height:h,rx:3,
+    fill:lit?"var(--panel)":"transparent",
+    stroke:lit?hue:"var(--edge)","stroke-width":st.live?2.2:(lit?1.4:1),
+    "stroke-opacity":lit?1:.6};
+  if(lit) box.filter="url(#g-"+hueName2(hue)+")";
+  g.appendChild(el("rect",box));
+  if(st.live) g.appendChild(el("circle",{cx:x+w/2-9,cy:y,r:3.5,fill:"var(--amber)"}));
+  var t=el("text",{x:x-w/2+10,y:y+(big?0:3.5),fill:lit?"var(--ink)":"var(--dim)",
+    "font-family":"IBM Plex Mono, monospace","font-size":big?11.5:10,"font-weight":lit?600:400});
+  t.textContent=name; g.appendChild(t);
+  if(big&&label){
+    var sub=el("text",{x:x-w/2+10,y:y+12,fill:"var(--dim)",
+      "font-family":"IBM Plex Mono, monospace","font-size":8.5});
+    sub.textContent=label; g.appendChild(sub);
+  }
+  var meta=el("text",{x:x+w/2-(st.live?18:9),y:y+(big?0:3.5),"text-anchor":"end",
+    fill:lit?hue:"var(--dim)","font-family":"IBM Plex Mono, monospace","font-size":9});
+  meta.textContent=lit?(st.tools?st.tools+" tools":"×"+st.n):(st.model||"").slice(0,4);
+  g.appendChild(meta);
+  g.addEventListener("click",function(ev){ev.stopPropagation();orgDetail(name,st,label)});
+  scene.appendChild(g);
+}
+
+function drawOrg(){
+  var scene=document.getElementById("scene");
+  while(scene.firstChild)scene.removeChild(scene.firstChild);
+  if(!S)return;
+  var defs=el("defs",{});
+  ["teal","green","amber","violet"].forEach(function(n){
+    var f=el("filter",{id:"g-"+n,x:"-60%",y:"-60%",width:"220%",height:"220%"});
+    f.appendChild(el("feGaussianBlur",{stdDeviation:3.5,result:"b"}));
+    var m=el("feMerge",{}); m.appendChild(el("feMergeNode",{in:"b"}));
+    m.appendChild(el("feMergeNode",{in:"SourceGraphic"})); f.appendChild(m); defs.appendChild(f);
+  });
+  scene.appendChild(defs);
+
+  var COL=236, W=200, x0=0, yCTO=40, yLead=150, yDev=252, DH=38, mid=x0+COL*2;
+  orgNode(scene, mid, yCTO, 200, "cto", "technical direction", "var(--teal)", true);
+
+  LEADS.forEach(function(L,i){
+    var cx=x0+COL*i;
+    scene.appendChild(el("path",{d:"M"+mid+","+(yCTO+17)+" C"+mid+","+(yCTO+60)+
+      " "+cx+","+(yLead-60)+" "+cx+","+(yLead-17),fill:"none",stroke:"var(--edge)","stroke-width":1}));
+    orgNode(scene, cx, yLead, W, "team-lead-"+L.n, L.stacks, "var(--amber)", true);
+    var sl=el("text",{x:cx,y:yLead+32,"text-anchor":"middle",fill:"var(--dim)",
+      "font-family":"IBM Plex Mono, monospace","font-size":8.5,"letter-spacing":".1em"});
+    sl.textContent="QUEUED · PHASE 0"; scene.appendChild(sl);
+
+    ["senior-frontend-"+L.n,"junior-frontend-"+L.n+"a","junior-frontend-"+L.n+"b"]
+     .forEach(function(d,j){
+       var y=yDev+j*DH;
+       scene.appendChild(el("path",{d:"M"+(cx-W/2+12)+","+(yLead+17)+" L"+(cx-W/2+12)+","+y+
+         " L"+(cx-W/2+20)+","+y,fill:"none",stroke:"var(--edge)","stroke-width":1}));
+       orgNode(scene, cx+10, y, W-20, d, "", j===0?"var(--violet)":"var(--edge)", false);
+     });
+  });
+
+  var by=yDev+3*DH+30;
+  LEADS.forEach(function(L,i){
+    scene.appendChild(el("path",{d:"M"+(x0+COL*i+10)+","+(yDev+2*DH+13)+" C"+(x0+COL*i+10)+","+(by-28)+
+      " "+mid+","+(by-28)+" "+mid+","+(by-13),fill:"none",stroke:"var(--edge)",
+      "stroke-width":1,"stroke-opacity":.5}));
+  });
+  orgNode(scene, mid, by, 250, "senior-backend", "", "var(--green)", false);
+  var bl=el("text",{x:mid,y:by+25,"text-anchor":"middle",fill:"var(--dim)",
+    "font-family":"IBM Plex Mono, monospace","font-size":8.5});
+  bl.textContent="one seat, shared by all five leads"; scene.appendChild(bl);
+
+  var note=el("text",{x:x0-100,y:by+58,fill:"var(--dim)",
+    "font-family":"IBM Plex Mono, monospace","font-size":9});
+  note.textContent="ownership, not a routing path — the Listener writes to any seat directly (AGENTS.md §1)";
+  scene.appendChild(note);
+
+  if(!placed){placed=true;
+    // clear the roster rail on the left and the top bar above
+    view.k=Math.min(1,(innerWidth-560)/1180); view.x=345; view.y=74; apply();}
+}
+
+function orgDetail(name,st,label){
+  var d=document.getElementById("detail"); d.hidden=false;
+  d.innerHTML='<div class="who">'+esc(name)+'</div>'+
+    (label?'<div class="said">'+esc(label)+'</div>':'')+
+    '<div class="lrow"><span>state</span><b>'+(st.live?"running":st.ran?"has run":"idle")+'</b></div>'+
+    '<div class="lrow"><span>dispatched</span><b>'+st.n+'</b></div>'+
+    '<div class="lrow"><span>tool calls</span><b>'+(st.tools||0)+'</b></div>'+
+    '<div class="lrow"><span>tier</span><b>'+esc(st.model)+' · '+esc(st.effort)+'</b></div>'+
+    (st.ran?"":'<div class="warn">Exists and has never been dispatched. A fact about the roster, '+
+     'not a defect.</div>');
+}
+
 function detail(r){
   var d=document.getElementById("detail"), lv=levelOf(r.seat);
   var said=(S.events||[]).filter(function(e){return e.kind==="return"&&e.who===r.instance});
@@ -741,7 +856,8 @@ function render(s){
         '"><span>'+esc(x.name)+'</span>'+(x.dispatched>0?'<i>×'+x.dispatched+'</i>':
         '<i>'+esc(x.model.slice(0,4))+'</i>')+'</div>'}).join("")}).join("");
 
-  place(true); strip();
+  if(VIEW==="org") drawOrg(); else place(true);
+  strip();
 }
 function tick(){
   fetch("/api/state"+(picked?"?s="+picked:""))
@@ -749,6 +865,15 @@ function tick(){
     .catch(function(){if(++misses>=2)document.getElementById("live").innerHTML=
       '<span class="pulse"></span>server stopped'});
 }
+function setView(v){
+  VIEW=v; placed=false; sel=null;
+  document.getElementById("vflow").className="vbtn"+(v==="flow"?" on":"");
+  document.getElementById("vorg").className="vbtn"+(v==="org"?" on":"");
+  document.getElementById("detail").hidden=true;
+  if(v==="org"){drawOrg()}else{view={x:0,y:0,k:1};place(false)}
+}
+document.getElementById("vflow").onclick=function(){setView("flow")};
+document.getElementById("vorg").onclick=function(){setView("org")};
 document.getElementById("sess").addEventListener("change",function(e){
   picked=e.target.value;sel=null;document.getElementById("detail").hidden=true;tick()});
 
