@@ -425,3 +425,78 @@ beyond spot-checking that PagerDuty's own docs are incident/on-call framed, whic
 
 No Jira touched, no git command run, no file under `Dabbler/dabbler-code/` written, no role
 file other than my own edited — all per this task's constraints.
+
+---
+
+## 2026-09-06 — Two wallet defects from cto's T-049 ruling, ticketed under KAN-127
+
+`team-lead` relayed two defects `cto` found while ruling on `T-049` (money-write invariants),
+explicitly not part of that decision and needing their own tickets. Re-verified both myself
+against `Dabbler/dabbler-code/supabase/migrations/20260829080500_baseline_schema.sql` before
+writing anything — did not take `cto`'s line numbers on trust, same discipline as `KAN-128`.
+
+**Defect A — confirmed exactly as reported.** `wallets` (`:26677`–`:26688`) has `user_id`
+`NOT NULL` and primary key (`:28296`), and a separate `owner_id` `NOT NULL` with no default.
+`fn_get_wallet` (`:6096`) inserts `(owner_type, owner_id, currency)` — omits `user_id`.
+`_wallet_recalc` (`:1813`) inserts `(user_id, balance_aed, held_aed)` — omits `owner_id`.
+Neither insert can succeed against the other's constraint. Ticketed as **`KAN-130`**.
+
+**Defect B — confirmed exactly as reported.** `trgfn_payment_to_ledger` (`:19211`) calls
+`fn_get_wallet('platform', gen_random_uuid(), NEW.currency)` — a fresh uuid every invocation,
+so `wallets_unique_idx (owner_type, owner_id, currency)` never collides and platform
+commission would scatter across one wallet row per payment. Ticketed as **`KAN-131`**.
+
+Both parented under `KAN-127` (audit-findings epic, same as `KAN-128`/`KAN-129`). Both
+**BLOCKED ON cto RULING**: which wallet design wins for A, and how the platform wallet's
+identity is fixed for B (coupled to A's ruling). Both left at **To Do**, not transitioned —
+same standing as `KAN-128`/`KAN-129`, unsized until `cto` rules and `team-lead-4` sizes
+against the shared `senior-backend` queue with `pm`. Commented on each stating the ticket was
+filed with no transition applied.
+
+**Not part of T-049 and not duplicated** — `T-049`'s Decision 2 explicitly separates these two
+from the invariants-and-constraint decision it settles; confirmed by reading the ruling in
+full before ticketing rather than assuming the relay's framing.
+
+**On `KAN-128`, now unblocked by `T-049`** (recommendation only, not acted on): `T-049`
+Decision 1 answers `KAN-128` acceptance criterion 1 in full — the `(ref_type, ref_id,
+direction)` key with `ON CONFLICT DO NOTHING` for `wallet_ledger`, and the two partial-unique
+keys for `payment_intents`. `KAN-128` should be re-scoped to cite `T-049` by name in its AC
+rather than left open-ended ("whatever cto rules"), and can now be sized and dated by
+`team-lead-4` against the same `senior-backend` queue as `KAN-130`/`KAN-131`. Did not act on
+this — `team-lead` instructed recommendation only.
+
+**Not verified:** did not independently re-run the zero-row count against the live Supabase
+project `wtncuzcskpigqpmnxwws` for either ticket — carried from `cto`'s `T-049` measurement,
+noted as such in both tickets' evidence sections.
+
+No file under `Dabbler/dabbler-code/` written, no git command run, `DECISIONS.md` not edited,
+no ticket transitioned or re-dated beyond what is described above.
+
+---
+
+## 2026-09-06 — KAN-128 re-scoped to T-049 and unblocked, per team-lead's approval
+
+`team-lead` approved my earlier recommendation and gave the go-ahead to apply it. Re-scoped
+`KAN-128` and moved it to **Ready** (transition `2`). Comment id `10554` posted before the
+transition, per rule.
+
+Changes made: summary from `BLOCKED ON cto RULING: ...` to `RULED (T-049): ...`. AC #1
+rewritten to cite `DECISIONS.md:6090` Decision 1 directly instead of "whatever cto rules" —
+the `(ref_type, ref_id, direction)` unique key + `ON CONFLICT DO NOTHING` for `wallet_ledger`,
+the two partial-unique keys for `payment_intents`, and the amendment that matters carried
+verbatim: `direction` is in the key because `admin_cancel_payout` (`:2205`–`:2213`)
+legitimately inserts a second row (the reversing credit) for the same `(ref_type, ref_id)` —
+a plain `UNIQUE (ref_type, ref_id)` would have broken that path; `status` is excluded because
+it's mutated in place. AC #3 gained a check that the compensating-reversal path still
+succeeds after the fix. Also added `cto`'s zero-row measurement across all five money tables
+and the "free now, free once" framing, tied to D4 activating 2026-09-14.
+
+`due_date` still not set — did not estimate one myself. Named `team-lead-4` as owing it,
+coordinated with `pm` against the shared `senior-backend` queue, per team-lead's explicit
+instruction not to set one.
+
+Left `KAN-129`, `KAN-130`, `KAN-131` untouched — all three still genuinely blocked on a
+ruling that has not been made.
+
+No file under `Dabbler/dabbler-code/` written, no git command run, `DECISIONS.md` not edited,
+no Phase 0 ticket transitioned.

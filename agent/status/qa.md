@@ -233,3 +233,46 @@ Whether `flutter drive` on a Flutter-launched target avoids the two-instance pro
 skill bodies I did not open — Q1/Q3 rest on their `description:` lines only; whether any
 other seat's role file wires `verification-quality` or `wait-what` (I took the brief's
 statement that neither is wired, unchecked).
+
+## 2026-09-06 — `#356` corrected, harness measured, `drive-the-app` authored
+
+Dispatched by `team-lead` after `analyst` challenged my role file's reading of
+`dart-lang/ai#356`. Verified `analyst` independently rather than taking it: fetched
+https://github.com/dart-lang/ai/issues/356. **`analyst` is right.** The issue is closed and
+scopes to one combination — Dart MCP tools *plus* browser automation on the same web app
+(`-d web-server` never exposes DTD; `-d chrome` launches an isolated managed Chrome). It
+says nothing about `flutter drive` + `integration_test` and does not bar it.
+
+My file was wrong on a **second** count nobody flagged: it said Dart MCP "isn't configured
+in this project". The `mcp__plugin_dart-flutter_dart-mcp-server__*` tools are registered
+and reachable in-session. Whether DTD actually connects to a Dabbler build is untested and
+I did not claim otherwise.
+
+Corrected `agent/roles/qa.md` — kept the Chrome-attach caution for interactive web driving
+and the CanvasKit no-element-tree constraint, which are independent of `#356`.
+
+**Measured the harness** (`Dabbler/dabbler-code`, all 2026-09-06):
+
+- Android — `flutter test integration_test/app_test.dart -d emulator-5554
+  --dart-define-from-file=.env` → **exit 0, `00:12 +1: All tests passed!`**. The harness
+  works. **It hits live Supabase as a real authed user** and saved an FCM token for
+  `ec959ff7-46ef-4bf2-aab4-3515b81f5846` — not hermetic.
+- Web — blocked twice, and it is missing setup, not a forbidden tool.
+  `flutter test -d chrome` → `Web devices are not supported for integration tests yet.`
+  `chromedriver` not installed; `test_driver/integration_test.dart` never written.
+- iOS — **blocked by a space in the repo path.** SwiftPM double-encodes `One Brain` as
+  `One%2520Brain`; `ios/Flutter/ephemeral/pubspec.yaml` exists (1172 bytes) but Xcode looks
+  in a directory that does not exist. Environment defect, not a Dabbler bug. Every iOS
+  build from this checkout hits it. **Open — escalate to `po` if iOS coverage is wanted.**
+- macOS — `No macOS desktop project configured`.
+- `scripts/run_integration_tests.sh` auto-routes to iOS and therefore always fails here.
+  Call `flutter test` directly with `-d`.
+
+**Authored `agent/skills/drive-the-app/SKILL.md`** — 214 lines, no
+`disable-model-invocation`, confirmed invocable (it appeared in the available-skills list
+after being written). Every step marked `[M]` measured-with-date or `[U]` untested. Wired
+into this file's reflex table as the first row.
+
+Left `Dabbler/dabbler-code` clean — `git status --porcelain` empty. Logs went to the job
+tmp dir, not the repo. Booted the iPhone 16 Pro simulator and the `Dabbler_test` emulator;
+both are still running.

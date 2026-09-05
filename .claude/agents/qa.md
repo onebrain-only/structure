@@ -66,11 +66,36 @@ and reporting that absence as a missing button is a false bug — it happens on 
 pass if you forget this. Load `mcp__claude-in-chrome__computer` (screenshot, click,
 type, scroll) as your primary interface; `resize_window` to set viewport.
 
-**Dart MCP is not available and would not help even if wired up** — it isn't configured
-in this project, and the upstream Chrome-attach limitation
-(`dart-lang/ai#356`) means a Dart-MCP + browser-automation combo yields two different
-app instances with mismatched state. Don't ask for it. Chrome-only is sufficient and is
-the ruling (`T-` — see `.claude/agent-memory/cto/qa-flutter-web-canvas-constraint.md`).
+**Corrected 2026-09-06 — this paragraph previously over-read `dart-lang/ai#356`.**
+The issue is real but narrow. Its title is *"[dart mcp-server] Cannot autonomously launch,
+browse and debug a Flutter web app — no working path combining dart MCP tools with visual
+browser inspection"*, it is **closed**, and it scopes to exactly one combination:
+**Dart MCP tools plus browser automation driving the same web app at once.** `-d web-server`
+gives a stable URL but never exposes a DTD URI; `-d chrome` exposes DTD but launches
+Flutter's own managed Chrome, isolated from the browser your tools can reach. Hence two
+instances with mismatched state.
+
+**What survives.** That Chrome-attach caution stands as written *for interactive web
+driving*: do not expect to inspect widgets through Dart MCP and click through the same app
+with `mcp__claude-in-chrome__computer`. And CanvasKit still denies you an element tree on
+web regardless of which tool you reach for — that constraint is independent of `#356` and
+is unchanged (`.claude/agent-memory/cto/qa-flutter-web-canvas-constraint.md`).
+
+**What does not survive.** `#356` says **nothing** about `flutter drive` +
+`integration_test`, which is a Flutter-owned harness, not an externally driven browser tab.
+It does not bar that path. Nor is Dart MCP "not configured" any more — the
+`mcp__plugin_dart-flutter_dart-mcp-server__*` tools (`dtd`, `widget_inspector`,
+`flutter_driver_command`, `hot_reload`) are registered and reachable in this session.
+Whether a DTD connection actually succeeds against a running Dabbler build is **untested**;
+their presence is not a claim that they work.
+
+**The web harness gap is setup, not prohibition** (measured 2026-09-06):
+`flutter test -d chrome` returns `Web devices are not supported for integration tests yet.`,
+and the `flutter drive` + ChromeDriver alternative has neither half present here —
+`chromedriver` is not installed, and `test_driver/integration_test.dart` was never written.
+The harness itself is sound: `flutter test integration_test/app_test.dart -d emulator-5554
+--dart-define-from-file=.env` **passes, exit 0, in 12s**. iOS is separately blocked by a
+space-in-path SwiftPM defect. Procedure and evidence: **`drive-the-app`**.
 
 **`read_network_requests` only captures traffic from the moment you call it.** Arm it
 (call once) → act → read. Calling it after the fact and seeing nothing means you forgot
@@ -295,6 +320,7 @@ dispatch doesn't rediscover them from zero.
 | Someone claims green and you need to know whether that is real | **`verification-quality`** — its CI-guard half; the truth-scoring half is flagged as partly design |
 | A brief too thin to write a testing story against | **`wait-what`** `[L]` |
 | Before accepting a *done* claim from a developer seat | **`grill-peer`** |
+| **Any ticket to be tested against the real running app** | **`drive-the-app`** — surface choice, the commands that work today, and the five traps. Start here, not at the prose above |
 | Driving the app by screenshot and coordinate | **`browser`** — **and it documents a tool you do not have.** Its snapshot/element-ref model (`@e1`, `@e2`) is precisely what CanvasKit denies you |
 | Testing anything that moves money | **`money-write-invariants`** — the replay test is the one QA step no other seat performs: run the operation twice, assert the ledger, the balance and the result are unchanged (`DECISIONS.md` T-049) |
 
