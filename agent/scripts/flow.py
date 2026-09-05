@@ -301,299 +301,335 @@ PAGE = r"""<!doctype html><html lang="en"><head>
 <title>One Brain — Agent Flow</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500&display=swap">
 <style>
-:root{--paper:#F3F4F1;--raise:#FFF;--ink:#171C1A;--ink2:#3D4744;--muted:#6B7671;
---rule:#CBD2CE;--soft:#E1E6E2;--struct:#3E5F63;--structsoft:#DCE6E6;
---signal:#B4560B;--signalsoft:#F6E4D2;--live:#1F6F4A;--livesoft:#DCEDE3;--grid:#E4E8E4}
-@media(prefers-color-scheme:dark){:root:not([data-theme=light]){--paper:#111513;--raise:#181E1B;
---ink:#E7ECE7;--ink2:#B4BDB8;--muted:#828E88;--rule:#2B332F;--soft:#212824;--struct:#7FAAAE;
---structsoft:#1C2626;--signal:#E5883C;--signalsoft:#2B1E11;--live:#5FBE8C;--livesoft:#14241B;--grid:#1B211D}}
-:root[data-theme=dark]{--paper:#111513;--raise:#181E1B;--ink:#E7ECE7;--ink2:#B4BDB8;--muted:#828E88;
---rule:#2B332F;--soft:#212824;--struct:#7FAAAE;--structsoft:#1C2626;--signal:#E5883C;
---signalsoft:#2B1E11;--live:#5FBE8C;--livesoft:#14241B;--grid:#1B211D}
+:root{
+  --void:#0B0F0E; --deep:#101614; --panel:#141B19; --edge:#232D2A;
+  --ink:#E8EDE9; --ink2:#9DA9A3; --dim:#5F6B66;
+  --teal:#5FA8AE; --teal-dim:#2A4448;
+  --amber:#E5883C; --amber-dim:#3A2716;
+  --green:#5FBE8C; --green-dim:#17301F;
+  --violet:#9A8FD8;
+}
 *{box-sizing:border-box}
-body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif;
--webkit-font-smoothing:antialiased;overflow:hidden}
+html,body{height:100%}
+body{margin:0;background:var(--void);color:var(--ink);overflow:hidden;
+  font:14px/1.5 "IBM Plex Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
-h1{font-family:"Bricolage Grotesque",system-ui,sans-serif;font-size:19px;font-weight:800;letter-spacing:-.02em;margin:0}
-.eyebrow{font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
 
-.bar{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:11px 18px;
-border-bottom:1px solid var(--rule);background:var(--raise);height:52px}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--muted);display:inline-block;margin-right:6px}
-.dot.on{background:var(--live);box-shadow:0 0 0 3px var(--livesoft)}
-@media(prefers-reduced-motion:no-preference){.dot.on{animation:pulse 2s ease-in-out infinite}}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
-.counts{display:flex;margin-left:auto;border:1px solid var(--rule);border-radius:2px;overflow:hidden}
-.counts div{padding:4px 12px;border-right:1px solid var(--rule)}
-.counts div:last-child{border-right:0}
-.counts b{font-family:"IBM Plex Mono",monospace;font-size:14px;font-variant-numeric:tabular-nums;display:block;line-height:1.2}
-.counts span{font-size:9.5px;color:var(--muted)}
-select,button{font-family:"IBM Plex Mono",monospace;font-size:11px;padding:5px 9px;background:var(--paper);
-color:var(--ink);border:1px solid var(--rule);border-radius:2px;cursor:pointer}
-button:hover{border-color:var(--struct)}
-button:focus-visible,select:focus-visible{outline:2px solid var(--struct);outline-offset:1px}
+/* ---------- chrome ---------- */
+.top{position:fixed;inset:0 0 auto 0;height:50px;z-index:5;display:flex;align-items:center;gap:16px;
+  padding:0 18px;background:linear-gradient(var(--void),rgba(11,15,14,.72));backdrop-filter:blur(6px)}
+.brand{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:17px;letter-spacing:-.02em}
+.pulse{width:7px;height:7px;border-radius:50%;background:var(--dim);display:inline-block;margin-right:6px}
+.pulse.on{background:var(--green);box-shadow:0 0 9px var(--green)}
+@media(prefers-reduced-motion:no-preference){.pulse.on{animation:bp 2.4s ease-in-out infinite}}
+@keyframes bp{0%,100%{opacity:1}50%{opacity:.35}}
+.meta{font-family:"IBM Plex Mono",monospace;font-size:11px;color:var(--ink2);letter-spacing:.02em}
+.meta b{color:var(--ink);font-weight:600}
+select{font-family:"IBM Plex Mono",monospace;font-size:11px;padding:4px 8px;background:var(--panel);
+  color:var(--ink);border:1px solid var(--edge);border-radius:3px}
+.spacer{margin-left:auto}
 
-.grid{display:grid;grid-template-columns:216px minmax(0,1fr) 300px;height:calc(100vh - 52px)}
-.rail{overflow-y:auto;padding:14px 15px;border-right:1px solid var(--rule)}
-.insp{overflow-y:auto;padding:14px 16px;border-left:1px solid var(--rule);background:var(--raise)}
-.rail h2,.insp h2{font-family:"Bricolage Grotesque",sans-serif;font-size:12px;font-weight:600;margin:0 0 9px;letter-spacing:-.01em}
-.canvas{position:relative;overflow:hidden;background:var(--paper);cursor:grab}
-.canvas.drag{cursor:grabbing}
-svg{display:block;width:100%;height:100%;touch-action:none}
+/* ---------- ledger ---------- */
+.ledger{position:fixed;right:16px;top:62px;width:242px;z-index:4;background:var(--panel);
+  border:1px solid var(--edge);border-radius:4px;padding:12px 13px}
+.ledger .big{font-family:"IBM Plex Mono",monospace;font-size:21px;font-weight:600;letter-spacing:-.02em}
+.ledger .sub{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--dim);margin-bottom:11px}
+.lrow{display:flex;justify-content:space-between;gap:9px;font-family:"IBM Plex Mono",monospace;
+  font-size:10.5px;padding:3px 0;color:var(--ink2)}
+.lrow b{color:var(--ink);font-weight:500;font-variant-numeric:tabular-nums}
+.lhead{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim);margin:11px 0 4px;padding-top:9px;border-top:1px solid var(--edge)}
+.warn{font-size:10px;color:var(--dim);line-height:1.45;margin-top:9px;padding-top:8px;
+  border-top:1px solid var(--edge)}
 
-.lvl{margin-bottom:12px}
-.lvl>.eyebrow{display:block;margin-bottom:5px;color:var(--struct)}
-.seat{display:flex;justify-content:space-between;align-items:center;gap:6px;padding:3px 7px;
-border:1px solid transparent;border-radius:2px;font-family:"IBM Plex Mono",monospace;font-size:10.5px}
-.seat.logged{color:var(--ink2)}
-.seat:not(.logged){color:var(--muted)}
-.seat.hot{background:var(--signalsoft);border-color:var(--signal);color:var(--signal);font-weight:600}
-.seat .tier{font-size:9px;opacity:.65}
-.seat .n{background:var(--signal);color:#fff;border-radius:8px;padding:0 5px;font-size:9px;font-weight:600}
+/* ---------- roster ---------- */
+.roster{position:fixed;left:16px;top:62px;width:186px;z-index:4;background:var(--panel);
+  border:1px solid var(--edge);border-radius:4px;padding:11px 12px;max-height:calc(100vh - 190px);overflow-y:auto}
+.rhead{font-family:"IBM Plex Mono",monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--dim);margin:9px 0 4px}
+.rhead:first-child{margin-top:0}
+.rseat{display:flex;justify-content:space-between;gap:6px;font-family:"IBM Plex Mono",monospace;
+  font-size:10px;padding:2px 5px;border-radius:2px;color:var(--dim)}
+.rseat.logged{color:var(--ink2)}
+.rseat.hot{background:var(--amber-dim);color:var(--amber)}
+.rseat i{font-style:normal;opacity:.6;font-size:9px}
 
-.hint{position:absolute;left:14px;bottom:12px;font-family:"IBM Plex Mono",monospace;font-size:10px;
-color:var(--muted);background:var(--raise);border:1px solid var(--rule);padding:4px 9px;border-radius:2px}
-.zoom{position:absolute;right:14px;bottom:12px;display:flex;gap:5px}
+/* ---------- detail ---------- */
+.detail{position:fixed;right:16px;bottom:96px;width:242px;z-index:4;background:var(--panel);
+  border:1px solid var(--edge);border-radius:4px;padding:12px 13px}
+.detail .who{font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:600;letter-spacing:-.01em}
+.detail .said{font-size:12px;color:var(--ink2);margin:7px 0 10px;line-height:1.5;
+  max-height:112px;overflow-y:auto}
+.pill{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:9px;padding:1px 6px;
+  border-radius:2px;letter-spacing:.04em;margin-bottom:7px}
 
-.kv{font-family:"IBM Plex Mono",monospace;font-size:11px;display:flex;justify-content:space-between;
-gap:8px;padding:4px 0;border-bottom:1px solid var(--soft)}
-.kv span{color:var(--muted)}
-.kv b{font-weight:500;text-align:right}
-.insp .desc{font-size:13px;color:var(--ink2);margin:8px 0 12px}
-.tag{display:inline-block;font-family:"IBM Plex Mono",monospace;font-size:10px;padding:1px 7px;
-border-radius:2px;margin-bottom:9px}
-.tag.company{background:var(--structsoft);color:var(--struct)}
-.tag.product{background:var(--livesoft);color:var(--live)}
-.tag.project{background:var(--signalsoft);color:var(--signal)}
-.tag.developer{background:var(--soft);color:var(--ink2)}
-.empty{color:var(--muted);font-size:12.5px;padding:14px 0}
-.chip{font-family:"IBM Plex Mono",monospace;font-size:10px;padding:1px 6px;border:1px solid var(--rule);
-border-radius:2px;color:var(--muted);display:inline-block;margin:0 3px 3px 0}
+/* ---------- timeline ---------- */
+.strip{position:fixed;left:16px;right:16px;bottom:16px;height:64px;z-index:4;background:var(--panel);
+  border:1px solid var(--edge);border-radius:4px;display:flex;align-items:center;gap:14px;padding:0 15px}
+.strip .lbl{font-family:"IBM Plex Mono",monospace;font-size:10px;color:var(--dim);white-space:nowrap}
+.track{position:relative;flex:1;height:30px}
+.track svg{position:absolute;inset:0;width:100%;height:100%}
+
+canvas{position:fixed;inset:0;z-index:0}
+svg#stage{position:fixed;inset:0;width:100%;height:100%;z-index:1}
+.hint{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;z-index:6;pointer-events:none;
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--dim);opacity:.55}
 </style></head><body>
 
-<div class="bar">
-  <h1>One Brain</h1>
-  <span class="eyebrow" id="livelabel"><span class="dot"></span>connecting</span>
+<canvas id="stars"></canvas>
+<svg id="stage"><g id="scene"></g></svg>
+
+<div class="top">
+  <span class="brand">One Brain</span>
+  <span class="meta" id="live"><span class="pulse"></span>connecting</span>
   <select id="sess"></select>
-  <button id="fit">fit</button>
-  <div class="counts">
-    <div><b id="cTurns">0</b><span>turns</span></div>
-    <div><b id="cRuns">0</b><span>runs</span></div>
-    <div><b id="cTools">0</b><span>tool calls</span></div>
-    <div><b id="cSeats">0</b><span>seats woken</span></div>
-  </div>
+  <span class="spacer"></span>
+  <span class="meta" id="hdr">—</span>
 </div>
 
-<div class="grid">
-  <div class="rail"><h2>The roster</h2><div id="roster"></div></div>
-  <div class="canvas" id="canvas">
-    <svg id="svg"><g id="scene"></g></svg>
-    <div class="hint">drag to pan · scroll to zoom · click a node</div>
-    <div class="zoom"><button id="zout">−</button><button id="zin">+</button></div>
-  </div>
-  <div class="insp"><h2>Inspector</h2><div id="insp"><p class="empty">Click a node in the graph.</p></div></div>
+<div class="roster" id="roster"></div>
+
+<div class="ledger" id="ledger"></div>
+
+<div class="detail" id="detail" hidden></div>
+
+<div class="strip">
+  <span class="lbl" id="t0">—</span>
+  <div class="track"><svg id="tl"></svg></div>
+  <span class="lbl" id="t1">—</span>
 </div>
+
+<div class="hint">drag to pan · scroll to zoom · click a node</div>
 
 <script>
-var LEVELS=[["company","Company"],["product","Product"],["project","Project"],["developer","Developers"]];
-var NS="http://www.w3.org/2000/svg";
-var picked=null,misses=0,sel=null,S=null,view={x:0,y:0,k:1},didFit=false;
+var NS="http://www.w3.org/2000/svg",S=null,sel=null,misses=0,picked=null;
+var view={x:0,y:0,k:1},placed=false;
 
 function esc(s){return (s||"").replace(/[<>&"]/g,function(c){
   return {"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;"}[c]})}
-function t2ms(t){var d=new Date(t);return isNaN(d)?0:d.getTime()}
-function clock(t){var d=new Date(t);return isNaN(d)?"":d.toTimeString().slice(0,5)}
 function el(n,a){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);return e}
+function ms(t){var d=new Date(t);return isNaN(d)?0:d.getTime()}
+function hhmm(t){var d=new Date(t);return isNaN(d)?"":d.toTimeString().slice(0,5)}
+function nfmt(n){return n>=1e6?(n/1e6).toFixed(2)+"M":n>=1e3?(n/1e3).toFixed(1)+"k":String(n)}
 function levelOf(n){
   if(["cto","cpo","cxo","analyst"].indexOf(n)>=0)return "company";
   if(["pm","devops","content-manager"].indexOf(n)>=0)return "product";
   if(n==="po"||n==="qa"||n.indexOf("team-lead")===0)return "project";
   return "developer"}
+var HUE={company:"var(--teal)",product:"var(--green)",project:"var(--amber)",developer:"var(--violet)"};
 
+/* starfield — drawn once, cheap, sets the ground the nodes sit on */
+(function(){
+  var c=document.getElementById("stars"),x=c.getContext("2d");
+  function paint(){
+    c.width=innerWidth;c.height=innerHeight;
+    x.fillStyle="#0B0F0E";x.fillRect(0,0,c.width,c.height);
+    for(var i=0;i<190;i++){
+      var r=Math.random()*1.1+.2;
+      x.globalAlpha=Math.random()*.34+.05;
+      x.fillStyle=i%9===0?"#5FA8AE":"#7E8C86";
+      x.beginPath();x.arc(Math.random()*c.width,Math.random()*c.height,r,0,7);x.fill();
+    }
+    x.globalAlpha=1;
+  }
+  paint(); addEventListener("resize",function(){paint();place(true)});
+})();
+
+function hex(cx,cy,r){
+  var p=[];
+  for(var i=0;i<6;i++){var a=Math.PI/180*(60*i-30);
+    p.push((cx+r*Math.cos(a)).toFixed(1)+","+(cy+r*Math.sin(a)).toFixed(1))}
+  return p.join(" ");
+}
 function apply(){document.getElementById("scene").setAttribute("transform",
   "translate("+view.x+","+view.y+") scale("+view.k+")")}
 
-/* ---- graph ---------------------------------------------------------- */
-var LANE_Y=150, LANE_H=74, LEFT=120, SPAN=1180;
-
-function draw(s){
+/* ---------- the constellation ---------- */
+function place(keep){
   var scene=document.getElementById("scene");
-  while(scene.firstChild) scene.removeChild(scene.firstChild);
-  var runs=s.runs||[]; if(!runs.length){ return }
+  while(scene.firstChild)scene.removeChild(scene.firstChild);
+  if(!S||!S.runs)return;
+  var TOP=54, BOT=96, band=innerHeight-TOP-BOT;
+  var runs=S.runs, cx=innerWidth/2, cy=TOP+band/2;
 
-  var stamps=[]; runs.forEach(function(r){stamps.push(t2ms(r.start)); if(r.end)stamps.push(t2ms(r.end))});
-  (s.events||[]).forEach(function(e){if(e.kind==="prompt")stamps.push(t2ms(e.ts))});
-  var t0=Math.min.apply(null,stamps), t1=Math.max.apply(null,stamps);
-  var X=function(t){ return t1===t0 ? LEFT : LEFT + (t2ms(t)-t0)/(t1-t0)*SPAN };
+  var defs=el("defs",{});
+  ["teal","green","amber","violet"].forEach(function(n){
+    var f=el("filter",{id:"g-"+n,x:"-60%",y:"-60%",width:"220%",height:"220%"});
+    f.appendChild(el("feGaussianBlur",{stdDeviation:5,result:"b"}));
+    var m=el("feMerge",{});m.appendChild(el("feMergeNode",{in:"b"}));
+    m.appendChild(el("feMergeNode",{in:"SourceGraphic"}));f.appendChild(m);defs.appendChild(f);
+  });
+  scene.appendChild(defs);
 
-  // one lane per seat, ordered by first dispatch
-  var lanes=[],laneOf={};
-  runs.forEach(function(r){ if(!(r.seat in laneOf)){ laneOf[r.seat]=lanes.length; lanes.push(r.seat) } });
-
-  // lane backgrounds + labels
-  lanes.forEach(function(seat,i){
-    var y=LANE_Y+60+i*LANE_H;
-    scene.appendChild(el("line",{x1:LEFT-60,y1:y,x2:LEFT+SPAN+70,y2:y,
-      stroke:"var(--grid)","stroke-width":1}));
-    var lb=el("text",{x:LEFT-70,y:y+4,"text-anchor":"end",fill:"var(--muted)",
-      "font-family":"IBM Plex Mono, monospace","font-size":11});
-    lb.textContent=seat; scene.appendChild(lb);
+  /* the Listener's own tool calls — short tethers, they belong to it and to nothing else */
+  var recent=(S.events||[]).filter(function(e){return e.kind==="tool"}).slice(-14);
+  recent.forEach(function(e,i){
+    var a=Math.PI*2*(i/recent.length)+.35, r=118+((i%3)*15);
+    var tx=cx+Math.cos(a)*r, ty=cy+Math.sin(a)*r;
+    scene.appendChild(el("line",{x1:cx,y1:cy,x2:tx,y2:ty,stroke:"var(--edge)","stroke-width":1}));
+    scene.appendChild(el("circle",{cx:tx,cy:ty,r:2.4,fill:"var(--dim)"}));
+    var t=el("text",{x:tx+6,y:ty+3,fill:"var(--dim)","font-family":"IBM Plex Mono, monospace","font-size":8.5});
+    t.textContent=e.tool; scene.appendChild(t);
   });
 
-  // the Listener spine
-  scene.appendChild(el("line",{x1:LEFT-60,y1:LANE_Y,x2:LEFT+SPAN+70,y2:LANE_Y,
-    stroke:"var(--rule)","stroke-width":2}));
-  var sl=el("text",{x:LEFT-70,y:LANE_Y+4,"text-anchor":"end",fill:"var(--ink)",
-    "font-family":"IBM Plex Mono, monospace","font-size":11.5,"font-weight":600});
-  sl.textContent="listener"; scene.appendChild(sl);
+  /* agents on a ring, clockwise in dispatch order */
+  var R=Math.max(150,Math.min(cx-190, band/2-58));
+  runs.forEach(function(r,i){
+    var a=Math.PI*2*(i/runs.length)-Math.PI/2;
+    var nx=cx+Math.cos(a)*R, ny=cy+Math.sin(a)*R;
+    var lv=levelOf(r.seat), hue=HUE[lv];
+    var open=!r.end;
 
-  // CEO prompts above the spine
-  (s.events||[]).filter(function(e){return e.kind==="prompt"}).forEach(function(e){
-    var x=X(e.ts);
-    scene.appendChild(el("line",{x1:x,y1:LANE_Y-42,x2:x,y2:LANE_Y,stroke:"var(--rule)","stroke-width":1}));
-    var d=el("rect",{x:x-5,y:LANE_Y-47,width:10,height:10,fill:"var(--ink)",
-      transform:"rotate(45 "+x+" "+(LANE_Y-42)+")"});
-    d.style.cursor="pointer";
-    d.addEventListener("click",function(ev){ev.stopPropagation();
-      inspect({kind:"prompt",ts:e.ts,text:e.text})});
-    scene.appendChild(d);
-  });
-  var cl=el("text",{x:LEFT-70,y:LANE_Y-38,"text-anchor":"end",fill:"var(--muted)",
-    "font-family":"IBM Plex Mono, monospace","font-size":11});
-  cl.textContent="CEO"; scene.appendChild(cl);
-
-  // runs
-  runs.forEach(function(r){
-    var y=LANE_Y+60+laneOf[r.seat]*LANE_H;
-    var x0=X(r.start), open=!r.end;
-    // an open run gets a fixed stub, not a bar stretched to now — one unmatched
-    // reply should not swamp the whole canvas
-    var w=open?118:Math.max(96,X(r.end)-x0);
-    var lv=levelOf(r.seat);
-    var stroke=lv==="company"?"var(--struct)":lv==="product"?"var(--live)":
-               lv==="project"?"var(--signal)":"var(--ink2)";
-
-    // dispatch edge out, return edge back
-    scene.appendChild(el("path",{d:"M"+x0+","+LANE_Y+" C"+x0+","+(LANE_Y+34)+" "+x0+","+(y-30)+" "+x0+","+(y-13),
-      fill:"none",stroke:"var(--signal)","stroke-width":1.5}));
-    if(!open) scene.appendChild(el("path",{
-      d:"M"+(x0+w)+","+(y-13)+" C"+(x0+w)+","+(y-34)+" "+(x0+w)+","+(LANE_Y+30)+" "+(x0+w)+","+LANE_Y,
-      fill:"none",stroke:"var(--live)","stroke-width":1.5,"stroke-dasharray":"3 3"}));
+    // tether, bowed so crossings read as separate lines
+    var mx=(cx+nx)/2+Math.cos(a+Math.PI/2)*34, my=(cy+ny)/2+Math.sin(a+Math.PI/2)*34;
+    scene.appendChild(el("path",{d:"M"+cx+","+cy+" Q"+mx+","+my+" "+nx+","+ny,
+      fill:"none",stroke:open?"var(--amber)":hue,"stroke-width":sel===r.instance?2:1,
+      "stroke-opacity":sel===r.instance?.95:.4,"stroke-dasharray":open?"4 4":""}));
 
     var g=el("g",{}); g.style.cursor="pointer";
-    g.appendChild(el("rect",{x:x0,y:y-13,width:w,height:26,rx:2,
-      fill:"var(--raise)",stroke:stroke,"stroke-width":sel===r.instance?2.5:1.2}));
-    g.appendChild(el("rect",{x:x0,y:y-13,width:3,height:26,fill:stroke}));
-    var room=Math.floor((w-(w>150?52:30))/6.6);
-    var tx=el("text",{x:x0+10,y:y+4,fill:"var(--ink)","font-family":"IBM Plex Mono, monospace",
-      "font-size":11,"font-weight":500});
-    tx.textContent=r.seat.length>room?r.seat.slice(0,Math.max(3,room-1))+"…":r.seat;
-    g.appendChild(tx);
-    if(r.secs!=null && w>150){
-      var dt=el("text",{x:x0+w-8,y:y+4,"text-anchor":"end",fill:"var(--muted)",
-        "font-family":"IBM Plex Mono, monospace","font-size":9.5});
-      dt.textContent=r.secs+"s"; g.appendChild(dt);
+    // duration ring: how long this seat held the floor
+    if(r.secs!=null){
+      var frac=Math.min(1,r.secs/600), rr=32;
+      var end=-Math.PI/2+Math.PI*2*frac;
+      var lg=frac>.5?1:0;
+      g.appendChild(el("path",{d:"M"+cx0(nx,rr)+","+(ny-rr)+" A"+rr+","+rr+" 0 "+lg+" 1 "+
+        (nx+rr*Math.cos(end))+","+(ny+rr*Math.sin(end)),
+        fill:"none",stroke:hue,"stroke-width":2.5,"stroke-linecap":"round","stroke-opacity":.85}));
     }
-    if(open){
-      g.appendChild(el("circle",{cx:x0+w-10,cy:y,r:3.5,fill:"var(--signal)"}));
-      var op=el("text",{x:x0+w-20,y:y+3.5,"text-anchor":"end",fill:"var(--signal)",
-        "font-family":"IBM Plex Mono, monospace","font-size":9});
-      op.textContent="open"; g.appendChild(op);
-    }
-    g.addEventListener("click",function(ev){ev.stopPropagation(); sel=r.instance; inspect(r); draw(S)});
+    g.appendChild(el("polygon",{points:hex(nx,ny,25),fill:"var(--deep)",stroke:hue,
+      "stroke-width":sel===r.instance?2.2:1.4,filter:"url(#g-"+hueName(lv)+")"}));
+    if(open) g.appendChild(el("circle",{cx:nx,cy:ny,r:4,fill:"var(--amber)"}));
+
+    var nm=el("text",{x:nx,y:ny+46,"text-anchor":"middle",fill:"var(--ink)",
+      "font-family":"IBM Plex Mono, monospace","font-size":10.5,"font-weight":500});
+    nm.textContent=r.seat; g.appendChild(nm);
+    var sc=el("text",{x:nx,y:ny+59,"text-anchor":"middle",fill:"var(--dim)",
+      "font-family":"IBM Plex Mono, monospace","font-size":9});
+    sc.textContent=r.secs!=null?r.secs+"s":"open"; g.appendChild(sc);
+
+    g.addEventListener("click",function(ev){ev.stopPropagation();sel=r.instance;detail(r);place(true)});
     scene.appendChild(g);
   });
 
-  // messages sent to running agents
-  (s.events||[]).filter(function(e){return e.kind==="message"}).forEach(function(e){
-    var x=X(e.ts), ln=laneOf[ (e.to||"").replace(/-[^-]*$/,"") ];
-    var y = ln!=null ? LANE_Y+60+ln*LANE_H : LANE_Y;
-    scene.appendChild(el("path",{d:"M"+x+","+LANE_Y+" L"+x+","+(y-13),
-      fill:"none",stroke:"var(--struct)","stroke-width":1,"stroke-dasharray":"2 4"}));
-    scene.appendChild(el("circle",{cx:x,cy:LANE_Y,r:3,fill:"var(--struct)"}));
+  /* the Listener, at the centre, because everything actually does route through it */
+  scene.appendChild(el("polygon",{points:hex(cx,cy,46),fill:"var(--deep)",stroke:"var(--teal)",
+    "stroke-width":2,filter:"url(#g-teal)"}));
+  scene.appendChild(el("polygon",{points:hex(cx,cy,33),fill:"none",stroke:"var(--teal)",
+    "stroke-width":1,"stroke-opacity":.4}));
+  var lt=el("text",{x:cx,y:cy+4,"text-anchor":"middle",fill:"var(--teal)",
+    "font-family":"IBM Plex Mono, monospace","font-size":11,"font-weight":600});
+  lt.textContent="listener"; scene.appendChild(lt);
+  var lc=el("text",{x:cx,y:cy+68,"text-anchor":"middle",fill:"var(--dim)",
+    "font-family":"IBM Plex Mono, monospace","font-size":9.5});
+  lc.textContent=(S.tools||[]).reduce(function(a,t){return a+t[1]},0)+" tool calls";
+  scene.appendChild(lc);
+
+  if(!placed){placed=true;apply()}
+}
+function cx0(nx,rr){return nx}
+function hueName(lv){return lv==="company"?"teal":lv==="product"?"green":lv==="project"?"amber":"violet"}
+
+/* ---------- detail ---------- */
+function detail(r){
+  var d=document.getElementById("detail"), lv=levelOf(r.seat);
+  var said=(S.events||[]).filter(function(e){return e.kind==="return"&&e.who===r.instance});
+  d.hidden=false;
+  d.innerHTML='<span class="pill" style="background:var(--panel);border:1px solid '+HUE[lv]+
+    ';color:'+HUE[lv]+'">'+lv+'</span>'+
+    '<div class="who">'+esc(r.seat)+'</div>'+
+    '<div class="said">'+esc(r.desc||"—")+'</div>'+
+    '<div class="lrow"><span>instance</span><b>'+esc(r.instance.slice(0,20))+'</b></div>'+
+    '<div class="lrow"><span>held the floor</span><b>'+(r.secs!=null?r.secs+"s":"still open")+'</b></div>'+
+    '<div class="lrow"><span>started</span><b>'+hhmm(r.start)+'</b></div>'+
+    (said.length?'<div class="lhead">what came back</div><div class="said">'+
+      esc(said[said.length-1].text)+'</div>':'')+
+    '<div class="warn">Its own tool calls are not in this transcript — a dispatched seat runs in its '+
+    'own context. Claude Code hooks would stream them.</div>';
+}
+
+/* ---------- timeline ---------- */
+function strip(){
+  var sv=document.getElementById("tl");
+  while(sv.firstChild)sv.removeChild(sv.firstChild);
+  var ev=(S.events||[]).filter(function(e){return e.ts});
+  if(!ev.length)return;
+  var t0=ms(ev[0].ts), t1=ms(ev[ev.length-1].ts)||t0+1;
+  var w=sv.clientWidth||900, h=30;
+  document.getElementById("t0").textContent=hhmm(ev[0].ts);
+  document.getElementById("t1").textContent=hhmm(ev[ev.length-1].ts);
+  sv.appendChild(el("line",{x1:0,y1:h/2,x2:w,y2:h/2,stroke:"var(--edge)","stroke-width":1}));
+  var C={prompt:"var(--ink)",dispatch:"var(--amber)",return:"var(--green)",
+         message:"var(--teal)",tool:"var(--dim)"};
+  ev.forEach(function(e){
+    var x=t1===t0?0:(ms(e.ts)-t0)/(t1-t0)*w;
+    if(e.kind==="tool"){
+      sv.appendChild(el("rect",{x:x,y:h/2-2,width:1,height:4,fill:C.tool,"fill-opacity":.5}));
+    }else{
+      sv.appendChild(el("circle",{cx:x,cy:h/2,r:e.kind==="dispatch"?3.6:2.6,fill:C[e.kind]||C.tool}));
+    }
   });
-
-  if(!didFit){ fit(); didFit=true }
 }
 
-function fit(){
-  var c=document.getElementById("canvas");
-  var w=c.clientWidth-40, need=SPAN+LEFT+120;
-  view.k=Math.min(1, w/need); view.x=20; view.y=20; apply();
-}
-
-/* ---- inspector ------------------------------------------------------ */
-function inspect(o){
-  var h="";
-  if(o.kind==="prompt"){
-    h='<span class="tag developer">CEO prompt</span>'+
-      '<div class="desc">'+esc(o.text)+'</div>'+
-      '<div class="kv"><span>at</span><b>'+clock(o.ts)+'</b></div>';
-  } else {
-    var lv=levelOf(o.seat);
-    h='<span class="tag '+lv+'">'+lv+'</span>'+
-      '<div class="mono" style="font-size:14px;font-weight:600">'+esc(o.seat)+'</div>'+
-      '<div class="desc">'+esc(o.desc||"—")+'</div>'+
-      '<div class="kv"><span>instance</span><b>'+esc(o.instance)+'</b></div>'+
-      '<div class="kv"><span>started</span><b>'+clock(o.start)+'</b></div>'+
-      '<div class="kv"><span>returned</span><b>'+(o.end?clock(o.end):"— running")+'</b></div>'+
-      '<div class="kv"><span>duration</span><b>'+(o.secs!=null?o.secs+"s":"—")+'</b></div>'+
-      '<div class="kv"><span>listener tool calls<br>while it ran</span><b>'+o.tools+'</b></div>'+
-      '<p class="empty" style="font-size:11.5px;line-height:1.5">Its own tool calls are not in this'+
-      ' transcript — subagents run in their own context. Enabling Claude Code hooks would stream them.</p>';
-  }
-  document.getElementById("insp").innerHTML=h;
-}
-
-/* ---- data ----------------------------------------------------------- */
+/* ---------- data ---------- */
 function render(s){
   S=s;
-  if(s.error){document.getElementById("insp").innerHTML='<p class="empty">'+esc(s.error)+'</p>';return}
-  document.getElementById("livelabel").innerHTML='<span class="dot'+(s.live?" on":"")+'"></span>'+(s.live?"live":"idle");
+  if(s.error){document.getElementById("hdr").textContent=s.error;return}
+  document.getElementById("live").innerHTML='<span class="pulse'+(s.live?" on":"")+'"></span>'+
+    (s.live?"live":"idle");
   var se=document.getElementById("sess");
   if(se.options.length!==s.sessions.length){
     se.innerHTML=s.sessions.map(function(x){return '<option value="'+x.id+'">'+(x.live?"● ":"")+
-      x.id.slice(0,8)+"  ·  "+(x.size/1048576).toFixed(1)+"MB</option>"}).join("");
-    se.value=s.active;
+      x.id.slice(0,8)+'</option>'}).join(""); se.value=s.active;
   }
-  document.getElementById("cTurns").textContent=s.turns;
-  document.getElementById("cRuns").textContent=(s.runs||[]).length;
-  document.getElementById("cTools").textContent=s.tools.reduce(function(a,t){return a+t[1]},0);
-  document.getElementById("cSeats").textContent=s.seats.filter(function(x){return x.dispatched>0}).length;
+  var u=s.usage||{},woke=s.seats.filter(function(x){return x.dispatched>0}).length;
+  document.getElementById("hdr").innerHTML='<b>'+s.runs.length+'</b> runs · <b>'+woke+
+    '</b>/'+s.seats.length+' seats woken · <b>'+nfmt(u.out||0)+'</b> out';
 
-  document.getElementById("roster").innerHTML=LEVELS.map(function(L){
-    return '<div class="lvl"><span class="eyebrow">'+L[1]+'</span>'+
-      s.seats.filter(function(x){return x.level===L[0]}).map(function(x){
-        return '<div class="seat'+(x.logged?" logged":"")+(x.dispatched>0?" hot":"")+'">'+
-          '<span>'+esc(x.name)+'</span>'+(x.dispatched>0?'<span class="n">'+x.dispatched+'</span>':
-          '<span class="tier">'+esc(x.model)+'·'+esc(x.effort)+'</span>')+'</div>'}).join("")+'</div>'
-  }).join("");
-  draw(s);
+  document.getElementById("ledger").innerHTML=
+    '<div class="big">$'+(u.cost!=null?u.cost.toFixed(2):"—")+'</div>'+
+    '<div class="sub">'+esc(u.model||"—")+' · '+(u.msgs||0)+' messages</div>'+
+    '<div class="lrow"><span>output</span><b>'+nfmt(u.out||0)+'</b></div>'+
+    '<div class="lrow"><span>of which thinking</span><b>'+nfmt(u.think||0)+'</b></div>'+
+    '<div class="lrow"><span>input</span><b>'+nfmt(u["in"]||0)+'</b></div>'+
+    '<div class="lhead">cache</div>'+
+    '<div class="lrow"><span>read</span><b>'+nfmt(u.cache_read||0)+'</b></div>'+
+    '<div class="lrow"><span>written</span><b>'+nfmt(u.cache_write||0)+'</b></div>'+
+    '<div class="lhead">tools</div>'+
+    (s.tools||[]).slice(0,6).map(function(t){
+      return '<div class="lrow"><span>'+esc(t[0])+'</span><b>'+t[1]+'</b></div>'}).join("")+
+    '<div class="warn">Cost covers input and output at the published Opus 5 rate. Cache is shown in '+
+    'tokens and deliberately not priced — the rate depends on the TTL in use.</div>';
+
+  var LV=[["company","Company"],["product","Product"],["project","Project"],["developer","Developers"]];
+  document.getElementById("roster").innerHTML=LV.map(function(L){
+    return '<div class="rhead">'+L[1]+'</div>'+s.seats.filter(function(x){return x.level===L[0]})
+      .map(function(x){return '<div class="rseat'+(x.logged?" logged":"")+(x.dispatched>0?" hot":"")+
+        '"><span>'+esc(x.name)+'</span>'+(x.dispatched>0?'<i>×'+x.dispatched+'</i>':
+        '<i>'+esc(x.model.slice(0,4))+'</i>')+'</div>'}).join("")}).join("");
+
+  place(true); strip();
 }
-
 function tick(){
   fetch("/api/state"+(picked?"?s="+picked:""))
     .then(function(r){return r.json()}).then(function(s){misses=0;render(s)})
-    .catch(function(){if(++misses>=2)document.getElementById("livelabel").innerHTML=
-      '<span class="dot"></span>server stopped'});
+    .catch(function(){if(++misses>=2)document.getElementById("live").innerHTML=
+      '<span class="pulse"></span>server stopped'});
 }
-
-/* ---- pan + zoom ----------------------------------------------------- */
-var cv=document.getElementById("canvas"),down=false,sx=0,sy=0;
-cv.addEventListener("mousedown",function(e){down=true;sx=e.clientX-view.x;sy=e.clientY-view.y;cv.classList.add("drag")});
-window.addEventListener("mouseup",function(){down=false;cv.classList.remove("drag")});
-window.addEventListener("mousemove",function(e){if(down){view.x=e.clientX-sx;view.y=e.clientY-sy;apply()}});
-cv.addEventListener("wheel",function(e){e.preventDefault();
-  var f=e.deltaY<0?1.12:1/1.12,k=Math.min(3,Math.max(.2,view.k*f));
-  var r=cv.getBoundingClientRect(),mx=e.clientX-r.left,my=e.clientY-r.top;
-  view.x=mx-(mx-view.x)*(k/view.k); view.y=my-(my-view.y)*(k/view.k); view.k=k; apply()},{passive:false});
-document.getElementById("zin").onclick=function(){view.k=Math.min(3,view.k*1.2);apply()};
-document.getElementById("zout").onclick=function(){view.k=Math.max(.2,view.k/1.2);apply()};
-document.getElementById("fit").onclick=fit;
 document.getElementById("sess").addEventListener("change",function(e){
-  picked=e.target.value;didFit=false;sel=null;tick()});
+  picked=e.target.value;sel=null;document.getElementById("detail").hidden=true;tick()});
+
+/* pan + zoom */
+var st=document.getElementById("stage"),dn=false,ox=0,oy=0;
+st.addEventListener("mousedown",function(e){dn=true;ox=e.clientX-view.x;oy=e.clientY-view.y});
+addEventListener("mouseup",function(){dn=false});
+addEventListener("mousemove",function(e){if(dn){view.x=e.clientX-ox;view.y=e.clientY-oy;apply()}});
+st.addEventListener("wheel",function(e){e.preventDefault();
+  var f=e.deltaY<0?1.1:1/1.1,k=Math.min(2.6,Math.max(.35,view.k*f));
+  view.x=e.clientX-(e.clientX-view.x)*(k/view.k);
+  view.y=e.clientY-(e.clientY-view.y)*(k/view.k);view.k=k;apply()},{passive:false});
+st.addEventListener("click",function(){sel=null;document.getElementById("detail").hidden=true;place(true)});
 
 tick(); setInterval(tick,2000);
 </script></body></html>
