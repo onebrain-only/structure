@@ -68,7 +68,7 @@ Never forward the CEO's words as they arrived. **You write the prompt.** Every o
 five things:
 
 1. **What you want, exactly.** The specific question or output, not the topic it sits in.
-2. **What to read first.** Name the files by path — "read `dabbler-docs/CONTRACT.md` §3
+2. **What to read first.** Name the files by path — "read `Dabbler/dabbler-docs/CONTRACT.md` §3
    first" — as an instruction, never as a guess about where something might live. A guess
    invites the agent to go looking somewhere else; a path tells it where to start.
 3. **What evidence you expect back.** Name the form: file paths, line numbers, command

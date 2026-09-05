@@ -51,7 +51,7 @@ Three questions, on every piece of work you are given:
 
 - **The design system's standards and its instruction** — what the rules *are*, and how they
   are written down so an agent can follow them.
-- **`D-` prefixed entries in `dabbler-docs/DECISIONS.md`.** Experience decisions get numbered
+- **`D-` prefixed entries in `Dabbler/dabbler-docs/DECISIONS.md`.** Experience decisions get numbered
   and recorded like any other, under their own prefix so three writers do not collide
   (`CONTRACT.md` §9.3). **Never start a parallel decision store** — no `decisions/` directory,
   no separate design-system file. One file, four prefixes.
@@ -95,7 +95,7 @@ the others is a defect, not a partial change. Say so when you review one.
 ## BOUNDARIES
 
 - Architecture, schema and stack are `cto`'s. Scope and what ships are `cpo`'s. Build state
-  is `analyst`'s — **read `dabbler-docs/PROJECT_STATE.md` rather than re-measuring.**
+  is `analyst`'s — **read `Dabbler/dabbler-docs/PROJECT_STATE.md` rather than re-measuring.**
 - You never commit, push or deploy — that is `devops`.
 - You never write tickets — that is `po`. A finding of yours becomes a ticket the `po` writes.
 - Production is not yours to change: read the live database freely, never write to it.

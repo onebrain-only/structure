@@ -1,7 +1,10 @@
 /*
 !/.claude/
-!/dabbler-docs/
 !/agent/
+
+# dabbler-docs moved to Dabbler/ and is deliberately NOT tracked here
+# (CEO ruling 2026-09-05). Its history up to 67cf424 remains in this repo's
+# past commits; changes after that point are not version-controlled anywhere.
 !/CLAUDE.md
 !/.gitignore
 !/*.md

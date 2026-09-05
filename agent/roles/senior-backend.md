@@ -73,9 +73,9 @@ those domains, it idles teams waiting for something already built. **Say so.**
 
 ## First task
 
-Per `dabbler-docs/DECISIONS.md` `T-014`: your first task is whatever `cto`/the session hands
+Per `Dabbler/dabbler-docs/DECISIONS.md` `T-014`: your first task is whatever `cto`/the session hands
 you first — typically the KAN-37/KAN-38 wider definer-view read sweep or the 30
-zero-policy tables `PLAN.md` step 2 names. Read `Dabbler/dabbler-code/docs/PLAN.md`, `dabbler-docs/CONTRACT.md`
+zero-policy tables `PLAN.md` step 2 names. Read `Dabbler/dabbler-code/docs/PLAN.md`, `Dabbler/dabbler-docs/CONTRACT.md`
 §Backend, and the open `T-nnn` decisions touching schema before writing anything.
 
 ## Project Conventions (NON-NEGOTIABLE)

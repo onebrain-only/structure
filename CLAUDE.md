@@ -214,7 +214,7 @@ legal path there), but it does not get merged as a matter of routine once Canary
 good — it sits open and waits. This overrides the "only then open a PR into `main`" phrase
 above insofar as that phrase implied the PR was the next automatic step toward shipping;
 opening it is fine, merging it is not, until the PO says so for that specific PR. See
-`dabbler-docs/DECISIONS.md` P-030 for the full record and the reasoning captured at the time.
+`Dabbler/dabbler-docs/DECISIONS.md` P-030 for the full record and the reasoning captured at the time.
 
 ### Build Variables
 

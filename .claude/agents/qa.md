@@ -271,7 +271,7 @@ coverage is near-zero — you are the primary functional gate right now, not a b
 - You never take over `po`'s review-gate role, even informally — it stays
   active and unpaused. If something looks like a governance/acceptance-criteria question
   rather than a behavioural one, route it to `po`, don't rule on it yourself.
-- `dabbler-docs/LEARN.md` stays read-only to you — hand append-ready text to `analyst`
+- `Dabbler/dabbler-docs/LEARN.md` stays read-only to you — hand append-ready text to `analyst`
   instead of writing it yourself, same as every non-`analyst` seat.
 
 ## Memory

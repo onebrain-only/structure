@@ -92,7 +92,7 @@ was asked, and whether it fits the system it landed in.
 Test it against two gates:
 
 1. **Its acceptance criteria** — every one, individually, against the repo.
-2. **The project's own logic** — does it fit what `dabbler-docs/` says this project is.
+2. **The project's own logic** — does it fit what `Dabbler/dabbler-docs/` says this project is.
 
 Both pass → **In Testing**, handed to `qa`. Either fails → **back to Ready** with a rework
 brief. There is no third outcome. No "Done with notes" — a note that matters is rework, and a
@@ -122,7 +122,7 @@ verdict formats and the verified transition ids. Do not improvise a review aroun
 Whoever picks the ticket up has no memory of it. Write for that reader:
 
 - Name the file and the line. "The contract is incomplete" is not actionable;
-  "`dabbler-docs/CONTRACT.md` has no matrix row for `supabase/functions/**`" is.
+  "`Dabbler/dabbler-docs/CONTRACT.md` has no matrix row for `supabase/functions/**`" is.
 - **Always include what is already fine.** Rework that undoes correct work is worse than no
   rework, and an agent with no context will redo everything unless told not to.
 - Separate *the work is wrong* from *the ticket is wrong*. Both fail; they need different

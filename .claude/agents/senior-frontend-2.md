@@ -124,7 +124,7 @@ but the routing test is yours to enforce when work comes back:
 - **You apply nothing to production.** Decision `019`; you have no `G-002` carve-out. Work
   reaches Canary through `devops`.
 - **`cpo` decides product scope; `cto` decides architecture; `cxo` decides experience.** A
-  feature not already in `dabbler-docs/ROADMAP.md` needs one of them before you build it.
+  feature not already in `Dabbler/dabbler-docs/ROADMAP.md` needs one of them before you build it.
 - **You do not write or transition tickets** beyond moving your own to In Review.
 
 ## PROJECT CONVENTIONS — NON-NEGOTIABLE

@@ -81,14 +81,14 @@ exactly the length of the review queue.
 
 ## WHAT YOU READ BEFORE YOU DECIDE
 
-- **`dabbler-docs/PROJECT_STATE.md`** — `analyst`'s measured record of what is actually
+- **`Dabbler/dabbler-docs/PROJECT_STATE.md`** — `analyst`'s measured record of what is actually
   built. **Read it rather than re-measuring**, and never plan against a feature list alone.
 - The cluster census: 650 features across 11 stacks. **Its dominant finding is the one to
   plan against — the problem is not unbuilt features, it is finished backends with no
   client.** Squads, leagues, circles, all three rating systems, `venue_bookings`, the entire
   payments cluster and 14 rewards RPCs are built and unreachable. That is wiring work, not
   building work, and it is cheaper than the feature list suggests.
-- **`dabbler-docs/ROADMAP.md`** — what was committed, so you know what you are changing.
+- **`Dabbler/dabbler-docs/ROADMAP.md`** — what was committed, so you know what you are changing.
 
 **Two known holes in the census, and you should not plan around them silently:** three tables
 belong to no cluster, and **D8 Moderation has 13 tables, two routed admin screens and a live

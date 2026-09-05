@@ -152,7 +152,7 @@ directory and a status file. **A seat missing any of those is not a seat.**
 | `cto` | Decides technical direction and holds the standard. Architecture, schema shape, stack, build-vs-buy | `ARCHITECTURE.md` · `CONVENTIONS.md` · `SCHEMA.md` §11 · `T-` decisions | Writes feature code. Writes to production |
 | `cpo` | Vision, scope, PRDs. Judges every proposal against the committed business strategy | `BRIEF.md` · `ROADMAP.md` · `P-` decisions · **sole writer to the Notion business corpus** | Decides technical shape. Touches production |
 | `cxo` | **Chief Experience Officer.** Judges whether work matches the design system, the product's own logic, and the company's goals | The design system's standards and instruction · `D-` decisions | Writes code. Edits what it judges |
-| `analyst` | Establishes what is *true* about the codebase, so every decision starts from reality. Finds problems; does not fix them | `dabbler-docs/**` · `agent/**` · `.claude/agents/**` | Writes any code. Grades anyone's work |
+| `analyst` | Establishes what is *true* about the codebase, so every decision starts from reality. Finds problems; does not fix them | `Dabbler/dabbler-docs/**` · `agent/**` · `.claude/agents/**` | Writes any code. Grades anyone's work |
 
 **`cto` decides what should be true; `analyst` measures what is true; `cxo` judges how it
 feels; `cpo` decides whether it should exist at all.** Four different questions. Sending one
