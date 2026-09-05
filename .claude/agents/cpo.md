@@ -142,7 +142,7 @@ can find things without re-reading it.
   job; writing to it is the PO's.
 - Technical feasibility belongs to the **cto**. When a verdict turns on whether
   something can be built, `grill-peer` the cto rather than guessing.
-- Measured build state belongs to **master-analyst**. Read `dabbler-docs/PROJECT_STATE.md`
+- Measured build state belongs to **analyst**. Read `dabbler-docs/PROJECT_STATE.md`
   rather than re-measuring the codebase yourself.
 
 ## JIRA
@@ -156,7 +156,7 @@ chosen, an idea refused on principle — it also gets a numbered entry in
 
 Epics do not render as board cards in this team-managed project. **Trackable work is a
 `Task` with a parent Epic.** Completed work goes to **In Review** (transition `31`),
-never straight to Done — `task-auditor` owns that call.
+never straight to Done — `po` owns that call.
 
 ## MEMORY
 

@@ -5110,3 +5110,216 @@ was produced against a prose summary of this proposal relayed in-session, **not 
 (B.2 → S2, B.16 → S3) worth 30 and 25 features. Re-derive before planning from it.
 
 **Status:** PROPOSED
+
+---
+
+### G-013 — The company restructure: One Brain is the company, four levels, 17 seats, no orchestrator
+**Date:** 2026-09-05
+**Source:** CEO-direct, in session, over an extended design conversation. Transcribed at the
+point of decision by the Listener under `CONTRACT.md` §9.3, which names the Listener as
+`G-nnn`'s second appender for CEO-direct structural decisions specifically.
+
+**Decision.** The agent system is restructured from a single product team into a company.
+
+**One Brain is the company, the workspace and the holding layer** — no `Dabbler/` directory and
+no extra nesting. **Dabbler is a product** with four projects: the **app** (staffed), the
+**design system**, the **admin dashboard** and the **website** (declared, unstaffed). **Seats
+are shared across projects and must be told which project they are working in.**
+
+**Four levels replace two:**
+
+| Level | Seats |
+|---|---|
+| 0 | CEO · **Listener** (the main session, not an agent) |
+| 1 — Company | `cto` · `cpo` · `cxo` · `analyst` — four peers |
+| 2 — Product | `pm` · `devops` · `content-manager` |
+| 3 — Project | `po` · `team-lead-1..5` · `qa` |
+| Developers | `senior-backend` · `senior-frontend` · `junior-frontend` |
+
+**The distribution layer is a behaviour, not a seat.** The Listener writes directly to whichever
+seat owns the question — a senior developer included — and never down a chain of managers. **The
+`orchestrator` seat is deleted**; a seat whose only job is routing is a relay, and the relay is
+the cost this design removes. Routing is carried by the new `route-to-seat` skill, which
+inherited the deleted seat's prompt contract and verification rules intact.
+
+**Seat changes.** Renamed: `master-analyst`→`analyst`, `version-control`→`devops` (**and promoted
+to product level** — it now owns every project's repo, not one), `qa-tester`→`qa`,
+`backend-owner`→`senior-backend`, `flutter-feature-agent`→`senior-frontend`. Merged:
+`task-auditor`→`po`, `app-store-submission-fixer`→`devops`. Split by evidence:
+`notifications-specialist` across the two seniors. New: `cxo`, `pm`, `content-manager`, `po`,
+`team-lead-1..5`, `junior-frontend`. **Nothing was deleted without its knowledge being placed
+where a live seat reads it**; three retired status logs are at `agent/status/archive/`.
+
+**`cxo` is the Chief Experience Officer** — design system standards, look and feel, whether a
+feature serves the company's goals. It judges and never edits what it judges. It takes a new
+`D-nnn` prefix in this file and **never starts a parallel decision store.**
+
+**`cpo` becomes the sole writer to the Notion business corpus**, reversing the explicit
+prohibition in its own role file. Notion holds the core business documents; `dabbler-docs/`
+holds the business-**technical** documents. Two stores, one writer each, neither a copy.
+
+**`po` absorbs the review gate**, creating a closed loop: it writes the acceptance criteria and
+judges work against them. **This trade was made deliberately by the CEO to cut back-and-forth.**
+It is held by two rules — the `po` never reviews work it executed, and where a criterion proves
+badly written the verdict says so rather than failing the developer for the PO's wording.
+**Watch it:** if rework starts being blamed on developers for the PO's own criteria, the loop has
+failed and the gate needs an independent seat again.
+
+**Model and effort** are reset by the CEO in `AGENTS.md` §9b. Two overrides are deliberate and
+recorded there rather than inherited: `senior-backend` runs **Sonnet/high** — the seat where a
+mistake is least recoverable, on the cheaper model — and `junior-frontend` runs **Opus/low**.
+
+**What this decision does NOT do.**
+
+**It does not resolve `G-012`, and it must not be read as having done so.** `G-012` (`cto`,
+2026-09-04, still **PROPOSED**) proposes seven ownership stacks S1–S7 from measured file-import
+coupling and **explicitly rejects the D1–D11 census clustering** this decision assigns to team
+leads. That rejection is on the record with measurements behind it.
+
+**Why the two are not necessarily in conflict.** `G-012` measured collisions between *writers*.
+Under this structure **team leaders write no code at all** — they plan and assign, and every file
+is written by one of three developers whose paths are governed by `CONTRACT.md` §3 and serialised
+by §4 and §7. A feature taxonomy used to decide *what to work on* is not a write boundary. It
+would be dangerous as one; here it is not one.
+
+**What survives from `G-012` and still needs a CEO ruling**, unchanged by this decision:
+
+- `lib/app/app_router.dart` — **1,712 LOC, 85 `GoRoute`**, a contended file, one writer at a time.
+- `lib/features/profile/presentation/providers/profile_providers.dart` — **870 lines holding
+  three domains' concerns**, consumed by `social` (10 providers) and `home` (5).
+
+Until those two are split, **three developers will serialise on them however stacks are grouped.**
+That is `G-012`'s Phase 0 / Phase 1 gate and it is a measurement, not a preference.
+
+**Two stacks are active — D2 and D6 — because three developers cannot feed five leads.** Capacity
+sets that number. Activating a stack is a `pm` decision with the CEO.
+
+**B.9 Organiser dashboard (40 features) is assigned to no app lead.** It has no app slice because
+it is not an app feature — it belongs to the **admin dashboard project**, which is declared and
+unstaffed. `G-012` reached a different conclusion (organiser is a persona, ~30 of 40 are
+game/venue operations, so it proposed S3). **Both readings are recorded; neither is ruled.**
+
+**The append-only history was deliberately not rewritten.** `DECISIONS.md`, `LEARN.md`,
+`STATUS.md` and the archived status logs still use retired seat names. Rewriting a log to match a
+later reorganisation falsifies it. **The rename map is in `AGENTS.md` §2.**
+
+**Consequence.** `CLAUDE.md`'s Listener section, `agent/AGENTS.md` (v0.7), `agent/WORKFLOWS.md`
+(§1, §2, §3, §4, W1, W5, §7) and `CONTRACT.md` §3 are rewritten. `CONTRACT.md` §3 is restructured
+from column-per-agent to **writer-per-path** — 17 columns of `R` hid the one cell that carried
+meaning, and had already produced two documented column-artefact errors.
+
+**Status:** ACTIVE
+
+---
+
+### G-014 — Three developers per team leader, one backend developer per project
+**Date:** 2026-09-05
+**Source:** CEO-direct, in session. Transcribed at the point of decision by the Listener under
+`CONTRACT.md` §9.3. Supersedes the developer count in `G-013`, not its structure.
+
+**Decision.** **Each team leader gets three developers; each project gets one backend
+developer.** Roster 17 → **30 seats**.
+
+| | |
+|---|---|
+| `senior-frontend-1` … `-5` | **5** — one per lead, scoped to that lead's slices |
+| `junior-frontend-1a`/`-1b` … `-5a`/`-5b` | **10** — two per lead |
+| `senior-backend` | **1** — one per project; the app is the only staffed project |
+
+**Why the asymmetry is deliberate.** The CEO had ruled earlier that *"one backend agent is
+enough but more than one frontend is needed."* Three developers per lead would have made five
+backend seats, contradicting that. Two reasons decided it the other way:
+
+1. **The work is not where a symmetric split would put it.** The cluster census's dominant
+   finding is **finished backends with no client** — payments (110 features, complete backend,
+   dead slice), squads, leagues, circles, all three rating systems, `venue_bookings`, 14 rewards
+   RPCs. The unbuilt work is overwhelmingly **frontend wiring**.
+2. **It is the seat where a mistake is least recoverable.** `senior-backend` writes RLS and
+   migrations against a production database with open security findings, and already runs on
+   the cheaper model (`AGENTS.md` §9b). Multiplying it multiplies that exposure.
+
+**The cost of the asymmetry, stated rather than hidden.** One backend seat now serves sixteen
+developers and five leads, then queues again behind `cto` — the only seat that may apply to
+production (`019`, `G-002`). **It is the narrowest resource in the system.** Its role file
+obliges it to state its queue out loud, batch by migration rather than by requester, and push
+back work that is not actually schema.
+
+**Seniors are scoped to their lead's slices, and that scoping is the mechanism.** `AGENTS.md` §5
+puts the ceiling on parallelism at **disjoint file sets, not agent count.** Five seniors inside
+their own slices genuinely run in parallel; one wandering outside them serialises everyone.
+`CONTRACT.md` §3's application-code section is rewritten as a slice→writer map to make that
+enforceable rather than aspirational.
+
+**Three surfaces stay shared and belong to nobody** — `lib/core/**`, `lib/data/**`, and the
+design-system paths — plus `profile_providers.dart` (870 lines, three domains). `CONTRACT.md` §4
+is extended to cover them with the contended-file protocol: **one agent at a time, append your
+block, no junior enters.**
+
+**What this decision makes urgent rather than optional.** `G-012`'s **Phase 0 router split**.
+`lib/app/app_router.dart` is 1,712 lines with 85 routes and nearly every feature touches it;
+§4 permits one agent inside at a time. **At three developers that was a safety rule. At sixteen
+it is the schedule.** This decision does not authorise the split — it records that the split is
+now on the critical path, and that dispatching many developers before it lands buys queueing,
+not throughput.
+
+**Renames.** `senior-frontend` → `senior-frontend-1`; `junior-frontend` → `junior-frontend-1a`.
+The inherited notification client memory moved from `senior-frontend-1` to **`senior-frontend-5`**,
+whose lead owns D6 Notifications, with a pointer left behind.
+
+**Cost note.** Fifteen of the sixteen developer seats run on Opus (`AGENTS.md` §9b). The tiers
+were set when there were three developer seats. **The lever is not the tier, it is how many are
+dispatched at once** — only two stacks are active, so most of these seats should be idle, and an
+idle seat costs nothing.
+
+**Still unresolved, unchanged by this decision:** `G-012`'s partition disagreement. It derives
+seven ownership stacks from measured file coupling and rejects the D1–D11 clustering that the
+new slice→writer map uses. **The slice boundaries are exactly where that disagreement would
+bite.** Confirm a slice with `analyst` before assigning against it.
+
+**Status:** ACTIVE
+
+---
+
+### G-015 — CEO ruling: `G-012` Phase 0 is authorised, and the ownership partition goes back to `cto`
+**Date:** 2026-09-05
+**Source:** CEO-direct, in session, ruling on the two questions `G-013` and `G-014` left open.
+Transcribed by the Listener under `CONTRACT.md` §9.3.
+
+**Ruling 1 — `G-012` Phase 0 is AUTHORISED, and it runs before developers are dispatched.**
+
+`G-012` has stood as **PROPOSED** since 2026-09-04. The CEO has now authorised its Phase 0. The
+refactor happens **first**; the sixteen developer seats are not dispatched onto feature work
+until it lands.
+
+**The reasoning is a measurement, not a preference.** `lib/app/app_router.dart` is 1,712 lines
+carrying 85 routes, nearly every feature touches it, and `CONTRACT.md` §4 admits **one agent at
+a time**. At three developers that was a safety rule; at sixteen it is the schedule. Dispatching
+before the split buys queueing, not throughput.
+
+**Ruling 2 — the ownership partition is `cto`'s to re-derive, from measured code coupling.**
+
+`G-012` rejected the D1–D11 census clustering that `G-013`/`G-014` used for team-lead and slice
+assignment, on measured grounds: `profile`↔`social` are fused at 5 files out / 10 in while
+`profile`↔`auth_onboarding` have a thin seam, so a feature taxonomy puts the loose pair together
+and the tight pair apart.
+
+**The CEO ruled for the `cto`'s measurement, in his own words: the CTO knows the project better
+than he does.** That is the deciding reason and it is recorded as such rather than paraphrased
+into a technical justification the CEO did not give.
+
+**Consequence — what is now provisional.** `CONTRACT.md` §3's slice→writer map, written under
+`G-014`, is **PROVISIONAL**. It stands only until `cto` returns a partition derived from
+coupling, at which point the differences are reconciled and this file records what moved.
+
+**What is NOT provisional.** The org structure of `G-013` and the headcount of `G-014` — four
+levels, 30 seats, three developers per lead, one backend developer per project — are unchanged.
+This ruling is about **where the boundaries between teams fall**, not about how many teams there
+are or who reports to whom.
+
+**The constraint `cto` must work inside.** The roster has **five** team leaders, each with one
+senior and two junior frontend developers, and **one** backend developer shared across all of
+them. `G-012` proposed **seven** stacks. Those numbers do not match. `cto` must either map its
+partition onto five leads, or state plainly that five is the wrong number and what the right one
+is — **it may not silently return seven boundaries for five teams.**
+
+**Status:** ACTIVE
