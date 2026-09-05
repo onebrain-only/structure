@@ -171,7 +171,7 @@ seat another's question is the most common routing error there is.
 | Seat | Charter | Owns | Never |
 |---|---|---|---|
 | `po` | **The only seat that writes Jira tickets.** Creates, audits, arranges, tracks — and runs the acceptance-criteria review gate before QA | The board · every ticket · the review verdict | Writes code. Reviews work it executed |
-| `team-lead-1..5` | Hold stacks, plan, split, assign, report capacity. **One active stack each** | The In Progress and In Development transitions · the capacity number | **Writes any code, SQL or copy** |
+| `team-lead-1..5` | Hold stacks, plan, split, assign, report capacity. **One active stack each** | The In Progress transition · the capacity number | **Writes any code, SQL or copy** |
 | `qa` | Drives the **running** app and tests whether it works. Files bugs | Testing stories · bug reports | **Fixes anything** |
 
 ### Developers — assigned by a lead

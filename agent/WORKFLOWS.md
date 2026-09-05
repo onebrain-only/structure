@@ -16,20 +16,37 @@ final message, not this repo. If the board does not show it, it did not happen.
 CEO request
    → Epic (the container)
       → child Tasks (the trackable units)
-         → Backlog → Ready → In Progress → In Development → In Review → In Testing → Done
+         → To Do → Ready → In Progress → In Review → QA-Test → Done
 ```
+
+**Six columns inside three states.** Jira has exactly three `statusCategory` values, and the
+board's columns live inside them. This is the model the CEO built and it is the one to reason
+with — a column is a position within a state, never a state of its own:
+
+| State (Jira `statusCategory`) | Columns |
+|---|---|
+| **To Do** | `To Do` · `Ready` |
+| **In Progress** | `In Progress` · `In Review` · `QA-Test` |
+| **Done** | `Done` |
+
+**`In Development` does not exist and is not coming back.** The restructure spec called for a
+seventh column of that name. It was dropped deliberately: nobody ever defined what separated
+it from `In Progress`, so it would have been a column no seat knew when to use.
+
+**The CEO's spoken labels are not the board's names.** He says *Backlog* for `To Do`,
+*Development* for `In Progress`, *Testing* for `QA-Test`. Those are conversational, and no
+transition call may use them. **Documents and API calls carry the exact status names above.**
 
 **Who moves a ticket into each column** — a transition made by the wrong seat is a process
 failure, not a shortcut:
 
 | Into | Moved by |
 |---|---|
-| Backlog | `po` |
+| To Do | `po` |
 | Ready | `po` |
 | In Progress | the owning `team-lead-N` |
-| In Development | the owning `team-lead-N` |
 | In Review | the developer who finished it |
-| In Testing | `po` — **only after its review gate passes** (§3) |
+| QA-Test | `po` — **only after its review gate passes** (§3) |
 | Done | `po` |
 
 **Writing is `po`-only.** No other seat creates, edits or re-words a ticket. The `pm` says
@@ -73,7 +90,7 @@ what is needed; the `po` writes it.
 | Site | `dabbler.atlassian.net` |
 | cloudId | `18c8e9f5-d139-4e03-b5d8-89122cc14937` |
 | Project key | `KAN` — "Dabbler Team", **team-managed** |
-| Columns | Backlog · Ready · In Progress · In Development · In Review · In Testing · Done |
+| Columns | To Do · Ready · In Progress · In Review · QA-Test · Done — six, inside three states (§1) |
 
 **Epics do not render as cards on a team-managed board. Tasks do.**
 
@@ -81,11 +98,26 @@ This is the rule that was got wrong once, and it is why every trackable unit is 
 `issueTypeName: "Task"` with a `parent` Epic. An Epic alone is invisible to the person
 watching the board — the work exists in the API and nowhere a human is looking.
 
-**Transition IDs are project configuration, not a constant, and this project's are being
-changed.** The board carried four columns (To Do `11` · In Progress `21` · In Review `31` ·
-Done `41`) until the 2026-09-05 restructure moved it to the seven above. **Always call
-`getTransitionsForJiraIssue` and read the ids back** — never write a remembered number into a
-transition call. Any id in any document here is a convenience, not an authority.
+**Transition ids are project configuration, not constants.** These are the live values, read
+back from `getTransitionsForJiraIssue` with `includeUnavailableTransitions: true` on
+2026-09-05:
+
+| Status name (exact) | status id | transition id | Category |
+|---|---|---|---|
+| `To Do` | 10004 | `11` | To Do |
+| `Ready` | 10008 | `2` | To Do |
+| `In Progress` | 10005 | `21` | In Progress |
+| `In Review` | 10006 | `31` | In Progress |
+| `QA-Test` | 10009 | `3` | In Progress |
+| `Done` | 10007 | `41` | Done |
+
+**`Ready` is `2` and `QA-Test` is `3` — they break the 11/21/31/41 pattern.** Anyone who
+assumes the pattern guesses wrong, which is exactly why the next rule exists.
+
+**Always call `getTransitionsForJiraIssue` and read the ids back** — never write a remembered
+number into a transition call. Any id in any document here is a convenience, not an
+authority; the board carried four columns until the 2026-09-05 restructure and the table
+above will go stale the same way.
 
 **Issue keys are not assigned sequentially.** Creating twelve tickets does not give you
 twelve consecutive keys — KAN-5, 8, 10, 12 were interleaved with another epic's children in
@@ -106,7 +138,7 @@ is done" — and the gate is where that claim is tested rather than accepted.
 **The gate belongs to `po`** since 2026-09-05, when `task-auditor` was merged into it.
 **Reviewing is a distinct act with its own skill.** Use the `task-review` skill, which applies
 two gates: the ticket's own acceptance criteria, and alignment with the governance docs. The
-outcome is a written verdict and a transition — to **In Testing**, handed to `qa`, or back to
+outcome is a written verdict and a transition — to **QA-Test**, handed to `qa`, or back to
 **Ready** with what is missing. There is no third outcome.
 
 **The `po` writes the criteria and also judges against them.** That closed loop is deliberate
@@ -178,12 +210,12 @@ work. The moment a handoff creates work, it goes through the Listener.
    than assuming it from the stack name, splits it into subtasks, and routes each by **task
    shape**: `junior-frontend` for repeating an existing pattern in a single file,
    `senior-frontend` for business logic and multi-file work, `senior-backend` for anything
-   schema-shaped. Moves to **In Progress**, then **In Development**.
+   schema-shaped. Moves it to **In Progress**.
 3. **The developer** implements, following the build order (`MANIFESTO.md` §2): database →
    constants → repository → providers → screen → route. Writes tests for what it built, runs
    `flutter analyze` and `flutter test`, and **pastes the output rather than summarising it.**
    Moves to **In Review**.
-4. **`po`** runs the review gate (§3). Pass → **In Testing**. Fail → back to **Ready** with a
+4. **`po`** runs the review gate (§3). Pass → **QA-Test**. Fail → back to **Ready** with a
    rework brief.
 5. **`qa`** executes the testing story it wrote when the task was dispatched, against the
    running app. Bugs go back to the owning developer, never fixed by `qa`.
@@ -196,7 +228,7 @@ work. The moment a handoff creates work, it goes through the Listener.
 | 1 | `po` | The request | A ticket with criteria and a date | Criteria are testable; date came from capacity |
 | 2 | `team-lead-N` | A Ready ticket | Subtasks, each assigned | Each routed by shape, not by who is idle |
 | 3 | developer | A subtask | Code through step 6 of the build order | A route reaches it; `analyze` 0 errors; `test` passes |
-| 4 | `po` | The diff | Verdict | In Testing, or back to Ready |
+| 4 | `po` | The diff | Verdict | QA-Test, or back to Ready |
 | 5 | `qa` | Passed work | Testing story executed | Bugs filed, or none found and said so |
 | 6 | `cxo` | User-visible change | Experience verdict | Rule named, or nothing to raise |
 | 7 | `devops` | Approved work | A verified Canary deploy | **The site shows it** |

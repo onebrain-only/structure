@@ -56,22 +56,51 @@ Dabbler's projects and who audits your board.
 
 ## THE BOARD
 
-Seven columns:
+**Six columns, sitting inside Jira's three states.** You do the transitioning, so these are
+the names and ids you will actually call with — read them carefully.
 
 ```
-Backlog → Ready → In Progress → In Development → In Review → In Testing → Done
+To Do → Ready → In Progress → In Review → QA-Test → Done
 ```
+
+| State (`statusCategory`) | Columns |
+|---|---|
+| **To Do** | `To Do` · `Ready` |
+| **In Progress** | `In Progress` · `In Review` · `QA-Test` |
+| **Done** | `Done` |
+
+**There is no `In Development` column.** The restructure spec named one; it was dropped
+because nothing ever distinguished it from `In Progress`. A transition call naming it fails.
+
+**The CEO says *Backlog*, *Development* and *Testing*** for `To Do`, `In Progress` and
+`QA-Test`. Those are his conversational labels, not board statuses — translate them; never
+send them to the API.
+
+**The live ids, read back 2026-09-05:**
+
+| Status name (exact) | status id | transition id |
+|---|---|---|
+| `To Do` | 10004 | `11` |
+| `Ready` | 10008 | `2` |
+| `In Progress` | 10005 | `21` |
+| `In Review` | 10006 | `31` |
+| `QA-Test` | 10009 | `3` |
+| `Done` | 10007 | `41` |
+
+**`Ready` is `2` and `QA-Test` is `3`.** They break the 11/21/31/41 pattern, and an id guessed
+from the pattern is a failed call. **Ids are project configuration and this table will go
+stale: call `getTransitionsForJiraIssue` and read the ids back rather than trusting any
+written number, here or anywhere else** (`WORKFLOWS.md` §2).
 
 **Who moves a ticket into each column:**
 
 | Into | Moved by |
 |---|---|
-| Backlog | `po` |
+| To Do | `po` |
 | Ready | `po` |
 | In Progress | the owning `team-lead-N` |
-| In Development | the owning `team-lead-N` |
 | In Review | the developer who finished it |
-| In Testing | `po` — **after your review gate passes** |
+| QA-Test | `po` — **after your review gate passes** |
 | Done | `po` |
 
 **Standing rules, and they are not negotiable:**
@@ -94,7 +123,7 @@ Test it against two gates:
 1. **Its acceptance criteria** — every one, individually, against the repo.
 2. **The project's own logic** — does it fit what `Dabbler/dabbler-docs/` says this project is.
 
-Both pass → **In Testing**, handed to `qa`. Either fails → **back to Ready** with a rework
+Both pass → **QA-Test**, handed to `qa`. Either fails → **back to Ready** with a rework
 brief. There is no third outcome. No "Done with notes" — a note that matters is rework, and a
 note that does not matter should not be written.
 

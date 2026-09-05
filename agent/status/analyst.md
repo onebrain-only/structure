@@ -253,3 +253,107 @@ memory. The five non-feature importers are now named in `CONTRACT.md` rather tha
 `lib/core/services/auth_service.dart`, `lib/core/auth/session_cleanup.dart` — **the router and
 the top bar being among them makes it worse than a feature-level collision.** Rebuilt;
 `--check` ok × 30.
+
+---
+
+## 2026-09-05 — `CONTRACT.md` §4.1: the Phase 0 exclusive grant (`G-017`)
+
+**Brief:** `team-lead`. Phase 0's named executor, `senior-frontend-3`, was forbidden by
+`CONTRACT.md` §3/§4 from writing every surface Phase 0 requires. `cto` anticipated it at
+`STACKS.md:739–741` — **but a plan cannot grant permission, only the contract can.**
+
+**Done.** Added **`CONTRACT.md` §4.1** (`dabbler-docs/CONTRACT.md:358–443`), inside §4 because it
+is an exception to §4's discipline, not a new regime. Nine paths named individually with the
+status each returns to. Exclusion stated as plainly as the grant, with `STACKS.md` §10.0's
+parallel-work allowlist carried across. Expiry = `STACKS.md` §10.6's landing test quoted verbatim
+in substance **plus** `po` transitioning all five tickets to Done — automatic, no further decision.
+Logged as **`G-017`**. Header `Last updated` moved.
+
+**Two paths the brief did not name, added because omitting them re-blocks the executor at ticket
+two:** `lib/providers.dart` (CONTENDED; `P0-2` rewrites an import there) and **other leads'
+feature slices** (`P0-2`'s 38 importers span 13 of 20 feature dirs; `P0-4` moves seven screens
+*into* leads 2 and 4's slices). Also added `test/app/route_inventory_test.dart` — §3 scopes a
+developer's tests to code it owns and the router is nobody's — and
+`lib/core/providers/geo_providers.dart`.
+
+**What I did NOT verify.** I did not re-run the 38-importer or 13-of-20 counts, the 25-of-69
+router-import figure, or the 11-files-in-`lib/data/` figure — all are `cto`'s at `c46b5c5`
+(`STACKS.md` §9b, §10.2) and I took them as given for a permissions amendment. I did not check
+the current worktree against `c46b5c5`. I did not open or edit any Jira ticket, `STACKS.md`, or
+any `T-nnn`. **No code touched. Nothing committed or pushed — changes are in the working tree for
+`cto`/`devops`.**
+
+**Files changed:** `Dabbler/dabbler-docs/CONTRACT.md` · `Dabbler/dabbler-docs/DECISIONS.md`
+(`G-017`) · `agent/status/analyst.md`.
+
+---
+
+## 2026-09-05 — The board becomes six columns; the documents are corrected to match
+
+**What I did.** The CEO built a six-column board organised by Jira's three `statusCategory`
+values, replacing the seven-column model the restructure spec assumed. `team-lead` verified
+the mapping and the transition ids against the live board and briefed me. I corrected every
+governance document that named a column which does not exist — a seat calling
+`transitionJiraIssue` with `In Development` or `In Testing` would have failed on the first
+real ticket.
+
+**What I touched.**
+- `agent/WORKFLOWS.md` §1 (`:19–50`) — lifecycle, three-state table, the dropped-column note,
+  the CEO's-labels note, the who-moves-it mapping. §2 (`:93`, `:101–120`) — columns row and the
+  six-row id table replacing the four-column paragraph. §3 (`:141`) and §5 (`:207–225`) —
+  review-gate outcome and W1 steps 2–4 now pass to `QA-Test`, fail to `Ready`.
+- `Dabbler/dabbler-docs/CONTRACT.md` §3 (`:300–303`) — the three "Release and the board"
+  transition rows, plus one new row naming the six statuses.
+- `agent/roles/po.md` (`:46–92`) — board section rewritten with exact names, live ids, the
+  `Ready`=2 / `QA-Test`=3 pattern warning, and the read-the-ids-back rule restated here
+  because this seat does the transitioning.
+- `agent/roles/qa.md` (`:153–158`) — QA's work arrives in `QA-Test`; `qa` still transitions
+  nothing.
+- `agent/AGENTS.md` (`:174`) — `team-lead-1..5` owns one transition, not two.
+- `.claude/bindings/team-lead-1..5.yml` — same correction in the seat descriptions;
+  `.claude/agents/**` regenerated with `agent/scripts/build-agents.sh` (30 seats built).
+- `agent/skills/task-review/SKILL.md` — id table completed to six; the verdict flow said
+  Done / To Do, which contradicts `WORKFLOWS.md` §3 and `po.md`. Corrected to
+  `QA-Test` / `Ready` under the precedence rule, and `task-auditor` in the verdict template
+  replaced with `po`.
+- `Dabbler/dabbler-docs/DECISIONS.md` (`:5600–5697`) — **G-018**, two rulings: the six-column
+  model with its reasoning and live ids, and the standing constraint that nothing is pushed to
+  any remote except One Brain until the CEO lifts it.
+
+**What I decided.** Extending the correction into `agent/skills/task-review/SKILL.md` and
+`agent/AGENTS.md`, neither named in the brief. Both carried board-status claims that would
+have contradicted the corrected documents, and my role requires correcting the losing document
+in the same session.
+
+**What I did not do.** No Jira write of any kind. No board reconfiguration — the board is
+correct as built. No `T-nnn` entry edited. No commit: everything is left in the working tree,
+and `Dabbler/dabbler-docs` is its own git repo so its changes are invisible to One Brain's
+`git status`.
+
+**What I did not verify.** The transition ids and the status-to-category mapping are
+`team-lead`'s measurement, taken as given — I made no API call this session. Whether any
+existing KAN ticket currently sits in a status the old documents named.
+
+**Blocked:** nothing.
+
+## 2026-09-05 — `G-019`: Phase 0 grant amended (defect in `G-017`)
+
+**Task:** from `team-lead` — `team-lead-3` found that `G-017`'s grant could not satisfy `P0-2`'s
+own exit condition. Verified against the tree; the defect is real.
+
+**Measured at HEAD (`dabbler-code`):**
+- `grep -rl 'misc/data/datasources' test/` → `test/data/repositories/profiles_repository_impl_test.dart` — **1 file**, the only one.
+- Totals: **39** importing files — 26 in `lib/features/` (13 dirs), **10** in `lib/data/`, 1 in `test/`, 2 (`lib/providers.dart`, `lib/core/providers/geo_providers.dart`).
+
+**Written:**
+- `Dabbler/dabbler-docs/CONTRACT.md:395` — new §4.1 grant row for that test file, **import-path rewrite only** (two lines, `:7`/`:8`). Not a grant over `test/`.
+- `Dabbler/dabbler-docs/CONTRACT.md:391` — 11 → **10** files in `lib/data/`.
+- `Dabbler/dabbler-docs/CONTRACT.md:398` — 38 → **39** importing files.
+- `Dabbler/dabbler-docs/CONTRACT.md:4` — `Last updated` line.
+- `Dabbler/dabbler-docs/DECISIONS.md` — **`G-019`**, ACTIVE, appended. `G-017` itself not edited.
+
+**Open, owned by `cto`:** `STACKS.md` §10.2 still reads "38 importing files plus 11 in `lib/data/`".
+`analyst` does not write `STACKS.md`. `G-017`'s prose at `DECISIONS.md:5580` also says 38; left as
+the historical record, corrected in `G-019`.
+
+**Not done:** nothing committed — left in the working tree, as instructed.

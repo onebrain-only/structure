@@ -1,13 +1,14 @@
 ---
 name: task-review
-description: Use when reviewing a Jira ticket sitting in the In Review column of the Dabbler board — deciding whether work is genuinely complete or needs rework. Triggers on "review this ticket", "is KAN-NN done", "check the review column", "audit this task", "did this meet its acceptance criteria". Applies two gates (acceptance criteria, and alignment with the governance docs in docs/) and moves the ticket to Done or back to To Do with a written verdict.
+description: Use when reviewing a Jira ticket sitting in the In Review column of the Dabbler board — deciding whether work is genuinely complete or needs rework. Triggers on "review this ticket", "is KAN-NN done", "check the review column", "audit this task", "did this meet its acceptance criteria". Applies two gates (acceptance criteria, and alignment with the governance docs in docs/) and moves the ticket to QA-Test or back to Ready with a written verdict.
 ---
 
 # Task Review — the gate before QA
 
 A ticket in **In Review** is a claim, not a fact. Your job is to test the claim.
 
-Two outcomes only. **Done**, or **back to To Do.** There is no "Done with notes" —
+Two outcomes only. **QA-Test**, handed to `qa`, or **back to Ready.** You do not move a
+ticket to Done from here — `qa` tests it first. There is no "Done with notes" —
 a note that matters is rework, and a note that does not matter should not be written.
 
 ---
@@ -78,7 +79,7 @@ a false pass, and false passes are what this agent exists to prevent.
    sweep, then reason on top of it.
 3. **Gate 1** — walk the criteria one at a time, gathering evidence for each.
 4. **Gate 2** — read the relevant `docs/` files and check the work against them.
-5. **Decide.** Both gates pass → Done. Anything fails → To Do.
+5. **Decide.** Both gates pass → QA-Test. Anything fails → Ready.
 6. **Write the verdict as a Jira comment**, then transition.
 
 **Comment first, transition second.** A status change with no explanation is
@@ -88,10 +89,10 @@ indistinguishable from a mistake.
 
 ## Verdict format
 
-### PASS — moving to Done
+### PASS — moving to QA-Test
 
 ```
-✅ REVIEW PASSED — moving to Done
+✅ REVIEW PASSED — moving to QA-Test
 
 GATE 1 — Acceptance criteria
 - [criterion] → PASS. Evidence: <file:line / command + output>
@@ -102,16 +103,16 @@ GATE 2 — Project alignment
 - Could NOT check against: <files still empty specs>
 - No conflicts found. <specific note on anything notable>
 
-Reviewed by task-auditor.
+Reviewed by po.
 ```
 
-### FAIL — moving back to To Do
+### FAIL — moving back to Ready
 
 The comment **is the rework brief.** Another agent picks up this ticket with no
 memory of it — write for that reader.
 
 ```
-🔁 REVIEW FAILED — moving back to To Do
+🔁 REVIEW FAILED — moving back to Ready
 
 WHAT IS WRONG
 1. <criterion or rule> — FAILED.
@@ -128,7 +129,7 @@ WHERE TO START
 BLOCKED ON
 <a PO decision, or "nothing">
 
-Reviewed by task-auditor.
+Reviewed by po.
 ```
 
 **Rules for a fail comment:**
@@ -162,9 +163,14 @@ Transitions on this board (verified, global — any status reaches any other):
 | Target | Transition id | Status id |
 |---|---|---|
 | To Do | `11` | 10004 |
+| Ready | `2` | 10008 |
 | In Progress | `21` | 10005 |
 | In Review | `31` | 10006 |
+| QA-Test | `3` | 10009 |
 | Done | `41` | 10007 |
+
+**`Ready` is `2` and `QA-Test` is `3`** — they break the 11/21/31/41 pattern. A pass sends the
+ticket to **QA-Test**, not to Done; a fail sends it back to **Ready**.
 
 **Re-fetch with `getTransitionsForJiraIssue` rather than trusting this table** if a
 transition is rejected — workflows change.
