@@ -390,3 +390,21 @@ leads were being told to assign work their developers may not legally write.
 question, written into that role file.
 
 **Not done:** nothing committed — left in the working tree, as instructed. `dabbler-code` untouched.
+
+**Amendment, same day — `G-020` finished properly.** `team-lead` re-swept and found the stale claim
+one layer down: `.claude/bindings/senior-frontend-2.yml` and `-5.yml` still read "D2/D6 is ACTIVE",
+and `agent/roles/senior-frontend-2.md:41` / `-5.md:41` read "D2/D6 is active as of 2026-09-05". All
+four corrected to queued, with the same measured basis (D2: 10 reserved files across five slices;
+D6: 0 reserved, 7 router references, and the open router question preserved as unanswered).
+
+**Juniors checked and already clean.** `junior-frontend-2a/2b/5a/5b` bindings name their lead's
+stacks without asserting activity — the template did not carry the claim down.
+
+**Found and fixed, same class, not in the brief:** `agent/roles/senior-frontend-3.md:41` said "No
+stack of your lead's is active … Do not invent work", nine lines above `:50` naming that seat Phase
+0's sole exclusive executor. The one seat that *does* have work was being told it had none. Line 41
+now states both, and scopes "do not invent work" to outside the five Phase 0 tickets.
+
+**Verification:** `grep -rl 'is ACTIVE'` across `.claude/bindings/`, `.claude/agents/` and `agent/`
+returns only `agent/.flow/events.jsonl` — hook logs of my own grep commands, not a document.
+`build-agents.sh --check` exits 0 on 30/30. Still nothing committed; `dabbler-code` untouched.

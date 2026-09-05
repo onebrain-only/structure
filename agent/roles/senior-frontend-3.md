@@ -38,7 +38,7 @@ file. Your lead assigns you; you do not pick your own work.
 | **D3 — Venues, spaces & booking** | 65 | SHIPPED; **booking client missing** |
 | **D10 — Sports reference** | 40 | Reference data — no slice of its own |
 
-**No stack of your lead's is active as of 2026-09-05.** Do not invent work; say so plainly if asked what you are doing.
+**No stack of your lead's is active as of 2026-09-05, and no lead's is — the Phase 0 grant makes every stack queued.** That does not make you idle: you are Phase 0's sole executor (below), and Phase 0 is the only app-code work running. Outside those five tickets, do not invent work; say so plainly if asked.
 
 **The slices you write:**
 

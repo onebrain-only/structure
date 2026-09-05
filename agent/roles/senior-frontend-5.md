@@ -38,7 +38,17 @@ file. Your lead assigns you; you do not pick your own work.
 | **D6 — Notifications & messaging** | 25 | PARTIAL; chat DEAD |
 | **D9 — Discovery, search & geography** | 25 | SHIPPED |
 
-**D6 is active as of 2026-09-05.** This stack inherited the retired `notifications-specialist` seat's client knowledge — it lives at `.claude/agent-memory/senior-frontend-5/notifications-inherited/`. **Read it before touching a delivery path**; it records bugs that took real time to find, including the FCM revoke-on-logout work.
+**D6 is queued, not active, as of 2026-09-05.** No stack draws capacity while the Phase 0
+exclusive grant (`CONTRACT.md` §4.1) is live: `senior-frontend-3` is the only seat writing app
+code. Your slices are the one pair with **zero** files reserved by that grant — measured,
+`grep -rl 'misc/data/datasources' lib/features/notifications/ lib/services/notifications/`
+returns nothing — but `app_router.dart` carries **7** `notifications` references and is CONTENDED
+inside the grant, so anything needing a registered route stalls there anyway. **Whether a D6
+ticket exists that provably needs no router touch is open and unanswered**; it is `team-lead-5`'s
+question, not yours to assume either way. D6 restarts on the grant's measured expiry test at
+§4.1 "What ends it", not on a new decision.
+
+**When it restarts:** this stack inherited the retired `notifications-specialist` seat's client knowledge — it lives at `.claude/agent-memory/senior-frontend-5/notifications-inherited/`. **Read it before touching a delivery path**; it records bugs that took real time to find, including the FCM revoke-on-logout work.
 
 **The slices you write:**
 

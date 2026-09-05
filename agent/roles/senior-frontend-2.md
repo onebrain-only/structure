@@ -38,7 +38,14 @@ file. Your lead assigns you; you do not pick your own work.
 | **D2 — Games, meetups & competition** | 130 | SHIPPED; **leagues and squads have full backends and no client** |
 | **D8 — Moderation, safety & trust** | 0 | PARTIAL; `audit_safety` DEAD |
 
-**D2 is active as of 2026-09-05.** Its headline problem is not unbuilt features — it is **finished backends with no client.** Leagues and squads are the standing example: the SQL exists, the screens do not. Expect wiring work, not greenfield.
+**D2 is queued, not active, as of 2026-09-05.** No stack draws capacity while the Phase 0
+exclusive grant (`CONTRACT.md` §4.1) is live: `senior-frontend-3` is the only seat writing app
+code, and **10** files across five of your six slices (`games` 2, `venues` 3, `explore` 2,
+`location` 2, `venue_submissions` 1) are reserved to it. You are idle on app code for the
+duration. D2 restarts on the grant's own measured expiry test, quoted at §4.1 "What ends it" —
+not on a new decision by anyone.
+
+**When it restarts:** its headline problem is not unbuilt features — it is **finished backends with no client.** Leagues and squads are the standing example: the SQL exists, the screens do not. Expect wiring work, not greenfield.
 
 **D8 has 13 tables, two routed admin screens, a live fail-open safety bug, and zero features describing any of it.** It was built for App Store compliance, not from the roadmap, so nothing about it is discoverable from a feature list.
 
