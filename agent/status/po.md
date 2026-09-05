@@ -51,3 +51,16 @@ exists for it were not investigated — out of scope per the brief.
 ticket that can start now. `po` reviews each ticket at In Review against its acceptance criteria
 before transitioning to QA-Test, in strict order; no ticket after `KAN-121` starts before its
 predecessor is accepted.
+
+## 2026-09-05 — re-dated Phase 0 tickets to Monday–Friday work week
+
+Re-dated KAN-121–KAN-125 after the CEO's actual cadence was clarified (planning Sunday, sprint
+starts Monday, working week Monday–Friday), correcting the earlier Sunday–Thursday assumption
+that put KAN-121 due on a Sunday. New dates, independently computed and matching `team-lead`'s
+cross-check: KAN-121 2026-09-07 (Mon), KAN-122 2026-09-09 (Wed), KAN-123 2026-09-11 (Fri),
+KAN-124 2026-09-16 (Wed, 2-sitting ticket), KAN-125 2026-09-18 (Fri). Capacity/ordering/serial
+constraint from `team-lead-3` unchanged (6 sittings + 5 acceptance gates). Also updated the
+Epic (KAN-120) description's date-assumption section to state the real cadence and struck
+through (not deleted) the superseded Sunday–Thursday dates for the record. No ticket created
+or deleted, no acceptance criteria, ordering, or assignment changed, no ticket transitioned —
+all five remain in Ready. No code touched.

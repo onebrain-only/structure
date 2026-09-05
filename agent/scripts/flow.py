@@ -254,6 +254,103 @@ def parse_cached(path):
     return out
 
 
+def subagent_runs(session_id):
+    """What each dispatched seat actually did, from its own transcript.
+
+    Every subagent writes a full transcript under
+      ~/.claude/projects/<project>/<session>/subagents/agent-a<instance>-<hash>.jsonl
+    These were there all along. An earlier version of this file claimed a
+    dispatched seat's tool calls were unrecorded, on the strength of finding no
+    `isSidechain` rows in the parent transcript. That was a wrong inference from
+    the wrong file.
+    """
+    d = project_dir()
+    if not d:
+        return {}
+    sub = os.path.join(d, session_id, "subagents")
+    if not os.path.isdir(sub):
+        return {}
+    out = {}
+    for fn in os.listdir(sub):
+        if not fn.endswith(".jsonl") or not fn.startswith("agent-a"):
+            continue
+        inst = fn[len("agent-a"):-len(".jsonl")]
+        inst = inst.rsplit("-", 1)[0]          # drop the trailing hash
+        path = os.path.join(sub, fn)
+        tools = collections.Counter()
+        files = collections.Counter()
+        rows = 0
+        tok = {"out": 0, "think": 0, "cache_read": 0}
+        try:
+            with open(path, encoding="utf-8", errors="replace") as fh:
+                for line in fh:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    try:
+                        x = json.loads(line)
+                    except Exception:
+                        continue
+                    rows += 1
+                    m = x.get("message") or {}
+                    u = m.get("usage") or {}
+                    tok["out"] += u.get("output_tokens", 0) or 0
+                    tok["cache_read"] += u.get("cache_read_input_tokens", 0) or 0
+                    tok["think"] += (u.get("output_tokens_details") or {}).get("thinking_tokens", 0) or 0
+                    c = m.get("content")
+                    if not isinstance(c, list):
+                        continue
+                    for b in c:
+                        if isinstance(b, dict) and b.get("type") == "tool_use":
+                            tools[shorten(b.get("name", "?"))] += 1
+                            i = b.get("input") or {}
+                            fp = i.get("file_path")
+                            if isinstance(fp, str):
+                                files[os.path.relpath(fp, ROOT) if fp.startswith(ROOT) else fp] += 1
+        except OSError:
+            continue
+        out[inst] = {"rows": rows, "tools": tools.most_common(10),
+                     "tool_total": sum(tools.values()),
+                     "files": files.most_common(6),
+                     "out": tok["out"], "think": tok["think"],
+                     "cache_read": tok["cache_read"],
+                     "cost": round(tok["out"] / 1e6 * 25.0, 2)}
+    return out
+
+
+def hook_events():
+    """Events written by agent/scripts/flow-hook.sh, if hooks are configured.
+
+    Absent until the CEO reloads settings once (/hooks). Until then the graph
+    shows dispatch and reply and says plainly that the inside is not recorded.
+    """
+    p = os.path.join(ROOT, "agent", ".flow", "events.jsonl")
+    if not os.path.exists(p):
+        return {"live": False, "count": 0, "by_event": [], "by_session": []}
+    ev = collections.Counter()
+    ses = collections.Counter()
+    n = 0
+    try:
+        with open(p, encoding="utf-8", errors="replace") as fh:
+            for line in fh:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    d = json.loads(line)
+                except Exception:
+                    continue
+                n += 1
+                ev[d.get("event", "?")] += 1
+                sid = d.get("session_id")
+                if sid:
+                    ses[sid] += 1
+    except OSError:
+        pass
+    return {"live": n > 0, "count": n,
+            "by_event": ev.most_common(), "by_session": ses.most_common(12)}
+
+
 def sessions():
     d = project_dir()
     if not d:
@@ -279,6 +376,10 @@ def state(session_id=None):
         return {"error": "No session transcripts found under ~/.claude/projects.", "sessions": []}
     pick = next((s for s in ses if s["id"] == session_id), ses[0])
     data = parse_cached(pick["path"])
+    inner = subagent_runs(pick["id"])
+    for r in data.get("runs", []):
+        r["inner"] = inner.get(r["instance"])
+    data["inner_found"] = sum(1 for r in data.get("runs", []) if r.get("inner"))
     seats = roster()
     used = collections.Counter(d["seat"] for d in data["dispatches"])
     for name, s in seats.items():
@@ -290,6 +391,7 @@ def state(session_id=None):
         "live": (time.time() - pick["mtime"]) < 120,
         "seats": sorted(seats.values(), key=lambda x: x["name"]),
         "generated": time.time(),
+        "hooks": hook_events(),
         **data,
     }
 
@@ -507,7 +609,16 @@ function place(keep){
     nm.textContent=r.seat; g.appendChild(nm);
     var sc=el("text",{x:nx,y:ny+59,"text-anchor":"middle",fill:"var(--dim)",
       "font-family":"IBM Plex Mono, monospace","font-size":9});
-    sc.textContent=r.secs!=null?r.secs+"s":"open"; g.appendChild(sc);
+    sc.textContent=(r.secs!=null?r.secs+"s":"open")+(r.inner?"  ·  "+r.inner.tool_total+" tools":"");
+    g.appendChild(sc);
+    // a second, inner arc: how much work happened inside, against the busiest run
+    if(r.inner && r.inner.tool_total){
+      var mx=Math.max.apply(null,(S.runs||[]).map(function(z){return z.inner?z.inner.tool_total:0}))||1;
+      var f2=Math.min(1,r.inner.tool_total/mx), r2=20, e2=-Math.PI/2+Math.PI*2*f2;
+      g.appendChild(el("path",{d:"M"+nx+","+(ny-r2)+" A"+r2+","+r2+" 0 "+(f2>.5?1:0)+" 1 "+
+        (nx+r2*Math.cos(e2))+","+(ny+r2*Math.sin(e2)),
+        fill:"none",stroke:hue,"stroke-width":1.5,"stroke-opacity":.45,"stroke-linecap":"round"}));
+    }
 
     g.addEventListener("click",function(ev){ev.stopPropagation();sel=r.instance;detail(r);place(true)});
     scene.appendChild(g);
@@ -543,10 +654,23 @@ function detail(r){
     '<div class="lrow"><span>instance</span><b>'+esc(r.instance.slice(0,20))+'</b></div>'+
     '<div class="lrow"><span>held the floor</span><b>'+(r.secs!=null?r.secs+"s":"still open")+'</b></div>'+
     '<div class="lrow"><span>started</span><b>'+hhmm(r.start)+'</b></div>'+
+    (r.inner?
+      '<div class="lhead">what it did</div>'+
+      '<div class="lrow"><span>tool calls</span><b>'+r.inner.tool_total+'</b></div>'+
+      '<div class="lrow"><span>turns</span><b>'+r.inner.rows+'</b></div>'+
+      '<div class="lrow"><span>output</span><b>'+nfmt(r.inner.out)+'</b></div>'+
+      '<div class="lrow"><span>of which thinking</span><b>'+nfmt(r.inner.think)+'</b></div>'+
+      '<div class="lrow"><span>cost</span><b>$'+r.inner.cost.toFixed(2)+'</b></div>'+
+      '<div class="lhead">tools it ran</div>'+
+      r.inner.tools.map(function(t){
+        return '<div class="lrow"><span>'+esc(t[0])+'</span><b>'+t[1]+'</b></div>'}).join("")+
+      (r.inner.files.length?'<div class="lhead">files it touched</div>'+
+        r.inner.files.map(function(f){
+          return '<div class="lrow"><span title="'+esc(f[0])+'">'+esc(f[0].split("/").pop())+
+                 '</span><b>'+f[1]+'</b></div>'}).join(""):"")
+      :'<div class="warn">No inner transcript found for this run.</div>')+
     (said.length?'<div class="lhead">what came back</div><div class="said">'+
-      esc(said[said.length-1].text)+'</div>':'')+
-    '<div class="warn">Its own tool calls are not in this transcript — a dispatched seat runs in its '+
-    'own context. Claude Code hooks would stream them.</div>';
+      esc(said[said.length-1].text)+'</div>':'');
 }
 
 /* ---------- timeline ---------- */
@@ -596,7 +720,15 @@ function render(s){
     '<div class="lhead">cache</div>'+
     '<div class="lrow"><span>read</span><b>'+nfmt(u.cache_read||0)+'</b></div>'+
     '<div class="lrow"><span>written</span><b>'+nfmt(u.cache_write||0)+'</b></div>'+
-    '<div class="lhead">tools</div>'+
+    '<div class="lhead">agents</div>'+
+    '<div class="lrow"><span>runs with inner record</span><b>'+(s.inner_found||0)+'/'+s.runs.length+'</b></div>'+
+    '<div class="lrow"><span>their tool calls</span><b>'+
+      s.runs.reduce(function(a,r){return a+(r.inner?r.inner.tool_total:0)},0)+'</b></div>'+
+    '<div class="lrow"><span>their output</span><b>'+
+      nfmt(s.runs.reduce(function(a,r){return a+(r.inner?r.inner.out:0)},0))+'</b></div>'+
+    '<div class="lrow"><span>their cost</span><b>$'+
+      s.runs.reduce(function(a,r){return a+(r.inner?r.inner.cost:0)},0).toFixed(2)+'</b></div>'+
+    '<div class="lhead">listener tools</div>'+
     (s.tools||[]).slice(0,6).map(function(t){
       return '<div class="lrow"><span>'+esc(t[0])+'</span><b>'+t[1]+'</b></div>'}).join("")+
     '<div class="warn">Cost covers input and output at the published Opus 5 rate. Cache is shown in '+

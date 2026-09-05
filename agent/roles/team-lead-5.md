@@ -43,7 +43,21 @@ and your developers' capacity go. An inactive stack is still yours — you keep 
 answer questions about it, and you do not let its tickets rot — but no capacity is spent on
 it until the CEO or the `pm` makes it active.
 
-**D6 is your active stack as of 2026-09-05.** This is where the retired
+**No stack is active while the Phase 0 exclusive grant (`CONTRACT.md` §4.1) is live** — not
+yours, not any lead's. Every developer seat but `senior-frontend-3` is idle on app code for the
+duration (§4.1 "The exclusion"). A stack that was queued resumes on the grant's own expiry test,
+quoted there — not on a new decision.
+
+**D6 is yours, and it is queued — not active — as of 2026-09-05.** It is the stack `pm`
+selected for you and it draws **no capacity** while the Phase 0 grant is live. `notifications` is
+the one slice with **zero** files reserved by `CONTRACT.md` §4.1 — measured:
+`grep -rl 'misc/data/datasources' lib/features/notifications/ lib/services/notifications/`
+returns nothing — but `app_router.dart` carries **7** `notifications` references and is CONTENDED
+inside the grant, so any ticket needing a registered route stalls there anyway. **Whether a D6
+ticket exists that provably needs no router touch is an open question and yours to answer** — it
+has not been established either way.
+
+**When D6 restarts on the grant's expiry test, start here.** This is where the retired
 `notifications-specialist` seat's knowledge landed — its memory was split into
 `senior-backend` (schema, edge functions, RLS) and `senior-frontend` (FCM, feed, client
 wiring) rather than deleted. **Ask those two what they already know before planning; they

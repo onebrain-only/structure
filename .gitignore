@@ -19,3 +19,8 @@
 
 # macOS finder droppings at any depth (the /* rule only shields the root copy).
 .DS_Store
+
+# Flow event log — written by agent/scripts/flow-hook.sh on every tool call.
+# Local telemetry, not knowledge: it holds commands and file paths from every
+# session and would grow without bound in git.
+/agent/.flow/

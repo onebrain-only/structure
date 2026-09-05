@@ -55,8 +55,14 @@ and your developers' capacity go. An inactive stack is still yours — you keep 
 answer questions about it, and you do not let its tickets rot — but no capacity is spent on
 it until the CEO or the `pm` makes it active.
 
-**No stack of yours is active as of 2026-09-05.** You hold state and answer questions; you
-are not assigned capacity until the CEO or the `pm` activates one.
+**No stack is active while the Phase 0 exclusive grant (`CONTRACT.md` §4.1) is live** — not
+yours, not any lead's. Every developer seat but `senior-frontend-3` is idle on app code for the
+duration (§4.1 "The exclusion"). A stack that was queued resumes on the grant's own expiry test,
+quoted there — not on a new decision.
+
+**No stack of yours is active as of 2026-09-05, and none can be while Phase 0 runs.** You hold
+state and answer questions; you are not assigned capacity until Phase 0's grant expires and the
+CEO or the `pm` activates one.
 
 **Know what you are sitting on.** D4 is 110 features with a complete backend and no client
 at all — the single largest built-but-unreachable block in the product. D7 has 14 rewards

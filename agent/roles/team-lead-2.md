@@ -43,7 +43,19 @@ and your developers' capacity go. An inactive stack is still yours — you keep 
 answer questions about it, and you do not let its tickets rot — but no capacity is spent on
 it until the CEO or the `pm` makes it active.
 
-**D2 is your active stack as of 2026-09-05.** It is the largest cluster in the product and
+**No stack is active while the Phase 0 exclusive grant (`CONTRACT.md` §4.1) is live** — not
+yours, not any lead's. Every developer seat but `senior-frontend-3` is idle on app code for the
+duration (§4.1 "The exclusion"). A stack that was queued resumes on the grant's own expiry test,
+quoted there — not on a new decision.
+
+**D2 is yours, and it is queued — not active — as of 2026-09-05.** It is the stack `pm`
+selected for you and it draws **no capacity** while the Phase 0 grant is live: five of its six
+slices (`games`, `venues`, `explore`, `location`, `venue_submissions`) hold **10** files reserved
+to `senior-frontend-3` under `CONTRACT.md` §4.1, and any ticket needing a registered route also
+touches `app_router.dart`, which is CONTENDED and inside the grant. Do not assign into it; it
+restarts on the grant's expiry test, not on a fresh decision.
+
+**When it does restart, plan against this.** D2 is the largest cluster in the product and
 its headline problem is not unbuilt features — it is *finished backends with no client*.
 Leagues and squads are the standing example. Plan against that, not against a feature list.
 

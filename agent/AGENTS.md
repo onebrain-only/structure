@@ -101,14 +101,22 @@ still answered for, but drawing no capacity.
 | Lead | Stacks — *what to work on* | Active | Slices it **writes** — *the boundary* |
 |---|---|---|---|
 | `team-lead-1` | D1 Identity · D5 Social · D11 Platform | — | `profile`, `social`, `home`, `news`, `moderation` |
-| `team-lead-2` | D2 Games · D8 Moderation | **D2** | `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities` |
+| `team-lead-2` | D2 Games · D8 Moderation | **queued (Phase 0)** | `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities` |
 | `team-lead-3` | D3 Venues · D10 Sports reference | — | `auth_onboarding`, `username_engine`, `app_boot` |
 | `team-lead-4` | D4 Money · D7 Rewards | — | `rewards`, `admin` (+ Commerce on activation) |
-| `team-lead-5` | D6 Notifications · D9 Discovery | **D6** | `notifications` + `lib/services/notifications/**` |
+| `team-lead-5` | D6 Notifications · D9 Discovery | **queued (Phase 0)** | `notifications` + `lib/services/notifications/**` |
 | — | — | — | `core`, `error` **UNOWNED** (platform residue) · `misc` **UNOWNED**, dissolved by Phase 0 |
 
-**Two stacks are active because three developers cannot feed five.** Capacity, not ambition,
-sets that number. Activating a stack is a `pm` decision with the CEO.
+**No stack is active while the Phase 0 exclusive grant (`CONTRACT.md` §4.1) is live. D2 and D6
+resume on the grant's own expiry test, quoted there — not on a new decision.** Both are *queued*,
+not deactivated: they are the two stacks `pm` had selected, and they restart the moment the grant
+ends, with no fresh judgement by anyone. Until then every developer seat but `senior-frontend-3`
+is idle on app code (§4.1 "The exclusion"), so an active label here would promise capacity that
+cannot legally be spent.
+
+**Two stacks — not three, not five — because three developers cannot feed five.** Capacity, not
+ambition, sets that number. Selecting *which* stacks is a `pm` decision with the CEO; *starting*
+them again after Phase 0 is not a decision at all, it is the grant's measured expiry.
 
 **Read the two right-hand columns as two different things, because they are.** The `D`-labels
 are a **feature taxonomy** — they cluster the product's 650 features and answer *what a lead

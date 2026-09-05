@@ -357,3 +357,36 @@ own exit condition. Verified against the tree; the defect is real.
 the historical record, corrected in `G-019`.
 
 **Not done:** nothing committed — left in the working tree, as instructed.
+
+---
+
+## 2026-09-05 — `G-020`: D2 and D6 become `queued (Phase 0)`; the roster no longer contradicts the grant
+
+**Brief from `team-lead`, relaying a `pm` ruling.** `agent/AGENTS.md` §1 marked D2 and D6 **Active**
+while `CONTRACT.md` §4.1 reserved the paths those stacks need to `senior-frontend-3` alone. Two
+leads were being told to assign work their developers may not legally write.
+
+**Verified before editing** (`dabbler-code` `c46b5c5`, read-only):
+- `grep -rl 'misc/data/datasources'` per D2 slice: `games` 2, `venues` 3, `explore` 2, `location` 2,
+  `venue_submissions` 1, `activities` 0 — **10** total, matching `pm`.
+- `lib/features/notifications/` + `lib/services/notifications/`: **0** files — D6's slice is genuinely
+  outside the grant table.
+- `grep -c notifications lib/app/app_router.dart` → **7**. The router is CONTENDED inside the grant,
+  so D6 stalls there regardless.
+
+**Written:**
+- `agent/AGENTS.md:104,107` — Active column now `**queued (Phase 0)**` for both. `:110` carries the
+  footnote: reactivation is the grant's own expiry test, not a new decision.
+- All five `agent/roles/team-lead-*.md` — a standing paragraph that no stack is active while the
+  grant is live. Leads 2 and 5 additionally say the stack is theirs, queued, and drawing no capacity,
+  with the file counts above.
+- `.claude/bindings/team-lead-2.yml` / `-5.yml` — the routing descriptions still read "D2/D6 is
+  ACTIVE" to the Listener. Corrected; **not in the brief, but it is the string a dispatcher reads.**
+- `DECISIONS.md` `G-020` at `:5779`.
+- `build-agents.sh` rerun; `--check` exits 0.
+
+**Left open, deliberately.** Whether a `notifications` ticket exists needing zero router touch is
+**not established**. `pm` declined to invent it; I have not resolved it. It is now `team-lead-5`'s
+question, written into that role file.
+
+**Not done:** nothing committed — left in the working tree, as instructed. `dabbler-code` untouched.

@@ -29,5 +29,57 @@
     "sales-influence@wondelai-skills": true,
     "systems-architecture@wondelai-skills": true,
     "code-craftsmanship@wondelai-skills": true
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent/scripts/flow-hook.sh PreToolUse",
+            "async": true,
+            "timeout": 5
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent/scripts/flow-hook.sh PostToolUse",
+            "async": true,
+            "timeout": 5
+          }
+        ],
+        "matcher": "*"
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent/scripts/flow-hook.sh SubagentStart",
+            "async": true,
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "agent/scripts/flow-hook.sh SubagentStop",
+            "async": true,
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
 }
