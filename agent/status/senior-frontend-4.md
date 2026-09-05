@@ -17,7 +17,7 @@ Measured the repo where a claim depended on it.
 ### What I decided / found
 
 1. **Enablement, not availability, is the binding constraint for my two stacks.**
-   `/Users/moatazmustapha/Desktop/One Brain/.claude/settings.json` `enabledPlugins` does
+   `/Users/moatazmustapha/Desktop/Thebes/.claude/settings.json` `enabledPlugins` does
    **not** contain `ux-design@wondelai-skills` and contains **zero** `marketingskills`
    plugins. So `hooked-ux`, `microinteractions`, `drive-motivation`,
    `improve-retention`, `paywalls`, `pricing`, `churn-prevention` — the seven closest

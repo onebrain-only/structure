@@ -177,4 +177,4 @@ and owns nothing. Ask a peer or escalate; never dispatch.
 
 ## Status entry
 
-Before you report this task complete, append to `/Users/moatazmustapha/Desktop/One Brain/agent/status/junior-frontend-4b.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.
+Before you report this task complete, append to `/Users/moatazmustapha/Desktop/Thebes/agent/status/junior-frontend-4b.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.

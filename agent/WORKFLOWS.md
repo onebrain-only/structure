@@ -74,8 +74,8 @@ what is needed; the `po` writes it.
 5. **No task is complete until the agent has appended to its own
    `agent/status/<name>.md`.** **The path is resolved from the One Brain workspace
    root, never from the project tree the agent happens to be standing in** — today
-   that root is `/Users/moatazmustapha/Desktop/One Brain`, so the entry goes to
-   `/Users/moatazmustapha/Desktop/One Brain/agent/status/<name>.md` and the 30 role
+   that root is `/Users/moatazmustapha/Desktop/Thebes`, so the entry goes to
+   `/Users/moatazmustapha/Desktop/Thebes/agent/status/<name>.md` and the 30 role
    files carry it absolute for exactly this reason. **The failure this prevents is
    silent:** on 2026-09-05 `po` ran with its working directory set to
    `Dabbler/dabbler-code`, and the "create the file if it does not exist" clause below

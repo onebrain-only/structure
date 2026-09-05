@@ -12,7 +12,7 @@ Every step below is marked. **[M]** = measured, with the date it was last run.
 **[U]** = untested here; inherited or documented but not executed. Do not present a `[U]`
 step's outcome as fact — run it and upgrade it, or say it is untested in your report.
 
-Repo root throughout: `/Users/moatazmustapha/Desktop/One Brain/Dabbler/dabbler-code`.
+Repo root throughout: `/Users/moatazmustapha/Desktop/Thebes/Dabbler/dabbler-code`.
 **Use absolute paths.** A relative `agent/status/` resolves against the project tree and
 silently creates a second, unread log.
 
@@ -39,7 +39,7 @@ Chrome.** Neither goes to iOS today.
 ## Step 1 — See what is actually connected
 
 ```bash
-cd "/Users/moatazmustapha/Desktop/One Brain/Dabbler/dabbler-code"
+cd "/Users/moatazmustapha/Desktop/Thebes/Dabbler/dabbler-code"
 flutter devices
 ```
 
@@ -69,7 +69,7 @@ asserts a `MaterialApp` mounted. It is a launch smoke test, not a feature test.
 **[M] 2026-09-06 — this is the command that works:**
 
 ```bash
-cd "/Users/moatazmustapha/Desktop/One Brain/Dabbler/dabbler-code"
+cd "/Users/moatazmustapha/Desktop/Thebes/Dabbler/dabbler-code"
 flutter test integration_test/app_test.dart -d emulator-5554 --dart-define-from-file=.env
 ```
 
