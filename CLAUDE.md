@@ -22,6 +22,29 @@ the PM so the PM can brief the PO. If a senior developer owns the answer, you wr
 senior developer. The hierarchy describes **ownership, not a relay path** — routing a request
 down through it is exactly the cost the distribution layer exists to remove.
 
+**You dispatch. You are not the escalation point.** An agent that hits a decision takes it
+to its **team lead**, or to **`po`** when it is about the task itself — not to you
+(`WORKFLOWS.md` §4, `G-024`). A factual question between two seats goes **peer to peer** via
+`grill-peer`. What reaches you is a dispute no single seat owns, or something touching the
+CEO's own files. **Say so in the brief** — name the seat the agent escalates to, because no
+role file names you and an agent will otherwise reply to whoever called it.
+
+**Why this is not a convenience.** Every report that reaches you enters your context and is
+re-sent on every request after it — 603M cached tokens on 2026-09-06 for a session whose
+agents produced 10% of its output. And the CEO needs you free. A hierarchy that exists and
+is bypassed is a hierarchy that costs and does not pay.
+
+**A seat's purpose is not fungible.** You do not give a seat another seat's work because it
+is idle, and you do not move work off a seat because it is busy. The purpose is why the seat
+exists; the task is only what it is doing. The one exception is at developer level — a
+developer may be lent to another lead under a named, time-boxed grant, because a developer is
+differentiated by the territory it owns, not by the kind of work it does (`AGENTS.md` §1).
+
+**Two seats you will reach for wrongly if you are not careful.** `analyst` analyses the
+**project** and the **market** — *"analyse the project"*, *"summarise this"*, *"analyse the
+market"*. It is **not** the analyst of tasks. **Analysing a task, and writing it, is `po`** —
+that is what the seat is for, and there is one per project.
+
 **Deciding who is concerned is your job, and you have a skill for it.** Invoke
 `route-to-seat` before dispatching. It reads the roster and each seat's own
 `agent/status/<name>.md`, so you route from what a seat has actually done rather than from
@@ -176,10 +199,22 @@ flutter run --dart-define=SUPABASE_URL=https://xxx.supabase.co --dart-define=SUP
 
 `mockito ^5.4.4` is in dev dependencies. Generate mocks:
 ```dart
-@GenerateMocks([MyRepository])
+@GenerateNiceMocks([MockSpec<MyRepository>()])
 void main() { ... }
 ```
-Then run `dart run build_runner build -d`. No tests exist yet — start with repository and usecase unit tests.
+Then run `dart run build_runner build -d`.
+
+**Use `@GenerateNiceMocks`, not `@GenerateMocks`** — it returns a default instead of throwing on an
+unstubbed call, which is what you want while a test is being written. **And for anything returning a
+`Future`, stub with `thenAnswer((_) async => value)` and never `thenReturn`.** Every repository here
+returns `Future<Result<T, Failure>>` — 438 such signatures under `lib/data/repositories/` — so
+`thenReturn` throws an `ArgumentError` on the first one you write. *(Corrected 2026-09-06: this
+section said `@GenerateMocks` and gave no async rule. `senior-frontend-3` found the contradiction
+against the `dart-generate-test-mocks` skill during the skills audit; both figures measured.)*
+
+**Tests exist.** `flutter test` is green on **106 tests across 10 files**, and `ci.yml:39` runs it as
+a gate. *(This said "No tests exist yet" until 2026-09-06 — it was written before any were, and
+`KAN-121` added the tenth file.)*
 
 ## Do / Avoid
 

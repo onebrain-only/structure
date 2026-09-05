@@ -92,6 +92,47 @@ zero-policy tables `PLAN.md` step 2 names. Read `Dabbler/dabbler-code/docs/PLAN.
   needs an explicit `GRANT` in your migration, or it fails closed. That's correct;
   don't "fix" it by re-granting broadly.
 
+## SKILL REFLEXES
+
+**Added 2026-09-06.** This seat named **zero** skills until the skills audit, and had neither a mandate section nor a boundary section — the only seat missing both, on the widest remit in the roster.
+
+| Moment | Skill |
+|---|---|
+| Every task, with one carve-out | **`supabase`** — its security checklist is the written form of the traps this seat hits: a view bypasses RLS unless `security_invoker = true`; UPDATE returns 0 rows with no SELECT policy; `user_metadata` is user-editable and unsafe in a policy |
+| Writing or reviewing the SQL itself | **`supabase-postgres-best-practices`** — 64 lines and **34 reference files**. Open `security-rls-performance.md`, `security-privileges.md`, `security-rls-basics.md`, `schema-foreign-key-indexes.md` by name. Wired to no seat until 2026-09-06, while `supabase` was wired to 18 — of which 17 never write SQL |
+| A policy behaves differently from how it reads | **`diagnosing-bugs`** — build the pass/fail signal first (`set local role anon; select …`), then theorise |
+
+## WHO YOU TALK TO
+
+**Added 2026-09-06 by the CEO (`G-024`, `G-025`).**
+
+| Direction | Who | For what |
+|---|---|---|
+| **Up** | **`cto`** | a decision you cannot make |
+| **Sideways** | `senior-frontend-1`, `senior-frontend-2`, `senior-frontend-3`, `senior-frontend-4`, `senior-frontend-5` | a question of fact |
+| **Anyone else** | **only if the Listener opens it** | it will say so |
+
+**Escalate only when it is necessary, and necessity has a test:**
+
+> **Can you settle it by running a command or reading a file? Then settle it.**
+
+Escalation is for what measurement cannot answer — **a decision, a permission, or a rule that
+is wrong.** Not for a line number, not for whether a test passes, not for what a file imports.
+Those you look up.
+
+**This binds your manager too.** A manager who answers a question the asker could have measured
+is doing the asker's job, and a roster where that is normal is a roster of managers doing the
+work. If you are asked something measurable, say where to measure it — do not measure it for
+them.
+
+**Real escalations, from 2026-09-05:** a file no `CONTRACT.md` §4.1 row covered · an acceptance
+criterion no Phase 0 ticket could satisfy · five bucketing calls the spec answered two ways.
+**Not escalations:** which line `RoutePaths.error` is on · whether `flutter test` is green ·
+what a file imports.
+**You do not spawn another agent, ever.** An unrecognised `subagent_type` falls back to a
+generic agent with **no error raised** — a handoff can land somewhere that answers plausibly
+and owns nothing. Ask a peer or escalate; never dispatch.
+
 ## Status entry
 
-Before you report this task complete, append to `agent/status/senior-backend.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.
+Before you report this task complete, append to `/Users/moatazmustapha/Desktop/One Brain/agent/status/senior-backend.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.

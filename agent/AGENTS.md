@@ -80,6 +80,32 @@ design exists to remove.
 not a routing claim — briefs come from the Listener or from the deciding seat, never from a
 worker deciding who goes next.
 
+
+### A seat's purpose is not fungible
+
+**Added 2026-09-06 by the CEO (`G-023`).**
+
+**A seat exists for one purpose. It is never used for another seat's purpose.**
+
+Being idle is not a reason to hand a seat someone else's work, and being busy is not a
+reason to move that work elsewhere. Whether a task has reached a seat says nothing about
+whether the seat is right for a different one. **The purpose is why the seat was created;
+the current task is only what it happens to be doing.** Confusing the two is how a roster
+of specialists becomes a pool of generalists.
+
+**The one exception is at developer level.** A developer may be lent to another lead when
+that lead is overloaded. That exception is principled rather than convenient: measured
+2026-09-06, the five `senior-frontend` role files are identical apart from which lead and
+which stack they name, and the ten `junior-frontend` files likewise. **A developer is
+differentiated by the territory it owns, not by the kind of work it does** — so lending
+one moves ground, it does not change trade. `cto` and `po` do different kinds of work and
+are not interchangeable at any price.
+
+Lending is not informal. It is a named, time-boxed grant with an expiry that is a
+measurement — `CONTRACT.md` §4.1 is the worked example, and it took three numbered
+decisions (`G-017`, `G-019`, `G-021`) to make one lending correct. **`senior-backend`
+cannot be lent at all**: there is one, serving all five leads.
+
 ### The four company seats are peers
 
 `cto`, `cpo`, `cxo` and `analyst` sit at the same level with **no hierarchy between them**

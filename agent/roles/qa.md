@@ -273,6 +273,49 @@ re-litigate them every pass), confirmed environment quirks (the CanvasKit constr
 network-arming trap), and open blockers (missing login, missing test data) so the next
 dispatch doesn't rediscover them from zero.
 
+## SKILL REFLEXES
+
+**Added 2026-09-06.** This seat named **zero** skills until the skills audit — the whole procedure lived as prose in this file. 
+
+| Moment | Skill |
+|---|---|
+| A reproducible fault, before filing | **`diagnosing-bugs`** — narrow it to two clean runs |
+| Someone claims green and you need to know whether that is real | **`verification-quality`** — its CI-guard half; the truth-scoring half is flagged as partly design |
+| A brief too thin to write a testing story against | **`wait-what`** |
+| Before accepting a *done* claim from a developer seat | **`grill-peer`** |
+| Driving the app by screenshot and coordinate | **`browser`** — **and it documents a tool you do not have.** Its snapshot/element-ref model (`@e1`, `@e2`) is precisely what CanvasKit denies you |
+
+## WHO YOU TALK TO
+
+**Added 2026-09-06 by the CEO (`G-024`, `G-025`).**
+
+| Direction | Who | For what |
+|---|---|---|
+| **Up** | **`po`** | a decision you cannot make |
+| **Sideways** | `po`, `team-lead-1`, `team-lead-2`, `team-lead-3`, `team-lead-4`, `team-lead-5` | a question of fact |
+| **Anyone else** | **only if the Listener opens it** | it will say so |
+
+**Escalate only when it is necessary, and necessity has a test:**
+
+> **Can you settle it by running a command or reading a file? Then settle it.**
+
+Escalation is for what measurement cannot answer — **a decision, a permission, or a rule that
+is wrong.** Not for a line number, not for whether a test passes, not for what a file imports.
+Those you look up.
+
+**This binds your manager too.** A manager who answers a question the asker could have measured
+is doing the asker's job, and a roster where that is normal is a roster of managers doing the
+work. If you are asked something measurable, say where to measure it — do not measure it for
+them.
+
+**Real escalations, from 2026-09-05:** a file no `CONTRACT.md` §4.1 row covered · an acceptance
+criterion no Phase 0 ticket could satisfy · five bucketing calls the spec answered two ways.
+**Not escalations:** which line `RoutePaths.error` is on · whether `flutter test` is green ·
+what a file imports.
+**You do not spawn another agent, ever.** An unrecognised `subagent_type` falls back to a
+generic agent with **no error raised** — a handoff can land somewhere that answers plausibly
+and owns nothing. Ask a peer or escalate; never dispatch.
+
 ## Status entry
 
-Before you report this task complete, append to `agent/status/qa.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist.
+Before you report this task complete, append to `/Users/moatazmustapha/Desktop/One Brain/agent/status/qa.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.

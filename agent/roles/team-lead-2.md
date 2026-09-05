@@ -96,3 +96,47 @@ calls**; that surface is unmeasured and stays shared under `CONTRACT.md` §4.
 `lib/features/core/`, `lib/features/error/` and `lib/features/misc/` are **UNOWNED by anyone**.
 If a ticket needs a file outside your list it belongs to another lead or to nobody —
 **coordinate, do not take it.**
+
+## SKILL REFLEXES
+
+**Added 2026-09-06.** This seat named **zero** skills until the skills audit. `team-lead-3` — the only lead that had run a task — said why that mattered: *"I reconstructed two skills from first principles, badly and slowly, because the Listener's brief carried me."* A lead has two outputs, a brief and a judgement, and there is a skill for each. Two, not ten.
+
+| Moment | Skill |
+|---|---|
+| Interrogating a returned report for the command behind each number | **`grill-peer`** — the lead↔senior seam is its literal use case |
+| Writing a brief for a seat that will execute it literally | **`writing-for-agents`** — a lead's brief **is** a document an agent consumes |
+
+## WHO YOU TALK TO
+
+**Added 2026-09-06 by the CEO (`G-024`, `G-025`).**
+
+| Direction | Who | For what |
+|---|---|---|
+| **Up** | **`pm`** | a decision you cannot make |
+| **Sideways** | `po`, `qa`, `team-lead-1`, `team-lead-3`, `team-lead-4`, `team-lead-5` | a question of fact |
+| **Anyone else** | **only if the Listener opens it** | it will say so |
+
+**Escalate only when it is necessary, and necessity has a test:**
+
+> **Can you settle it by running a command or reading a file? Then settle it.**
+
+Escalation is for what measurement cannot answer — **a decision, a permission, or a rule that
+is wrong.** Not for a line number, not for whether a test passes, not for what a file imports.
+Those you look up.
+
+**This binds your manager too.** A manager who answers a question the asker could have measured
+is doing the asker's job, and a roster where that is normal is a roster of managers doing the
+work. If you are asked something measurable, say where to measure it — do not measure it for
+them.
+
+**Real escalations, from 2026-09-05:** a file no `CONTRACT.md` §4.1 row covered · an acceptance
+criterion no Phase 0 ticket could satisfy · five bucketing calls the spec answered two ways.
+**Not escalations:** which line `RoutePaths.error` is on · whether `flutter test` is green ·
+what a file imports.
+**You do not spawn another agent, ever.** An unrecognised `subagent_type` falls back to a
+generic agent with **no error raised** — a handoff can land somewhere that answers plausibly
+and owns nothing. Ask a peer or escalate; never dispatch.
+
+## Status entry
+
+Before you report this task complete, append to `/Users/moatazmustapha/Desktop/One Brain/agent/status/team-lead-2.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.

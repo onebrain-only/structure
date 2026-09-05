@@ -10,6 +10,98 @@ still gets one.
 
 # LOG
 
+## 2026-09-05 — KAN-122 (P0-2) verified independently and moved to In Review; four days of slack reported
+
+**Agent:** `team-lead-3`
+**Outcome:** Re-measured every exit criterion myself rather than accepting `team-lead`'s or
+`senior-frontend-3`'s numbers. **All six pass, and every figure matched the brief exactly.**
+Transitioned `KAN-122` to `In Review` and recorded the evidence on the ticket. No other ticket
+touched — `KAN-121` left alone as instructed.
+
+**My measurements (verbatim):**
+- `git diff --numstat HEAD | awk '{a+=$1;b+=$2;n++} END {print n, a, b}'` → **`42 42 42`**
+- `git diff --numstat HEAD | awk '$1>1 || $2>1'` → **exactly three rows**:
+  `lib/data/repositories/supabase_profile_repository.dart`,
+  `lib/features/social/providers/friends_list_provider.dart`,
+  `test/data/repositories/profiles_repository_impl_test.dart` — the three `G-021`/`G-019` names,
+  **no fourth**.
+- `grep -rn "misc/data/datasources" lib/ test/` → **empty**, exit 1.
+- `ls -1 lib/features/misc/` → `presentation` only.
+- `flutter analyze --no-pub --no-fatal-infos` → **exit 0**, `errors=0 warnings=0 infos=56`.
+- `flutter test` → **exit 0, 106 tests, "All tests passed!"**; `flutter test test/app/` → **+3**,
+  so P0-1's golden test is still green.
+- `git diff -M --name-status HEAD` → three renames, all **`R100`**.
+- `git status --porcelain` → 3 renames + 39 modified + `?? test/app/`, nothing else.
+
+**The one discrepancy, and it is not a defect.** Criterion 4 says **103** tests; I measured **106**.
+`103` is the pre-`KAN-121` baseline and `KAN-121` added `route_inventory_test.dart` (+3). The
+criterion's number is stale by one ticket, not overrun. Stated openly in the ticket comment so the
+reviewer does not fail it. **This is the second time a Phase 0 ticket has carried a stale
+`CLAUDE.md`-derived baseline** — the earlier one was my own unverified 0/0/103 claim on 2026-09-05.
+I now measure rather than quote, and `po` should stop copying `103` into `KAN-123`–`125`.
+
+**Transition:** read back live via `getTransitionsForJiraIssue` before use — **id `31`**, name
+`In Review`, target status **`10006`**. Applied. **Comment id `10540`.**
+
+**Capacity position — the part only I own.**
+Original sizing was **6 sittings, strictly serial, one seat (`senior-frontend-3`), zero
+parallelism**: P0-1 `1`, P0-2 `1`, P0-3a `1`, P0-3b `2`, P0-4 `1`. The board's dates encode that at
+**~2 calendar days per sitting** (09-07, 09-09, 09-11, 09-16, 09-18). **Two sittings are now
+consumed and four remain.**
+
+Recommendation to `team-lead` — a **uniform −4 day shift**, which preserves every ticket's sitting
+cost and moves only the start:
+- `KAN-123` (P0-3a, 1 sitting) `2026-09-11` → **`2026-09-07`**
+- `KAN-124` (P0-3b, 2 sittings) `2026-09-16` → **`2026-09-12`**
+- `KAN-125` (P0-4, 1 sitting) `2026-09-18` → **`2026-09-14`**
+
+Derived from the four remaining sittings at the same 2-day rate, **not** from the fact that two
+tickets went fast. **Conditional on `KAN-122` reaching `Done`** — it is `In Review`, and the chain
+is serial on Done, not on In Review. `KAN-121`'s gate cleared same-day; if this one does not, the
+shift shrinks one-for-one.
+
+**Did my sizing hold? Yes — and the early finish is not evidence that it was generous.** P0-1 and
+P0-2 were both **1-sitting mechanical** tickets: a golden test, and a 3-file move plus 42 import
+lines with the whole population enumerable in advance. They ran without interruption, which is
+exactly what a correctly-sized mechanical ticket does. **P0-3b is the only 2-sitting ticket and the
+only one carrying design judgment** — 1712 LOC / 80 top-level route entries broken into modules.
+Two clean mechanical tickets say nothing about it. **Shift the dates; do not shrink the durations.**
+I am not reducing P0-3b to one sitting on this evidence.
+
+**I did not re-date anything.** `po` owns `due_date`; the number above is a recommendation routed
+through `team-lead`.
+
+**Watching for:** (1) `KAN-122`'s review verdict — the −4 shift is conditional on it reaching Done,
+and a rework eats the slack one-for-one; (2) `KAN-123` (P0-3a) is the ticket whose output sizes
+`KAN-124` — if its builder→slice bucketing table comes back thinner than the 80 entries, P0-3b's
+2-sitting estimate loses its basis and I re-cost before P0-3b opens, not during it; (3) the stale
+`103` propagating into `KAN-123`–`125` criteria; (4) still: any second writer on a §4.1 path, or a
+request to bring a junior into Phase 0.
+
+**Not verified:** I did not open any of the 39 importing files to check the rewritten import
+resolves to the intended symbol — I verified line counts, the grep is empty, and analyze/test are
+green, which is evidence of correctness but not a reading of the diff content. I did not
+`shasum` the three moved files against `git show HEAD:<old path>`; I relied on `git`'s own `R100`
+similarity score, which is a strong but different claim. I did not review `KAN-123`, `124` or `125`
+descriptions in this pass, so my sitting costs above are carried forward from the 2026-09-05
+sizing, not re-derived from the current ticket text. I did not look at `KAN-121` at all. `P0-5` has
+no ticket on the board (`KAN-126` does not exist) and I did not chase why.
+
+
+## 2026-09-05 — KAN-122 (P0-2) moved to In Progress; line-budget defect raised
+
+- **Import surface re-measured at HEAD `c46b5c5`:** `grep -rln "misc/data/datasources" lib/ test/` → **39 files**, `grep -rn` → **42 lines**. Matches `CONTRACT.md` §4.1's stated **39** importing files and **10** under `lib/data/**`, and the one file under `test/` (`test/data/repositories/profiles_repository_impl_test.dart`). Breakdown: 26 under `lib/features/`, 10 under `lib/data/`, `lib/providers.dart`, `lib/core/providers/geo_providers.dart`, 1 test file.
+- **Grant coverage: complete.** Every one of the 39 falls under a §4.1 row. The 26 feature files sit in slices all named at `CONTRACT.md:167`–`:170`; three of them (`app_boot/providers.dart`, `auth_onboarding/presentation/providers/auth_profile_providers.dart`, `username_engine/providers.dart`) are `senior-frontend-3`'s own slices under §3 and need no grant at all. No file falls outside every row.
+- **Defect found — the one-line-per-file budget is short by two files.** §4.1 and `KAN-122` criterion 6 permit one line per importing file, with the test file as the *single* two-line exception (`G-019`). Measured: **three** files carry two imports — the granted test file `:7`–`:8`, plus **`lib/features/social/providers/friends_list_provider.dart:5`–`:6`** and **`lib/data/repositories/supabase_profile_repository.dart:7`–`:8`**, neither granted a second line. 36×1 + 3×2 = 42. As written, criterion 1 (zero remaining lines) is unreachable without violating criterion 6 in two files — the same defect class `G-019` fixed, in two files it missed. Both paths *are* covered by §4.1 rows; only the line budget is wrong. **I did not amend `CONTRACT.md` — I do not own it.** Raised to `team-lead` for a `G-019`-style extension.
+- **Comment posted (id `10506`):** executor is `senior-frontend-3` and nobody else, fixed by the §4.1 named grant and not delegable; no junior on a single import line; the one-line rule with an explicit list of what counts as a violation; the line-budget defect stated openly so the reviewer does not fail it silently; and "done" = `grep -rn "misc/data/datasources" lib/ test/` **empty**, `lib/features/misc/data/` gone, the three moved files proven byte-identical by `git diff -M --stat` (rename, 100%, 0 insertions/0 deletions) **and** matching `shasum -a 256` against `git show HEAD:<old path>`, `flutter analyze --no-pub --no-fatal-infos` 0 errors/0 warnings, `flutter test` 103 tests plus `route_inventory_test.dart`, P0-1's golden test still green, and `git diff --name-only` listing nothing beyond the 39 + 3.
+- **Transition:** read back via `getTransitionsForJiraIssue` before use — **id `21`**, name `In Progress`, target status **`10005`**. Same transition `KAN-121` took. Applied; `KAN-122` now `In Progress`. No other ticket touched. The board also carries a separate **`Development`** status (transition id `4` → status `10010`); I used `In Progress` for consistency with `KAN-121` and leave that question where it sits.
+- **Capacity / date.** `KAN-121` is **In Review**, not Done. Phase 0 is strictly serial on one seat (`senior-frontend-3`), and `KAN-122`'s own description says it starts only after P0-1 is Done — so opening this ticket is not releasing the work. The `2026-09-09` due date still holds **only if `KAN-121` passes its review gate on its `2026-09-07` date**. It has not yet. If P0-1 comes back for rework, `KAN-122` slips one-for-one and so do `KAN-123`, `KAN-124` and `KAN-125`; I take that to the lead rather than absorbing it.
+
+**Watching for:** (1) `KAN-121`'s review verdict — a rework sends the whole Phase 0 chain right by the rework duration, and I re-date rather than hope; (2) whether the two-line grant extension lands before `senior-frontend-3` reaches those two files, since without it a correct diff is formally a rejection; (3) any second writer on a §4.1 path, or a request to bring a junior in "just for the imports".
+
+**Not verified:** I did not run `flutter analyze` or `flutter test` — the 0 errors / 0 warnings and 103-test baselines remain `CLAUDE.md`'s claim, not my measurement. I did not open any of the 39 importing files beyond counting and locating the `misc/data/datasources` lines, so I have not checked whether any import is unused or whether relative-path imports will resolve at the new depth. I did not read the contents of the three moving files. I did not verify the §4.1 rows for `app_router.dart`, `lib/app/routes/**` or the `P0-4` screen moves, which this ticket does not touch.
+
+
 ## 2026-09-05 — (no ticket) — Phase 0 split reviewed; capacity reported to `team-lead`
 
 **Agent:** `team-lead-3`
@@ -40,3 +132,172 @@ bucketing rule, not from the collision set itself. I did not read `P0-5`'s `devo
 **Next:** `po` writes the five tickets once the three defects are settled; `P0-1` is the first
 and only ticket that can start.
 
+
+## 2026-09-05 — KAN-121 (P0-1) moved to In Progress
+
+- Transition: read back via `getTransitionsForJiraIssue` before use — **id `21`**, name `In Progress`, target status `10005`. Matched the brief. Applied; issue now `In Progress`. No other ticket touched.
+- Comment posted (id `10503`): executor is `senior-frontend-3` and nobody else, fixed by the `CONTRACT.md` §4.1 named grant (not delegable); no junior enters any Phase 0 ticket; no second writer on any §4.1 path while the grant is live; "done" = golden test green against unmodified `app_router.dart` **and** demonstrably red on a deliberate two-entry `_routes` reorder, both pasted as raw command output, plus the 85 / one-indexedStack-with-4-branches assertions and no `go_router` bump.
+- Ticket `due_date` on the board is **2026-09-07**.
+
+**Watching for:** (1) P0-1 not landing by 2026-09-07 — Phase 0 is strictly serial and single-seat, so a slip here shifts P0-2, P0-3a/b and P0-4 one-for-one and I take that back to the lead rather than absorbing it; (2) any sign of a second writer on a §4.1 path, or a request to bring a junior in "just for the imports" — either invalidates the golden test as evidence and stops the ticket.
+
+## 2026-09-05 — Phase 0 compression answer + `KAN-123` opened
+
+**Task from `team-lead`:** CEO wants Phase 0 finished Fri 2026-09-11, new work Mon 09-14.
+Give the capacity answer and open `KAN-123`. No file writes under `dabbler-code/`, no
+re-dating, no sizing of `KAN-126`, no git-mutating commands. All honoured.
+
+**Capacity verdict: YES, four sittings fit five working days — conditionally.** The condition
+is that `KAN-124` (P0-3b) keeps **two** sittings and Friday 09-11 carries **no ticket**. I did
+not shrink P0-3b and I still push back on cutting it to one. What I revised is the *calendar
+spacing*, not the sitting cost: P0-1 and P0-2 were spaced two board-days apart and both landed
+executed/gated/QA'd/closed inside one day. That is evidence the two-day spacing was slack, not
+duration. Slack is exactly what a compression request is allowed to spend.
+
+**Schedule handed to `team-lead` for `po` to route (I set no dates myself):**
+
+| Ticket | Sittings | Recommended `due_date` |
+|---|---:|---|
+| `KAN-123` P0-3a | 1 | 2026-09-07 (Mon) — unchanged |
+| `KAN-124` P0-3b | 2 | 2026-09-09 (Wed) |
+| `KAN-125` P0-4 | 1 | 2026-09-10 (Thu) |
+| Fri 2026-09-11 | — | **no ticket — rework buffer + §10.6 landing test** |
+
+The window holds **exactly one** rework cycle. A second one, anywhere in the chain, slips P0-4
+past Friday. Chain is strictly serial on one non-delegable seat (`senior-frontend-3`,
+`CONTRACT.md` §4.1), so nothing parallelises out of trouble.
+
+**Flagged to `team-lead`:** §10.6 requires all **five** tickets Done for the grant to expire.
+`KAN-126` (P0-5, `devops`) is therefore on the Friday critical path even though it is
+process-only and on another seat. Not mine to size; stated as a dependency.
+
+**Thin-table contingency, decided in advance (not on Wednesday):** I verified the denominator
+mechanically before opening the ticket —
+`awk 'NR>=444' lib/app/app_router.dart | grep -cE '^    (GoRoute|StatefulShellRoute|ShellRoute)'`
+returns **80**. (85 `path:` occurrences and 4 `StatefulShellBranch`es exist; the extra 5 are
+nested in the shell route.) So "thin" is no longer ambiguous, and it splits three ways:
+- **Fewer than 80 entries covered** → incomplete work, not a re-cost. Straight back to
+  `senior-frontend-3` same day under the ticket's own rework triggers. P0-3b's cost is untouched.
+- **Sparse collision sets (few frozen pairs)** → a legitimate finding, and it makes P0-3b
+  *cheaper*, not dearer. I still do not cut P0-3b to one sitting: its cost is the six-file
+  extraction plus the golden test, not the ordering constraint.
+- **Frozen pairs spanning two different buckets** → the only outcome that re-costs upward, and
+  the only one that breaks the week. §10.3 requires `_routes` to reduce to an ordered
+  concatenation of six module lists; a cross-bucket frozen pair may make that unachievable as
+  specified. That is a spec problem for `analyst`/`cto`, not a sizing problem. I put it on the
+  ticket as **flag-on-sight, do not save for the writeup**, so it surfaces Monday and not
+  Wednesday.
+
+**`KAN-123` opened.** Grant position: **no write path required at all** — read-and-analysis over
+`lib/app/app_router.dart` and `lib/utils/constants/route_constants.dart`, deliverables posted as
+ticket comments. §4.1 covers it with room to spare; §1 makes reading open regardless. The live
+hazard is the reverse of a permission gap — `KAN-122`'s work is uncommitted on purpose, so the
+DoD's no-write proof is a working-tree snapshot rather than a clean tree:
+`git status --porcelain | wc -l` = **43**, md5 **657d1bc3773bf83086fa9199d2c83e58**, HEAD
+**c46b5c5**. Predecessor P0-2 (`KAN-122`) confirmed Done.
+
+- Comment id **10545** (operative DoD, six numbered conditions, exact commands).
+- Transition id **21**, name **In Progress**, target status id **10005**. Read back live from
+  the board before use, as before. Board oddity worth keeping on record: `Development`
+  (transition id 4 → status 10010) is **still present on the live board** despite the CEO
+  saying he is removing it. Used `In Progress` per the settled ruling; noting the id only so a
+  future run is not surprised by it.
+
+**Not verified:** that a sitting maps to one calendar day — it is an inference from two
+mechanical tickets, and P0-3b is not mechanical. That `KAN-126` can land by Friday. That the
+Cloudflare `Canary` build (§10.6) will be green — nothing is committed yet.
+
+## 2026-09-05 (second run) — re-answered on "we work 24 hours" + ceiling-not-target
+
+**Two constraints changed mid-question** and `team-lead` asked me to re-answer: (1) there is no
+Mon–Fri *execution* constraint — the weekday week governs only how `due_date` reads on the board;
+(2) a `due_date` is a **ceiling, not a target** — earliest-believed and outer-bound are two
+different numbers and both were asked for.
+
+**`KAN-123` was already open from the first run — verified, not redone.** Status `In Progress`
+(id 10005), comment **10545** present, `due_date` 2026-09-07. Working-tree snapshot re-checked
+and **unchanged**: 43 porcelain entries, md5 `657d1bc3773bf83086fa9199d2c83e58`, HEAD `c46b5c5`.
+`senior-frontend-3` is executing and has written nothing, which is what P0-3a requires.
+
+**Revised verdict: yes, and considerably faster than five days — but P0-3b still needs two
+sittings.** Removing the weekday boundary removes a *calendar* limit that was never the binding
+one. The binding limits are unchanged and none of them is a clock: a strictly serial chain on one
+non-delegable seat, and P0-3b carrying design judgement the other four tickets do not.
+
+**I held the position I said I would hold.** "We work 24 hours" is not an argument that the work
+is smaller. Restated the mechanism explicitly so it survives the pressure: two sittings means two
+passes **with a checkpoint between them** — the checkpoint is what makes it two, not elapsed time,
+so running them back to back does not merge them into one.
+
+**Two dates per ticket, given to `team-lead` for `po` to route (I set no dates):**
+
+| Ticket | Sittings | Earliest I believe | Ceiling I commit to |
+|---|---:|---|---|
+| `KAN-123` P0-3a | 1 | 2026-09-06 (Sun) | 2026-09-07 (Mon) |
+| `KAN-124` P0-3b | 2 | 2026-09-07 (Mon) | 2026-09-09 (Wed) |
+| `KAN-125` P0-4 | 1 | 2026-09-08 (Tue) | 2026-09-10 (Thu) |
+| §10.6 landing + Canary | — | 2026-09-09 (Wed) | 2026-09-11 (Fri) |
+
+Earliest beats the CEO's Friday by two days; ceiling still meets it. **The gap between the two
+columns is the rework budget, stated explicitly** rather than hidden as Friday padding — which is
+the honest way to answer "ceiling, not target". Roughly two rework cycles now, against one before.
+
+**Thin-table contingency: unchanged and standing**, restated ahead of the table landing, since
+`KAN-123` is executing now. Under 80 covered = rework, not re-cost. Sparse collision sets make
+P0-3b cheaper and still buy no sitting back. Cross-bucket frozen pair = the only upward re-cost
+and the only spec-breaker; already on the ticket as flag-on-sight.
+
+**What breaks under back-to-back pace — named for `team-lead`:**
+1. **The golden file.** §10.3's whole proof is P0-1 green *with no edit to the golden file*. Under
+   pace the tempting fix for a red golden test is to edit the golden. That converts the only
+   evidence P0-3b worked into evidence of nothing. Watched hardest.
+2. **The uncommitted tree.** Four tickets stacked on `KAN-122`'s uncommitted work at `c46b5c5`.
+   Back-to-back pace is exactly when someone reaches for `reset`/`checkout`/`stash` to unstick
+   themselves, and one such command erases all of it.
+3. **Gate compression.** `po`'s review gate and `qa` are other seats running at the same cadence.
+   A gate that keeps pace by becoming a rubber stamp removes the thing that catches P0-3b.
+4. **`KAN-126`.** 24-hour working does not help a dependency on a seat I do not control, and
+   §10.6 does not close without it.
+
+**Not verified:** every elapsed-time figure here is inferred from two mechanical tickets closing
+fast on one Saturday; P0-3b is not mechanical. `KAN-126`'s fit. That the §10.6 landing test passes
+— still nothing committed, no analyze/test/Canary run against a Phase 0 result exists.
+
+## 2026-09-06 — skills audit of the lead seat (survey, read-only)
+
+`team-lead` asked all thirty seats what skills their seat should carry. Answered for **the lead
+seat**, not only for myself. **No file changed except this one.**
+
+**Measured:** `agent/skills/` holds **74** skills (`ls | wc -l` = 75 incl. `AVAILABLE.md`).
+`grep -ic "skill" agent/roles/team-lead-3.md` = **0** — my role file names none, and neither do
+the other four leads. `AVAILABLE.md` lists eight installed marketplaces, ~450 skills; `pm-skills`
+carries 77.
+
+**Opened in full (not judged from description):** `to-tickets`, `to-spec`, `grill-peer`,
+`task-review`, `writing-for-agents` (repo); `epic-breakdown-advisor`, `user-story-splitting`,
+`roadmap-planning`, `prioritization-advisor`, `altitude-horizon-framework` (`pm-skills`).
+
+**Adopt for the lead seat — two:** `grill-peer` (I ran its loop by hand on `KAN-121`–`KAN-123`
+without knowing it existed) and `writing-for-agents` (a lead's only output is a document another
+agent executes; nothing else in the roster teaches that).
+
+**Rejected as `po`'s, not mine:** `to-tickets`, `to-spec`, `task-review`,
+`epic-breakdown-advisor`, `user-story-splitting`. All five terminate in writing or gating a
+ticket. `epic-breakdown-advisor` and `user-story-splitting` are the **same Humanizing Work
+material twice** — adopting both would be a defect.
+**Rejected as `pm`'s:** `roadmap-planning`, `prioritization-advisor`.
+**Rejected outright:** `altitude-horizon-framework` — career coaching, not work tooling.
+
+**The gap, and it is measured.** `find ~/.claude/plugins/marketplaces -type d` for
+`*estimat*|*capacity*|*critical*path*|*schedul*|*forecast*|*sprint*` returned **two hits, neither
+relevant** (`design-sprint`, `commit-commands`). Across 74 repo skills and ~450 installed, **there
+is no skill on estimation, capacity, or critical-path scheduling** — the four things I actually
+did this week. Named the public methods that would fill it: **critical chain / aggregated project
+buffer** (Goldratt) — my earliest-vs-ceiling column pair is an explicit project buffer and I
+derived it without the vocabulary — plus **reference-class forecasting** and **throughput/Monte
+Carlo forecasting** (Vacanti). Half the gap is teachable; refusing to shrink an estimate under
+pressure is authority, not method.
+
+**Not verified:** that the other four leads would answer the same — I am the only one that has run
+a real task. Whether `grill-peer`'s round format survives the lead→senior direction in practice;
+I have used its discipline, never its literal template.

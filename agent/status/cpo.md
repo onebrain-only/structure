@@ -191,3 +191,59 @@ negotiation. Part A is the promotion gate judged against `13b`'s ten P0s (5 red,
 **The finding I most want the PO to see:** P0-7 (monitoring) and P0-8 (rollback) are the only
 two P0 criteria with **no ticket and no owner**. They are also what makes the rest of the gate
 measurable and a bad promotion recoverable.
+
+---
+
+## 2026-09-06 — Skills audit of this seat (survey, no changes)
+
+Read `agent/skills/` (74), `agent/skills/AVAILABLE.md`, `agent/roles/cpo.md`. Opened
+SKILL.md bodies for: `incoming-request-advisor`, `derisk-measurement-advisor`,
+`prd-development`, `autonomous-investigation`, `positioning-statement`, `cpo-advisor`,
+`cpo-review`, `grill-with-docs`, `to-spec`, `front-door`, `wait-what`,
+`good-strategy-bad-strategy`, `blue-ocean-strategy`, `crossing-the-chasm`,
+`monetizing-innovation`, `inspired-product`, `continuous-discovery`,
+`porters-five-forces`, `problem-framing-canvas`, `ansoff-matrix`, `swot-analysis`,
+`feature-investment-advisor`, `prioritization-advisor`, `epic-breakdown-advisor`,
+`roadmap-planning`.
+
+**Kept:** `incoming-request-advisor`, `derisk-measurement-advisor`, `cpo-review`,
+`positioning-statement`, `jobs-to-be-done`, `competitive-analysis-process`,
+`autonomous-investigation`, `writing-for-agents`, `grill-po`, `grill-peer`.
+
+**Rejected from my own role file:** `cpo-advisor` (portfolio/PMF/org-design for a
+multi-product company with retention data — Dabbler is pre-launch, one product, no
+retention curve; its calculators are also documented as not installed).
+`prd-development` (60–120 min PRD workflow that ends in an engineering-ready spec —
+`po` owns tickets and `to-spec` covers the synthesis; this seat's output is a verdict).
+`tam-sam-som-calculator`, `saas-revenue-growth-metrics`,
+`saas-economics-efficiency-metrics`, `business-health-diagnostic` — all four assume a
+running SaaS with live revenue; the numbers they want are in `02`/`15`/`17` as
+committed forecasts, not measurements, so running them would manufacture analysis of
+our own assumptions.
+
+**Recommended additions (bodies read):** `good-strategy-bad-strategy` (audits whether a
+corpus document is a strategy or a goal list — the strongest single fit for this seat),
+`monetizing-innovation` (the only opened skill that reasons about pricing/packaging as
+design input, which is what `02` and `16` are), `crossing-the-chasm` (beachhead and
+whole-product for the GTM playbook), `problem-framing-canvas` (for NOT ESTABLISHED
+verdicts, where the job is to say what would settle it).
+
+**Rejected candidates from the offered list:** `porters-five-forces`, `swot-analysis`,
+`ansoff-matrix` (all three are web-research instruments over public sources; my ground
+truth is a private corpus and the market mandate is `analyst`'s and unscoped),
+`blue-ocean-strategy` (category creation is already decided in `00`/`01`),
+`inspired-product` / `continuous-discovery` (both require weekly live customer contact
+we do not have pre-launch).
+
+**Gap with no tool:** nothing anywhere holds a proposal against a written corpus and
+returns which document it contradicts, with the passage. `grill-with-docs` writes ADRs;
+it does not test against existing ones. Nearest public method is a policy/compliance
+conformance review (a control-mapping matrix, as MASVS does for security); no product
+framework I know of does this. The four-verdict ladder in my role file IS the method —
+it is written as prose in one role file and has no skill, so no other seat can apply it
+and it cannot be improved independently of the file.
+
+**Structural defect noted, not acted on:** `agent/roles/cpo.md` has no mandate section.
+It did not change these answers — the corpus section carries enough of the remit.
+
+**Handoff:** `team-lead` holds this survey. Nothing changed but this file.

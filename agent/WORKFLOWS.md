@@ -1,7 +1,7 @@
 # agent/WORKFLOWS.md — Workflows and Handoffs
 
-**Owner:** analyst (write) · all agents (read)
-**Last updated:** 2026-09-05 — the v0.7 company restructure
+**Owner:** `po` (write) · all agents (read) — moved from `analyst` 2026-09-06, `G-022`
+**Last updated:** 2026-09-05 — W6 added (regeneration), W1 amended to match
 **Purpose:** The procedure. `AGENTS.md` carries the shape of the roster; this carries how
 a task that crosses two or three agents actually moves, end to end.
 
@@ -72,7 +72,15 @@ what is needed; the `po` writes it.
    follow-ups, deferred work — say so explicitly in the closing comment. A green Epic
    above open CRITICAL children is a lie the board tells.
 5. **No task is complete until the agent has appended to its own
-   `agent/status/<name>.md`.** This binds every agent, on every task, with no
+   `agent/status/<name>.md`.** **The path is resolved from the One Brain workspace
+   root, never from the project tree the agent happens to be standing in** — today
+   that root is `/Users/moatazmustapha/Desktop/One Brain`, so the entry goes to
+   `/Users/moatazmustapha/Desktop/One Brain/agent/status/<name>.md` and the 30 role
+   files carry it absolute for exactly this reason. **The failure this prevents is
+   silent:** on 2026-09-05 `po` ran with its working directory set to
+   `Dabbler/dabbler-code`, and the "create the file if it does not exist" clause below
+   turned a relative path into a brand-new `dabbler-code/agent/status/po.md` that
+   nothing reads. No error was raised. This binds every agent, on every task, with no
    exemption for small work. The entry records **what it did, what it touched,
    what it decided, and what is blocked**. **Create the file if it does not
    exist** — several seats have none yet, and a missing file is not a reason to
@@ -166,7 +174,14 @@ ticket says which happened.
 
 ## 4. THE HANDOFF RULE
 
-**Agents do not brief each other. Briefs come from the Listener.**
+**Agents do not brief each other. Briefs come from the Listener. An agent that needs a
+decision asks its team lead or `po` — not the Listener.**
+
+**Amended 2026-09-06 by the CEO (`G-024`).** Until today every question and every finished
+report came back to the Listener, and that was never written anywhere — no role file
+mentions the Listener at all. It happened because the Listener dispatches, so agents reply
+to their caller. The cost is measurable: every report enters the Listener's context and is
+re-sent on every request after it. **The hierarchy exists; use it.**
 
 **Corrected 2026-09-05.** This section used to read *"Everything routes through the master…
 reports to `master-analyst` / the orchestrating session."* That was wrong twice over:
@@ -191,12 +206,29 @@ Use the **`route-to-seat`** skill to decide who is concerned and to write the pr
   working directory, and an unrecognised `subagent_type` falls back to a generic agent with
   no error raised. An agent-to-agent handoff can therefore land in a generic agent that
   answers plausibly and owns nothing.
-- **The contract is enforced at one point or not at all.** The Listener knows the permission
-  matrix; a worker deciding who to hand to next is deciding scope, which is not its call.
+- **A worker does not decide scope.** Deciding who does a piece of work next is a scope
+  decision. That has always been true and it is still true — what changed on 2026-09-06 is
+  **who holds it.** It is not the Listener alone. **`po` owns task analysis and the review
+  gate; a team lead owns capacity and assignment.** Those are the seats whose job scope is,
+  and an agent takes its scope question to them.
 
-**The exception:** a direct message is fine for a *question* — "does the notification
-schema already have a `read_at` column?" — where the answer changes nothing and creates no
-work. The moment a handoff creates work, it goes through the Listener.
+**The three channels, after `G-024`:**
+
+| Direction | Goes to | Example |
+|---|---|---|
+| **Down — a brief** | the **Listener**, and only the Listener | dispatching work from the CEO's word |
+| **Up — a decision** | your **team lead**, or **`po`** for anything about the task itself | "this acceptance criterion cannot be met" · "this needs a second sitting" |
+| **Sideways — a question** | the **peer**, directly (`grill-peer`) | "does the notification schema already have a `read_at` column?" |
+
+**A sideways question was always allowed** and this section said so; the `grill-peer` skill,
+named in 23 of the 30 role files, is the mechanism. Use it rather than routing a factual
+question through anyone.
+
+**What still reaches the Listener:** a dispute no single seat owns — two peers who disagree
+and cannot defer to each other — and anything touching the CEO's own files. On 2026-09-05
+`team-lead-3` and `devops` disagreed on whether `KAN-126` was on Phase 0's critical path.
+Neither could settle it; `CONTRACT.md:378` did. **That is the shape of a Listener question,
+and it is rare.**
 
 ---
 
@@ -214,24 +246,28 @@ work. The moment a handoff creates work, it goes through the Listener.
 3. **The developer** implements, following the build order (`MANIFESTO.md` §2): database →
    constants → repository → providers → screen → route. Writes tests for what it built, runs
    `flutter analyze` and `flutter test`, and **pastes the output rather than summarising it.**
-   Moves to **In Review**.
+   **It commits hand-written source only — generated output is `devops`'s, at step 7 (W6).**
+   Where the change touches a Freezed model, a Riverpod generator or an `.arb` file, it may run
+   `build_runner` locally to make `analyze` pass, but **leaves the regenerated files out of the
+   handoff and says in the ticket that regeneration is owed.** Moves to **In Review**.
 4. **`po`** runs the review gate (§3). Pass → **QA-Test**. Fail → back to **Ready** with a
    rework brief.
 5. **`qa`** executes the testing story it wrote when the task was dispatched, against the
    running app. Bugs go back to the owning developer, never fixed by `qa`.
 6. **`cxo`** judges the experience if the change is user-visible — a separate question from
    whether it works.
-7. **`devops`** commits, pushes `Canary`, and verifies canary.dabbler.pro.
+7. **`devops`** regenerates if regeneration is owed — **W6**, a separate commit of its own —
+   then commits, pushes `Canary`, and verifies canary.dabbler.pro.
 
 | Step | Seat | Receives | Produces | Done when |
 |---|---|---|---|---|
 | 1 | `po` | The request | A ticket with criteria and a date | Criteria are testable; date came from capacity |
 | 2 | `team-lead-N` | A Ready ticket | Subtasks, each assigned | Each routed by shape, not by who is idle |
-| 3 | developer | A subtask | Code through step 6 of the build order | A route reaches it; `analyze` 0 errors; `test` passes |
+| 3 | developer | A subtask | Code through step 6 of the build order, **hand-written source only** | A route reaches it; `analyze` 0 errors; `test` passes; **no `*.g.dart` / `*.freezed.dart` in the diff** |
 | 4 | `po` | The diff | Verdict | QA-Test, or back to Ready |
 | 5 | `qa` | Passed work | Testing story executed | Bugs filed, or none found and said so |
 | 6 | `cxo` | User-visible change | Experience verdict | Rule named, or nothing to raise |
-| 7 | `devops` | Approved work | A verified Canary deploy | **The site shows it** |
+| 7 | `devops` | Approved work | **Regeneration commit if owed (W6)**, then a verified Canary deploy | Generated output is its own commit; **the site shows it** |
 
 **Step 2 is where money is saved or wasted.** A junior given senior work produces a rewrite;
 a senior given junior work is burned budget. The test is the work, never the queue.
@@ -322,6 +358,52 @@ procedure, guardrails and per-rejection output format.
 | 3 | `devops` | Out-of-scope fix | A report naming the slice. **STOPS** | The report exists; no out-of-scope edit was made |
 | 4 | `po` | That report | A ticket | Criteria testable, owner named |
 | 6 | `devops` | An approved fix | Version bump + build + upload | Build accepted by App Store Connect |
+
+### W6 — Regenerating generated code
+
+**Owned by `devops`.** Established by `STACKS.md` §10.5 under the Phase 0 authorisation
+(`G-015`); `CONTRACT.md` §3:209 forward-references it. `CONTRACT.md` §3 already said generated
+files are never hand-edited — it did not say **who regenerates them**, and this is that answer.
+
+**It runs at commit time, after a developer's source-only commit.** It is not a step a developer
+performs and not something that happens during implementation.
+
+**Trigger:** a change to a Freezed model, a Riverpod generator, or an `.arb` file — anything whose
+output lands in `lib/l10n/**`, `*.g.dart` or `*.freezed.dart` (`CONTRACT.md` §3:209).
+
+1. **The developer commits hand-written source only** and does **not** commit `build_runner`
+   output. It may run `build_runner` locally to make `flutter analyze` pass; the regenerated files
+   stay out of the commit. It says in the ticket that regeneration is owed.
+2. **`devops` runs `dart run build_runner build -d`** against that commit.
+3. **`devops` commits the generated output as a separate commit containing nothing else** — no
+   source, no formatting, no unrelated file. One commit, machine-written, reviewable by being
+   skipped rather than read.
+4. **`devops` runs `flutter analyze` and `flutter test` on the result** and pastes the output. A
+   regeneration that breaks either is a finding, not a commit.
+5. Then W1 step 7 proceeds: push `Canary`, verify canary.dabbler.pro.
+
+| Step | Seat | Receives | Produces | Done when |
+|---|---|---|---|---|
+| 1 | developer | A source change | A commit of hand-written files only | **No `*.g.dart` / `*.freezed.dart` / `lib/l10n/**` in the diff**; the ticket says regeneration is owed |
+| 2–3 | `devops` | That commit | A separate commit of generated output | The regeneration commit touches **only** generated paths |
+| 4 | `devops` | Both commits | `analyze` + `test` output, pasted | 0 errors, tests pass |
+| 5 | `devops` | A green tree | Canary deploy | **canary.dabbler.pro shows it** |
+
+**Only one `build_runner` run at a time across the roster.** `devops` holds that lock; no other
+seat runs it against `dabbler-code`. This is the same class of rule as §7 but a different surface —
+§7 names four contended **files**, this names a contended **command**, and the four-file check at
+dispatch does not catch it.
+
+**Why the rule exists, measured 2026-09-05 at `dabbler-code` HEAD:** **52 generated files, 45 of
+them under `lib/data/`** (`git ls-files | grep -cE '\.(g|freezed)\.dart$'` → 52;
+`git ls-files 'lib/data/*' | grep -cE '\.(g|freezed)\.dart$'` → 45). A commit mixing 45
+machine-written files with three hand-written ones is unreviewable — the review gate (§3) cannot
+see the three. And at sixteen developers, two concurrent `build_runner` runs conflict in files
+nobody authored, which is a merge conflict with no author to resolve it.
+
+**`content-manager` dependency:** `STACKS.md` §10.5 and §10.0's parallel-work table tie this to the
+first generated-l10n commit — **P0-5 must land before any generated-l10n Dart is committed**, not
+to Phase 0's completion.
 
 ---
 

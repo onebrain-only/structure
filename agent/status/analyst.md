@@ -408,3 +408,199 @@ now states both, and scopes "do not invent work" to outside the five Phase 0 tic
 **Verification:** `grep -rl 'is ACTIVE'` across `.claude/bindings/`, `.claude/agents/` and `agent/`
 returns only `agent/.flow/events.jsonl` — hook logs of my own grep commands, not a document.
 `build-agents.sh --check` exits 0 on 30/30. Still nothing committed; `dabbler-code` untouched.
+
+---
+
+## 2026-09-05 — `G-021`: §4.1's line budget was 39 where the tree is 42; two files gained their second line
+
+**Brief:** `team-lead`, on a defect found by `team-lead-3` while opening `KAN-122` (Phase 0 `P0-2`).
+Same defect class as `G-019`, in two files that amendment missed.
+
+**Measured first, independently, before touching anything** (`Dabbler/dabbler-code`, HEAD):
+`grep -rl "misc/data/datasources" lib/ test/ | wc -l` → **39** ·
+`grep -rn … | wc -l` → **42** ·
+`grep -rc … | awk -F: '$2>1'` → exactly **three** files at two lines each:
+`lib/features/social/providers/friends_list_provider.dart` (`:5`,`:6`),
+`lib/data/repositories/supabase_profile_repository.dart` (`:7`,`:8`),
+`test/data/repositories/profiles_repository_impl_test.dart` (`:7`,`:8`, already granted by `G-019`).
+Matches the brief's figures in every respect.
+
+**The defect:** §4.1's one-line-per-file rule named the test file as the *single* two-line
+exception. `KAN-122` criterion 1 requires the grep to come back empty, which needs two lines
+rewritten in each of the two other files — which criterion 6 and §4.1 call a rejection. A correct
+diff would have been rejected by the rule judging it.
+
+**Written:** `DECISIONS.md` `G-021` appended (ACTIVE). `G-020` was already taken, same day, by
+`pm`'s roster/stack-state correction — the brief expected `G-020` and I used the next free number,
+`G-021`, verified with `grep -c "G-021" DECISIONS.md` → 0 before writing. Flagged to `team-lead`
+rather than blocking the critical path on it; renumbering is a one-line change if wanted.
+
+**`CONTRACT.md` §4.1 amended:** the line-budget paragraph now reads "42 lines across 39 files",
+carries a three-row table naming each two-line file with its line numbers, and states the
+arithmetic `36 × 1 + 3 × 2 = 42` so the next reader checks rather than re-derives. `:4`
+`Last updated` updated to cite `G-021`.
+
+**Deliberately not done:** no path added, no table row widened or reworded, exclusion clause
+untouched, expiry conditions untouched, the `39` and `10` figures from `G-019` unchanged. Nothing
+written under `Dabbler/dabbler-code/`, no Jira touched, nothing committed.
+
+---
+
+## 2026-09-05 — W6 written, W1 amended, rule 5 reworded (KAN-126 criterion 1)
+
+**Brief:** from `team-lead`. Two parts: review its unrouted edit to `agent/WORKFLOWS.md` §1
+rule 5, and write the `build_runner` regeneration rule that KAN-126 criterion 1 requires.
+
+**What I did.**
+
+1. **Rule 5 — kept the substance, reworded it.** `team-lead`'s edit was correct: the path was
+   relative, and the "create the file if it does not exist" clause turns that into a silent
+   wrong-tree write. I kept the absolute path — a governance rule that cannot be resolved
+   unambiguously is not a rule — but split the one long sentence into the rule, the current
+   root value, and the named 2026-09-05 `po` incident, so a future reader knows what it is
+   defending against and can re-point the root if it moves.
+2. **Wrote `W6 — Regenerating generated code`** in §5. `devops` owns it; it runs at commit
+   time after a developer's source-only commit; the generated output is a separate commit
+   containing nothing else; one `build_runner` run at a time across the roster. Five steps
+   plus a step table, matching W1–W5's shape.
+3. **Amended W1** — step 3 (developer commits hand-written source only; may run
+   `build_runner` locally to make `analyze` pass but leaves the output out of the handoff),
+   step 7 (`devops` regenerates first, as its own commit), and both their rows in the step
+   table. Without this W1 would have contradicted W6.
+
+**What I verified rather than accepted.**
+
+- `devops`'s reading of W1 — steps 3 and 7, neither mentioning regeneration: **accurate**,
+  read at `agent/WORKFLOWS.md:214-224` before the edit.
+- **52 generated files, 45 under `lib/data/`** — re-measured at `dabbler-code` HEAD with
+  `git ls-files | grep -cE '\.(g|freezed)\.dart$'` → 52 and
+  `git ls-files 'lib/data/*' | ...` → 45. Matches `STACKS.md` §10.5.
+- `CONTRACT.md` §3 **line 209** carries the forward-reference verbatim: *"Phase 0 `P0-5`
+  makes regeneration a `devops`-owned commit step"*. **I did not edit `CONTRACT.md`.**
+- No prior W6 and no other regeneration workflow — `grep -rn "build_runner\|regenerat" agent/`
+  returns only role-file reminders and `build-agents.sh`, none of them a workflow.
+- No conflict with §4 (W6 is a workflow step, not an agent-to-agent handoff) or §7 (§7 names
+  four contended **files**; W6 names a contended **command**, which the dispatch check does
+  not catch — I said so inside W6 rather than editing §7).
+
+**Decided.** No `DECISIONS.md` entry. W6 implements `STACKS.md` §10.5 under the `G-015`
+Phase 0 authorisation, which is already recorded; a second entry restating it would create
+two places to correct the same rule.
+
+**Touched:** `agent/WORKFLOWS.md` (rule 5 reworded, W1 steps 3 and 7 and their table rows
+amended, W6 added, header date), `agent/status/analyst.md`.
+
+**Not touched, as instructed:** nothing under `Dabbler/dabbler-code/` — `build_runner` not
+run. `CONTRACT.md`, `STACKS.md`, `agent/roles/**`, `AGENTS.md` unchanged. No git-mutating
+command. KAN-126 not transitioned, not commented, still `To Do`.
+
+**Blocked:** nothing.
+
+**Not verified:** KAN-126's criterion 1 wording itself — I wrote to `team-lead`'s statement
+of it, not to the ticket, which I am barred from reading into. Whether the rule as written
+satisfies the criterion as filed is `po`'s call at the gate.
+
+### Addendum, same run — `CONTRACT.md:440` gate figure corrected
+
+**Corrected** the §4.1 expiry gate's test figure from *"103 tests across 9 files **plus**
+`route_inventory_test.dart`"* to **"106 tests across 10 files"**, with `cto`'s provenance
+clause plus one addition of my own: **106/10 is the post-`P0-1` figure and at `c46b5c5` is
+true only in the uncommitted worktree.** `test/app/route_inventory_test.dart` is **untracked**
+(`git ls-files --error-unmatch` → *"Did you forget to 'git add'?"*); HEAD carries **9** tracked
+test files. Without that clause anyone running the gate against HEAD reads 103/9, concludes the
+gate fails, and misreads "P0-1 is not committed yet" as "the grant has not expired for a
+different reason".
+
+**Checked the other five gate lines** — all consistent, none edited:
+
+| Gate line | Measured at `c46b5c5` | Verdict |
+|---|---|---|
+| `:439` `analyze` 0 errors / 0 warnings | 0/0/56 infos, per `CLAUDE.md` 2026-09-04 | Correct |
+| `:441` router ≤ 450 LOC, ≤ 6 `features/` imports | **1,712 LOC, 69 `features/` import lines, 13 distinct feature dirs** | Correct as a `P0-3b` **target**, not met — as expected |
+| `:442` `grep "misc/data/datasources"` empty | **12 files still match at HEAD**; 0 in the worktree (`KAN-122` uncommitted) | Correct as a `P0-2` target; same HEAD/worktree gap as the test count |
+| `:443` `misc/` = exactly three residual screens | **10 screens at HEAD**; `STACKS.md` §10.4:661-666 confirms three is the intended residue | Correct as a `P0-4` target, not met |
+| `:444` Cloudflare `Canary` green | Not checkable from here | Left alone |
+
+**Not touched:** `:378` ticket list, the expiry mechanics, the exclusion clause, and what the
+gate requires. Only the figure moved.
+
+**`KAN-126` is not one of the five.** `:378` already says so unambiguously; `team-lead` and
+`devops` read it the same way. No edit made and none needed.
+
+**The pattern, recorded because this is the third time today.** `STACKS.md:697`,
+`CONTRACT.md:440` and two earlier copies carried the same sentence; each was corrected
+separately, hours apart, by whichever seat happened to trip over it. **The defect is not the
+stale number — it is that a measured figure was transcribed into four documents instead of
+cited from one.** `CONTRACT.md:440` even announces the duplication in its own preamble
+(*"the `STACKS.md` §10.6 landing test, verbatim in substance"*), which is a copy declaring
+itself a copy and still drifting. The gate figures belong in `STACKS.md` §10.6 alone, with
+`CONTRACT.md` §4.1 citing the section rather than restating it — that is a real edit to the
+shape of §4.1, not a figure fix, so I have **not** made it under this brief. Flagging it as
+the follow-up worth taking.
+
+**Also not verified:** I did not run `flutter test`. The 106 comes from `team-lead`'s four
+measurements plus my count of **10 test files in the worktree / 9 at HEAD**, which is the
+part that determines whether the figure is a drift or a pending commit. The test *count*
+itself I took on report.
+
+---
+
+## 2026-09-06 — Skills audit of my own seat (survey, dispatched by `team-lead`)
+
+Read-only. No file changed except this one. Read the 74 `SKILL.md` frontmatter descriptions
+under `agent/skills/` and `agent/roles/analyst.md` fresh (mtime 2026-09-06 01:38, post-`G-022`
+/`G-023`).
+
+**Reach for, in practice:** `project-audit` (mandated, every audit), `research`,
+`grill-peer`, `writing-for-agents`, `domain-modeling`, `diagnosing-bugs`, `supabase` +
+`supabase-postgres-best-practices`, `verification-quality`, `to-tickets`.
+
+**Named in my file but would not fire:** none outright dead, but `domain-modeling`'s ADR half
+now points at documents I no longer write — it survives only for the terminology half.
+
+**Unwired but should be mine:** `verification-quality`, `improve-codebase-architecture`
+(scan half only — its grill-through half is `cto`'s), `to-tickets`.
+
+**The gap I care about:** market analysis is now my second mandate (`G-023`) and
+`agent/skills/` contains **zero** market skills — no competitor analysis, no pricing
+comparison, no market sizing, no demand measurement. The methodology exists on this machine
+as installed plugins (`~/.claude/plugins/cache/pm-skills/{competitive-analysis-process,
+tam-sam-som-calculator,swot-analysis}`, `~/.claude/plugins/cache/wondelai-skills/`) but is
+wired to no seat and carries no Dabbler context. Full detail in the reply to `team-lead`.
+
+**Not verified:** I read frontmatter descriptions only, not skill bodies; a skill whose
+description undersells it could be miscategorised above.
+
+---
+
+## 2026-09-06 — Public-source search for the seven surviving skill gaps (research, dispatched by `team-lead`)
+
+Read-only. No file changed except this one. No code, no git, no Jira, nothing under
+`Dabbler/dabbler-code/`. Every claim below rests on a URL I opened this session.
+
+**Verdict per gap:** 1 Fastlane — adopt-and-compress (docs.fastlane.tools `deliver`/`pilot`/
+`match` all confirmed live; the resubmission half is NOT in the App Review Guidelines page and
+lives in App Store Connect Resolution Center, unverified from Apple's own docs). 2 Driving the
+running app — **`dart-lang/ai#356` does NOT bar `flutter drive` + `integration_test`**; the
+issue is scoped to combining Dart MCP tooling with an *externally driven browser tab*, and
+Flutter's own docs give the exact ChromeDriver + `flutter drive` commands. Gap 2 is a missing
+skill, not a missing tool. 3 Task analysis — **INVEST + Example Mapping** (Matt Wynne,
+cucumber.io, 2015) are both real and citable; adopt the frames, author the checklist. 4
+Runbook authoring — nothing public is a fit; PagerDuty's incident-response site is
+incident-shaped, not procedure-authoring-shaped. **Author.** 5 Estimation — **Lighthouse**
+(LetPeopleWork, MIT, self-hosted, reads Jira) is a real maintained tool, not a skill; RCF and
+Monte Carlo are methods with primary sources. Adopt tool, author skill. 6 Money-flow — Stripe
+idempotency docs + Modern Treasury ledger series + TigerBeetle debit/credit are the primary
+sources; none is a brief-time checklist. **Author**, citing them. 7 Arabic/RTL —
+`content-manager`'s three resources: Apple HIG RTL page **exists**; Material's URL is
+`m3.material.io/foundations/layout/understanding-layout/bidirectionality-rtl` (the bare
+`/foundations/bidirectionality` is a **404**); there is **no W3C document called RTLReq** — the
+real one is **W3C ALReq, "Arabic & Persian Layout Requirements"**. Add W3C "Text size in
+translation" for the EN→AR expansion figure.
+
+**Not verified:** the Apple HIG RTL page and both Material bidirectionality pages return their
+`<title>` but no body to WebFetch (JS-rendered) — I confirmed existence and identity, not
+content. ALReq's last-modified date is not stated on the page I read. The ~25% EN→AR expansion
+figure is W3C reporting IBM's guidelines, not a W3C measurement, and I did not open the IBM
+source. The Resolution Center appeal procedure is from secondary sources only; no Apple-owned
+page documenting it was opened.

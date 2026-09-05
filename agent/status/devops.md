@@ -426,3 +426,133 @@ to remove relay hops — forwarding recreates one anyway, inside the roster.
 report — it goes to team-lead directly so it can be verified against the
 repo rather than arriving second-hand. Recording this per `WORKFLOWS.md`
 §1 rule 5, which applies even though no harm resulted this time.
+
+## KAN-126 (P0-5) sizing — measurement only, nothing written (2026-09-05)
+
+Dispatched by `team-lead` to cost KAN-126, which has no `due_date` because
+nobody had costed it. Measurement run: no file under `dabbler-code/` touched,
+no git-mutating command, `build_runner` not run, no ticket transitioned.
+
+**Surface, measured at `c46b5c5` + working tree.**
+`find lib \( -name '*.g.dart' -o -name '*.freezed.dart' \) | wc -l` -> **52**.
+Same restricted to `lib/data/` -> **45**. Both match `STACKS.md` §10.5 and the
+ticket description exactly. No correction owed.
+
+**Where they live:** 35 in `lib/data/models`, 4 in `lib/data/models/social`,
+4 in `lib/data/models/check_in`, 2 in `lib/data/models/profile` (= 45), plus
+4 `features/notifications/data/models`, 2 `features/venues/data/models`,
+1 `features/auth_onboarding/domain/models` (= 7). **Every one sits under a
+`models/` directory.**
+
+**Blocker found — criteria 2 and 3 cannot be met, for two independent reasons.**
+
+1. *No commit is authorised.* `git status --porcelain` returns **43 paths**
+   (3 staged renames from P0-2, 39 modified, 1 untracked `test/app/`) and
+   `git log` HEAD is still `c46b5c5`. KAN-121 and KAN-122 are Done with
+   nothing committed. Criteria 2 and 3 are both `git log` / `git show --stat`
+   assertions against history that does not exist and cannot be created under
+   the freeze.
+2. *Even with the freeze lifted, no Phase 0 ticket generates output to commit.*
+   Of the 43 changed paths, **0** match `*.g.dart` or `*.freezed.dart`.
+   Phase 0 touches `lib/data/repositories/**`, `lib/features/**/providers`,
+   `lib/app/`; the generated files are all under `models/`. The three renamed
+   P0-2 files have no `.g.dart`/`.freezed.dart` sibling, and none of the
+   modified `lib/data/repositories/*.dart` carries a `part '...'` directive.
+   An import rewrite regenerates nothing. So the commit pair criterion 2 asks
+   for has no source change to hang on — the ticket's own exit condition is
+   unsatisfiable on Phase 0 as Phase 0 is currently scoped, freeze or no freeze.
+
+Reported to `team-lead` rather than worked around. No commit proposed.
+
+**Cost:** 2 sittings. Sitting 1 = criterion 1 (write the rule into
+`agent/WORKFLOWS.md`, one new named workflow plus a step in W1) — fits any
+single day in 09-07..09-11, fully parallel with `senior-frontend-3`, no shared
+path. Sitting 2 = criteria 2+3, the end-to-end demonstration — **undatable**,
+its precondition is not in my control. Gave `team-lead` the number; `po` owns
+the `due_date`.
+
+**Read:** P0-5 is a gate on committing generated-l10n Dart (`STACKS.md:517`),
+not a gate on Phase 0's own completion criteria (§10.6). Phase 0 can close with
+criterion 1 done and the demonstration outstanding, provided no `.arb`-generated
+Dart is committed before it.
+
+**Not verified:** nothing was executed, so nothing here is proven working —
+only counted. Whether the rule as written would be followed is untested by
+construction.
+
+## 2026-09-05 — Committed KAN-121 and KAN-122 locally on `Canary` (no push)
+
+Briefed by `team-lead`: commit the accumulated Phase 0 work as two commits, local
+only. The CEO's standing policy quoted in the brief — *"we always push in
+Saturdays after the sprint done; while working we only commit locally."*
+
+**Pre-flight.** Tree matched the brief exactly: 3 staged `R100` renames, 39 modified,
+`?? test/app/` holding two files. `git diff --stat` over the 39 read
+`42 insertions(+), 42 deletions(-)`. No path outside the 43 described, so
+`senior-frontend-3`'s in-flight `KAN-123` had written nothing and there was nothing
+to commit around. Staged by explicit path in both commits; never `git add -A`.
+
+**Commits**, both on `Canary` on top of `c46b5c5`:
+
+- `866e2f1` `test(app): freeze the router's declared route table with a golden test`
+  — KAN-121. `test/app/route_inventory_test.dart` + `test/app/route_inventory.golden.txt`,
+  2 files, 223 insertions. Committed first because it is the net KAN-122 was
+  executed under.
+- `dbfc6bb` `refactor(core): move the shared Supabase datasource out of features/misc`
+  — KAN-122. 42 files: the 3 renames at `R100` (0 lines) plus 39 import rewrites,
+  42 insertions / 42 deletions. The three two-line files are
+  `supabase_profile_repository.dart`, `friends_list_provider.dart` and
+  `profiles_repository_impl_test.dart`, under the `G-019`/`G-021` grants.
+
+**Gate re-measurement.** The two `CONTRACT.md` §4.1 conditions that had been split
+between HEAD and the worktree now read the same either way — test files
+`9 -> 10`, `misc/data/datasources` matches `39 -> 0`. §4.1's expiry is a
+measurement anybody can run again. `flutter test` exits 0 on 106 tests;
+`git status --porcelain` is empty.
+
+**Attribution.** No `Co-Authored-By`, per the brief and the `CLAUDE.md` rule; this
+repo has no `.claude/settings.json`, so `attribution.commit` is unset. Noted back
+to `team-lead` that the last five commits in this repo *do* carry the trailer, so
+the house history and the written rule disagree — the rule was followed. The
+`Claude-Session:` trailer was kept, matching house style; it is a traceability
+pointer, not authorship.
+
+**Not done:** nothing pushed, no PR, no tag, `main` untouched, no amend/rebase/
+reset/stash, no `build_runner`, no Jira transition or comment.
+
+---
+
+## 2026-09-06 — Skills audit (survey only, no work)
+
+**Task:** `team-lead` asked four questions about which of the 74 skills in
+`agent/skills/` this seat uses, which of its role-file skills it would not,
+which unwired skills belong here, and what capability is missing.
+
+**Method:** listed `agent/skills/` (74 entries confirmed), read the
+`description:` frontmatter of the seven candidate skills plus ~20 others, and
+sampled the bodies of `github-workflow-automation`, `github-release-management`,
+`github-multi-repo`, `git-guardrails-claude-code` and `hooks-automation` because
+their descriptions did not settle whether they carried real procedure or
+`claude-flow`/`ruv-swarm` CLI boilerplate. Read `agent/roles/devops.md`.
+
+**Answer given:**
+1. Reach for: `resolving-merge-conflicts`, `code-review`, `grill-peer`,
+   `git-guardrails-claude-code` (read, not install), `research`.
+2. Role file names nothing this seat rejects.
+3. Of the seven unwired skills, **one** is genuinely this seat's
+   (`git-guardrails-claude-code`, 95 lines, concrete, real hook script);
+   the other six are not. `github-workflow-automation` (1047 lines),
+   `github-release-management` (1064), `github-multi-repo` (862) and
+   `hooks-automation` (1201) are `npx claude-flow` / `npx ruv-swarm` command
+   catalogues for tooling this repo does not run — they contain no GitHub
+   Actions, Cloudflare Pages or Fastlane knowledge. `github-project-management`
+   is `po`'s. `github-code-review` duplicates `code-review` and the review gate
+   is `po`/`qa`.
+4. Three real gaps confirmed: Fastlane/store submission, Cloudflare Pages deploy
+   verification, and the `W6` `build_runner` regeneration step under `KAN-126`.
+
+**Deploy result:** none — no push, no build, nothing to verify. This was a
+read-only survey.
+
+**Not done, deliberately:** no git command of any kind, no `flutter`, no
+`build_runner`, no file created or edited except this entry, no escalation.

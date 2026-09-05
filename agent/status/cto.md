@@ -243,3 +243,216 @@ exists in the document — `:184` G0a and `:156` state only the 13-of-20 directo
 reproduces.
 
 **Recorded:** `DECISIONS.md` T-048. Phase 0 plan, partition and acceptance criteria untouched.
+
+## 2026-09-05 — T-049: `STACKS.md` stale-fact correction (names + numbers)
+
+**Task from `team-lead-1`.** Correction only — no ownership, gate, boundary or phase-plan
+change, and no re-analysis. Scope: `Dabbler/dabbler-docs/STACKS.md` and nothing else.
+
+**Verified before editing.** `agent/AGENTS.md` §2 rename map: `version-control` → `devops`
+("renamed **and promoted to product level**"), `backend-owner` → `senior-backend` ("renamed;
+gained the notification backend"). `ls agent/roles/` shows `devops.md` and
+`senior-backend.md`; no `version-control.md`, no `backend-owner.md`.
+
+**Measurements, in `Dabbler/dabbler-code`:**
+- `git grep -l "misc/data/datasources" HEAD -- lib/data/ | wc -l` → **10** (not 11). Agrees
+  with `T-048` at `STACKS.md:486`, which had already corrected 11 → 10 and left §10 behind.
+- `flutter test` → **`+106: All tests passed!`**; `find test -name '*_test.dart' | wc -l` → **10**.
+
+**Edits (7):** `:114` `backend-owner` → `senior-backend` · `:154`, `:159`, `:191`
+`version-control` → `devops` (three of these are the definition of **P0-5**, whose owner was
+a deleted seat) · `:520` 11 → **10** files · `:526` marked as the pre-P0-1 measurement, number
+left standing · `:576` and `:665` 103 tests → **106 tests across 10 files**, with the reason
+stated so the next reader reads a correction, not a drift.
+
+**Left alone deliberately:** `:163` (*"written for a single `flutter-feature-agent`"*) — a true
+statement about the past. Same for every retired seat name in `CONTRACT.md` and
+`agent/WORKFLOWS.md`.
+
+**Open, flagged not fixed:** `:697` — *"103 tests across 9 files **plus**
+`route_inventory_test.dart`"* does not double-count and is defensible as written, so I left
+it under the brief's rule. But it is a **Phase 0 exit criterion**, and an executor who runs
+`flutter test` sees `+106`, not 103. That is the same shape as the near-miss on `KAN-122`.
+Recommend `team-lead-1` authorise changing it to **106 tests across 10 files**.
+
+**Standing note:** `P0-5` still has no ticket (`KAN-121`–`KAN-125` under `KAN-120`). The
+specification now names a seat that exists, so it can be assigned when `po` writes it.
+
+### 2026-09-05 — T-049 addendum: `:697` exit criterion corrected
+
+`team-lead-1` authorised the one change I flagged and did not make. The Phase 0 exit
+criterion at `:697` now states the measured figure directly instead of requiring the reader
+to add 103 + `route_inventory_test.dart`:
+
+- **Before:** ``exits 0 on 103 tests across 9 files **plus** `route_inventory_test.dart` ``
+- **After:** ``exits 0 on **106 tests across 10 files** (103/9 before P0-1 added
+  `route_inventory_test.dart`; a correction, not a drift)``
+
+Provenance clause kept, matching `:576` and `:667`. Eight edits total in `STACKS.md`; no
+other file touched. `:163` and `:526` untouched, as before.
+
+**Residual-stale-name gap now closed.** `grep -nE "version-control|backend-owner"` on
+`STACKS.md` returns **nothing** (exit 1). The only `flutter-feature-agent` is `:163`, which is
+correctly historical. This agrees with `team-lead-1`'s independent run, and with my own
+pre-edit grep, which had already enumerated exactly the four lines in the brief — so the
+"four might not be all of them" caveat in my first report was over-cautious rather than a
+real hole.
+
+**Rule this reinforces, worth carrying forward:** a gate figure that requires the reader to
+do arithmetic to reconcile it against a command's output is a gate that will eventually be
+read wrong. State the number the command prints. `KAN-122` nearly failed a correct diff on
+exactly this.
+
+---
+
+## 2026-09-05 — §10.3 bucketing contradiction ruled; fifth stale test-count corrected
+
+**Task:** from `team-lead`. `STACKS.md` §10.3's P0-3b bucketing table glued a slice rule and a
+path rule into the `platform` row, contradicting the governing sentence directly below it, which
+forbids bucketing by path. 13 routes turn on it. Also `:635` carried a fifth transcribed copy of
+the stale `103 green` gate figure.
+
+**Ruling: the slice rule governs. The path carve-out is deleted.** Reasons, in order of weight:
+the slice rule reads a fact already in `app_router.dart` (the builder's import path), so it is
+total and needs no table lookup; the carve-out would place `features/profile/` imports inside
+`platform_routes.dart`, which is the exact cross-slice import the split exists to remove; and
+`platform` is a slice family in every other row, so the surface-kind reading that produced the
+carve-out has no stated boundary and would eventually claim `/profile` and `/notifications` too.
+The one thing the slice rule cannot read — a route with no builder, i.e. `/` at `:446` — is now
+its own **rule** (builderless ⇒ platform), not an exception.
+
+**Verified before ruling, in `dabbler-code` at HEAD `dbfc6bb`:** `/landing` (`:462`) builds
+`LandingPage` imported at `:13` from `features/auth_onboarding/` ⇒ identity. `/settings/language`
+(`:1262`) builds `LanguageSelectionScreen`, also `auth_onboarding` ⇒ identity, despite its path —
+no seventh bucket needed. Eleven imports at `:61`–`:74` resolve the `settings`/`support`/`about`/
+`preferences` screens to `features/profile/` ⇒ profile_social. `/help/center` (`:1284`) is
+genuinely `features/misc/` ⇒ platform.
+
+**Distribution `KAN-124` is sized against, unchanged from `senior-frontend-3`'s measurement:**
+profile_social 33 · identity 28 · platform 12 · play_places 5 · notification 1 · home_shell 1 = 80.
+
+**Edits — `Dabbler/dabbler-docs/STACKS.md` only, three of them.** Platform row rewritten to a pure
+slice rule; the governing sentence gained a no-exceptions clause, the builderless rule, and the
+four verified dispositions; `:635` (now `:653`) corrected to **106 tests across 10 files** with the
+same provenance clause used at `:576`, `:667` and `:697`, plus a pointer to §10.6 as the source.
+`grep -n "103 green" STACKS.md` now returns nothing. No file under `dabbler-code/` touched; the
+tree is clean; no git-mutating command run; no Jira action taken.
+
+**HEAD measurements, both confirming `team-lead`:**
+`git ls-tree -r --name-only HEAD | grep -c '^test/.*_test\.dart$'` → **10**.
+`git grep -l "misc/data/datasources" HEAD | wc -l` → **0**.
+(The brief's `git ls-tree -r HEAD | grep -c '^test/...'` cannot match — `ls-tree` without
+`--name-only` prefixes mode/type/hash — and returns 14 when the anchor is dropped, because it then
+catches `integration_test/` and two vendored packages. Use `--name-only`.)
+
+**Position on transcribe-versus-cite: I agree with `analyst`, and this is now the fifth proof.**
+A measured figure belongs in one place. §10.6 is the right home — it is where "Phase 0 has landed"
+is defined, so the gate figures are its subject, not a borrowed detail. Every other "Done when"
+should read `§10.6's gate figures` and stop. I did not make that structural change; `team-lead`
+asked for the ruling first. It needs a `DECISIONS.md` entry and I do not write those.
+
+**`DECISIONS.md` entry owed — two, and I have written neither:** (1) the bucketing rule, because
+it will otherwise be re-litigated at every new route added under `/settings/`; (2) gate figures
+are cited from `STACKS.md` §10.6, never transcribed. Routing is `team-lead`'s.
+
+**Not verified:** I did not run `flutter test`. The **106** in the corrected line is cited from the
+already-verified figure at `:576`/`:667`/`:697`, not re-measured by me; I verified only the file
+count (10) and the grep (0). I did not re-derive `senior-frontend-3`'s 80-entry per-route
+classification — I spot-checked the five routes the contradiction turns on and accepted the rest.
+
+### 2026-09-05, same day — the three cases the first ruling did not reach (C, D, E; 12 entries)
+
+**One rule settles all three.** The first ruling made the bucketing function total for routes with
+a builder inside a `features/` slice, and completed it for builderless routes. It left a hole:
+a route whose builder constructs a widget in **no** slice. That is now **rule 2 — builder outside
+every `features/` slice ⇒ `platform`** — the same shape as the builderless rule, and it disposes of
+D (6 entries), E (1 entry) and the `features/rewards/` gap without a seventh bucket.
+
+**C — bucket at split time (09-09), not post-`P0-4`.** Five entries: `/rewards` (`:926`),
+`/activities` (`:909`), `GameComposerScreen` (`:1177`, `:1202`, `:1215`). All `platform` in P0-3b.
+Reasons: bucketing forward makes P0-3b unverifiable against the tree it runs on — neither executor
+nor reviewer could answer "is this route in the right module?" from the repo on 09-09; it couples a
+finished ticket to an unfinished one that may slip or land with different destinations; and the
+golden-file proof freezes route *order and set*, not module membership, so forward-bucketing buys
+nothing in proof terms. **Decisive:** `features/rewards/` is named in **no** bucket rule, so
+forward-bucketing would have forced either a seventh bucket or an edit to a bucket rule — a re-plan,
+which the brief forbids. Rule 2 resolves it instead: `/rewards` is `platform` on 09-09 **and** after
+P0-4, so it never moves. **P0-4 moves the other four** into `play_places`; I wrote that into §10.4's
+"Done when" with the four line numbers, so it is not an inference. **This grows `KAN-125`** by four
+route relocations — small, but re-cost it rather than absorb it.
+
+**D — six routes `platform`; `_PlaceholderScreen` moves, once, inside `lib/app/`.** Verified: the
+class is private at `:1682`–`:1711`, constructed at the six sites named. A module file cannot reach
+it, so the three options were move / duplicate / leave the six behind. Duplicating is indefensible.
+Leaving them costs ~115 LOC against the 450 budget for zero benefit — and note it costs **no**
+`features/` imports, so it does not touch the ≤ 6 target either way. **Ruling: rename to
+`PlaceholderScreen`, move verbatim to `lib/app/routes/placeholder_screen.dart`, body unchanged.**
+The destination is the whole point — inside `lib/app/`, so *"no `.dart` file outside `lib/app/`
+changed"* stays true and the proof condition is untouched. This does not brush the non-goal: that
+clause forbids fixing, renaming, deleting or re-pathing a **route**; a private widget the extraction
+mechanically cannot leave behind is not opportunism.
+
+**I rejected `senior-frontend-3`'s `profile_social` for D**, and it was right to flag it as its
+weakest call. Five of six are social surfaces, so the intent reading is real — but it is an
+*intent* reading, which is the same species of reasoning as bucketing by path string, and I ruled
+that out yesterday. Rule 2 is mechanical: open `placeholder_screen.dart`, see no `features/` slice,
+done. Migration cost is symmetric anyway — when a real screen lands, that one route moves to that
+screen's slice, whichever module it started in.
+
+**Corrected a false example in my own document.** §10.3's governing sentence illustrated itself with
+*"`RoutePaths.socialNotifications` (`:1544`) builds a `social` screen"*. It does not — `:1554` builds
+`_PlaceholderScreen`. An executor following that example literally would misbucket. The governing
+example is now `/settings/language`, which is true and demonstrates the same point; the
+`socialNotifications` case is restated correctly under rule 2. The old line number `:1544` was also
+off by ten.
+
+**E — `/language_selection` (`:597`) is `platform`** under rule 2 (inline `const Scaffold`). **It
+warrants a defect ticket:** it is a dead *Coming Soon* route, distinct from the real
+`/settings/language` (`:1262`), and `grep -rn "language_selection\|languageSelection" lib/ test/`
+finds no navigation to it — only the route itself and `test/app/route_inventory.golden.txt:11`.
+Being in the golden file means P0-3b may not delete it. Route to `po`; I do not create tickets.
+
+**Edits — `STACKS.md` only, six.** Platform row now points at the two completion rules; the
+governing example replaced; the builderless paragraph became a numbered pair; rule 2's three groups
+written out with line numbers; the C sequencing paragraph added; `_PlaceholderScreen` named as the
+one thing that leaves `app_router.dart`; and §10.4's "Done when" gained the four relocations. No
+file under `dabbler-code/` touched, tree clean, no git-mutating command, no Jira action.
+
+**Verified in `dabbler-code` at HEAD `dbfc6bb`:** ten files in
+`lib/features/misc/presentation/screens/`; `_PlaceholderScreen` defined `:1682` and constructed at
+`:1540/:1554/:1568/:1584/:1597/:1607`; `/language_selection` at `:597` an inline `const Scaffold`
+with no class; the five misc-resident construction sites at `:909/:926/:1177/:1202/:1215`;
+`app_router.dart` is 1712 lines.
+
+**`DECISIONS.md` entry owed — the two from yesterday, plus this makes the first one wider:** the
+bucketing entry should now record the rule as *slice, else builderless ⇒ platform, else
+outside-any-slice ⇒ platform*, with `_PlaceholderScreen`'s move as its stated consequence. Still
+`team-lead`'s to route; I do not write them.
+
+**Not verified:** I did not re-derive the 80-entry classification — I verified the 12 entries in
+this brief and accepted the rest, as before. I did not run `flutter analyze` or `flutter test`, so
+the LOC arithmetic for option (a) in D (~115 lines) is a count of the ranges I read, not a measured
+post-split figure. §10.4's table cites `activities_screen_v2` as *"routed `:903`"* and
+`rewards_screen.dart` as *"routed `:914`"* while I cite `:909` and `:926`; I believe those are the
+`GoRoute(` opening lines against my construction sites, but I did not confirm that and left §10.4's
+figures untouched.
+
+## 2026-09-06 — Skills audit of the cto seat (survey, no changes)
+
+**Task:** team-lead skills survey — four questions about `agent/skills/` (74 skills) against
+`agent/roles/cto.md` SKILL REFLEXES. Read-only; nothing created, edited or deleted except this entry.
+
+- **Verified:** `ls agent/skills | wc -l` = **74**; frontmatter `description:` read for all 74 via awk.
+- **Finding 1:** two skills my role file names — `systems-architecture` and the `dart-flutter` family —
+  are **not in `agent/skills/`**. They resolve from installed plugins, not the repo folder. A reflex
+  pointing outside the audited set is a dependency nobody in this repo controls.
+- **Finding 2:** `cto-advisor` / `cto-review` / the four `cto-*-skill` files are generic executive
+  templates; only `cto-architecture-decision-skill` maps to an output I actually produce
+  (a `DECISIONS.md` entry). The metrics and roadmap ones have never fired.
+- **Gap named:** no skill for **verifying a claim about the live Supabase catalogue** — the single
+  most repeated and most error-prone thing this seat does. Every trap in my memory
+  (`verification-lessons`, `invoker-flip-join-trap`, `create-or-replace-view-resets-invoker`,
+  `policy-role-vs-check-trap`, `rpc-404-false-pass-trap`) is knowledge held only in memory files,
+  not in a reusable procedure.
+- **Not verified:** skill bodies (descriptions only, per the brief); whether the 40 unwired skills
+  are truly unwired across all 30 roles.
