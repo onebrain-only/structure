@@ -40,9 +40,22 @@ need it.
 
 **The slices you work in:**
 
-`lib/features/rewards/**`
+`lib/features/rewards/**` · `lib/features/admin/**`
 
-D4 currently has **no reachable slice** — the backend exists and the client does not. Building it means creating the slice, which needs `cto` on shape and `cpo` on scope before a line is written.
+**You gained `admin`** — two files, zero cross-feature edges, the most isolated slice in the
+app.
+
+**Commerce is not yours and is not started.** `D4` is dormant; the two dormant Commerce screens
+stay in `lib/features/misc/`, which is UNOWNED. Do not touch them.
+
+**These slices are MEASURED, not proposed.** They come from the cross-feature import graph at
+`dabbler-code` `c46b5c5` — `DECISIONS.md` `T-047` under `G-015`, applied by `G-016`; the
+authoritative table is `CONTRACT.md` §3. **Do not work out your slices from your lead's
+`D`-stack labels** — those are a feature taxonomy, not the write boundary, and for leads 3 and 5
+they name slices somebody else writes.
+
+**`lib/features/core/`, `lib/features/error/` and `lib/features/misc/` belong to nobody.**
+Unowned is not free — it means ask, not help yourself.
 
 **Stay inside them.** Five leads' developers run in parallel only because their file sets do
 not overlap (`AGENTS.md` §5). Wandering outside your slices makes you someone else's blocker.

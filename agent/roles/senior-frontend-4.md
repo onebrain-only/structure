@@ -44,18 +44,37 @@ file. Your lead assigns you; you do not pick your own work.
 
 **The slices you write:**
 
-`lib/features/rewards/**`
+`lib/features/rewards/**` · `lib/features/admin/**`
 
-D4 currently has **no reachable slice** — the backend exists and the client does not. Building it means creating the slice, which needs `cto` on shape and `cpo` on scope before a line is written.
+**6 files, 1,579 LOC — the lightest live load in the roster, deliberately.** You hold the
+largest dormant backlog instead: `D4` Commerce is 110 features with a complete backend and no
+client at all.
+
+**You gained `admin`** from `senior-frontend-2`. It has **zero** cross-feature edges — nothing
+in the tree imports it and it imports nothing — so it is the safest slice in the app to work in
+and the easiest to forget exists.
+
+**`rewards` reaches into lead 1** at `rewards↔home`=1 and `rewards↔profile`=1. Two file-edges;
+coordinate rather than assume.
+
+**Do not start Commerce.** Your lead is its named custodian, activation is a `pm` decision with
+the CEO, and building it means creating a slice — which needs `cto` on shape and `cpo` on scope
+before a line is written. The two dormant Commerce screens
+(`misc/presentation/screens/transactions_screen.dart`, `participation_payment_step.dart`) **stay
+in `misc/`** and are not yours to move.
 
 **This scope is what makes five senior frontends possible at all.** `CONTRACT.md` §4 lets one
 agent at a time into a contended file, and `AGENTS.md` §5 says the ceiling on parallelism is
 disjoint file sets — not agent count. **Stay inside your slices and the five of you run in
 parallel. Wander outside them and you become each other's queue.**
 
-**Proposed mapping, not yet confirmed.** These slices were derived from the cluster census's
-verdicts, not from a scan of the tree. Before treating it as authoritative for a ticket, have
-`analyst` confirm the slice for that specific piece of work.
+**This mapping is MEASURED and authoritative — it is no longer proposed.** It was cut from the
+cross-feature import graph at `dabbler-code` `c46b5c5`: `DECISIONS.md` `T-047` under `G-015`,
+applied by `G-016`, evidence at `STACKS.md` §§9a, 11.1–11.2, 12. `CONTRACT.md` §3 holds the
+authoritative table. **You no longer ask `analyst` to confirm a slice before every ticket** —
+that instruction existed because the old map was a guess. **Do not infer your slices from your
+lead's `D`-stack labels**; those are a feature taxonomy, not the write boundary, and for leads 3
+and 5 they name slices somebody else writes.
 
 ## SHARED SURFACES — coordinate, never assume
 

@@ -3,7 +3,7 @@
 **Status:** PROPOSAL. Not ratified. No `DECISIONS.md` id yet.
 **Authored:** 2026-09-04 · **Measured against:** `dabbler-code` HEAD `c46b5c5`, branch `Canary`
 **Source:** `cto` stack analysis, session `01MCCanB436igB4CLHdMnD2R`
-**Companion docs:** `PROJECT_STATE.md` §3 and §24 (build state) · `CONTRACT.md` (permission matrix) · `dabbler-code/docs/SCHEMA.md` (tables)
+**Companion docs:** `PROJECT_STATE.md` §3 and §24 (build state) · `CONTRACT.md` (permission matrix) · `Dabbler/dabbler-code/docs/SCHEMA.md` (tables)
 
 ---
 
@@ -14,7 +14,7 @@ together, and what can be changed independently"* — not *"what belongs togethe
 conceptually."*
 
 The stacks were derived by measuring the **import graph between the 20 directories under
-`dabbler-code/lib/features/`** and taking ownership from its strongly-connected components.
+`Dabbler/dabbler-code/lib/features/`** and taking ownership from its strongly-connected components.
 They were **not** derived from the Supabase table families. That distinction matters: a
 separate analysis (`cpo`, same session) clustered the 650 corpus features by table family
 into eleven domains D1–D11, and four of those groupings break when a developer is placed
@@ -426,3 +426,390 @@ lists · `persona_service.dart` imports nothing cross-feature · `feature_flags.
 This document is a proposal and binds nothing. Until the S1–S7 boundaries, the Phase 0/1
 gates and the router-module ruling carry `DECISIONS.md` ids with their rejected
 alternatives, **they will be re-litigated.**
+
+---
+
+# PART II — RATIFIED WORK
+
+**Added 2026-09-05 by `cto`, under `DECISIONS.md` `G-015`.** §§1–9 above are the 2026-09-04
+proposal and are left unedited (append-only, `CONTRACT.md` §6). §10 and §11 supersede §1 and §3
+where they differ; §12 records the differences against `CONTRACT.md` §3.
+
+**Re-measured against `dabbler-code` `c46b5c5`, branch `Canary`, 2026-09-05 — the same commit
+§§1–9 were measured at.** Every number below carries the command that produced it.
+
+## 9a. The metric, stated once
+
+Every coupling number in §10–§12 is **E(A→B) = the count of `.dart` files inside
+`lib/features/A/` containing at least one `import`/`export` of a file inside
+`lib/features/B/`**, resolving both `package:dabbler/…` and relative URIs. Undirected pair
+strength is `E(A→B) + E(B→A)`.
+
+**Reproduce with** `/Users/moatazmustapha/.claude/jobs/219439e2/tmp/coupling.py` — or equivalently:
+
+```bash
+cd dabbler-code
+python3 - <<'EOF'
+import os,re,collections
+ROOT="lib"; FEAT="lib/features"
+imp=re.compile(r"""^\s*(?:import|export)\s+['"]([^'"]+)['"]""",re.M)
+def sl(p):
+    r=os.path.relpath(p,ROOT).split(os.sep)
+    return r[1] if r[0]=="features" and len(r)>1 else None
+e=collections.defaultdict(set)
+for dp,_,fs in os.walk(FEAT):
+    for f in fs:
+        if not f.endswith(".dart"): continue
+        p=os.path.join(dp,f); s=sl(p)
+        if not s: continue
+        for u in imp.findall(open(p,errors="replace").read()):
+            if u.startswith("package:dabbler/"): t=os.path.join(ROOT,u[16:])
+            elif u.startswith(("dart:","package:")): continue
+            else: t=os.path.normpath(os.path.join(dp,u))
+            d=sl(t)
+            if d and d!=s: e[(s,d)].add(p)
+for k,v in sorted(e.items(),key=lambda x:-len(x[1])): print(k,len(v))
+EOF
+```
+
+### 9b. Where §§1–9's numbers do not reproduce under this metric — corrections
+
+`G-012`'s headline coupling claim mixed two metrics inside one phrase. The **direction and the
+ranking hold; three counts do not.** Corrected here rather than silently restated.
+
+| Claim in §§1–9 / `G-012` | What reproduces at `c46b5c5` | Verdict |
+|---|---|---|
+| "`profile`↔`social` fused at **5 files out / 10 in**" | `profile→social` = **7** source files (14 import statements, 5 distinct target files); `social→profile` = **9** source files (10 import statements, **2** distinct target files) | **Mixed metric.** "5 out" was *distinct target files*; "10 in" was *import statements*. Under one metric the pair is **7 out / 9 in = 16**, still the strongest edge in the tree by 1.8× |
+| "`auth_onboarding` reaches into `profile` at **5 files, all domain-layer**" | **4** source files, 8 import statements, 6 distinct target files. **3 of the 8 statements target `profile/presentation/providers/add_persona_provider.dart`** | **Wrong on both counts.** The seam is 4 files, and it is *not* purely domain-layer |
+| "`profile` reaches back at **4 files**, all auth presentation providers" | **3** source files, 4 statements, 3 target files — all under `auth_onboarding/presentation/providers/` | Count wrong (3, not 4); "all presentation providers" is correct |
+| "`explore` imports **13 distinct files** across `games`, `venues`, `location`; imported back exactly once" | `explore` imports **13 distinct target files** (games 5 + venues 5 + location 3) from **3 source files**; imported back exactly once (`games→explore`, 1 file) | **Reproduces exactly** |
+| "`misc/data/datasources` — **13 of 20** feature directories import it" | **13 of 20** feature dirs; **38 files total**, of which 11 are in `lib/data/`, plus `lib/providers.dart` and `lib/core/providers/geo_providers.dart` | Reproduces, and is larger than stated — the blast radius is 38 files, not 13 |
+| `app_router.dart` 1,712 LOC · 85 `GoRoute` · `StatefulShellRoute` at `:746` · 13 of 20 feature dirs | All reproduce. Also: **83 imports, 69 from feature slices, 25 of those from `auth_onboarding` alone**; **80 top-level entries** in `_routes` (`:444`) | Reproduces |
+| `profile_providers.dart` 870 lines | Reproduces | Reproduces |
+| §3 G0c "the five game-composer screens" in `misc/` | `misc/presentation/screens/` holds **10** screens, not 8. `activities_screen_v2.dart` and `rewards_screen.dart` were **named nowhere in §§1–9 and are both live routed** (`app_router.dart:54-55`, routes at `:903` and `:914`) | **Gap.** G0c was incomplete; §10 P0-4 corrects it |
+
+---
+
+## 10. PHASE 0 — the executable plan
+
+**Authorised by `G-015` Ruling 1.** No developer is dispatched onto app feature work until this
+lands. This section is written so the `po` can ticket it and one `senior-frontend-N` can execute
+it with no memory of this document.
+
+### 10.0 Who executes it, and why one seat
+
+**One senior, exclusively, for the duration.** Phase 0 touches `lib/app/`, `lib/core/`,
+`lib/data/` and five feature directories. Every one of those is either CONTENDED or SHARED under
+`CONTRACT.md` §4 — *one agent inside at a time*. Two developers in Phase 0 is not parallelism, it
+is a merge conflict with a schedule attached.
+
+**It must be the senior who owns `auth_onboarding`** — `senior-frontend-3` under §11, or
+`senior-frontend-1` if Phase 0 is ticketed before §11 is reconciled into `CONTRACT.md` §3.
+**Reason, measured:** 25 of the router's 69 feature imports and 18 of the 20 pre-shell route
+entries are `auth_onboarding`'s. That seat carries the largest single share of the file being
+split. **No junior enters any Phase 0 ticket** (`CONTRACT.md` §4).
+
+**What may run in parallel with Phase 0 — the complete list:**
+
+| Seat | May run | Why it is disjoint |
+|---|---|---|
+| `senior-backend` | security remediation in `supabase/**` | Phase 0 touches no path under `supabase/` |
+| `content-manager` | EN/AR strings | Phase 0 touches no `.arb` file. **P0-5 must land before any generated-l10n Dart is committed** |
+| `qa`, `analyst`, `cxo`, `cpo`, `pm`, `po` | read-only and document work | no write path into `lib/` |
+
+**Nothing else.** In particular **no work in `lib/data/**`** — P0-2 rewrites imports in 11 files
+there.
+
+### 10.1 P0-1 — Route-inventory golden test. **This is first and it is not optional.**
+
+**Finding that forces it:** `grep -rln "app_router\|AppRouter\|GoRouter" test/` returns **nothing**.
+**Nine** `*_test.dart` files (`find test -name '*_test.dart' | wc -l`), 103 tests, and **not one
+touches the router.** A 1,712-line refactor of the
+app's most contended file currently has zero regression coverage. `flutter test` staying green
+proves nothing about P0-3, because it never proved anything about the router in the first place.
+
+**What comes into existence:** `Dabbler/dabbler-code/test/app/route_inventory_test.dart`.
+
+**What it asserts,** walking `AppRouter.router.configuration.routes` recursively (go_router
+`^12.0.0`, `pubspec.yaml:68`) and flattening to an ordered list of `(fullPath, name, runtimeType)`:
+
+1. the flattened list is **exactly** the golden list checked in beside it;
+2. the count of `GoRoute` is **85**;
+3. exactly one `StatefulShellRoute.indexedStack` exists, with **4** `StatefulShellBranch`.
+
+**Done when:** the test passes against **unmodified** `app_router.dart`, and passes again after
+deliberately reordering any two top-level entries **fails** it. Both directions must be
+demonstrated in the ticket comment — a golden test that cannot fail is not coverage.
+
+**If `RouteConfiguration.routes` proves not to be public in the pinned version,** fall back to
+asserting `router.routerDelegate.currentConfiguration` after `router.go(path)` for all 85 paths,
+and say so on the ticket. **Do not upgrade `go_router` to make the test easier** — that is a
+dependency change and it is not authorised (`G-015` scope).
+
+### 10.2 P0-2 — `misc/data/datasources/**` → `lib/core/data/`
+
+Cheapest high-value unblock, and it is bigger than §3 G0a said: **38 importing files across 13 of
+20 feature directories, plus 11 files in `lib/data/`, `lib/providers.dart`, and
+`lib/core/providers/geo_providers.dart`.**
+
+**Moves — 3 files, unchanged content, path only:**
+
+| From | To |
+|---|---|
+| `lib/features/misc/data/datasources/supabase_client.dart` | `lib/core/data/supabase_client.dart` |
+| `lib/features/misc/data/datasources/supabase_error_mapper.dart` | `lib/core/data/supabase_error_mapper.dart` |
+| `lib/features/misc/data/datasources/supabase_remote_data_source.dart` | `lib/core/data/supabase_remote_data_source.dart` |
+
+**Done when:** `grep -rn "misc/data/datasources" lib/ test/` returns **zero** lines ·
+`lib/features/misc/data/` no longer exists · `flutter analyze --no-pub --no-fatal-infos` exits 0
+with **0 errors, 0 warnings** · `flutter test` exits 0 on **103 tests** · P0-1 green.
+
+**Rule for the executor:** import-path edits only. **Do not reformat, reorder or "tidy" any of the
+38 files** (`CONTRACT.md` §4 rule 1). A diff that touches more than one line per file, outside the
+three moved files, is a rejection.
+
+### 10.3 P0-3 — Split `app_router.dart`
+
+**Two tickets, and P0-3a comes first.**
+
+#### P0-3a — Prove which routes may be reordered
+
+GoRouter matches in declaration order, so a split that changes order changes behaviour.
+**Establish the constraint set before moving anything.**
+
+**Deliverable:** a table, posted on the ticket, of every pair of the 80 top-level entries in
+`_routes` (`app_router.dart:444`) whose path patterns can match a common URI. For each such pair,
+their relative order is **frozen**. Everything not in that table is free to move.
+
+**Watch for specifically:** `/game/:gameId` (`:865`) against `/sports/games/:gameId` (`:815`);
+`'${RoutePaths.error}:message'` (`:1666`), which is a trailing catch-all shape and is **last for a
+reason**; and any `RoutePaths.*` constant that resolves to a bare `:param` segment at a depth
+where a literal sibling exists — resolve the constants from
+`lib/utils/constants/route_constants.dart`, do not reason from the constant name.
+
+**Done when:** the frozen-pair table exists, and `'${RoutePaths.error}:message'` is explicitly
+listed as last-in-order regardless of module.
+
+#### P0-3b — Extract the modules
+
+**What comes into existence** — `lib/app/routes/` does not exist today (`find lib/app -type f`
+returns exactly one file):
+
+| New file | Exports | Bucketing rule |
+|---|---|---|
+| `lib/app/routes/identity_routes.dart` | `List<RouteBase> identityRoutes` | builder constructs a screen under `features/{auth_onboarding,username_engine,app_boot}/` |
+| `lib/app/routes/profile_social_routes.dart` | `profileSocialRoutes` | `features/{profile,social,home,news,moderation}/` |
+| `lib/app/routes/play_places_routes.dart` | `playPlacesRoutes` | `features/{games,venues,explore,location,venue_submissions,activities}/` |
+| `lib/app/routes/notification_routes.dart` | `notificationRoutes` | `features/notifications/` |
+| `lib/app/routes/platform_routes.dart` | `platformRoutes` | `features/{admin,error,misc}/`, settings, help, about, `/` and `/landing` |
+| `lib/app/routes/home_shell_route.dart` | `RouteBase homeShellRoute` | the `StatefulShellRoute.indexedStack` at `:746`–`:814` and its 4 branches, moved whole |
+
+**Bucket by the owning slice of the screen the builder constructs, never by the path string.**
+`RoutePaths.socialNotifications` (`:1544`) builds a `social` screen, not a `notifications` one.
+
+**What stays in `app_router.dart`:**
+
+- `_handleRedirect` (`:149`–`:443`) — **entire, unmodified, not distributed.** It carries
+  onboarding-step enforcement, an OAuth-callback profile check (`:268`–`:279`) and a
+  shared-game-link branch (`:255`). **Redirect is policy and policy stays in one head.** A Phase 0
+  diff that touches a single line inside this range is a rejection.
+- `appRouter` / `AppRouter.router` (`:120`, `:142`–`:145`), `routerRefreshNotifier`.
+- `_routes`, reduced to an ordered concatenation of the six module lists, respecting P0-3a's
+  frozen pairs.
+
+**Done when:** P0-1 golden test green **with no edit to the golden file** — that is the whole
+proof · `app_router.dart` ≤ **450 LOC** · `app_router.dart` has **≤ 6** `features/` imports (down
+from 69) · `flutter analyze` 0 errors 0 warnings · `flutter test` 103 green · no `.dart` file
+outside `lib/app/` changed.
+
+**Explicit non-goal:** do not fix, rename, delete or re-path any route while inside this refactor,
+however wrong it looks (`CONTRACT.md` §4 rules 3 and 4). Report it; it gets its own ticket.
+
+### 10.4 P0-4 — Empty `misc/presentation/screens/` down to its residue
+
+`misc/` is not a feature. It is two unrelated things under one name. P0-2 removes the
+infrastructure half; this removes most of the screens half.
+
+**§3 G0c named 8 screens. There are 10.** The two it missed are both **live routed**:
+
+| Screen | Destination | Evidence |
+|---|---|---|
+| `game_composer_screen.dart` | `features/games/presentation/screens/` | routed `app_router.dart:92`; composer |
+| `sport_format_step.dart` | `features/games/presentation/screens/` | composer step |
+| `venue_slot_step.dart` | `features/games/presentation/screens/` | composer step |
+| `player_invitation_step.dart` | `features/games/presentation/screens/` | composer step |
+| `review_confirmation_step.dart` | `features/games/presentation/screens/` | composer step |
+| **`activities_screen_v2.dart`** | `features/activities/presentation/screens/` | **imported `app_router.dart:54`, routed `:903`. Named nowhere in §§1–9** |
+| **`rewards_screen.dart`** | `features/rewards/presentation/screens/` | **imported `app_router.dart:55`, routed `:914`. Named nowhere in §§1–9** |
+| `help_center_screen.dart` | **stays** | platform surface |
+| `transactions_screen.dart` | **stays** | Commerce is dormant; §1 S7 |
+| `participation_payment_step.dart` | **stays** | Commerce is dormant; §1 S7 |
+
+**Ruling on the last three: they stay in `misc/`.** Creating a holding directory for two dormant
+Commerce screens invents a slice for a domain the PO has not scheduled, and resurrecting the
+payments slice deleted in `34f9a6d` as a side effect of a refactor is exactly the "while I'm in
+here" failure `CONTRACT.md` §4 exists to stop.
+
+**Done when:** `lib/features/misc/` contains exactly `presentation/screens/` with exactly those
+**three** files and nothing else · analyze 0/0 · 103 tests green · P0-1 green.
+**Sequencing: P0-4 runs after P0-3b**, so the router import churn happens once.
+
+### 10.5 P0-5 — `build_runner` becomes a `devops`-owned commit-time step
+
+**52 generated files, 45 of them under `lib/data/`** (`find lib -name '*.g.dart' -o -name
+'*.freezed.dart' | wc -l`). `CONTRACT.md` §3 already says these are never hand-edited; it does not
+say who regenerates them.
+
+**Decision:** `devops` owns regeneration. A developer commits its source change only; `devops`
+runs `dart run build_runner build -d` and commits the generated output as a **separate commit**.
+
+**Why:** a stack that commits regenerated output alongside its source change produces a diff in
+which 45 machine-written files hide the three hand-written ones. That diff is unreviewable, and at
+sixteen developers two of them running `build_runner` concurrently produces a conflict in files
+nobody authored.
+
+**Done when:** the step is written into `agent/WORKFLOWS.md` by its owner and `devops` has run it
+once end to end on a P0 ticket. **This is a process change, not code — it is the one Phase 0 item
+that does not touch `lib/`, and it can run concurrently with P0-1 through P0-4.**
+
+### 10.6 Phase 0 order, and what "Phase 0 has landed" means
+
+```
+P0-1 (golden test)  ──►  P0-2 (datasources)  ──►  P0-3a (order proof)  ──►  P0-3b (split)  ──►  P0-4 (misc screens)
+P0-5 (build_runner process)  ──────────────── concurrent, no lib/ writes ────────────────►
+```
+
+**Phase 0 has landed when all five are Done and, at the resulting commit:**
+`flutter analyze --no-pub --no-fatal-infos` exits 0 on 0 errors / 0 warnings · `flutter test`
+exits 0 on 103 tests across 9 files **plus** `route_inventory_test.dart` · `app_router.dart`
+≤ 450 LOC with ≤ 6 feature imports · `grep -rn "misc/data/datasources" lib/ test/` is empty ·
+the Cloudflare `Canary` build is green on `canary.dabbler.pro`. **Only then are the sixteen
+developer seats dispatched.**
+
+**Phase 1 (`profile_providers.dart`, §3 G1) is NOT in Phase 0 and does not gate dispatch.** It
+gates one thing: whether `team-lead-1`'s cluster can later be split across two leads. See §11.4.
+
+---
+
+## 11. THE PARTITION — five team leaders, from measured coupling
+
+### 11.1 The graph the partition is cut from
+
+Undirected pair strength at `c46b5c5`, all pairs ≥ 3, `misc` excluded because P0-2 and P0-4
+dissolve it:
+
+```
+profile ── social            16      ◄── strongest edge in the tree
+home ── social                8
+auth_onboarding ── profile    7
+location ── social            6
+explore ── games              4
+explore ── venues             3      games ── location        3
+explore ── location           3      venues ── location       3
+explore ── profile            3      auth_onboarding ── games 3
+auth_onboarding ── social     3
+```
+
+Two dense components fall out, joined only by thin edges: **{profile, social, home, news}** and
+**{games, venues, explore, location, venue_submissions}**. `notifications` is near-isolated
+(heaviest edge: 2). `admin` has **zero** cross-feature edges.
+
+### 11.2 The five leads
+
+| Lead | Slices | Files | LOC | Coupling evidence for the grouping |
+|---|---|---|---|---|
+| **`team-lead-1`** — Profile, Social & Feed | `profile`, `social`, `home`, `news`, `moderation` | 167 | **69,485** | Holds the **16**-weight `profile↔social` edge and the **8**-weight `home↔social` edge intact. These are the two most expensive cuts available anywhere in the tree; both are internal here. `news↔profile`=1, `news↔social`=1, `moderation↔social`=1, `moderation↔profile`=1 |
+| **`team-lead-2`** — Play & Places | `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities` | 91 | 29,872 | Internal edges `explore↔games`=4, `explore↔venues`=3, `explore↔location`=3, `games↔location`=3, `venues↔location`=3, `games↔venues`=2 — **18 in total, all internal.** `explore` imports 13 distinct target files across `games`/`venues`/`location` from 3 source files and is imported back exactly once: it is a composition surface, not a peer |
+| **`team-lead-3`** — Identity & Access | `auth_onboarding`, `username_engine`, `app_boot` | 53 | 13,127 | Cut at the `auth_onboarding↔profile` seam, weight **7** — the cheapest cut that separates a slice of this size (48 files / 12,896 LOC). The seam is directional: `auth→profile` 4 files, `profile→auth` 3 files, and every one of `profile`'s 4 back-imports targets `auth_onboarding/presentation/providers/` |
+| **`team-lead-4`** — Rewards, Staff & Commerce | `rewards`, `admin` · **+ Commerce (`D4`) on activation** | 6 | 1,579 | `rewards↔home`=1, `rewards↔profile`=1. `admin` has **zero** cross-feature edges — it is separable at no cost from anywhere. Deliberately the lightest live load because it holds the largest dormant backlog |
+| **`team-lead-5`** — Notifications & Messaging | `notifications` (+ `lib/services/notifications/**`) | 19 | 4,259 | Heaviest edge is **2** (`notifications↔activities`, `notifications↔profile`). **This boundary already works. Do not touch it** |
+
+Unassigned by design: `core` (1 file, 18 LOC) and `error` (1 file, 53 LOC) are platform residue;
+`misc` is dissolved by Phase 0. Total: 351 feature files, 125,851 LOC — reconciles.
+
+### 11.3 Platform is not a sixth team
+
+`lib/app/**`, `lib/core/**`, `lib/data/**`, `lib/widgets/**`, `lib/utils/**`, `lib/themes/**`,
+`lib/design_system/**`, `lib/providers.dart`, `lib/l10n/**` and the four contended files stay
+**SHARED with no single writer**, governed by `CONTRACT.md` §4.
+
+**Rejected: create a platform lead.** `G-014` fixes the roster at five leads and this decision
+does not reopen it. A sixth lead would have to be cut out of the five, and every candidate cut
+costs more than the coordination it saves.
+
+**The one exception is Phase 0 itself**, which is platform work with no owner today. §10.0 gives
+it a single named executor for its duration and takes the surfaces out of shared use while it
+runs. **After Phase 0 the surfaces return to §4 discipline.**
+
+### 11.4 Is five the right number? — the answer, stated plainly
+
+**Five is the right number of cuts. It is the wrong number of equal loads, and no roster change
+fixes that.**
+
+The coupling graph supports exactly five disjoint groups with a total cut cost of 24 file-edges.
+But the load lands **55% / 24% / 10% / 1.3% / 3.4%** by LOC. `team-lead-1` holds more than half
+the feature tree with one senior and two juniors; `team-lead-4` holds 1,579 lines.
+
+**Adding a sixth lead does not help, and this is the measured reason.** The only place a sixth
+lead could go is inside `team-lead-1`'s cluster, and every cut there is expensive:
+
+| Candidate cut of `team-lead-1` | Cost | Verdict |
+|---|---|---|
+| `profile` \| `social` | **16** | Most expensive cut in the tree. **Two teams in `profile_providers.dart` on day one** |
+| `social` \| `home` | 8 | `home` is 7 files; a 7-file team is not a team |
+| move `news` out | 3 | Cheap, but `news` rendering already lives in `social` (`social/presentation/widgets/kind_cards/news_kind_card.dart`). Available if `team-lead-4` needs mass; the price is 3 |
+
+**The imbalance is a code fact, not an org fact, and it has a code fix: Phase 1.** Splitting
+`profile_providers.dart` (870 lines, three domains, `social` consumes 10 providers from it and
+`home` 5) is what drops `social→profile` from 9 source files toward zero — **9 of its 10 import
+statements target that one file.** After Phase 1 the `profile|social` cut stops costing 16 and
+`team-lead-1` becomes divisible.
+
+**Recommendation to the CEO and `pm`:** keep five. Load `team-lead-1` with the senior and both
+juniors and hold `team-lead-4`'s and `team-lead-5`'s juniors idle rather than giving them work
+outside their slices — `AGENTS.md` §5 puts the ceiling on parallelism at disjoint file sets, and
+an idle seat costs nothing while a wandering one serialises everybody. **Schedule Phase 1 as the
+next structural ticket after Phase 0**, not as a Phase 2 nicety: it is the only lever that
+rebalances the roster.
+
+### 11.5 What this partition does NOT settle
+
+- **`B.9` Organiser dashboard.** §4 argues it goes to Play & Places; `G-013` argues it is the
+  unstaffed admin-dashboard project. **Both readings stand; this decision rules neither**, because
+  it is a product-scope question and the coupling graph is silent on it — organiser has no slice.
+- **`D4` Commerce activation.** `team-lead-4` is named its custodian. Activation is a `pm`
+  decision with the CEO (`AGENTS.md` §1).
+- **The two design systems.** Unchanged, still closed under `G-011`, now joint `cxo` + `cto`.
+
+---
+
+## 12. DELTA against `CONTRACT.md` §3 — every difference and its price
+
+`CONTRACT.md` §3's application-code map is **PROVISIONAL** under `G-015`. `analyst` owns that
+file; the amendment below is **proposed by `cto`, not applied.**
+
+| # | Slice | `CONTRACT.md` §3 (provisional) | §11 (measured) | Cost of leaving it unfixed |
+|---|---|---|---|---|
+| 1 | **`home`** | **absent — no writer** | `team-lead-1` | **This is the serious one.** `home` is 7 files / 3,403 LOC and contains `main_navigation_screen.dart`, the app shell reached by the `StatefulShellRoute`. It has the **8**-weight edge to `social`. An unowned slice with a shell in it is how the audit's 23 unowned slices happened |
+| 2 | **`core`** | **absent — no writer** | platform residue (1 file, 18 LOC) | Negligible in size, but name it or it recurs |
+| 3 | `auth_onboarding`, `username_engine`, `app_boot` | `team-lead-1` | **`team-lead-3`** | Leaving them: `team-lead-1` carries 220 files / 82,612 LOC — **66% of the feature tree on one senior.** This is the single largest correction |
+| 4 | `venues`, `venue_submissions` | `team-lead-3` | **`team-lead-2`** | Splits the Play & Places component. Price: `explore↔venues`=3, `games↔venues`=2, `venues↔location`=3 become **cross-team edges — 8 file-edges of standing coordination** |
+| 5 | `explore`, `location` | `team-lead-5` | **`team-lead-2`** | Same component split, a third way. Price: `explore↔games`=4, `explore↔venues`=3, `explore↔location`=3, `games↔location`=3, `venues↔location`=3 = **16 more cross-team file-edges.** Combined with #4, the provisional map cuts an 18-edge component **three ways** and pays 24 of those 18 edges twice over as coordination |
+| 6 | `explore`, `location` on `team-lead-5` alongside `notifications` | — | `notifications` alone | `notifications`'s heaviest edge to anything is **2**. Pairing it with a 26-file discovery cluster gives lead 5 two unrelated mental models and no shared code |
+| 7 | `activities` | `team-lead-2` | `team-lead-2` | **No change.** Listed because §11 keeps it while moving its neighbours |
+| 8 | `moderation` | `team-lead-2` | `team-lead-1` | Price of leaving it: **2** (`moderation↔social`=1, `moderation↔profile`=1). **Merely different, not wrong** — take it or leave it |
+| 9 | `admin` | `team-lead-2` | `team-lead-4` | Price: **0** — `admin` has no cross-feature edges. Preference only: §5 argues a staff console does not belong inside a consumer-product stack |
+| 10 | `misc` | `team-lead-1` | **dissolved by Phase 0**; 3 residual screens shared | Leaving it: 13 of 20 feature dirs keep importing into one lead's directory |
+| 11 | `news` | `team-lead-1` | `team-lead-1` | **No change**, but §11.4 records it as the cheap (cost 3) rebalancing lever if `team-lead-4` needs mass |
+| 12 | `profile_providers.dart` | `senior-frontend-1`, "treat as contended" | **unchanged, and correct** | Confirmed: 9 of `social`'s 10 import statements into `profile` target this one file. The contended treatment is the right call and stays until Phase 1 |
+| 13 | `lib/app/app_router.dart` | CONTENDED | CONTENDED **until Phase 0**, then 6 modules each following its lead | After P0-3b, five leads write their own module and only the assembly stays contended |
+
+**Slices that move, in one line:** `auth_onboarding`, `username_engine`, `app_boot` → lead 3 ·
+`venues`, `venue_submissions`, `explore`, `location` → lead 2 · `moderation` → lead 1 ·
+`admin` → lead 4 · `home` and `core` gain a writer for the first time · `misc` dissolves.
+
+**Stack labels that no longer describe the code.** `AGENTS.md` §1 gives lead 3 "D3 Venues · D10
+Sports reference" and lead 5 "D6 Notifications · D9 Discovery". Under §11 lead 3 holds Identity
+and lead 5 holds Notifications only. **The `D`-labels are a feature taxonomy and stay useful for
+deciding *what* to work on; they are no longer the write boundary.** `G-013` already drew that
+distinction — this makes it concrete.

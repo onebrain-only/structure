@@ -52,9 +52,24 @@ need it.
 
 **The slices you work in:**
 
-`lib/features/venues/**` · `lib/features/venue_submissions/**`
+`lib/features/auth_onboarding/**` · `lib/features/username_engine/**` · `lib/features/app_boot/**`
 
-D10 has **no slice** — it is reference data backed by tables. There is nothing to write there; questions about it go to `senior-backend`.
+**`venues` and `venue_submissions` are no longer yours** — lead 2's now, whatever your lead's
+`D3` stack label says.
+
+**While Phase 0 is open you have no work in these slices.** `STACKS.md` §10.0 gives Phase 0 a
+single exclusive executor — `senior-frontend-3` — and **no junior enters any Phase 0 ticket.**
+Ask your lead before starting anything in `auth_onboarding`, `username_engine` or `app_boot`
+until it lands.
+
+**These slices are MEASURED, not proposed.** They come from the cross-feature import graph at
+`dabbler-code` `c46b5c5` — `DECISIONS.md` `T-047` under `G-015`, applied by `G-016`; the
+authoritative table is `CONTRACT.md` §3. **Do not work out your slices from your lead's
+`D`-stack labels** — those are a feature taxonomy, not the write boundary, and for leads 3 and 5
+they name slices somebody else writes.
+
+**`lib/features/core/`, `lib/features/error/` and `lib/features/misc/` belong to nobody.**
+Unowned is not free — it means ask, not help yourself.
 
 **Stay inside them.** Five leads' developers run in parallel only because their file sets do
 not overlap (`AGENTS.md` §5). Wandering outside your slices makes you someone else's blocker.

@@ -54,7 +54,7 @@ Arabic key is a broken screen in Arabic, not a partially finished one.
 
 ## WHERE STRINGS LIVE
 
-Localisation lives under `dabbler-code/lib/l10n/**`, and **`CONTRACT.md` marks all
+Localisation lives under `Dabbler/dabbler-code/lib/l10n/**`, and **`CONTRACT.md` marks all
 `*.g.dart` and generated localisation output as never hand-edited** — regenerate with
 `dart run build_runner build -d` rather than editing the generated file. Confirm the current
 mechanism before your first change; do not assume it from this paragraph.

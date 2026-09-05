@@ -44,16 +44,36 @@ file. Your lead assigns you; you do not pick your own work.
 
 **The slices you write:**
 
-`lib/features/games/**` · `lib/features/activities/**` · `lib/features/moderation/**` · `lib/features/admin/**`
+`lib/features/games/**` · `lib/features/venues/**` · `lib/features/explore/**` · `lib/features/location/**` · `lib/features/venue_submissions/**` · `lib/features/activities/**`
+
+**91 files, 29,872 LOC.** You now hold the whole Play & Places component — **18 internal
+file-edges** (`explore↔games`=4, `explore↔venues`=3, `explore↔location`=3, `games↔location`=3,
+`venues↔location`=3, `games↔venues`=2), all of them inside your own slices rather than crossing
+a team line.
+
+**`explore` is a composition surface, not a peer.** It imports 13 distinct target files across
+`games`/`venues`/`location` from 3 source files and is imported back exactly once. Change it
+expecting to read three slices; change those three expecting `explore` to notice.
+
+**`moderation` and `admin` are no longer yours** — lead 1 and lead 4 respectively. `moderation`
+cost 2 file-edges to hand over and `admin` cost 0; both are recorded as preference, not defect.
+
+**You reach into lead 1's contended file.** `venues` (2 files), `explore` (2),
+`venue_submissions` (1) and `location` (1) import `profile_providers.dart`. **One agent inside
+it at a time** — coordinate with `senior-frontend-1` before you go in.
 
 **This scope is what makes five senior frontends possible at all.** `CONTRACT.md` §4 lets one
 agent at a time into a contended file, and `AGENTS.md` §5 says the ceiling on parallelism is
 disjoint file sets — not agent count. **Stay inside your slices and the five of you run in
 parallel. Wander outside them and you become each other's queue.**
 
-**Proposed mapping, not yet confirmed.** These slices were derived from the cluster census's
-verdicts, not from a scan of the tree. Before treating it as authoritative for a ticket, have
-`analyst` confirm the slice for that specific piece of work.
+**This mapping is MEASURED and authoritative — it is no longer proposed.** It was cut from the
+cross-feature import graph at `dabbler-code` `c46b5c5`: `DECISIONS.md` `T-047` under `G-015`,
+applied by `G-016`, evidence at `STACKS.md` §§9a, 11.1–11.2, 12. `CONTRACT.md` §3 holds the
+authoritative table. **You no longer ask `analyst` to confirm a slice before every ticket** —
+that instruction existed because the old map was a guess. **Do not infer your slices from your
+lead's `D`-stack labels**; those are a feature taxonomy, not the write boundary, and for leads 3
+and 5 they name slices somebody else writes.
 
 ## SHARED SURFACES — coordinate, never assume
 

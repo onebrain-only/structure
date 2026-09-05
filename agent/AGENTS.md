@@ -98,16 +98,32 @@ Work breaks down **stack → feature**. The product's 650 features cluster into 
 `team-lead-N` holds several and **works one at a time**. The rest are inactive: still owned,
 still answered for, but drawing no capacity.
 
-| Lead | Stacks | Active as of 2026-09-05 |
-|---|---|---|
-| `team-lead-1` | D1 Identity · D5 Social · D11 Platform | — |
-| `team-lead-2` | D2 Games · D8 Moderation | **D2** |
-| `team-lead-3` | D3 Venues · D10 Sports reference | — |
-| `team-lead-4` | D4 Money · D7 Rewards | — |
-| `team-lead-5` | D6 Notifications · D9 Discovery | **D6** |
+| Lead | Stacks — *what to work on* | Active | Slices it **writes** — *the boundary* |
+|---|---|---|---|
+| `team-lead-1` | D1 Identity · D5 Social · D11 Platform | — | `profile`, `social`, `home`, `news`, `moderation` |
+| `team-lead-2` | D2 Games · D8 Moderation | **D2** | `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities` |
+| `team-lead-3` | D3 Venues · D10 Sports reference | — | `auth_onboarding`, `username_engine`, `app_boot` |
+| `team-lead-4` | D4 Money · D7 Rewards | — | `rewards`, `admin` (+ Commerce on activation) |
+| `team-lead-5` | D6 Notifications · D9 Discovery | **D6** | `notifications` + `lib/services/notifications/**` |
+| — | — | — | `core`, `error` **UNOWNED** (platform residue) · `misc` **UNOWNED**, dissolved by Phase 0 |
 
 **Two stacks are active because three developers cannot feed five.** Capacity, not ambition,
 sets that number. Activating a stack is a `pm` decision with the CEO.
+
+**Read the two right-hand columns as two different things, because they are.** The `D`-labels
+are a **feature taxonomy** — they cluster the product's 650 features and answer *what a lead
+works on*. The slice list is the **write boundary** — it answers *which files that lead's
+developers may touch*, and it is measured, not chosen: `cto` cut it from the cross-feature
+import graph at `c46b5c5` (`DECISIONS.md` `T-047` under `G-015`, applied by `G-016`;
+`CONTRACT.md` §3 holds the authoritative table with counts and evidence).
+
+**The two do not line up, and pretending they do is the error this table now exists to stop.**
+Lead 3's stacks say Venues; **lead 3 writes Identity** — `venues` moved to lead 2 because it
+sits inside an 18-edge Play & Places component that the D-labels cut three ways. Lead 5's
+stacks say Notifications + Discovery; **lead 5 writes Notifications only** — `explore` and
+`location` moved to lead 2 for the same reason. **When a ticket's stack and its slice disagree,
+the slice decides who writes it** and the lead whose stack it is coordinates. Ownership
+questions go to `CONTRACT.md` §3, never to this table's second column.
 
 **B.9 Organiser dashboard (40 features) belongs to no lead here.** It has no slice in the app
 because it is not an app feature — it is the **admin dashboard project**, which is declared
@@ -163,16 +179,26 @@ seat another's question is the most common routing error there is.
 | Seat | Count | Takes | Never |
 |---|---|---|---|
 | `senior-backend` | **1, shared** | Schema, migrations, RLS, RPCs, edge functions — **notifications included** | Applies to production. Writes Dart features |
-| `senior-frontend-1..5` | 5, one per lead | Business logic, new patterns, multi-file changes, **scoped to its lead's slices** | Authors SQL. Applies to production. Wanders outside its slices |
+| `senior-frontend-1..5` | 5, one per lead | Business logic, new patterns, multi-file changes, **scoped to the slices its lead writes** — §1's fourth column, authoritative at `CONTRACT.md` §3 | Authors SQL. Applies to production. Wanders outside its slices. **Infers its slices from its lead's `D`-stack labels** — those are a taxonomy, not the boundary |
 | `junior-frontend-1a..5b` | 10, two per lead | **Only** work that repeats a pattern already in the tree — and it must cite the example by `file:line` | Invents a pattern. Touches the contended files, `lib/core/**` or `lib/data/**`. Deletes anything |
 
 **Scoping the seniors to their lead's slices is what makes five of them possible.** §5 of this
 file says the ceiling on parallelism is **disjoint file sets, not agent count**. Five seniors
-inside their own slices run in parallel; one outside them is everyone's queue.
+inside their own slices run in parallel; one outside them is everyone's queue. **The slice sets
+are disjoint by measurement, not by assertion** — that is the whole reason `T-047` cut them from
+the import graph rather than from the feature list.
 
 **Three surfaces stay shared and belong to nobody:** `lib/core/**`, `lib/data/**`, and the four
-contended files. **`lib/app/app_router.dart` is 1,712 lines with 85 routes**, and until
-`G-012`'s Phase 0 split lands it is not a safety rule — it is the schedule.
+contended files. **`lib/app/app_router.dart` is 1,712 lines with 85 routes**, and until Phase 0's
+`P0-3b` split lands it is not a safety rule — it is the schedule. **Phase 0 is authorised**
+(`G-015` Ruling 1) and runs before any developer is dispatched onto feature work.
+
+**Three feature directories have no writer, and that is recorded rather than hidden.**
+`lib/features/core/` (1 file) and `lib/features/error/` (1 file) are platform residue, too small
+to justify a boundary and coupled to nothing. `lib/features/misc/` is dissolved by Phase 0 down
+to three residual screens. All three are UNOWNED under `CONTRACT.md` §4 discipline. **Naming a
+gap is not the same as leaving one** — the previous map omitted `home` silently, and `home` holds
+the app shell.
 
 **`senior-backend` is the narrowest resource in the system.** Sixteen developers and five leads
 route every schema need through one seat, which then queues again behind `cto`, the only seat

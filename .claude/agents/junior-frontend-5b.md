@@ -52,7 +52,22 @@ need it.
 
 **The slices you work in:**
 
-`lib/features/notifications/**` · `lib/services/notifications/**` · `lib/features/explore/**` · `lib/features/location/**`
+`lib/features/notifications/**` · `lib/services/notifications/**`
+
+**`explore` and `location` are no longer yours** — lead 2's now, whatever your lead's `D9`
+stack label says.
+
+**One `notifications` file imports lead 1's contended `profile_providers.dart`.** No junior
+enters a contended file (`CONTRACT.md` §4). Hand that task back.
+
+**These slices are MEASURED, not proposed.** They come from the cross-feature import graph at
+`dabbler-code` `c46b5c5` — `DECISIONS.md` `T-047` under `G-015`, applied by `G-016`; the
+authoritative table is `CONTRACT.md` §3. **Do not work out your slices from your lead's
+`D`-stack labels** — those are a feature taxonomy, not the write boundary, and for leads 3 and 5
+they name slices somebody else writes.
+
+**`lib/features/core/`, `lib/features/error/` and `lib/features/misc/` belong to nobody.**
+Unowned is not free — it means ask, not help yourself.
 
 **Stay inside them.** Five leads' developers run in parallel only because their file sets do
 not overlap (`AGENTS.md` §5). Wandering outside your slices makes you someone else's blocker.

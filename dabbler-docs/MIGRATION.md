@@ -92,25 +92,25 @@ Per the PO's confirmed target layout:
 Desktop/One Brain/
   CLAUDE.md
   .claude/agents/ ...
-  dabbler-code/     (was: dabbler/)
+  Dabbler/dabbler-code/     (was: dabbler/)
   dabbler-docs/     (was: docs/)
 ```
 
 | Old (from the first split, same day) | New |
 |---|---|
-| `One Brain/dabbler/` | `One Brain/dabbler-code/` |
+| `One Brain/dabbler/` | `One Brain/Dabbler/dabbler-code/` |
 | `One Brain/docs/` | `One Brain/dabbler-docs/` |
 
 Nothing else moved. This was a plain rename (`mv`) on both — `dabbler-code`'s `.git`,
 remote, and history are untouched, exactly as the first move preserved them.
 
 Updated as part of this rename:
-- `One Brain/.gitignore` — now ignores `dabbler-code/` (was `dabbler/`).
-- `dabbler-code/docs/README.md` — pointer updated to `../dabbler-docs/`.
+- `One Brain/.gitignore` — now ignores `Dabbler/dabbler-code/` (was `dabbler/`).
+- `Dabbler/dabbler-code/docs/README.md` — pointer updated to `../dabbler-docs/`.
 - All `.claude/agents/*.md` files and `CLAUDE.md` — every bare `docs/X.md` reference
   disambiguated to either `dabbler-docs/X.md` (governance: DECISIONS, PROJECT_STATE,
   LEARN, CONTRACT, AGENTS, BRIEF, MANIFESTO, ROADMAP, WORKFLOWS, STATUS, status/,
-  briefs/) or `dabbler-code/docs/X.md` (technical: ARCHITECTURE, SCHEMA, CONVENTIONS,
+  briefs/) or `Dabbler/dabbler-code/docs/X.md` (technical: ARCHITECTURE, SCHEMA, CONVENTIONS,
   PLAN, README). This also fixed a pre-existing ambiguity from the first split, where
   agent definitions referenced bare `docs/X.md` without saying which of the two
   `docs/` folders they meant.

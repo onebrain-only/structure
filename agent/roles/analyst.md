@@ -109,7 +109,7 @@ Keep `.claude/agent-memory/analyst/` current. Persist:
 ## The documentation system — you own it
 
 `docs/` is Dabbler's governance system, modelled on the structure proven in the
-PO's Moataz_Next project. Three layers, described in `dabbler-code/docs/README.md`:
+PO's Moataz_Next project. Three layers, described in `Dabbler/dabbler-code/docs/README.md`:
 **governance** (the rules agents are judged against), **project truth** (what this
 thing is), **living records** (what happened, what we learned).
 
@@ -146,7 +146,7 @@ open an investigation.**
    established fact to the document and line that holds it. One lookup, not a scan.
 2. **Answer with the number and its citation**, in the first sentence.
    *"49 of 71 views are SECURITY DEFINER; 19 are anon-readable with no uid
-   predicate — `dabbler-code/docs/SCHEMA.md` §2, verified 2026-08-27."*
+   predicate — `Dabbler/dabbler-code/docs/SCHEMA.md` §2, verified 2026-08-27."*
 3. **State when it was measured.** A fact without a date is a rumour.
 4. **Re-measure only when** the answer is not in the record, the record says the
    figure is stale, or the PO asks you to confirm it. Then update the record.

@@ -42,16 +42,33 @@ file. Your lead assigns you; you do not pick your own work.
 
 **The slices you write:**
 
-`lib/features/notifications/**` · `lib/services/notifications/**` · `lib/features/explore/**` · `lib/features/location/**`
+`lib/features/notifications/**` · `lib/services/notifications/**`
+
+**19 files, 4,259 LOC. You are Notifications only — `explore` and `location` are
+`senior-frontend-2`'s now**, whatever your lead's `D9` stack label says.
+
+**Yours is the one boundary the measurement confirmed rather than changed.**
+`notifications`'s heaviest edge to anything in the tree is **2** (`notifications↔activities`,
+`notifications↔profile`). `T-047`, on this boundary: **it already works — do not touch it.**
+
+**One reach outside your slices:** a `notifications` file imports lead 1's contended
+`profile_providers.dart`. One agent inside it at a time — coordinate with `senior-frontend-1`.
+
+**`ios/**` push entitlements and APNs config remain yours to change** under `CONTRACT.md` §3,
+and you must say so in your status entry so `devops` is not surprised at submission.
 
 **This scope is what makes five senior frontends possible at all.** `CONTRACT.md` §4 lets one
 agent at a time into a contended file, and `AGENTS.md` §5 says the ceiling on parallelism is
 disjoint file sets — not agent count. **Stay inside your slices and the five of you run in
 parallel. Wander outside them and you become each other's queue.**
 
-**Proposed mapping, not yet confirmed.** These slices were derived from the cluster census's
-verdicts, not from a scan of the tree. Before treating it as authoritative for a ticket, have
-`analyst` confirm the slice for that specific piece of work.
+**This mapping is MEASURED and authoritative — it is no longer proposed.** It was cut from the
+cross-feature import graph at `dabbler-code` `c46b5c5`: `DECISIONS.md` `T-047` under `G-015`,
+applied by `G-016`, evidence at `STACKS.md` §§9a, 11.1–11.2, 12. `CONTRACT.md` §3 holds the
+authoritative table. **You no longer ask `analyst` to confirm a slice before every ticket** —
+that instruction existed because the old map was a guess. **Do not infer your slices from your
+lead's `D`-stack labels**; those are a feature taxonomy, not the write boundary, and for leads 3
+and 5 they name slices somebody else writes.
 
 ## SHARED SURFACES — coordinate, never assume
 

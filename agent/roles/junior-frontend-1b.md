@@ -41,9 +41,27 @@ need it.
 
 **The slices you work in:**
 
-`lib/features/auth_onboarding/**` · `lib/features/profile/**` · `lib/features/username_engine/**` · `lib/features/social/**` · `lib/features/news/**` · `lib/features/app_boot/**` · `lib/features/error/**` · `lib/features/misc/**`
+`lib/features/profile/**` · `lib/features/social/**` · `lib/features/home/**` · `lib/features/news/**` · `lib/features/moderation/**`
 
-**Two warnings specific to your slices.** `lib/features/profile/presentation/providers/profile_providers.dart` is **870 lines holding three domains' concerns**, consumed by `social` (10 providers) and `home` (5) — you and lead 2's developers will collide there until it is split (`G-012` Phase 1). And `misc/` is 12 screens with no domain; treat anything in it as unowned until `analyst` says otherwise.
+**One file inside your slices is off limits to you.**
+`lib/features/profile/presentation/providers/profile_providers.dart` is contended — 870 lines,
+32 importers across three leads, plus the router and the top bar. **No junior enters a contended file** (`CONTRACT.md` §4). If
+your task needs it, hand the task back.
+
+**`home` holds the app shell** (`main_navigation_screen.dart`). A single-file pattern-repeat
+there still changes what every other lead's screens sit inside — say so when you hand it back
+or when you finish it.
+
+**`auth_onboarding`, `username_engine`, `app_boot`, `error` and `misc` are no longer yours.**
+
+**These slices are MEASURED, not proposed.** They come from the cross-feature import graph at
+`dabbler-code` `c46b5c5` — `DECISIONS.md` `T-047` under `G-015`, applied by `G-016`; the
+authoritative table is `CONTRACT.md` §3. **Do not work out your slices from your lead's
+`D`-stack labels** — those are a feature taxonomy, not the write boundary, and for leads 3 and 5
+they name slices somebody else writes.
+
+**`lib/features/core/`, `lib/features/error/` and `lib/features/misc/` belong to nobody.**
+Unowned is not free — it means ask, not help yourself.
 
 **Stay inside them.** Five leads' developers run in parallel only because their file sets do
 not overlap (`AGENTS.md` §5). Wandering outside your slices makes you someone else's blocker.

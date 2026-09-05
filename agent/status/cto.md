@@ -178,3 +178,50 @@ regression into it destroys exactly that. SEC-17's real fix is *migrate the call
 **Scale for the PO:** 61 of 240 users — **25% of the user base** — have their raw `auth.users`
 UUID readable with no account (`master-analyst`'s sweep, reproduced on `v_game_card`: 216 of 216).
 
+
+---
+
+## 2026-09-05 — `G-015` discharged: five-lead partition + executable Phase 0 (`T-047`)
+
+**Branch:** `Canary` · **Measured at:** `dabbler-code` `c46b5c5` (unchanged since the 2026-09-04
+stack analysis, so §§1–9 of `STACKS.md` were re-checkable at the same commit).
+
+**Note on the gap in this log.** The 2026-09-03/04 stack analysis that produced
+`dabbler-docs/STACKS.md` and `DECISIONS.md` `G-012` was **never recorded here.** That work exists
+only in those two documents. Recorded now so the omission is visible rather than silent.
+
+**Delivered.**
+- `dabbler-docs/STACKS.md` **Part II (§9a–§12)** — the coupling metric stated once with its
+  reproduction command; §9b corrections table; §10 the five-ticket Phase 0 plan; §11 the five-lead
+  partition with per-grouping evidence; §12 the thirteen-row delta against `CONTRACT.md` §3.
+- `dabbler-docs/DECISIONS.md` **`T-047`** — ACTIVE, with six rejected alternatives.
+
+**The partition.** lead 1 `profile`+`social`+`home`+`news`+`moderation` (167 files / 69,485 LOC) ·
+lead 2 `games`+`venues`+`explore`+`location`+`venue_submissions`+`activities` (91 / 29,872) ·
+lead 3 `auth_onboarding`+`username_engine`+`app_boot` (53 / 13,127) · lead 4 `rewards`+`admin`
++ Commerce (6 / 1,579) · lead 5 `notifications` (19 / 4,259).
+
+**Answer given to `G-015`'s five-vs-seven constraint:** five is the right number of **cuts** and the
+wrong number of equal **loads** — 55/24/10/1.3/3.4 by LOC — and no roster change fixes it, because
+the only place a sixth lead fits is inside lead 1 where the cheapest cut is `profile|social` at 16
+file-edges. The fix is Phase 1, not headcount.
+
+**Three findings worth carrying.**
+1. **Nothing in `test/` references the router.** 9 `*_test.dart` files, 103 tests, zero router coverage on
+   a 1,712-LOC / 85-route file. `flutter test` green would have proved nothing about the split, so
+   P0-1 is now a golden route-inventory test and it gates the refactor.
+2. **`home` and `core` have no writer in `CONTRACT.md` §3.** `home` is 7 files / 3,403 LOC and
+   contains `main_navigation_screen.dart` — the shell the `StatefulShellRoute` reaches.
+3. **My own `G-012` numbers did not fully reproduce.** "`profile↔social` 5 out / 10 in" mixed
+   distinct-target-files with import-statements in one phrase (truth: 7 out / 9 in). "`auth` reaches
+   `profile` at 5 files, all domain-layer" is wrong twice — 4 files, and 3 of 8 statements hit
+   `presentation/providers/add_persona_provider.dart`. `STACKS.md` §3 G0c named 8 screens in
+   `misc/`; there are 10, and the two it missed are both live routed. **The argument held; three
+   counts did not.**
+
+**Handed on.** `analyst` owns the `CONTRACT.md` §3 and `AGENTS.md` §1 amendments — proposed in
+§12, **not applied by me.** `po` tickets P0-1…P0-5 from §10. No app feature work is dispatched
+until Phase 0 lands (`G-015` Ruling 1).
+
+**Not verified:** nothing was run. No `flutter analyze`, no `flutter test`, no app, no database
+query. Every number is static analysis of the tree at `c46b5c5`.

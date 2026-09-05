@@ -140,45 +140,90 @@ else. Copying the read-open default here would grant something the PO explicitly
 
 ### Application code
 
-**Amended 2026-09-05 for sixteen developers.** `lib/features/**` no longer has one writer. Each
-slice is written by **the `senior-frontend-N` whose lead owns that slice**, assisted by that
-lead's two juniors on pattern-repeat work only. **That scoping is the mechanism, not a
-formality** — `AGENTS.md` §5 puts the ceiling on parallelism at disjoint file sets, so five
-seniors inside their own slices run at once and one outside them serialises everybody.
+**Amended twice on 2026-09-05.** `lib/features/**` no longer has one writer. Each slice is
+written by **the `senior-frontend-N` whose lead owns that slice**, assisted by that lead's two
+juniors on pattern-repeat work only. **That scoping is the mechanism, not a formality** —
+`AGENTS.md` §5 puts the ceiling on parallelism at disjoint file sets, so five seniors inside
+their own slices run at once and one outside them serialises everybody.
+
+**The partition below is MEASURED. It is no longer proposed.** The provisional census-derived
+map that stood here earlier on 2026-09-05 is **superseded and gone.** What replaces it is
+`cto`'s partition, cut from the measured cross-feature import graph at `dabbler-code`
+`c46b5c5` — `DECISIONS.md` **`T-047`**, authorised by **`G-015`** Ruling 2, applied here by
+`analyst` under **`G-016`**. Evidence: `STACKS.md` §9a (the metric), §11.1–11.2 (the graph and
+the cut), §12 (the thirteen-row delta). The metric is `E(A→B)` = files in `lib/features/A/`
+importing a file in `lib/features/B/`; its reproduction command is `STACKS.md` §9a.
+**Do not re-derive slice ownership from the D1–D11 stack labels.** Those are a feature
+taxonomy for deciding *what* to work on and are **not** the write boundary — `AGENTS.md` §1.
+
+**Every one of the 20 directories in `lib/features/` appears below, by name.** That is the
+point of the table. The version it replaces named 18 and silently omitted **`home`** and
+**`core`** — and `home` holds `main_navigation_screen.dart`, the app shell reached by the
+`StatefulShellRoute`. A ticket assigned against `home` from the old table hit a slice with no
+writer. An unowned slice with a shell in it is how the audit's 23 unowned slices happened.
 
 | Slices | Writer | Lead |
 |---|---|---|
-| `auth_onboarding`, `profile`, `username_engine`, `social`, `news`, `app_boot`, `error`, `misc` | `senior-frontend-1` + `junior-frontend-1a/1b` | `team-lead-1` (D1·D5·D11) |
-| `games`, `activities`, `moderation`, `admin` | `senior-frontend-2` + `junior-frontend-2a/2b` | `team-lead-2` (D2·D8) |
-| `venues`, `venue_submissions` | `senior-frontend-3` + `junior-frontend-3a/3b` | `team-lead-3` (D3·D10) |
-| `rewards` | `senior-frontend-4` + `junior-frontend-4a/4b` | `team-lead-4` (D4·D7) |
-| `notifications` (features **and** `lib/services/notifications/**`), `explore`, `location` | `senior-frontend-5` + `junior-frontend-5a/5b` | `team-lead-5` (D6·D9) |
+| `profile`, `social`, `home`, `news`, `moderation` | `senior-frontend-1` + `junior-frontend-1a/1b` | `team-lead-1` |
+| `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities` | `senior-frontend-2` + `junior-frontend-2a/2b` | `team-lead-2` |
+| `auth_onboarding`, `username_engine`, `app_boot` | `senior-frontend-3` + `junior-frontend-3a/3b` | `team-lead-3` |
+| `rewards`, `admin` — **plus Commerce if and when `D4` is activated** | `senior-frontend-4` + `junior-frontend-4a/4b` | `team-lead-4` |
+| `notifications` (features **and** `lib/services/notifications/**`) | `senior-frontend-5` + `junior-frontend-5a/5b` | `team-lead-5` |
+| `core` (1 file, 18 LOC) · `error` (1 file, 53 LOC) | **UNOWNED — platform residue** | **none, by design.** Too small to justify a boundary and coupled to nothing. Governed by §4 shared-surface discipline: one agent inside at a time, append your block, no junior. **Named here so the gap is visible rather than invisible** |
+| `misc` (13 files) | **UNOWNED — dissolving** | **none.** Phase 0 `P0-2` and `P0-4` empty it to exactly three residual screens — `help_center_screen.dart`, `transactions_screen.dart`, `participation_payment_step.dart` — which then stay UNOWNED under §4 (`STACKS.md` §10.4). **Until Phase 0 lands, treat anything in `misc/` as unowned and ask before writing it** |
 
-**This slice→lead mapping is proposed, not verified.** It was derived from the cluster census's
-verdicts rather than a scan of the tree. **Have `analyst` confirm the slice before a ticket is
-assigned against it.** `G-012` reached a different partition from measured file coupling and is
-still open — see the note at the end of this section.
+**The counts, so the table can be checked rather than believed.** 5 + 6 + 3 + 2 + 1 = **17
+assigned**, plus `core`, `error` and `misc` = **20**, which is what `ls Dabbler/dabbler-code/lib/features/`
+returns. Files / LOC: lead 1 **167 / 69,485** · lead 2 **91 / 29,872** · lead 3 **53 / 13,127** ·
+lead 4 **6 / 1,579** · lead 5 **19 / 4,259** · unassigned **15 / 7,529**. Total **351 / 125,851**.
+**Independently re-measured by `analyst` at `c46b5c5` on 2026-09-05; `cto`'s figures reproduce
+exactly, every row.**
+
+**The load lands 55 / 24 / 10 / 1.3 / 3.4 percent by LOC, and that is deliberate, not an
+oversight.** `T-047` priced every alternative: the cheapest cut that would split `team-lead-1`
+is `profile | social` at **16 file-edges**, the most expensive cut anywhere in the tree, and it
+would put two teams inside `profile_providers.dart` on day one. **The imbalance is a code fact
+with a code fix — Phase 1**, splitting `profile_providers.dart`. Until then, hold leads 4 and 5
+juniors idle rather than sending them outside their slices; an idle seat costs nothing and a
+wandering one serialises everybody.
+
+**What this partition does NOT cover. Read this before inferring anything from it.** It is a cut
+of **`lib/features/**` and nothing else.** It says nothing about who owns any given file in
+`lib/data/`, `lib/core/`, `lib/app/`, `lib/widgets/`, `lib/utils/`, `lib/themes/` or
+`lib/design_system/`. Ownership on those surfaces is unchanged, **unmeasured**, and set by the
+path table immediately below plus §4. **Owning a slice does not acquire the `lib/data/`
+repository that slice calls.**
 
 | Path | Writer | Rule |
 |---|---|---|
 | `lib/features/<slice>/**` | the owning `senior-frontend-N` above | **Authors only — applies nothing to production, touches no migration.** Schema needs route to `senior-backend`. A junior works here on its lead's assignment, on pattern-repeat single-file work only, and must cite the existing example by `file:line` |
 | `lib/core/**` (except the four contended files) | **SHARED — no single writer** | Cross-cutting: a change here changes every slice. Requires `cto`'s sign-off on shape **and** coordination between leads before it is assigned. Treat with §4 discipline: **append your block, touch nothing else.** No junior enters it |
-| `lib/data/**` | **SHARED — no single writer** | Same rule. Holds the live repositories; the audit found three parallel profile stacks here already, which is what an unowned shared surface produces |
-| `lib/app/app_router.dart` | **CONTENDED** | §4. **1,712 lines, 85 routes, touched by nearly every feature.** At sixteen developers this is the schedule, not a safety rule — `G-012` Phase 0 splits it |
+| `lib/data/**` | **SHARED — no single writer** | Same rule. Holds the live repositories; the audit found three parallel profile stacks here already, which is what an unowned shared surface produces. **`T-047` did not re-derive this surface — its 71 repositories remain unmeasured and owned by filename under §4** |
+| `lib/app/app_router.dart` | **CONTENDED** | §4. **1,712 lines, 85 routes, touched by nearly every feature.** At sixteen developers this is the schedule, not a safety rule. **Phase 0 `P0-3b` splits it into six modules under `lib/app/routes/`**, after which each lead writes its own module and only the assembly stays contended (`STACKS.md` §10.3) |
 | `lib/providers.dart` | **CONTENDED** | §4 |
 | `lib/core/config/feature_flags.dart` | **CONTENDED** | §4 |
 | `lib/core/config/supabase_config.dart` | **CONTENDED** | §4 |
-| `lib/features/profile/presentation/providers/profile_providers.dart` | `senior-frontend-1`, **but see the rule** | **870 lines holding three domains' concerns**, consumed by `social` (10 providers) and `home` (5). Leads 1 and 2 collide here until `G-012` Phase 1 splits it. **Treat it as contended** — one agent inside at a time — despite sitting in lead 1's slice |
+| `lib/features/profile/presentation/providers/profile_providers.dart` | `senior-frontend-1`, **but see the rule** | **870 lines holding three domains' concerns.** **Treat it as contended** — one agent inside at a time — despite sitting in lead 1's slice, until Phase 1 splits it. **Re-measured by `analyst` 2026-09-05:** 32 files import it — `social` 9, `profile` 8, `home` 2, `news` 1 (lead 1); `venues` 2, `explore` 2, `venue_submissions` 1, `location` 1 (lead 2); `notifications` 1 (lead 5); and 5 shared/platform files — `lib/main.dart`, `lib/app/app_router.dart`, `lib/widgets/app_top_bar.dart`, `lib/core/services/auth_service.dart`, `lib/core/auth/session_cleanup.dart`. **The router and the top bar being among them makes this worse than a feature-level collision.** **Under the measured partition the collision is leads 1, 2 and 5** — the earlier "leads 1 and 2" was written against the superseded map |
 | `lib/themes/**`, `lib/design_system/**`, `lib/utils/**`, `lib/widgets/**` | **SHARED — no single writer** | `G-011`. Cross-cutting, so `cto` signs off on shape. **`cxo` owns the standard these must meet and never edits them.** **Two standing limits.** (1) **The two-design-systems question is not resolved by this row** — no agent deletes, merges or migrates one system into the other without a ruling, now **joint `cxo` + `cto`**. (2) A colour token lives in **three synced places** (tokens JSON, `lib/themes/app_theme.dart`, `tokens/*.dart`) — a write that changes one and not the others is a **defect, not a partial change** |
 | `lib/main.dart`, `lib/firebase_options.dart` | **UNOWNED** | Nobody writes it, except `devops` for iOS bootstrap requirements raised by an actual App Review rejection |
-| `lib/l10n/**`, all `*.g.dart`, all `*.freezed.dart` | **GENERATED** | Never hand-edited by anyone. Regenerate with `dart run build_runner build -d`. **`content-manager` supplies the strings and the keys; a developer wires them** |
+| `lib/l10n/**`, all `*.g.dart`, all `*.freezed.dart` | **GENERATED** | Never hand-edited by anyone. Regenerate with `dart run build_runner build -d`. **`content-manager` supplies the strings and the keys; a developer wires them.** Phase 0 `P0-5` makes regeneration a `devops`-owned commit step |
 
-**The open partition question.** `G-012` (`cto`, 2026-09-04, still **PROPOSED**) derives seven
-ownership stacks from measured file-import coupling and **explicitly rejects** the D1–D11 census
-clustering this table uses. The two are largely reconcilable — `G-012` measured collisions
-between *writers*, and team leaders write nothing — but **the slice boundaries above are the
-place the disagreement would actually bite.** Until it is ruled, confirm a slice with `analyst`
-before assigning against it, and expect the mapping to move.
+**~~The open partition question.~~ CLOSED 2026-09-05 by `T-047` under `G-015`, applied by
+`G-016`.** `G-012`'s seven stacks were mapped onto the five leads `G-014` fixes; the table above
+is the result and it is authoritative. **`analyst` no longer confirms slices ticket by ticket** —
+that instruction existed because the map was a guess, and it is not one any more. What remains
+genuinely open is narrower and is recorded rather than hidden:
+
+- **`B.9` Organiser dashboard.** `STACKS.md` §4 argues it belongs to Play & Places (`team-lead-2`);
+  `G-013` argues it is the unstaffed **admin-dashboard project**, not an app feature. **Both
+  readings stand and neither is ruled** — the coupling graph is silent on a persona with no
+  slice, so `T-047` deliberately did not choose. It is a product-scope call for `cpo`/`pm` with
+  the CEO. **Do not resolve it by assignment.**
+- **`D4` Commerce activation.** `team-lead-4` is named custodian; activating the stack is a `pm`
+  decision with the CEO. The two dormant Commerce screens stay in `misc/` (`STACKS.md` §10.4).
+- **Two preferences, priced and deliberately not re-litigated as defects.** `moderation` to lead 1
+  costs **2** file-edges either way; `admin` to lead 4 costs **0** — `admin` has no cross-feature
+  edges at all. `T-047` rejected-alternative 6 records both as preference, not error.
 
 ### Backend
 

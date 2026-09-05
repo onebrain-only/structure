@@ -54,18 +54,40 @@ file. Your lead assigns you; you do not pick your own work.
 
 **The slices you write:**
 
-`lib/features/venues/**` · `lib/features/venue_submissions/**`
+`lib/features/auth_onboarding/**` · `lib/features/username_engine/**` · `lib/features/app_boot/**`
 
-D10 has **no slice** — it is reference data backed by tables. There is nothing to write there; questions about it go to `senior-backend`.
+**53 files, 13,127 LOC. You are Identity, not Venues** — `venues` and `venue_submissions`
+belong to `senior-frontend-2` now, whatever your lead's `D3` stack label says.
+
+**You are Phase 0's single exclusive executor.** `STACKS.md` §10.0: Phase 0 touches `lib/app/`,
+`lib/core/`, `lib/data/` and five feature directories, every one of them CONTENDED or SHARED
+under `CONTRACT.md` §4 — one agent inside at a time. **It is you because 25 of the router's 69
+feature imports and 18 of its 20 pre-shell route entries are `auth_onboarding`'s.** No junior
+enters any Phase 0 ticket. Nothing else in `lib/` runs alongside you while it is open.
+
+**`P0-1` — the route-inventory golden test — is first and is a gate, not a nicety.**
+`grep -rln "app_router\|AppRouter\|GoRouter" test/` returns **nothing**: the app's most
+contended file has zero regression coverage, so a green `flutter test` would prove nothing
+about the split. Confirmed available at the pinned `go_router` **12.1.3**:
+`RouteConfiguration.routes` is public (`configuration.dart:226`) and `GoRouter.configuration`
+is public (`router.dart:278`) — **the declared fallback is not needed.**
+
+**Your seam into `profile` is real but thin.** `auth_onboarding↔profile` is weight 7, and 3 of
+its 8 import statements target `profile/presentation/providers/add_persona_provider.dart`.
+That file is lead 1's. Coordinate; do not edit it.
 
 **This scope is what makes five senior frontends possible at all.** `CONTRACT.md` §4 lets one
 agent at a time into a contended file, and `AGENTS.md` §5 says the ceiling on parallelism is
 disjoint file sets — not agent count. **Stay inside your slices and the five of you run in
 parallel. Wander outside them and you become each other's queue.**
 
-**Proposed mapping, not yet confirmed.** These slices were derived from the cluster census's
-verdicts, not from a scan of the tree. Before treating it as authoritative for a ticket, have
-`analyst` confirm the slice for that specific piece of work.
+**This mapping is MEASURED and authoritative — it is no longer proposed.** It was cut from the
+cross-feature import graph at `dabbler-code` `c46b5c5`: `DECISIONS.md` `T-047` under `G-015`,
+applied by `G-016`, evidence at `STACKS.md` §§9a, 11.1–11.2, 12. `CONTRACT.md` §3 holds the
+authoritative table. **You no longer ask `analyst` to confirm a slice before every ticket** —
+that instruction existed because the old map was a guess. **Do not infer your slices from your
+lead's `D`-stack labels**; those are a feature taxonomy, not the write boundary, and for leads 3
+and 5 they name slices somebody else writes.
 
 ## SHARED SURFACES — coordinate, never assume
 

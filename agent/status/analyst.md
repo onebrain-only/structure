@@ -1,8 +1,18 @@
-# agent/status/master-analyst.md — master-analyst status log
+# agent/status/analyst.md — `analyst` status log
 
-**Owner:** `master-analyst` — **this agent, and only this agent, writes here.**
-Every other agent reads it. The master-analyst reads the other agents' files to reconcile
+**Header corrected 2026-09-05 (`G-016`).** This file was named for `master-analyst`, the seat's
+name before the 2026-09-05 restructure. **The seat was renamed to `analyst`; the charter is
+unchanged** (`AGENTS.md` §2, rename map). **Entries below dated before 2026-09-05 say
+`master-analyst` and were deliberately not rewritten** — rewriting a log to match a later
+reorganisation falsifies it.
+
+**Owner:** `analyst` — **this agent, and only this agent, writes here.**
+Every other agent reads it. `analyst` reads the other agents' files to reconcile
 `agent/STATUS.md`; it does not write into them.
+
+**Peer, not checkpoint.** `analyst` sits in the leadership layer alongside `cto`, `cpo` and
+`cxo` (`AGENTS.md` §1). It does not review other agents' work — `po` does, exclusively — and is
+not a default recipient of routine task completions.
 
 **Purpose:** The detail behind this agent's work. `agent/STATUS.md` is the summary the PO
 reads; this file is where the specifics live.
@@ -179,3 +189,67 @@ allowlist note) · `docs/STATUS.md` (gap notice + 3 entries) · `docs/LEARN.md` 
 `docs/status/master-analyst.md` · `.claude/agent-memory/master-analyst/INDEX.md` ·
 `.claude/agent-memory/master-analyst/audit-false-positives.md`. **Jira:** KAN-88 created,
 KAN-41 commented. **No code touched.**
+
+---
+
+## 2026-09-05 — Applied `T-047`'s measured ownership partition; `CONTRACT.md` §3 amended and all 20 developer role files corrected
+
+**Task.** From `team-lead`/master session. `EFFORT: high`. Apply `DECISIONS.md` `T-047`'s
+five-lead partition under `G-015` Ruling 2, close the coverage gap it exposed, and correct the
+generated role files that carried the superseded slice lists. **Applying a decision, not making
+one** — the CEO ruled for `cto`'s measurement.
+
+**Done.**
+
+1. **`dabbler-docs/CONTRACT.md:141–226`** — §3 "Application code" rewritten. The provisional
+   census-derived slice→writer table is deleted; `T-047`'s partition replaces it with an added
+   **UNOWNED** row. **All 20 `lib/features/` directories are now named**; the superseded table
+   named 18. Three rows of the path table were also amended: `lib/data/**` (records that `T-047`
+   did not measure it), `app_router.dart` (`P0-3b` split), `profile_providers.dart` (re-measured
+   importer set), plus the `l10n`/generated row (`P0-5`). The "open partition question" trailer is
+   marked CLOSED and replaced by the three things that genuinely remain open.
+2. **`agent/AGENTS.md` §1** — the "Stacks, and who holds them" table gains a fourth column,
+   *Slices it writes*, plus a paragraph stating that the `D`-labels are a feature taxonomy and
+   **not** the write boundary, and naming the two seats where they diverge (lead 3 is Identity not
+   Venues; lead 5 is Notifications only). **§2** — `senior-frontend-1..5` row, parallelism
+   paragraph, shared-surfaces paragraph, plus a new paragraph recording the three UNOWNED feature
+   directories.
+3. **All 20 role files** under `agent/roles/` rewritten: `team-lead-1..5` (the "Which code these
+   stacks touch" section replaced), `senior-frontend-1..5` and `junior-frontend-1a..5b` (slice
+   path lists, per-lead warnings, and the "Proposed mapping, not yet confirmed" trailer).
+   `agent/scripts/build-agents.sh` run; **`--check` clean across all 30 seats, exit 0.**
+4. **`dabbler-docs/DECISIONS.md:5432`** — **`G-016`** appended, ACTIVE.
+5. **This file** — header corrected from `master-analyst`.
+
+**Measured, not accepted.** Every file/LOC figure in `T-047` was independently reproduced at
+`c46b5c5`: lead 1 167 / 69,485 · lead 2 91 / 29,872 · lead 3 53 / 13,127 · lead 4 6 / 1,579 ·
+lead 5 19 / 4,259 · unassigned 15 / 7,529 · total 351 / 125,851. **All rows match exactly.**
+One figure was corrected on my own measurement: `profile_providers.dart` has **32** importers
+spanning leads 1, 2 and 5, not "leads 1 and 2" as §3 said under the old map.
+
+**The hazard this closes.** `home` — 7 files, 3,403 LOC, holding `main_navigation_screen.dart`,
+the app shell — had **no writer** in `CONTRACT.md` §3. A ticket assigned against it hit an
+unowned slice. `core` was likewise absent. Both are now named: `home` to lead 1, `core` as
+UNOWNED platform residue with a stated reason.
+
+**Not verified.** I did not re-derive `T-047`'s **coupling edge weights** — the `E(A→B)` counts
+(16, 8, 7, 18-internal, etc.) are `cto`'s and I reproduced the file/LOC totals, not the graph.
+I did not re-check `PROJECT_STATE.md` against the tree in this session. I did not measure
+`lib/data/`'s 71 repositories or the ~130 tables absent from `supabase_config.dart` — both remain
+`cto`'s stated gaps. I did not open a Jira ticket for this work; it arrived as a direct brief.
+**No code touched.**
+
+**Files changed:** `dabbler-docs/CONTRACT.md` · `dabbler-docs/DECISIONS.md` (`G-016`) ·
+`agent/AGENTS.md` · `agent/roles/team-lead-{1..5}.md` ·
+`agent/roles/senior-frontend-{1..5}.md` · `agent/roles/junior-frontend-{1a,1b,…,5b}.md` ·
+`.claude/agents/*.md` (regenerated, 20 files) · `agent/status/analyst.md`.
+
+**Correction, same day, raised by `team-lead`.** The importer total was **32**, not 31 — an
+arithmetic slip in my own summation; the per-slice breakdown was right and the finding
+(collision spans leads 1, 2 and 5) is unaffected. Corrected in `CONTRACT.md` §3,
+`DECISIONS.md` `G-016`, `senior-frontend-1.md`, `junior-frontend-1a/1b.md`, this entry and
+memory. The five non-feature importers are now named in `CONTRACT.md` rather than counted:
+`lib/main.dart`, `lib/app/app_router.dart`, `lib/widgets/app_top_bar.dart`,
+`lib/core/services/auth_service.dart`, `lib/core/auth/session_cleanup.dart` — **the router and
+the top bar being among them makes it worse than a feature-level collision.** Rebuilt;
+`--check` ok × 30.

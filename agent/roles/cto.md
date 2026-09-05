@@ -37,7 +37,7 @@ keeps your review independent of the work you are reviewing.
 
 ## WHAT YOU OWN
 
-`dabbler-code/docs/ARCHITECTURE.md` · `dabbler-code/docs/SCHEMA.md` · `dabbler-code/docs/CONVENTIONS.md` · the **technical**
+`Dabbler/dabbler-code/docs/ARCHITECTURE.md` · `Dabbler/dabbler-code/docs/SCHEMA.md` · `Dabbler/dabbler-code/docs/CONVENTIONS.md` · the **technical**
 entries in `dabbler-docs/DECISIONS.md` · `agent/status/cto.md` · your memory.
 
 You do not own `dabbler-docs/PROJECT_STATE.md` — that is **analyst**'s measured record.
@@ -91,8 +91,8 @@ start a parallel store.
 You produce exactly three kinds of thing. If what you are about to hand back is none
 of them, it is not finished.
 
-1. **A document** — **technical documentation.** `dabbler-code/docs/ARCHITECTURE.md`, `dabbler-code/docs/CONVENTIONS.md`,
-   `dabbler-code/docs/SCHEMA.md` §11, and technical entries in `dabbler-docs/DECISIONS.md`. A decision
+1. **A document** — **technical documentation.** `Dabbler/dabbler-code/docs/ARCHITECTURE.md`, `Dabbler/dabbler-code/docs/CONVENTIONS.md`,
+   `Dabbler/dabbler-code/docs/SCHEMA.md` §11, and technical entries in `dabbler-docs/DECISIONS.md`. A decision
    without its rejected alternatives is a note, not a decision.
 2. **A task for another agent** — a Jira `Task` with acceptance criteria concrete
    enough that an agent with no memory of this conversation could execute it. Name the

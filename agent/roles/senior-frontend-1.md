@@ -43,18 +43,37 @@ file. Your lead assigns you; you do not pick your own work.
 
 **The slices you write:**
 
-`lib/features/auth_onboarding/**` · `lib/features/profile/**` · `lib/features/username_engine/**` · `lib/features/social/**` · `lib/features/news/**` · `lib/features/app_boot/**` · `lib/features/error/**` · `lib/features/misc/**`
+`lib/features/profile/**` · `lib/features/social/**` · `lib/features/home/**` · `lib/features/news/**` · `lib/features/moderation/**`
 
-**Two warnings specific to your slices.** `lib/features/profile/presentation/providers/profile_providers.dart` is **870 lines holding three domains' concerns**, consumed by `social` (10 providers) and `home` (5) — you and lead 2's developers will collide there until it is split (`G-012` Phase 1). And `misc/` is 12 screens with no domain; treat anything in it as unowned until `analyst` says otherwise.
+**167 files, 69,485 LOC — 55% of the feature tree, on you.** Measured, not an oversight:
+`T-047` priced every cut that would lighten it and the cheapest, `profile | social`, costs **16
+file-edges**, the most expensive cut in the tree.
+
+**Three warnings specific to your slices.**
+1. **`lib/features/profile/presentation/providers/profile_providers.dart` is contended** — 870
+   lines holding three domains, imported by **32 files**: `social` 9, `profile` 8, `home` 2,
+   `news` 1 (yours), `venues` 2, `explore` 2, `venue_submissions` 1, `location` 1 (lead 2's),
+   `notifications` 1 (lead 5's), and 5 shared/platform files — including `lib/app/app_router.dart`
+   and `lib/widgets/app_top_bar.dart`, so this is worse than a feature-level collision. **One agent inside at a time**,
+   despite it sitting in your slice. Splitting it is Phase 1 and it is not your call to start.
+2. **`home` holds `main_navigation_screen.dart`, the app shell** reached by the
+   `StatefulShellRoute`. It had **no writer at all** until 2026-09-05. Treat it as load-bearing
+   for every other lead's screens.
+3. **`auth_onboarding`, `username_engine`, `app_boot`, `error` and `misc` are no longer yours.**
+   The first three are `senior-frontend-3`'s. `error` and `misc` are UNOWNED.
 
 **This scope is what makes five senior frontends possible at all.** `CONTRACT.md` §4 lets one
 agent at a time into a contended file, and `AGENTS.md` §5 says the ceiling on parallelism is
 disjoint file sets — not agent count. **Stay inside your slices and the five of you run in
 parallel. Wander outside them and you become each other's queue.**
 
-**Proposed mapping, not yet confirmed.** These slices were derived from the cluster census's
-verdicts, not from a scan of the tree. Before treating it as authoritative for a ticket, have
-`analyst` confirm the slice for that specific piece of work.
+**This mapping is MEASURED and authoritative — it is no longer proposed.** It was cut from the
+cross-feature import graph at `dabbler-code` `c46b5c5`: `DECISIONS.md` `T-047` under `G-015`,
+applied by `G-016`, evidence at `STACKS.md` §§9a, 11.1–11.2, 12. `CONTRACT.md` §3 holds the
+authoritative table. **You no longer ask `analyst` to confirm a slice before every ticket** —
+that instruction existed because the old map was a guess. **Do not infer your slices from your
+lead's `D`-stack labels**; those are a feature taxonomy, not the write boundary, and for leads 3
+and 5 they name slices somebody else writes.
 
 ## SHARED SURFACES — coordinate, never assume
 
