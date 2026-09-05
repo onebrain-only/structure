@@ -369,3 +369,59 @@ land in.
 Task: answer 4 questions on skill usage for the po seat (team-lead brief). No Jira, no git, no file edits made.
 Findings: reflex-table skills (task-review, grill-peer, code-review, to-tickets, to-spec, writing-for-agents) all genuinely used, none to drop. Candidate additions: grill-with-docs (fits gate 2, docs-grounded review), verification-quality (overlaps evidence rules, untested). Confirmed two real gaps: no skill teaches task analysis (new §0 duty — nearest public frameworks: INVEST, Definition-of-Ready) and no skill teaches procedure/runbook authoring for WORKFLOWS.md (writing-for-agents only covers prompts, not lifecycle docs — nearest public frame: SOP/runbook format).
 Full reply sent to team-lead via SendMessage.
+
+## 2026-09-06 — Two verified defects ticketed from skills-audit findings
+Task: ticket the two real defects team-lead surfaced during the skills-audit survey (wallet_ledger/payment_intents double-credit, profiles_repository.dart stale doc comment pointing at abandoned stack). Both re-verified independently against the live tree before ticketing (not taken on the team-lead's or the finding-seats' word).
+
+Created: epic `KAN-127` (parent for both, since neither is Phase 0 or an active-stack ticket and no existing epic fits). Tasks `KAN-128` (money — double-credit, blocked on `cto` ruling on the fix mechanism) and `KAN-129` (doc comment — blocked on `cto` ruling on which of three remedies applies). Neither given a `due_date`: `KAN-128` awaits `cto`'s ruling then a `pm`-coordinated slot in the shared `senior-backend` queue (`team-lead-4` owes the number); `KAN-129` awaits `cto` naming an executor under the `lib/data/**` SHARED-surface rule (that lead owes the number).
+
+Side finding, not ticketed (out of scope for this task, flagged for `analyst`): `Dabbler/dabbler-docs/CONTRACT.md` §3 states `supabase/migrations/` does not exist (verified 2026-08-27) and that schema SQL lives only at `supabase/schema/migrations/**` (38 files). Re-checked 2026-09-06: `supabase/migrations/` now exists with 22 files, including the baseline schema file cited in `KAN-128`; `supabase/schema/migrations/` holds only 3. Ownership is unaffected (the Supabase-project row is path-independent, `senior-backend`), but the path table itself has drifted.
+
+No files under `Dabbler/dabbler-code/` written, no git commands run, no Phase 0 ticket touched — all per this task's constraints.
+
+## 2026-09-06 — Authored the two skill gaps from the skills-audit: task-readiness, runbook-authoring
+Task: author the two skill gaps this seat named in the 2026-09-06 skills audit above — task
+analysis, and standing-procedure authoring for `WORKFLOWS.md`. Judged them genuinely two
+disciplines (one is per-ticket, one is per-document that outlives a ticket) rather than one
+skill seen twice, and wrote two.
+
+**`agent/skills/task-readiness/SKILL.md`** — adopts INVEST (Bill Wake, 2003) and Example
+Mapping (Matt Wynne, cucumber.io, December 2015) rule/example/question discipline, run solo
+against a ticket before it's written rather than as a live workshop. Both sources opened and
+read myself via `WebFetch` against `cucumber.io/blog/bdd/example-mapping-introduction/` and
+`xp123.com/articles/invest-in-good-stories-and-smart-tasks/` — not taken from `analyst` on
+trust, per the brief's instruction. Confirmed invocable: no `disable-model-invocation` in its
+frontmatter, and it appeared by name in the skill listing immediately after being written.
+
+**`agent/skills/runbook-authoring/SKILL.md`** — no public framework fit (`analyst` checked
+PagerDuty's incident-response material and found it incident-shaped, not lifecycle-shaped);
+authored from what actually broke in `WORKFLOWS.md` itself: single-sourcing measured facts,
+naming executor/verifier per step, versioning a rule to its `G-NNN`, dry-running a new rule
+against a real past incident before publishing. Also invocable, same check.
+
+**Four real failures, checked against what was written, honestly:**
+- `KAN-122`'s one-line-per-file budget blocking a correct three-file diff — caught by
+  `task-readiness` step 3 (sketch a compliant example before writing the rule).
+- `KAN-126`'s demonstration-commit criterion with no Phase 0 ticket able to produce one —
+  caught by the same step's second failure mode (no example exists anywhere in scope).
+- `KAN-123`'s "every pair of the 80" (3,160 comparisons) — caught by step 5's Testable check.
+- The `flutter test` 103/9 → 106/10 figure copied into five documents — **not caught by
+  `task-readiness`**, which only reaches ticket criteria; this is `runbook-authoring` rule 1
+  (single-source a measured fact, cite rather than restate), named directly after this
+  incident.
+
+**Reflex table (`agent/roles/po.md` §SKILL REFLEXES) updated**, own file only: added
+`task-readiness` (drafting acceptance criteria / task-yet-or-not) and `runbook-authoring`
+(standing procedures), reworded the `writing-for-agents` row to say "once" so it reads
+distinctly from the new procedure row. Nothing existing is redundant — `to-tickets`,
+`to-spec` and `grill-with-docs` were already `[L]` (dead as reflexes) before this task and
+remain so; the two new skills fill what they gestured at but couldn't reach, not what a live
+skill already covered.
+
+**Not verified:** whether `team-lead` or the CEO judge PagerDuty's material as thoroughly
+ruled out as `analyst` reported — I did not independently search for a closer public fit
+beyond spot-checking that PagerDuty's own docs are incident/on-call framed, which took
+`analyst`'s characterization at its word rather than re-deriving it from scratch.
+
+No Jira touched, no git command run, no file under `Dabbler/dabbler-code/` written, no role
+file other than my own edited — all per this task's constraints.

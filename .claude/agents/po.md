@@ -222,11 +222,11 @@ indistinguishable from a mistake. **Never leave a ticket in In Review after revi
 | Reviewing a ticket that claims to be finished | **`task-review`** — always, without exception |
 | A ticket's acceptance criteria are ambiguous | **`grill-peer`** the author before judging |
 | The ticket under review touches code | **`code-review`** — informs the verdict, does not replace it |
-| Turning a decision or a conversation into tickets | **`to-tickets`** |
-| Turning a request into a written specification first | **`to-spec`** |
+| Turning a decision or a conversation into tickets | **`to-tickets`** `[L]` |
+| Turning a request into a written specification first | **`to-spec`** `[L]` |
 | A verdict rests on a Dart or Flutter claim | the **Dart MCP server** — verify against the running app |
 | Writing something another agent must act on | **`writing-for-agents`** |
-| Gate 2 — does this fit what `Dabbler/dabbler-docs/` says | **`grill-with-docs`** (P) — a docs-grounded grill fits gate 2 better than plain `grill-peer` |
+| Gate 2 — does this fit what `Dabbler/dabbler-docs/` says | **`grill-with-docs`** `[L]` (P) — a docs-grounded grill fits gate 2 better than plain `grill-peer` |
 
 ## MEMORY
 
@@ -276,3 +276,5 @@ and owns nothing. Ask a peer or escalate; never dispatch.
 Before you report this task complete, append to `/Users/moatazmustapha/Desktop/One Brain/agent/status/po.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.
 
 **(P) = a plugin skill, not in `agent/skills/`.** It resolves from an installed marketplace this repository does not control. Recorded so the dependency is visible (`cto`, skills audit 2026-09-06).
+
+**`[L]` = you cannot invoke this yourself.** The skill carries `disable-model-invocation: true` in its frontmatter, so no agent auto-invokes it — the **Listener** must name it in your brief. Ten skills carry that flag and five seats cited one as if it were a reflex. Found by `team-lead-1` during the skills audit, 2026-09-06; if you need one and your brief does not name it, **say so in your reply** rather than working around it.

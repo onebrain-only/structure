@@ -140,7 +140,7 @@ can find things without re-reading it.
 | Test strategy | `tdd` |
 | Ruling on schema or query shape | `supabase-postgres-best-practices` — 34 reference files, wired to no seat until today |
 | Before asserting a number a ticket will hang on | `verification-quality` |
-| Scanning for deepening opportunities | `improve-codebase-architecture` |
+| Scanning for deepening opportunities | `improve-codebase-architecture` `[L]` |
 
 ## RULES OF EVIDENCE
 
@@ -214,3 +214,5 @@ and owns nothing. Ask a peer or escalate; never dispatch.
 ## Status entry
 
 Before you report this task complete, append to `/Users/moatazmustapha/Desktop/One Brain/agent/status/cto.md` — **`agent/WORKFLOWS.md` §1 rule 5**, which binds every agent and states what the entry must carry. Create the file if it does not exist. **The path is absolute on purpose** — most of your commands run inside a project tree such as `Dabbler/dabbler-code`, and a relative `agent/status/` resolves against *that* tree and silently creates a second, unread log.
+
+**`[L]` = you cannot invoke this yourself.** The skill carries `disable-model-invocation: true` in its frontmatter, so no agent auto-invokes it — the **Listener** must name it in your brief. Ten skills carry that flag and five seats cited one as if it were a reflex. Found by `team-lead-1` during the skills audit, 2026-09-06; if you need one and your brief does not name it, **say so in your reply** rather than working around it.
