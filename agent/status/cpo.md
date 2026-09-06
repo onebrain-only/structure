@@ -619,3 +619,37 @@ settling all three in one pass is the efficient shape.
 
 **Changed:** this file and `DECISIONS.md` (`P-040`). No code, SQL, migration, Jira or Notion write.
 **Reported to:** `po` and `cto`.
+
+## 2026-09-07 — `P-041`: the values for all eight keys, and a function name I cited wrong
+
+**`cto` accepted `P-040` and correctly generalised its structural half.** My argument — omission is
+deny in `user_has_feature`, unlimited in the caps function — never depended on which key. So **all
+eight new keys need a complete set: 96 child rows, not 24.** `organiser_free`, `venue_basic`,
+`venue_pro`, `corporate_starter`, `corporate_growth` with no caps rows would each grant unlimited
+notifications. `cto`'s scope correction is right.
+
+**But rows without values decide nothing, and that handed six keys back to me.** Ruled `P-041`: **all
+eight take `kickoff`'s values** — nine flags at Player Free, caps 5/10/20. I checked each persona's
+feature list rather than extending the earlier two by analogy: §B.2, §C.1, §C.2, §D.2, §D.3, §E.2 —
+**none commits any notification-delivery product.** NOT ESTABLISHED throughout.
+
+**A consistency check that confirms the shape.** §E.2 grants Corporate employees *"Player Pro features
+free"*. Since `player_pro` carries Player Free values under `P-040`, the Corporate keys taking the same
+values satisfies §E.2 exactly. **Had I granted `player_pro` an uplift, the Corporate keys would have
+had to inherit it or contradict §E.2** — the conservative value is the only self-consistent one.
+
+**I cited a function name wrong.** There is no `check_notification_rate_limit`; it is
+**`can_send_notification_now`** (`:3987`, test at `:4006`). Verified by grep after `cto` flagged it;
+**`P-040` corrected in place** so it does not travel. The body I quoted and the ruling were right —
+only the name was wrong. `cto` also sharpened `user_has_feature` (`:20776`): it requires
+`is_enabled = true`, so a `false` row denies exactly like a missing one — which is why the criterion
+specifies values, not just row counts.
+
+**`cto` found a regression the rename creates** and I agree it cannot be deferred:
+`can_send_notification_now` hardcodes `v_plan := 'kickoff'` for users with no subscription, so after
+the rename the lookup misses and returns true — **unlimited notifications for most users**. Must move
+to `'player_free'` in the same change set. His separate-ticket position on the `'prime'` dead branches
+still stands; that distinction is correct.
+
+**Changed:** this file, `DECISIONS.md` (`P-041`, plus the name correction inside `P-040`).
+**Reported to:** `cto` and `po`. **Still owed:** the Socialiser question.

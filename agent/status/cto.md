@@ -1016,3 +1016,29 @@ Two seats, two days. Written up as `CONVENTIONS.md` §12e — a comment is evide
 never of state; quoting one propagates it. Memory: `jira-comment-is-not-state.md`.
 
 No rework: `po` re-read the live ticket rather than taking the relay, and wrote a correct new AC6.
+
+## 2026-09-07 (cont.) — P-040 accepted, generalised to 8 keys, and one regression caught
+
+`cpo` reframed the `pro` child-row question correctly: `subscription_features` is a complete
+9 x 3 matrix, not entitlements to allocate; twelve rows, two real decisions. Accepted; its two
+product calls (`quiet_override_high` false, caps 5/10/20) are its own and I did not touch them.
+
+**Re-verified both read paths live rather than the citations:**
+- `user_has_feature(uuid,text)` — EXISTS join, **and requires `sf.is_enabled = true`**. Missing
+  row denies; present-but-disabled row denies identically. Row presence is not sufficient.
+- The caps function is **`can_send_notification_now(uuid,notify_priority)`**, not
+  `check_notification_rate_limit` as cited. Body confirms `IF v_cap IS NULL THEN RETURN true`.
+
+**Generalised:** the omission argument does not depend on the key, so **all eight** new plan keys
+need complete sets — 8 x 12 = **96 child rows**, not 24. Five keys were about to ship granting
+unlimited notifications.
+
+**Regression the migration would CREATE.** `can_send_notification_now` hardcodes
+`IF v_plan IS NULL THEN v_plan := 'kickoff'`. After the rename that key is gone, `v_cap IS NULL`,
+and it returns true — unlimited notifications for every user with no active subscription. Ruled:
+this function-body edit lands in the SAME change set as the rename and may not be deferred to
+KAN-150. Does not weaken the separate-ticket ruling for the `'prime'` dead branches — those are
+behaviour-neutral tidying; this one is required for correctness.
+
+Sent verbatim to `po` (mechanism in 2 parts, then this addendum) and to `cpo`. `team-lead`
+removed itself from the relay on density grounds — correct call.

@@ -1492,3 +1492,37 @@ until `cto` confirms rename sequencing (not treating `cpo`'s `P-039` mapping rul
 sufficient); `prime` cleanup left unscoped pending my ticket instruction once `cto` rules the
 mechanics. No new decision needed from me — holding for `cto`'s reply on both the sequencing
 question and whether the cleanup folds into the same migration pass.
+
+## 2026-09-07 (cont.) — Stack-to-lead question: `team-lead-4`, measured not inferred
+
+`team-lead` asked which lead holds the subscriptions stack, since `cto` correctly declined
+to guess (stack assignment isn't its document, and it wasn't adding a fourth wrong claim to
+the day's count). Checked rather than assumed:
+
+- `STACKS.md` §11.2: `team-lead-4` = "Rewards, Staff & Commerce."
+- `STACKS.md` §11.5: *"`D4` Commerce activation. `team-lead-4` is named its custodian."*
+- `CONTRACT.md:170/222`, `DECISIONS.md:5858/5941/8134`: same, repeated, standing.
+
+`team-lead-4` is the documented custodian — `team-lead`'s suggestion was right, but the
+question deserved measurement, not agreement-by-plausibility. `team-lead-4` tracking this
+chain all day (`T-063`, `P-038`, the D4 billing gate) is the assignment working correctly,
+not coincidental adjacency.
+
+**Checked the trap the question warned about:** D4 is **not** an activated/running stack
+(`STACKS.md:144`: "Until then D4 is a backlog, not a stack"). Confirmed assigning the rename
+ticket to `team-lead-4` does not itself activate D4 — pre-activation billing/schema
+foundation work under `T-063` already proceeds ahead of activation per `team-lead-4`'s own
+standing framing (trigger = first subscription-writing ticket, not activation). No new
+`pm`+CEO decision needed here.
+
+**Epic:** told `po` to create a new epic for D4 Commerce subscription/billing foundation
+work rather than parent under `KAN-127` (general audit-findings epic — wrong home, per
+`cto`'s finding) — and to move `KAN-150` into it too, since it's Commerce-schema-driven, not
+a generic audit finding.
+
+**Not mine, flagged only:** `cpo`'s open ruling on where `pro`'s 12 child rows land on the
+`player_pro`/`organiser_pro` split — blocks authoring, will bear on `team-lead-4`'s eventual
+date.
+
+**Reported to:** `po` (the answer + epic instruction), `team-lead` (confirmation of both,
+via `main`).
