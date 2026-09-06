@@ -292,3 +292,69 @@ building them commits the sitting to a shape that may not survive the ruling. Th
 is blocked on anything else.
 
 ---
+
+## 2026-09-06 — KAN-124 (P0-3b) executed under the `T-056` ruling. Done.
+
+**Ruling applied:** `cto` `T-056` (`DECISIONS.md` `b1a3b5c`) — declaration order wins, the golden is
+not regenerated, and `_routes` becomes an **ordered composition** of the six modules' exports rather
+than a concatenation of six lists.
+
+**The measurement that chose the shape: 25 contiguous same-bucket runs across the 80 entries**
+(profile_social 8 · platform 6 · identity 5 · play_places 4 · home_shell 1 · notification 1).
+25 > 20, so the ruling selects the **flat form**: each module exports one named `RouteBase` getter
+per route and `_routes` is a flat 80-identifier list in declaration order. The run-list form was not
+built.
+
+**`app_router.dart` landed at 441 LOC, under the 450 bar, so the `cto` escalation did not fire.**
+It came in at 443 on first write and dropped to 441 when two imports (`feature_flags.dart`,
+`profile_providers.dart`) turned out to be used only by routes that left the file. No reorder was
+used to buy headroom and none was considered.
+
+**One rename beyond the two the ticket names, and it is forced.** `AppRouter._rootNavigatorKey`
+(`:123`) is passed as `parentNavigatorKey` by **77** of the 80 entries, so the modules cannot reach
+it while it is private. It is promoted to a public top-level `rootNavigatorKey` in `app_router.dart`
+and the modules import it back. **I did not create an eighth file for it** — the §4.1 grant
+enumerates six module files and `po` amended in a seventh, and adding another unilaterally is
+outside the grant. The resulting import cycle (`app_router.dart` ↔ `routes/*.dart`) is legal Dart and
+initialisation-safe: `router` is a lazy `static final` and every module export is a getter, so
+nothing is read before it is initialised. **Verified `_handleRedirect` never references the key**
+before renaming — `grep` over `:149`–`:443` returns nothing — so the rename cannot touch that range.
+
+### Acceptance criteria, all measured
+
+| # | Criterion | Result |
+|---|---|---|
+| 1 | golden test green, golden unedited | `+3 All tests passed`; `git diff HEAD -- test/app/route_inventory.golden.txt` **empty**; `git status test/` clean |
+| 2 | `app_router.dart` ≤ 450 LOC | **441** |
+| 3 | ≤ 6 `features/` imports | **4** (error_page, onboarding_controller, onboarding_state, auth_providers) — down from 69 |
+| 4 | `flutter analyze` 0 errors 0 warnings | exit **0**, 0 errors, 0 warnings, 57 infos |
+| 5 | `flutter test` | exit 0, **106 tests**, `All tests passed!` |
+| 6 | nothing outside `lib/app/` | `git status`: `M lib/app/app_router.dart`, `?? lib/app/routes/` only |
+| 7 | `_handleRedirect` byte-identical | `diff` empty, md5 `e7140e23…` on both sides |
+
+**Beyond the criteria, I closed `qa`'s gap #1 from comment `10539`** — the golden serialises only
+`fullPath\tname\truntimeType`, so it cannot see a route repointed at a different builder, and `qa`
+said the diff therefore had to be read by eye. I proved it mechanically instead: re-extract all 80
+entry bodies from `HEAD`, apply only the two sanctioned renames, and assert each appears verbatim in
+a module file. **0 of 80 failed.** `PlaceholderScreen` likewise diffs clean against `HEAD:1681`–`:1712`
+modulo the underscore. `_routes`' 80 identifiers match the original declaration order exactly.
+
+**Non-goal observed.** Nothing was fixed, renamed or re-pathed. `/language_selection` (`:596`, inline
+`const Scaffold`) and the misnamed `RoutePaths.socialNotifications` (`:1544`, a `PlaceholderScreen`)
+are both still there, still wrong, still `platform`, untouched.
+
+**Two infos I introduced, both deliberate.** `use_key_in_widget_constructors` on
+`placeholder_screen.dart:11` — fixing it means editing the constructor, and §10.3 requires the body
+unchanged but for the underscore, so I left it. `unnecessary_import` (cupertino) in
+`platform_routes.dart` I did remove, since that import line was mine, not moved code. Net infos
+57 vs a 56 baseline. Criterion 4 measures errors and warnings, both zero.
+
+**Not verified:** that the app boots and navigates — no emulator was run; the evidence here is the
+golden inventory, the verbatim-body proof, `analyze` and `test`, not a running app. The import cycle
+is argued safe from Dart's lazy-initialisation semantics and a green test run, not from a cold-start
+trace. Bucketing was taken from `KAN-123` `10548`/`10551` as instructed and re-derived only to the
+extent of confirming the 28/27/5/1/18/1 distribution.
+
+**Next:** `po`'s review gate, then `qa`. P0-4 (`KAN-125`) is unblocked.
+
+---
