@@ -113,11 +113,20 @@ say so and hold rather than commit and let the PO catch it after the fact.
   WIP, stage only the relevant hunks — never sweep WIP into a release
   commit.
 - Version bumps: `pubspec.yaml` is the source of truth (`x.y.z+build`);
-  also sync the hardcoded copies in `lib/core/utils/constants.dart`,
-  `lib/utils/constants/app_constants.dart`, the Settings screen
-  `_appVersion`, and the rewards analytics payload. Apple closes a version
-  train once approved — a rejected `CFBundleShortVersionString` means bump
-  the marketing version, not just the build number.
+  also sync the **three** hardcoded literals — `lib/core/utils/constants.dart:6`,
+  `lib/utils/constants/app_constants.dart:5`, and the Settings screen
+  `_appVersion` (`settings_screen.dart:52`). *(Corrected 2026-09-06: this said
+  four sites plus "the rewards analytics payload." There are three literals and
+  no such payload — `analytics_constants.dart`'s two `app_version` hits are
+  parameter **key names**, not a version value. Measured by `devops` while
+  authoring `store-release`, re-verified independently before this edit.)*
+  **Two of the three are dead:** `grep -rn "\.appVersion" lib/ test/ integration_test/`
+  returns nothing, and only `settings_screen.dart` renders one. Bump all three
+  anyway — a stale literal that goes live later is worse than a redundant edit —
+  but know that only one is visible to a user today.
+  Apple closes a version train once approved — a rejected
+  `CFBundleShortVersionString` means bump the marketing version, not just the
+  build number.
 
 ## Dabbler release topology
 
