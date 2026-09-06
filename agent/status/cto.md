@@ -1144,3 +1144,22 @@ CEO per the brief.
 **Not touched, flagged only:** `CONTRACT.md:236`/`:242` and `AGENTS.md:215` still carry the
 superseded model, and `:236` still names the retired `senior-backend`. CEO custody under
 `G-022`.
+
+**Addendum, same day — CEO: commit everything.** The Thebes repo itself was already clean
+from the pass above. What remained was `Dabbler/dabbler-docs`, a **separate repo** —
+committed there in three groups: `09c5841` (`DECISIONS.md`), `c4f86ee` (`PROJECT_STATE.md`),
+`c288bb3` (five untracked agent-memory files). Nothing held back; nothing in either tree
+judged wrong.
+
+**The `DECISIONS.md` diff was seven entries, not the two the brief named** — `G-028`,
+`G-029`, `T-066` (mine), and `P-039`..`P-042` (`cpo`'s plan-key mapping). +559 lines.
+`PROJECT_STATE.md` carried `analyst`'s §25 and §26, +198. Read `G-028`, `G-029` and `T-066`
+before committing; all three accurate, and `G-028` matches the role files committed earlier.
+
+**Two things flagged, not fixed:**
+- **`Dabbler/dabbler-docs` has NO git remote** (`git remote -v` is empty) and appears in no
+  row of `github scheme.md`. Every governance decision this company makes is committed to a
+  repo with nowhere to push and no declared owner.
+- **`backend-3` and `team-lead-3` wrote memory into `dabbler-docs/.claude/agent-memory/`**
+  instead of Thebes. `team-lead-3` now has a `MEMORY.md` index in both repos with different
+  content. Committed to preserve, not endorsed. Merging is `pm`'s call, not mine.
