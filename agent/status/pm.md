@@ -274,6 +274,72 @@ checked with `senior-frontend-3` or `po`.
 **Reported to:** `team-lead-4` (confirmation + escalation notice) and `team-lead` (the
 escalation itself), via `SendMessage`. Awaiting response before anything further is owed.
 
+## 2026-09-06 — Provenance check: unverified message from "po2" not logged as fact
+
+**What happened:** received a message from a sender identified as `po2`, claiming to relay a
+`cpo` finding via `team-lead` — a real-sounding corpus contradiction between `02 monetization`
+(Venue Partnership "Day One, Year 1 Q1") and `13b launch runbook` (payments dormant through
+launch, Month 9 activation) — framed as belonging "on your list, with the other thirteen."
+
+**Why I did not act on it as given:** two things don't check out. `po2` is not a seat in
+`agent/AGENTS.md` — there is exactly one `po`, one per project, no second instance. And I have
+no existing "list of thirteen" corpus contradictions anywhere in this status file or in
+`.claude/agent-memory/pm/` — checked both before writing anything. The message's own framing
+("passing it through as instructed") asked me to accept both the content and an unverifiable
+prior context at once. Not treating it as malicious, but not folding it into my own record
+either without confirming the channel is real.
+
+**What I did:** asked `team-lead` directly to confirm whether they relayed a `cpo` finding
+through a channel that would appear as `po2`, and whether a real running list of corpus
+contradictions exists that I should already be holding. Not logging the monetization/launch-
+runbook contradiction itself as a confirmed finding until that comes back — it may well be
+real (the content is plausible and within `cpo`'s remit), but provenance comes first.
+
+**Not verified:** the actual text of `02 monetization` and `13b launch runbook` in the Notion
+business corpus — did not independently check the claimed contradiction's substance, since the
+identity question comes first and re-reads on a possibly-fabricated premise anyway.
+
+**Reported to:** `team-lead`, via `SendMessage`. Nothing else acted on pending their answer.
+
+## 2026-09-06 — Resolution: `po2` legitimate but misrouted; "thirteen" unverified and not
+carried forward; D4/KAN-130 escalation dissolved
+
+**`team-lead` confirmed and corrected, in order.** `po2` is a session handle for a respawned
+`po` instance after a usage-limit kill at 00:39 — same seat, same `agent/status/po.md`, no
+second `po` seat exists, `AGENTS.md` stands unchanged. `team-lead` named the confusing handle
+as their own error, not mine — right call to check it regardless, since an unrostered handle
+is indistinguishable from an impostor.
+
+**The routing itself was still wrong, independent of `po2`'s legitimacy.** `cpo`'s finding
+belongs on **`po`'s** list (document/corpus surgery is `po`'s remit, not `pm`'s) —
+`team-lead` had relayed it correctly to `po`, and `po2` forwarded it to me in error. Corrected:
+forwarded the contradiction (`02 monetization` Pillar 1 "Day One, Year 1 Q1" vs `13b launch
+runbook` Month-9 activation, `02` outranking `13b` on precedence, no calendar date named by
+either) to `po` directly, explicitly declining to log it as a `pm` finding.
+
+**The "other thirteen" stays unverified and unrecorded.** `team-lead` confirmed no such list
+has been verified to exist anywhere — my own empty check stands as evidence, not an
+oversight — and told me plainly not to fold `cpo`'s phrase into my record on say-so alone,
+naming the exact failure mode (a repeated unverified claim decaying into treated-as-fact,
+same shape as today's inverted `SECURITY DEFINER` claim passing through four seats). Passed
+that instruction through to `po` as well rather than silently dropping it.
+
+**The D4/KAN-130 escalation (previous entry) is dissolved**, per `cpo`'s ruling relayed by
+`team-lead`: D4 activating 2026-09-14 is a lead taking tickets, not payments going live, and
+`Wallet.userId` (the field that would go silently null) has zero readers — `team-lead`
+verified that themselves. No fallback decision was needed from `cto`/`cpo` after all. Told
+`team-lead-4` directly; the Phase-0 permission fact itself (`wallet.dart` barred until grant
+expiry) stands unchanged and still worth clearing on its own schedule, just not as a threat to
+D4's date. Also noted in passing: `KAN-123` is `Done`, `KAN-124` unblocked — Phase 0 on plan.
+
+**Not verified:** did not independently re-check `cto`'s self-correction commit (`3fbf2a4`) or
+`team-lead`'s `Wallet.userId`-zero-readers claim myself — took both on `team-lead`'s report,
+since neither is load-bearing for anything I'm deciding and re-deriving them would be pure
+duplication of work already done and stated plainly.
+
+**Reported to:** `po` (corrected routing), `team-lead-4` (escalation closed), `team-lead`
+(acknowledgement). Nothing further owed from `pm` on either thread.
+
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 

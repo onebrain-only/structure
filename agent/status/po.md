@@ -652,3 +652,76 @@ apply-date discrepancy and the AC-3 probe-authorship question on KAN-128 — bot
 
 **No file under `Dabbler/dabbler-code/` written, no git command run, `DECISIONS.md` not
 edited, no code or SQL authored.** All actions were Jira comments, edits and one transition.
+
+---
+
+## 2026-09-06 (continuation 2) — KAN-130 updated with cpo's D4-collision ruling; corpus contradiction flagged, not ticketed
+
+**Agent:** `po`. `team-lead` relayed `cpo`'s ruling dissolving the D4/2026-09-14 collision `pm`
+had escalated against `KAN-130`'s client-side timing. Two independent legs, both verified
+before writing: (1) `13b launch runbook and day-0 operations` §C's binding gate
+("P0-5 · Payments dormant") and §I.3 (booking activation Month 9) mean 09-14 is D4's lead
+starting to take tickets, not payments going live — nothing in the corpus ties a real-money
+date to 09-14; (2) `Wallet.userId` (the field `KAN-130` AC 3 renames) has zero readers today —
+`team-lead` verified it is already nullable, no `.userId` reference in `lib/` resolves to
+either `Wallet` model class, `WalletRepositoryImpl` is instantiated nowhere but its own
+declaration, and the one write path that would touch it (`toMap()`) fails loudly on a
+dropped-column error rather than silently, and nothing calls it.
+
+**Edited `KAN-130`:** added a "`cpo` ruling" section with both legs and citations; softened
+AC 3's framing (now explicitly "not urgent — correctness work, not a race"); rewrote the
+`due_date`/"Not set" note to drop the D4 tie-in, keeping only the standing `KAN-128`-ships-first
+ordering constraint and adding a condition (land before the wallet slice's first real reader)
+in place of the removed date. Recorded, but did not act on, the file-grant question `team-lead`
+raised alongside this (extending `CONTRACT.md` §4.1's grantee file list — ruled "permitted but
+wrong" and inapplicable to this ticket since `KAN-130` isn't one of the five named Phase 0
+tickets the grant covers). `CONTRACT.md` itself untouched.
+
+**Not ticketed, by `cpo`'s own instruction:** the corpus contradiction `cpo` found between
+`02 monetization` (Venue Partnership activates "Day One, Year 1 Q1") and `13b` (payments
+dormant through launch, Month-9 booking) — a strategy precedence question, not a task, and not
+urgent since neither document names a calendar date that reaches 09-14. Flagging it here and to
+`pm` directly rather than filing a ticket, since `cpo` named it as belonging on `pm`'s list
+"with the other thirteen," not on the board.
+
+**Not independently re-verified by me this pass:** `team-lead`'s `Wallet.userId` zero-reader
+grep and the `13b`/`02 monetization` document citations — taken as reported from `cpo` via
+`team-lead`, consistent with my own earlier read of `wallet.dart` (which showed the field
+declared/constructed in two classes, matching `team-lead`'s count) but I did not re-run the
+wider-tree grep myself.
+
+---
+
+## 2026-09-06 (continuation 3) — KAN-128 due_date set; Jira table-in-list-item trap recorded for the roster
+
+**Agent:** `po`. `team-lead` reported the apply-date discrepancy `KAN-128`'s date was held on
+never existed as a live disagreement — `cto` had been quoting `team-lead`'s own original task
+brief, which itself carried a since-withdrawn 2026-09-10 figure (`team-lead-4`'s retraction,
+caught earlier by the `capacity-to-date` skill). `pm` and `cto` closed it directly, one date:
+`cto`'s apply slot, Wednesday 2026-09-09, conditional on the migration being a readable file
+by then.
+
+**Set `KAN-128` `due_date` = 2026-09-09** (verified via a follow-up read after the edit — see
+below). Removed the stale "unresolved discrepancy" language from the Sequencing section,
+replaced with the closure and its reasoning. Added an explicit "done" definition to the RULED
+section (authored + applied to the live project + committed locally; **not** Canary-verified,
+since `G-018` Ruling 2 blocks that leg entirely under the freeze) so the ticket isn't left
+un-closeable on a leg that structurally cannot run. Left the AC 3 probe-authorship open
+question in place, `cto`-owned, noted explicitly that it does not move the date — the 2-sitting
+figure is the ceiling regardless of who authors the four verification probes.
+
+**Standing-practice change, made durable per `team-lead`'s instruction, not just narrated:**
+a markdown table embedded inside a numbered Jira AC list item silently drops that entire list
+item's content on edit, and the API reports success with no error — caught earlier this session
+only because I re-read `KAN-128` immediately after writing it. Re-reading every ticket
+immediately after any edit is now my standing practice, not a one-off reaction — applied again
+on this edit (confirmed the `duedate` field and the rewritten sections both landed via a
+`getJiraIssue` call after the `editJiraIssue` call, not by trusting the edit response body). This
+entry itself is the durable record `team-lead` asked for; flagging to `team-lead`/`cto` that it
+also belongs in whatever authoring guidance covers Jira ticket edits generally, since the
+failure is invisible at the point of writing and will recur for any seat that formats a
+correction as a table inside a numbered AC.
+
+**On `KAN-130`'s `cpo` ruling:** confirmed already received and acted on in my prior turn
+(ticket updated, comment posted, `pm` notified of the corpus-contradiction flag) before this
+message arrived — no further action needed there.

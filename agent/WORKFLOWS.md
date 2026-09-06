@@ -136,6 +136,30 @@ a comment afterwards, which is recoverable but visible.
 **Labels in use:** `audit`, `security`, `follow-up`, `bug`, `cleanup`, `config`,
 `quality`, `po-decision`.
 
+### A silent data-loss trap in the Jira tooling — read before editing any ticket
+
+**A markdown table inside a numbered list item silently destroys the content it is part
+of, and the API reports success.** Found by `po` on 2026-09-06 while correcting KAN-128's
+AC 1: the edit dropped the acceptance criterion's **entire** body, and the tool returned
+no error. It was caught only because `po` re-read the ticket immediately afterwards.
+
+The cause is the markdown→ADF conversion, so it is not specific to one ticket, one field
+or one seat. Any agent writing an acceptance criterion with a table in it — which is the
+natural way to express a per-function or per-file rule — will hit it.
+
+**Two rules, both cheap:**
+
+1. **Never nest a table inside a numbered or bulleted list item.** Pull the table out into
+   its own section and reference it from the list item. This is what `po` did to recover
+   KAN-128, and the ticket reads better for it.
+2. **Re-read every ticket immediately after editing it.** Not the edit response — the
+   ticket. A success code from this API is not evidence the content landed. `po` adopted
+   this as standing practice after the incident; it is the general rule, not one seat's.
+
+**Why it is in this file rather than in a status log:** the failure is invisible at the
+moment of writing and the loss is total, so the seat that hits it next will not know to
+look unless it was told beforehand.
+
 ---
 
 ## 3. THE REVIEW GATE
