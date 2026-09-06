@@ -1730,3 +1730,70 @@ apply chains behind for the same reason. No new action on my side.
 **Status: no open items requiring my decision.** Waiting on `team-lead-2` (`KAN-156`
 capacity), `team-lead-4` (`KAN-155` sizing confirmation already in), and the CEO (`KAN-155`
 apply, `cto.md` role-file amendment — both relayed to `main`).
+
+## 2026-09-07 — G-022 custody ruling on stale `agent/roles/*.md` production-write text
+
+**Task:** dispatched by `team-lead` (originally `cto`'s escalation, picked up by the CEO): the
+2026-08-27 blanket "no agent writes to production" text in `agent/roles/cto.md:91-99` was known
+stale against `G-002` (2026-08-28), which narrows it for `cto`. Asked to re-measure scope,
+determine whether `G-022` gives custody, and execute or name who must.
+
+**Re-swept, measured:** `grep -rln "PO decision, 2026-08-27" agent/roles/` → 3 files:
+`cto.md`, `po.md`, `analyst.md`. Matches the brief's count.
+
+**Generator check:** `agent/scripts/build-agents.sh` builds `.claude/agents/<name>.md` from
+`agent/roles/<name>.md` + `.claude/bindings/<name>.yml`. `agent/roles/*.md` is the hand-maintained
+SOURCE, not generated — editing it is correct and durable, and survives regeneration (confirmed by
+diffing `agent/roles/cto.md` against `.claude/agents/cto.md`: the latter only adds a frontmatter +
+banner block on top of the former's content).
+
+**`G-022` reading:** `DECISIONS.md:6637` names only `MANIFESTO.md`/`CONTRACT.md`/`AGENTS.md`
+(→ CEO), `WORKFLOWS.md` (→ `po`), `PROJECT_STATE.md` (→ `analyst`); it does not name
+`agent/roles/*.md`. Its operative principle — "the writer of a rule must not be a seat the rule
+binds" — still reaches unnamed files: each role file binds only the seat it describes, so that
+seat may never correct its own file (why `cto` was right to decline and escalate), but a different,
+unbound seat is not conflicted and may correct it directly. This differs from the `analyst` case
+`G-022` was written for, where sole custody of files binding *every* seat let `analyst` edit rules
+that bound itself.
+
+**Custody found:** no single non-CEO seat holds blanket custody of `agent/roles/*.md` (unlike
+`MANIFESTO`/`CONTRACT`/`AGENTS.md`, which bind everyone and so had to move to the CEO). Custody is
+per-file and negative: not the seat the file's contested passage binds. I (`pm`) am not bound by
+the production-write rule stated in `cto.md`, `po.md`, or `analyst.md` — each rule binds only that
+file's own seat — so I was eligible to write all three corrections.
+
+**Executed:**
+- `agent/roles/cto.md:91-99` — rewrote the section (was actually false: claimed `cto` itself could
+  never write to production). Now states `cto`'s standing conditional authority under `G-002`
+  (four conditions) and `G-009` (further narrowing for security-remediation data changes), defers
+  to `CONTRACT.md`'s "Supabase project — writing" row as the single authoritative statement
+  (`SCHEMA.md` §8), and keeps the unrelated `devops`/`Canary`/PR app-code path unchanged, per
+  `team-lead-4`'s specification.
+- `agent/roles/po.md:210-217` and `agent/roles/analyst.md:276-287` — these were still true for
+  those two seats (neither gained anything from `G-002`), so left the blanket rule intact and
+  added one clause noting `cto` is the standing exception, so `po`/`analyst` don't misroute a
+  schema-only defect through the full ticket path when `cto` has a faster one.
+- Ran `agent/scripts/build-agents.sh` to regenerate `.claude/agents/cto.md`, `po.md`, `analyst.md`
+  from the corrected sources.
+- Re-ran the sweep for the old blanket phrasing: clean (the phrase now only appears in `po.md`/
+  `analyst.md` where it is still true, each now annotated with the `cto` exception).
+
+**Files touched:** `agent/roles/cto.md`, `agent/roles/po.md`, `agent/roles/analyst.md`,
+`.claude/agents/cto.md`, `.claude/agents/po.md`, `.claude/agents/analyst.md`. Not committed —
+sitting as working-tree changes pending the standing commit-only-when-asked rule.
+
+**Memory:** recorded the custody ruling at
+`.claude/agent-memory/pm/g022-role-file-custody.md` for reuse next time a role file is found stale.
+
+## 2026-09-07 (cont.) — committed, `sha` 81544778cfa68988a0f20146b57d6a009ff4064e
+
+`devops` confirmed unreachable this session (three dispatches all fell to generic fallback; its
+`.claude/agents/devops.md` exists with valid frontmatter but this session's registry doesn't
+resolve it). `team-lead` directed me to commit the six touched files directly since Thebes is the
+governance repo, not `dabbler-code` — no deploy hangs off it. Committed exactly the six
+(`agent/roles/{cto,po,analyst}.md` + regenerated `.claude/agents/{cto,po,analyst}.md`), left
+`agent/status/pm.md` unstaged as instructed. Not pushed.
+
+**Not yet in effect:** a running `cto` session loaded its definition at session start and will keep
+reading the false "never write to production" text until a new `cto` session starts. Anyone citing
+the fix today against an already-running `cto` should say so.

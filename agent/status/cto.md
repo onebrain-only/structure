@@ -1106,3 +1106,41 @@ CONSTRAINT) mine, 1 sitting ceiling 1. KAN-150 (2x CREATE OR REPLACE) mine, 1 si
 authoring free now, verified the two functions carry no `'kickoff'` literal so no coupling to the
 rename. **KAN-155 apply: CEO only, in no agent's queue.** Every count now includes posting the
 `G-002` condition-1 comment, which I had been under-counting all day.
+
+---
+
+## 2026-09-07 — committed the Thebes governance tree (4 commits, not pushed)
+
+**Dispatched by `team-lead`.** Commit the uncommitted Thebes changes; do not push.
+
+Four commits, grouped by what they are:
+
+- `524ccaa` — `.claude/bindings/{devops,qa}.yml` + their two regenerated agents. Unescaped
+  `"` inside a double-quoted YAML `description` broke parsing and dropped both seats from
+  the registry.
+- `ef6b8d5` — `agent/roles/backend-{1..8}.md` + eight regenerated agents. `G-028` model.
+  Verified the added paragraph is byte-identical across all eight (md5 of the block) and
+  that every `.claude/agents/backend-N.md` carries it.
+- `96f3db3` — `agent/roles/cto.md` + `.claude/agents/cto.md`. Section retitled to
+  "PRODUCTION MIGRATIONS: YOU APPROVE, YOU DO NOT APPLY".
+- `<status>` — `agent/status/{devops,pm,po,cto}.md`.
+
+**Reviewed before committing, not rubber-stamped.** `pm`'s rewrite of my own role file is
+an accurate statement of `G-028` as briefed, and correctly leaves the `G-009` question open
+rather than resolving it by inference. I accept it.
+
+**Not committed, and not mine: `G-028` and `G-029` are NOT in this repo.** The brief said
+they were appended to `DECISIONS.md` in this tree. They are not — `Dabbler/dabbler-docs` is
+a **separate git repo** (`git rev-parse --show-toplevel` returns
+`.../Thebes/Dabbler/dabbler-docs`) and is deliberately untracked from Thebes
+(`.gitignore:5`). Its `DECISIONS.md` and `PROJECT_STATE.md` are still uncommitted there.
+That repo appears in **no row of `github scheme.md`**, so no seat has stated commit
+authority over it. Escalated: the source-of-truth entries for the ruling these nine role
+files implement are sitting uncommitted in an unowned repo.
+
+**Not pushed.** 88 commits ahead of `origin/main` before this task; 92 after. Held for the
+CEO per the brief.
+
+**Not touched, flagged only:** `CONTRACT.md:236`/`:242` and `AGENTS.md:215` still carry the
+superseded model, and `:236` still names the retired `senior-backend`. CEO custody under
+`G-022`.

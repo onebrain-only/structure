@@ -1549,3 +1549,44 @@ Nine incoming messages, board-hygiene and new-work batch.
 **`KAN-155`'s AC10 reworded per `cto`'s clarification.** It had been phrased as something required before the CEO may apply — wrong, since `G-002`'s four conditions constrain `cto`'s own delegated slice of the production-write authority, not the CEO's underlying reserved authority (`019`). No agent decision gates the seat the authority belongs to. Reworded as `cto`'s own commitment instead, and made the sequencing explicit: posted after the authoring leg lands, not in parallel with it, since there's no SQL to brief before then.
 
 **Two-line lesson for the day, closing on it:** every one of today's several stale-flag near-misses resolved to either "already fixed, messages crossed" or "genuinely correct, my error" — none resolved to "I was right to leave it as-is." Worth remembering that a flag saying something is stale is worth a direct check before either defending the old text or assuming the flag is right; both directions turned up today.
+
+## 2026-09-07 (cont.) — full board cleanup pass: KAN-139/KAN-142 reviewed and passed to QA-Test, drift found on KAN-128 and KAN-39, no other columns wrong
+**Agent:** `po`
+**Outcome:** Dispatched by `team-lead` to establish what's genuinely finished/in-progress/Done/QA-Test and reconcile the board. Measured every non-Done ticket (30) against `dabbler-code` git history directly rather than against ticket text — searched commit log for every ticket number, confirmed ancestry on `Canary`, and independently re-ran `flutter analyze`/`flutter test` rather than trusting developer-reported counts.
+
+**Moved, with evidence:**
+* `KAN-139` (In Review → QA-Test): `super.key` fix confirmed at `90ea9f7`, 0 infos under `lib/app/`, 106 tests, no other file touched. Review gate PASS, comment posted.
+* `KAN-142` (In Review → QA-Test): `/phone-input` and `/bookings/<id>` dead-nav fixes confirmed at `6c5bca4`, both call sites fixed (not just the one a prior comment expected), no route fabricated. Review gate PASS, comment posted.
+
+**Left alone, correctly:**
+* `KAN-119` — untouched per brief's explicit instruction.
+* `KAN-128`/`KAN-132`/`KAN-136` (Development) — genuinely in progress or genuinely blocked (KAN-128 on `cto`'s G-002 apply; KAN-132/KAN-136 have no matching commits yet). `KAN-128` has an internal comment-thread discrepancy (comment `10627` treats "sitting 2" as outstanding six hours after comment `10590` already documented both sittings complete, confirmed against commit `93d6619` which contains both the migration and the probe pack) — flagged on the ticket, no transition, since the real gate (production apply) is unaffected either way.
+* `KAN-130` (Ready) — correctly reflects partial completion: client-half rename shipped (`7d2cd47`/`b6b2ea9`), SQL half genuinely not started, deliberately not transitioned per the ticket's own record.
+* `KAN-143`/`KAN-149` (QA-Test) — both already passed the review gate before this pass and are correctly stuck there because `qa` is paused by CEO order. No substitute gate invented.
+* 21 Ready/To Do tickets — `git log --all --oneline | grep KAN-<n>` returned zero commits for every one; none has secretly shipped work sitting in the wrong column.
+
+**Flagged, not acted on:**
+* `KAN-39` (In Review, untouched since 2026-09-01, ~6 days) — a leadership snapshot ticket, not a code ticket with a mechanical AC gate. Its blocking premise (`KAN-119` unresolved) is now stale since `KAN-119`'s fix shipped (`5f32b06`, confirmed on `Canary`). Commented with the delta; recommended `pm` decide whether to refresh or close. Not transitioned — no gate exists for a report ticket and inventing one isn't mine to do.
+* 5 Ready tickets with no `due_date` (`KAN-130`, `KAN-129`, `KAN-131`, `KAN-137`, `KAN-153`) — each is genuinely blocked on an upstream sequencing/decision, per their own tickets, not simply neglected. Left undated rather than inventing dates; owed to the sequencing leads.
+* Live Jira workflow has a `Development` status (id 10010, transition id `4`) distinct from `In Progress` (id 10005, transition id `21`) — confirmed via `getTransitionsForJiraIssue`. Zero tickets currently sit in `In Progress`; every in-flight ticket uses `Development`. This contradicts this role's own file, which states no such column exists — noting the discrepancy for whoever next edits `agent/roles/po.md`, not fixing it myself (out of scope for this seat).
+
+**Not verified by `po` this round:** whether `cto` has actually applied `KAN-128`'s migration to `wtncuzcskpigqpmnxwws` (read-only DB check not re-run this pass, relying on absence of contrary evidence in the ticket thread).
+
+## 2026-09-07 (cont.) — authentication freeze scoped and applied (2 tickets); KAN-119 executed to Backlog; KAN-128 flagged for G-028
+**Agent:** `po`
+**Outcome:** Resumed the interrupted task, now with `G-029` (board override authority) and `G-028` (backend authors+applies migrations, `cto` never applies) both live.
+
+**Part 1 — auth freeze scope, measured against every non-Done ticket (30), not guessed:**
+* Read every ticket's summary and, where ambiguous, its full description (checked `KAN-127`, `141`, `129`, `137`, `146`, `133` specifically for auth/onboarding/session content — none qualify: views/profile-convention/account-deletion-copy/money-demo/build-runner, none touch login/signup/OTP/session/redirect).
+* **In scope, 2 tickets:**
+  * `KAN-119` — `/auth-welcome` (login entry screen). Was `Development`.
+  * `KAN-142` — repoints two dead call sites to `RoutePaths.authWelcome`; caught precisely because its summary never says "auth," as the brief warned. Was `QA-Test` (this seat had just passed its review gate moments earlier).
+* **Considered and excluded, stated for the record:** `KAN-39` (launch-readiness assessment discusses auth heavily but doesn't touch auth code — a report, not a change) and `KAN-141` (one of its three views, `username_registry_public`, is signup-adjacent but the ticket is a read-only security audit, not a flow change). Neither stopped.
+* Both moved to `To Do`, each with a written reason citing the ruling verbatim and its date, under `G-029`. `KAN-142`'s move explicitly notes the freeze is a scope stop, not a reversal of its review verdict.
+* **Did not write an auth-screens rule anywhere** — scope stays undefined, per instruction.
+
+**Part 2 — `KAN-119` returned to Backlog, executed (not just narrated).** A prior comment (`10676`) had already recorded the CEO's instruction and the shipped-fix contradiction but never called the actual API transition — confirmed by re-reading the ticket's live status before acting. Transitioned `Development` → `To Do` this pass. Restated plainly and left open: the fix shipped (`5f32b06`, confirmed on `Canary`) while the ticket now reads "not started" — revert-or-not is the CEO's call and `devops`'s to execute, not decided here.
+
+**`G-028` flagged on `KAN-128`, not acted on.** Every prior comment on that ticket names `cto` as the one who applies its migration under `G-002`; `G-028` changes that to backend-authors-and-applies. The migration (`93d6619`) itself is unaffected. Re-routing the handoff is `cto`'s/`team-lead-4`'s call, not this seat's — flagged only.
+
+**`QA-Test` disposition, under `G-029`'s newly-unstuck authority — judgement stated, nothing marked Done:** `KAN-143`, `KAN-149`, `KAN-139` stay in `QA-Test`, waiting for `qa`'s functional pass. This seat's review gate (acceptance criteria + doc alignment) already passed on all three; functional correctness on the running app is a different question this seat has no tooling to answer, and I am not inventing a substitute gate. `KAN-142` is the one exception, pulled for the freeze, not for a QA-readiness judgement.

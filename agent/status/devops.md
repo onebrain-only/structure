@@ -802,3 +802,74 @@ read or edited. No credential written anywhere: `.env` still holds placeholder
 `Co-Authored-By` trailer. `flutter analyze` not run — no Dart under `lib/` changed.
 **Not verified:** `-d chrome` (no chromedriver), and the `--timeout` kill path was
 reasoned through and never actually triggered.
+
+---
+
+## 2026-09-07 — deploy audit, KAN-141 sequencing, Thebes push ruling, credential recommendation
+
+**Dispatched by `team-lead` (the Listener, previous session).** Four items: commit the
+`devops`/`qa` YAML quote-escaping fix in Thebes, independently audit a hand-pushed Canary
+deploy, take the KAN-141 git side forward, rule on pushing Thebes to `origin`, and
+recommend a fix for the PAT embedded in Thebes's remote URL.
+
+**Item 1 — declined.** `github scheme.md:18`: "`cto` owns the One Brain repo, and is the
+only seat that may commit or push to it." Committing the `.claude/agents/devops.md`,
+`.claude/agents/qa.md`, `.claude/bindings/devops.yml`, `.claude/bindings/qa.yml` fix in
+`/Users/moatazmustapha/Desktop/Thebes` is not mine to do regardless of how squarely the
+*content* is devops/qa's — the repo's commit/push authority is `cto`'s alone. Left
+uncommitted; flagged to `team-lead` and to `cto`.
+
+**Item 2 — Canary deploy audit (`Dabbler/dabbler-code`, `b79cc58..dc63d69`).**
+Independently re-derived, not taken on the team-lead's word:
+- `gh api repos/dabblersport/webapp/commits/dc63d69/check-runs` — 5 runs, all
+  `conclusion: success`: `analyze-and-test` ×2, `allowlist-check` ×2, `Cloudflare Pages`
+  ×1 (`completed_at` 2026-09-06T21:32:55Z).
+- `canary.dabbler.pro`: root 200, `/flutter_bootstrap.js` 200 with `etag:
+  "1c9753be433818fd657845b584a3c416"` — matches the team-lead's claimed post-push value —
+  `/auth-welcome` 200.
+- Verdict: the deploy is genuinely live and green. No correction needed.
+- What the team-lead's improvised check did not do that mine does: bind the verdict to
+  the commit sha via `gh api .../check-runs` rather than eyeballing a dashboard or
+  inferring success from the fingerprint/etag change alone — an etag change proves *a*
+  new build went live, not provably *this* commit's build (the check-run API names the
+  sha). Also screened for the three known false-alarm signals (WAF 403, empty
+  deployments API, blank first-screenshot) — none present here, so moot this time, but
+  worth carrying forward as an explicit checklist item.
+
+**Item 3 — KAN-141 git side, held, not committed.** Reviewed the diffs: `docs/SCHEMA.md`
+and `scripts/ci/check_anon_allowlist_test.sh` both correctly reflect the view/function
+drop and are internally consistent with each other and with the untracked migration
+`supabase/migrations/20260906210000_kan141_drop_list_active_usernames_and_public_view.sql`.
+`docs/CONVENTIONS.md`'s new §12a-12f is unrelated content (`cto`'s, per team-lead) and
+stays excluded from any KAN-141 commit. **Not committed**, because the docs/fixture
+change and the SQL apply must land as one unit at apply time, and the apply is `cto`'s
+under `G-002`/`G-006` — I hold no authorization to sequence or perform it. Escalated to
+`cto`: apply the migration under its own claim-comment protocol, then either commit
+alongside it or signal so I commit `docs/SCHEMA.md` + `check_anon_allowlist_test.sh`
+together immediately after. Also flagged `cto`'s open item inside `SCHEMA.md` itself:
+the `T-027` justification for `username_registry_public` needs formal supersession.
+Separately asked `cto` whether the unrelated `docs/CONVENTIONS.md` §12a-12f may be
+committed as its own commit — content is `cto`'s call, landing it would be mine.
+
+**Item 4 — Thebes push ruling: not mine.** Same citation as item 1. `github scheme.md`
+names `cto` as the sole seat with commit/push authority over `onebrain-only/structure`;
+the 86-commits-ahead state is `cto`'s to act on, not something I evaluate against the
+Dabbler main-branch freeze (which does not reach this repo).
+
+**Item 5 — credential exposure, recommendation only, not applied.** Thebes's PAT is
+embedded in `.git/config`'s remote URL (`github scheme.md:30`), which is how it printed
+into a transcript. Recommend, for whoever performs the rotation: drop the token from the
+remote URL entirely (`git remote set-url origin https://github.com/onebrain-only/structure.git`)
+and store the new PAT in the macOS Keychain via `git config credential.helper
+osxkeychain` (scoped locally to this repo so it does not collide with the `gh`-CLI
+identity the four `dabblersport/*` repos use) plus one `git credential approve` (or
+`security add-generic-password`) run interactively with the new token. That makes
+rotation a swap of one Keychain entry rather than an edit to a config file that can leak
+again via `remote -v`. I did not touch this repo's `.git/config` — the actual swap needs
+the new token, which is the CEO's to generate and enter, and touches a repo I do not
+have commit/push authority over.
+
+**Not done:** no commit, no push, in either repo touched by this task beyond this status
+file and the KAN-141-adjacent read-only review. `flutter analyze`/`flutter test` not
+re-run — no code changed in `dabbler-code`, only pre-existing uncommitted docs/script
+diffs were reviewed, not edited.
