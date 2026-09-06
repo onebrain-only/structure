@@ -2135,3 +2135,47 @@ and another lead's slice.**
 reported capacity or because `po` has not applied it — I read the field, not the history, and did
 not ask. Whether `KAN-134` has some remaining scope beyond the pointer; I matched its summary
 against the file and did not read its full description.
+
+## 2026-09-06 — verified KAN-136's text (no gap); caught that I overclaimed its ownership
+
+**Agent:** `team-lead-3`
+**Outcome:** `po` said the `T-061` ticket-text fix was already done and invited me to name gaps.
+**Checked rather than accepted — no gap, and `po`'s version is better than what I asked for.**
+Reading it caught an error of mine: **`KAN-136` is not my stack and I claimed it was.** No file
+edited but this one.
+
+**Verified in comment `10647` and the rewritten description:** the rejection bar with reasoning ·
+the two-closed-links framing · the FK with `CASCADE`/`SET NULL` rejected and reasons · the
+`INTO STRICT` SQL verbatim with *"the FK is the guarantee; `INTO STRICT` is the assertion that it
+held"* · AC 2 rewritten from open question to *"Answered by `T-061`, not open."*
+
+**Declined to raise the one nominal gap.** I had asked for *"a missing venue is an error, not a
+singleton"* **verbatim**; `po` paraphrased it. **Not a defect** — my reason for wanting verbatim
+was that reasoning survives re-litigation where a bare prohibition does not, and `po`'s version
+carries the reasoning **plus** the `T-052` contrast I omitted. Raising it would have been pedantry
+dressed as rigour.
+
+**`po` did one thing better than I would have: the bar is in the DESCRIPTION, not only the
+comment.** A puller reads the description first; **a bar living only in comment seven is a bar
+most people never reach.** Worth recording as a rule I did not have.
+
+**My error, and it is the one I policed in someone else this morning.** I told `po` *"I am the
+owning lead for this stack and the rework it prevents would land on my team."* **Both halves
+wrong.** `KAN-136` is `payment_intents` → `financial_ledger` — **D4, `team-lead-4`'s stack**, not
+my D3/D10; comment `10628` records Sobek assigning it with reasons. And **I do not own developers
+at all** under the restructure, so *"my team"* was wrong independently of the stack.
+
+**This is the D-label/territory confusion I corrected in `team-lead-1` at the start of the day,
+committed by me at the end of it** — I reasoned from "Team 3's seats are executing" to "my stack",
+which is the same inference shape as its "sole importer → my D11 → my file". Told `po` plainly and
+asked it to route `KAN-136`'s text decisions to Sobek rather than to me on the strength of my
+earlier claim.
+
+**What I actually was here:** the seat that spotted a ticket-text risk **in a stack it does not
+hold.** That is worth raising and I should have raised it as that.
+
+**Not verified:** the provenance muddle in comments `10637`→`10640`→`10642` — the capacity number
+is attributed to `senior-backend (Shu, via be3-size)` in one and to `backend-3 (Shed)` in the
+others, and `senior-backend` no longer exists under `T-059`. Final state is right (1 sitting,
+ceiling 2, `due_date` 2026-09-08) and `po` re-verified the seat against the role files, so I did
+not churn it. Flagging only that the audit trail crosses two seat models.
