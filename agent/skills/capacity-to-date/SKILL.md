@@ -69,7 +69,7 @@ makes the count go above one.
   owns a named deliverable, and here is who was asked" teaches §4 — which is the part leads
   get wrong. Report a branch this way rather than resolving it to the number you prefer.
 
-### Risk is not a checkpoint. A dependency boundary is.
+### Neither risk nor volume is a checkpoint. A dependency boundary is.
 
 **The test is whether the ticket's next part cannot start until the judgement lands** — not
 how likely the judgement is to be wrong. This is the distinction a lead gets wrong at speed,
@@ -91,6 +91,27 @@ rule, because a lead who takes only *risk is not a checkpoint* may conclude risk
 which is worse than the error it replaces. Hard-to-verify work lands in the gap between your
 earliest and ceiling columns (§2). That gap is where it is supposed to go, and pricing it there
 is what makes the two-column report do real work. It does not buy a sitting.
+
+**The failure is substituting a proxy for the test, and risk is only the nearest one.** The
+test is a single question — *can the next part start before this lands?* Under time pressure a
+lead reaches for whichever proxy is closest to hand and answers an easier question that feels
+like the same one. Two have now been caught on the same lead, by the same seat:
+
+| Proxy | The reasoning that feels right | Why it fails |
+|---|---|---|
+| **Risk** | less checkable, therefore a checkpoint | raises the odds of a rework cycle; creates no boundary (`KAN-128`) |
+| **Volume** | materially bigger, therefore more sittings | adds no boundary unless it adds one (`KAN-130`/`KAN-131`) |
+
+On the volume case, `senior-backend` again: *"Volume shifts the start, not the cost — that is
+your own argument about the `payment_intents` cut, and it runs symmetrically: lighter mechanical
+work buys back no sitting, and heavier mechanical work adds none unless it adds a **boundary**.
+I went looking for a second boundary and could not find one."* The bundle came back **2 sittings,
+ceiling 3** — the same shape as the ticket it was supposed to dwarf.
+
+**Expect a third proxy you have not met.** Test a proposed sitting by naming the boundary out
+loud; if the sentence that justifies it does not contain *"cannot start until"*, you are holding
+a proxy. *(Two instances, one lead, one correcting seat — a hypothesis about how the test gets
+misread, not a measured pattern.)*
 
 ### The opposite failure: a partial finish dressed as a checkpoint
 
@@ -128,6 +149,12 @@ exists for it, so a bare constraint would have been the failure `T-049` forbids)
 removed DDL volume from the authoring pass and touched nothing about the probe pack that makes
 the ticket two sittings. **Ask which sitting the cut came out of.** If it came out of the
 mechanical one, the cost is unchanged and only the start moves.
+
+**It runs symmetrically, and the upward direction is the one that catches people.** Lighter
+mechanical work buys back no sitting; heavier mechanical work adds none — unless it adds a
+boundary. A lead who has internalised the cut direction will still expect a materially bigger
+ticket to cost more, because the symmetry is not obvious from reading only the downward case.
+It is the same rule.
 
 ## 2. Capacity to date — the arithmetic
 

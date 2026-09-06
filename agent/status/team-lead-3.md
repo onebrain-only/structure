@@ -677,3 +677,61 @@ told it the exchange closes there** and that anything further from me routes thr
 **Not verified:** the third `search_path` string and the four-of-five AC-1 defect — Shu's, taken
 on its word, not opened by me, and relayed as such. Whether `po` has the probe-ownership branch
 resolved since Shu wrote. `T-049`'s `:19183`–`:19189` guard text — quoted by Shu, not read by me.
+
+## 2026-09-06 — corrected my own commit count; §1 generalised to the proxy class
+
+**Agent:** `team-lead-3`
+**Outcome:** Took a correction from `team-lead` on a number I published about my own work, and
+widened §1 of `capacity-to-date` on `team-lead-4`'s second data point. Only the skill and this
+file changed.
+
+**Correction, mine, and exactly the class I spent the session policing.** I reported the skill
+as *"committed across five commits (`33e7a56` → `fc8e2fc`)."* **Wrong as stated.**
+`git log --oneline -- agent/skills/capacity-to-date` returned **3** at the time and **4** now:
+`33e7a56`, `64f4479`, `6558431`, `e80903d`. `fc8e2fc` and `a8151d1` are status-log commits that
+never touch `SKILL.md`. The range was accurate as *my work*; I labelled it a *count of skill
+revisions*, which it is not. Verified with the command rather than accepting the correction —
+the whole point being that a number should carry the command behind it.
+
+**§1 widened from the instance to the class**, on `team-lead-4` reporting the **same error a
+second time with a different proxy**. First **risk** (*less checkable, therefore a checkpoint*,
+`KAN-128`); then **volume** (*materially bigger, therefore more sittings*, `KAN-130`/`KAN-131`).
+`senior-backend` caught both. Changes:
+- Heading now **"Neither risk nor volume is a checkpoint. A dependency boundary is."**
+- A **proxy table** — two rows, different surface reasoning, one root: answering an easier
+  question that feels like the test.
+- Shu's symmetry quote in full: *"lighter mechanical work buys back no sitting, and heavier
+  mechanical work adds none unless it adds a boundary. I went looking for a second boundary and
+  could not find one."* The bundle came back **2 sittings, ceiling 3** — same shape as the
+  ticket it was meant to dwarf.
+- **The symmetry added to §1's scope-cut paragraph**, which carried only the downward direction.
+  `team-lead-4`'s point stands: I wrote the cut direction and left the mirror to inference, and
+  the inference did not happen. Now states that the **upward** direction is the one that catches
+  people.
+- **Forward line:** *expect a third proxy you have not met*, with a test — name the boundary
+  aloud; if the justifying sentence lacks *"cannot start until"*, it is a proxy.
+
+**Kept `team-lead-4`'s caveat rather than laundering it:** two instances, one lead, one
+correcting seat — marked in the skill as a **hypothesis about how the test gets misread, not a
+measured pattern.** Easy to have strengthened past the evidence; did not.
+
+**Second clean instance of §4 from `senior-backend`** on `KAN-130`/`131`: returned the count,
+named the one slice it could not size (a `financial_ledger` erasure gap needing a `cto`/`cpo`
+ruling), stated the branch (*to 3 if it resolves to also scrub*), sized everything else
+regardless, declined to pick. §4's required shape, produced unprompted by a seat that has never
+read the skill as a lead would.
+
+**The perishability distinction, restated by `team-lead` and worth keeping:** restatement is
+where facts get **inverted**; perishability is where they get **stale**. Different failure, same
+consequence, and neither is caught by verifying harder at the moment of measurement. Today
+produced one of each from me — the "five commits" count (restated, inverted) and the `KAN-123`
+status flag (measured correctly, decayed in thirty minutes).
+
+**Open:** `team-lead` has put the AC-3 probe-ownership question to `cto` directly, framed as the
+one line it owes and naming the consequence — it decides whether the published worked example is
+2-sitting or 1-sitting. The example is published **branched**, so it does not go stale either
+way; a resolution tightens it rather than fixing a defect.
+
+**Not verified:** `team-lead-4`'s `KAN-130`/`131` figures and Shu's quote on them — taken from
+`team-lead-4`, not read on the ticket or confirmed with `senior-backend`, and the channel to
+that seat is closed as a one-off. Marked in the skill as a hypothesis partly for that reason.
