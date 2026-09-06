@@ -347,3 +347,106 @@ the two returns that bypass `child:`: the shell's `MainNavigationScreen` and a `
 wrapper at `:842` whose child is `NewsDetailScreen`. Neither adds a case.
 
 Posted as KAN-123 comment `10560`. Verdict unchanged: PASS.
+
+---
+
+## 2026-09-06 — Login on iOS, driven by hand. Verdict FAIL.
+
+Asked by `team-lead` to get logged in on the booted iPhone 16 Pro and return everything a
+scripted `integration_test/login_test.dart` would need. Story written to
+`.claude/agent-memory/qa/stories/login-ios.md`. **I did not log in.** Two blockers, both
+handed on rather than worked around (`WORKFLOWS.md` §6).
+
+**B1 — `/auth-welcome` renders blank, breaking the only UI route to the login screen.**
+Routing is fine (`[Router] loc=/auth-welcome auth=false … allow`); layout is not. First error
+of the run: `RenderFlex children have non-zero flex but incoming height constraints are
+unbounded`, `size: MISSING`, then 46 cascading `'hasSize'` assertions. Cause is a one-wrapper
+difference: `auth_welcome_screen.dart:293`–`:299` is `SingleChildScrollView` →
+`ConstrainedBox(minHeight:)` → `Padding` → `Column` with `const Spacer()` at `:342` and **no
+`IntrinsicHeight`**; `email_password_screen.dart:345`–`:351` is the identical pattern **with**
+`IntrinsicHeight` at `:347` and lays out fine. Debug-mode only — the check is an `assert` and
+I did not run release, so I claim nothing about release.
+
+**B2 — the `.env` credentials are not a real account.** `TEST_EMAIL=testuser@local.dev`,
+`TEST_PASSWORD` 8 chars — placeholder-shaped. Driven into the real form by hand, submit reached
+Supabase and came back with the app's own `Invalid email or password`. The brief's premise that
+credentials were ready **does not hold**. `G-010` gives me no Supabase read, so provisioning is
+`senior-backend`/`po`. **The form mechanics are sound** — focus, typing, enable/disable, submit,
+round-trip and error path all correct. Only the credentials failed.
+
+**The lead's root-cause hypothesis was directionally right, wrong on specifics.** Login is not
+`/email_input` → `/enter-password`. `/email_input` is the **signup** funnel and ends at
+`/otp_verification` needing an emailed code. Login is `/landing` → *Continue* → `/auth-welcome`
+→ *Already have an account? Log in* (`auth_welcome_screen.dart:220`) → `/enter-password`, which
+holds **both** fields. An agent driving `/email_input` to "log in" is on the wrong funnel —
+a sharper account of getting stuck than "there is no login screen".
+
+**Cold start lands on `/landing`** — established by running (`initialLocation` at
+`app_router.dart:137`, allowed through as an `authPaths` member at `:191`), not by reading.
+
+**Two environment defects found on the way, both ticket-shaped.** `scripts/run_integration_tests.sh`
+omits `--dart-define-from-file=.env` on both exec lines (`:40`, `:45`); `.env` is **not** in
+`pubspec.yaml` `assets:`, so `Environment._validate()` throws `Missing environment variables`.
+Provable without running it, and `integration_test/app_test.dart:9` points readers at that
+script. Separately the 12 Maestro flows target `com.onebrain.dabbler` while the bundle is
+`app.dabbler.pro` (`project.pbxproj:503`) and use selectors the app no longer has — history, not
+current truth.
+
+**`drive-the-app` Step 0 and Trap 4 are now stale and I own the correction.** iOS is **not**
+blocked: the `One Brain` → `Thebes` rename killed the double-encoding bug. Measured — SwiftPM
+resolved, `pod install` 810ms, `Xcode build done. 162.1s`, app ran. First build ~8 min wall
+clock (one-time SwiftPM clones); later launches under a minute. Also new to the skill: `simctl`
+has **no tap command** and neither `idb` nor `cliclick` is installed — driving works via
+`System Events` clicks over the Simulator window, mapping
+`mac = (670,168) + screenshot/3` read live from `group 1 of window 1` (never hardcode; it moves).
+Typing needs `Simulator` activated first or it silently no-ops while the field looks focused.
+`flutter run --route=/enter-password` reaches a route directly; `simctl openurl dabbler:///…`
+does **not**, despite the scheme being registered — worth its own look.
+
+**Selector finding that decides whether the test is solid.** There is **not one `Key`** on any
+interactive element in the login path (only `_formKey` and two carousel `ValueKey`s). Worse,
+`email_password_title` and `email_password_login_btn` are **both the literal `"Login"`**
+(`app_en.arb:81`, `:85`), so `find.text('Login')` matches two widgets and a tap throws — use
+`find.widgetWithText(FilledButton, 'Login')` until eight Keys are added.
+
+**Trap nobody had recorded:** a **native iOS notification permission alert** covers `/landing`
+on first launch after install. It is outside the Flutter view, so `tester.tap` cannot dismiss it
+and a fresh-install run hangs there with no useful error. Also: a **persisted session** makes a
+login test pass vacuously — my first launch went straight to `/home` as user
+`2061173c-678f-4a00-8934-5cd7e0997265`; `simctl uninstall app.dabbler.pro` clears it, verified.
+
+**Not verified:** login end to end · release-mode behaviour of B1 · `/auth-welcome` on Android or
+Chrome (layout logic, so it ought to reproduce — not measured) · Google/Apple sign-in · the OTP
+path, `/email_input`, `/forgot-password` (hidden anyway, `email_password_screen.dart:53`) ·
+Arabic/RTL · whether any working credentials exist anywhere (`G-010`, no Supabase read).
+
+Both trees clean before and after — `git status --porcelain` empty in `Dabbler/dabbler-code` and
+in `Thebes`. Wrote no code; touched nothing under `lib/`.
+
+**Addendum, same day — a second account was supplied and also failed. B2 gets sharper, not softer.**
+`team-lead` passed CEO-supplied credentials (a real `proton.me` address; **not recorded in any
+file, by instruction**). Driven into the form on a clean install: **also rejected**, same
+`Invalid email or password`. Two different accounts, same result.
+
+**It is not a broken form, and the app itself is the discriminator.** `_handleLogin`
+(`email_password_screen.dart:150`–`:164`) picks between two strings: `Invalid email or password`
+means the Supabase call **completed** and the server rejected it; `Login failed.` (`:162`) covers
+network/timeout/unexpected. We got the former both times, so plumbing, connectivity and the error
+path all work. `.env` also points at the **correct** project — `wtncuzcskpigqpmnxwws`, and the
+anon key's own `ref` claim decodes to the same, matching `CLAUDE.md`. Not the wrong-project trap.
+Screenshot `12_after.png` shows the password field in plaintext holding exactly the supplied value
+at the moment of rejection, so the input was right.
+
+**What I cannot separate, and it is the useful finding.** That one string covers three causes:
+wrong password, no such user, and **`email not confirmed`** — folded in at `:159`. An account
+registered but never confirmed is indistinguishable from a typo. Deciding which needs a Supabase
+read, denied to this seat by `G-010` → `senior-backend` via `po`. **Separate ticket:** collapsing
+`email not confirmed` into `Invalid email or password` actively misleads whoever is debugging, and
+is plausibly a large share of why login has been hard to diagnose.
+
+I did **not** press *Send email OTP* as a probe: `_handleSendEmailOtp` (`:167`) calls `sendOtp`
+unconditionally — *"Always use OTP for email, regardless of whether the user exists"* — which may
+create a user in the live project. Provisioning is outside this seat.
+
+Verdict unchanged: **FAIL**, and B1 (`/auth-welcome` blank) remains the headline — it is
+independent of any account.

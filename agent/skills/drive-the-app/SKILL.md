@@ -27,12 +27,13 @@ is not what the older prose assumed:
 |---|---|---|
 | **Android emulator** (`Dabbler_test`) | **[M]** works — `integration_test` runs green in 12s | automated harness runs; ADB screenshot/tap driving |
 | **Chrome, `flutter run`** | **[U]** documented, not run today | manual screenshot-and-coordinate driving |
-| **iOS simulator** | **[M]** **BLOCKED** — see Trap 4 | nothing, until the path bug is fixed |
+| **iOS simulator** | **[M]** **works** — builds and runs; see Step 2c | manual screenshot-and-coordinate driving; reaching a route directly with `--route` |
 | **macOS desktop** | **[M]** not configured — `No macOS desktop project configured` | nothing |
 | **Web + `integration_test`** | **[M]** **BLOCKED** two ways — see Trap 3 | nothing |
 
-Rule of thumb: **an automated harness run goes to Android. Manual driving goes to
-Chrome.** Neither goes to iOS today.
+Rule of thumb: **an automated harness run goes to Android. Manual driving goes to Chrome, or
+to iOS when the ticket is iOS-specific.** iOS was blocked until 2026-09-06 and is not any more —
+see Step 2c.
 
 ---
 
