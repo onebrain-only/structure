@@ -1003,3 +1003,39 @@ to KAN-136's/D4's payment-path activation, not the general pre-launch pile) — 
 first pass at that ticket.
 
 No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 14) — KAN-128 ceiling confirmed already correct (stale read); WORKFLOWS.md now owned by po under G-022
+
+team-lead-3 flagged KAN-128's ceiling as self-contradicting, reading it at updated 05:33:20;
+checked the live ticket and confirmed my own ceiling fix (updated 05:38:23) had already landed
+before that read completed — the AC-3 "stays 2 sittings" language refers to the branch count
+(T-055 doesn't move it), and the Set section already said "ceiling corrected: 3, not 2." No
+further edit needed; applied the timestamp-check practice again rather than re-editing blind.
+
+Confirmed both of my earlier refusals were correct: CONTRACT.md §4.1 is analyst's under its own
+header (CONTRACT.md:3) and DECISIONS.md 017, and per a new ruling G-022 (2026-09-06, CEO,
+DECISIONS.md:6018) not even analyst's anymore — no agent writes CONTRACT.md now, a seat
+proposes, the CEO applies. team-lead had routed it to analyst on the strength of analyst's own
+past G-019/G-021 amendments; analyst correctly declined on the same ground I did, and G-022
+exists specifically because those two amendments were a seat editing a rule that binds it.
+
+**G-022 also moves agent/WORKFLOWS.md to po** — "po already owns the review gate and acceptance
+criteria, which is the same substance stated in a different place." team-lead had written a
+subsection to it (commit bdadb22, the Jira table-in-list trap this seat found) before this
+ruling landed and handed it over rather than leaving it undiscovered. Content reviewed, kept
+as-is — it accurately describes a defect this seat found and re-verified. Noting the ownership
+change here since it changes this role's write surface going forward: agent/WORKFLOWS.md is now
+mine to maintain, alongside Jira, this status file, and memory.
+
+Saved a new reference memory: "the PO" in the governance corpus sometimes means the CEO, not
+this seat — confirmed by team-lead after cpo's P-036 ruling used the term for a Notion-writing
+task that turned out to be the CEO's, not mine. Recorded as a recurring naming trap per
+team-lead's explicit warning that it will mis-route again.
+
+Both flagged items in KAN-135 now have named owners (analyst-then-CEO for CONTRACT.md, the CEO
+for the Notion bullet) rather than sitting unowned.
+
+No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written. agent/WORKFLOWS.md
+reviewed but not edited this round (accepted as-is).
