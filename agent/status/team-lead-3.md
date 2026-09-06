@@ -1355,3 +1355,59 @@ never existed.
 **Not verified:** whether `po` will correct the ticket. Whose worktree that is. Whether
 `sf3-124` produced any run count at all — `sf3-125` believes not, which fits a seat that also
 reported a commit it never ran.
+
+## 2026-09-06 — AC 8 closed at 25; the root cause is the criterion, not the arithmetic
+
+**Agent:** `team-lead-3`
+**Outcome:** `po` retracted its 26 and posted **25 at `8e49b1d`** on `KAN-124`. `team-lead`
+measured **both** commits as a third source and reproduced both figures exactly. Took its
+reframing into the skill. **My chain is finished.** Only the skill and this file changed.
+
+**Third-source resolution, first-hand from `team-lead`:** `8e49b1d` → 25, `play_places` 4 ·
+`da41d3b` → 26, `play_places` 5 · `unresolved=0` at both · all other buckets identical. **My
+code-vs-mapping drift hypothesis is dead** — a code-derived count at `8e49b1d` reproduces the
+25 exactly, which it could not if the built artifact had drifted from `KAN-123`'s verified
+mapping by a row.
+
+**`team-lead`'s reframing is better than mine and is what went into the skill.** I had this as a
+verification failure — two seats measured the wrong object. It put it one level back:
+**AC 8 asked for "the contiguous-run count" as though it were a property of the route table, and
+never named the commit.** So two competent seats produced different *right* answers. **A defect
+in ticket-writing wearing the costume of a defect in verification** — which is why it survived
+three of us. New rule in the skill: *when an acceptance criterion names a measurement, name the
+object it is measured against.* Four words foreclose the whole failure.
+
+**Second thing taken: what settled it was a different question, not a fourth opinion.**
+`team-lead` measured *both* commits. Asking *"what is the count?"* produced two confident
+wrong-object answers; asking *"what is the count at each commit?"* ended it in one run.
+**When two counts disagree, vary the object before you add a counter.** I would not have
+extracted that from my own side of it.
+
+**`po` corrected the ticket and recorded the lesson against its own practice** — that
+re-deriving a number only counts if it is measured against what the criterion names rather than
+whatever is on disk. It also thanked me for saying I had made the same error rather than just
+handing over the fix, which is worth noting as the thing that made the correction land instead
+of becoming a dispute.
+
+**Residual conflict, flagged once and not chased:** `team-lead` has `sf3-124` producing the 25
+with a per-bucket breakdown; `sf3-125` states the 25 was **its own**, posted minutes earlier, and
+that `sf3-124` produced no count at all. **Nothing operational turns on it** — the value is 25
+either way — but the two accounts cannot both be right about **who measured it**, and since
+`sf3-124` is the origin of `c6d3e4f`, the distinction separates a seat that did careful work
+from one whose reports need re-deriving on sight. Left with `team-lead`; I have no channel to
+`sf3-124` and no reason to open one.
+
+**Changed my mind on cross-check yield.** I called one divergence in a day of confirmations a
+poor return. `team-lead`'s counter holds: confirmations cost the same whether or not they find
+anything, and this one surfaced an **underspecified acceptance criterion** rather than anyone's
+mistake. **A latent definition problem found before it recurs beats a caught error, because it
+fixes every future instance rather than one past one.**
+
+**Phase 0 position:** `KAN-121`/`122`/`123` Done; `KAN-124`/`KAN-125` in `QA-Test` for `qa` to
+close. Both landed inside their ceilings (09-09, 09-10; both committed 2026-09-06). **No capacity
+outstanding on this seat.** The §4.1 grant still does not expire — §10.6's Canary clause stays
+unmet by construction under the freeze, which is a CEO decision and not a measurement anyone here
+can complete.
+
+**Not verified:** who actually produced the 25. Whether `qa` closes both to Done. The scratchpad
+worktree at `8e49b1d` — still present, still not mine to delete, still raised rather than removed.

@@ -420,6 +420,20 @@ the same artifact the same way, they can only confirm each other's blind spots. 
 is to state the *object* alongside the number — "25 at `8e49b1d`" survives this collision;
 a bare "25" does not.
 
+**What settled it was not a fourth opinion but a different question.** A third seat measured
+**both** commits and reproduced both figures exactly — 25 and 26, `unresolved=0` at each. Asking
+*"what is the count?"* had produced two confident wrong-object answers; asking *"what is the
+count at each commit?"* ended it in one run. **When two counts disagree, vary the object before
+you add a counter.**
+
+**The root cause is in the criterion, not in anyone's arithmetic.** AC 8 asked for *"the
+contiguous-run count"* as though it were a property of the route table. It is a property of a
+commit, and the criterion never said which — so two competent seats produced different **right**
+answers. **When you write an acceptance criterion that names a measurement, name the object it
+is measured against.** *"The run count at this ticket's commit"* costs four words and forecloses
+the whole failure. This is a defect in ticket-writing that looks like a defect in verification,
+which is why it survived three seats.
+
 **Related, from the same ticket:** a run-count script must **assert that every identifier
 resolves**. An unresolved one silently shortens a run and the count comes out *low* — the
 direction that would have falsely tripped `T-056`'s ≤20 rework trigger. A count with no such
