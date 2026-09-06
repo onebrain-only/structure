@@ -2098,3 +2098,37 @@ summarised it. Two seats, same control, same day.
 
 **Owed next:** `KAN-150`, once `po` sends it. Expect it small — `P-041` says its `'prime'` branches
 are dead-code tidying with no behaviour change — but size it by boundary test, not by analogy.
+
+**KAN-155 ceiling revised down 3 → 2 on new evidence; sittings unchanged at 1.**
+
+`cto` measured two composite constraints today: `subscription_features_plan_key_feature_key_key`
+UNIQUE `(plan_key, feature_key)` and `notification_hourly_caps_pkey` PRIMARY KEY
+`(plan_key, priority)`. An AC2-repoint + AC3-seed collision on `player_free` therefore **aborts**
+rather than corrupting silently. That retires the expensive shape, so I dropped rework cycle (a).
+Cycle (b) — the whole-body `CREATE OR REPLACE` — stands untouched. **Sitting count unmoved at 1**:
+this is a budget revision, not a re-size, and the boundary analysis did not change.
+
+**Corrected an overclaim in the evidence I was adopting.** `cto` wrote *"no path where the
+migration reports success while carrying duplicate **or wrong-valued** entitlement rows."* The
+constraints are on **key columns only** and say nothing about `is_enabled` or `max_per_hour`.
+Duplicates are loud; **wrong values are still silent** — a seed carrying `pro`'s values inserts
+cleanly with correct keys. That is the failure the ticket itself names as likeliest (AC 3 item 6,
+copy-paste). Raised to `cto` as its call to confirm or correct, and told `po` that **AC 3's values
+check is NOT made redundant by the measurement and must stay as written** — the live risk is
+someone arguing the new constraints prove it unnecessary. Adopting a correction is not a reason to
+adopt its quantifier: the constraint facts were right, the scope word was too strong.
+
+**Carried `cto`'s `ON CONFLICT` ruling into the brief and asked `po` to make it a criterion.** Seed
+INSERTs take **no `ON CONFLICT`** — it would convert the loud abort into a silent no-op. Deliberately
+opposite to `T-049` Decision 2 (tolerable duplicate on a replayed webhook vs. a defect on a one-shot
+structural migration). `T-049` is fresh on this chain and the habit pulls the wrong way.
+
+**Refused to guess a count I am meant to carry unchanged.** `cto`'s message closed with *"the apply
+leg remains mine, still 1 sitting, still ceiling 1"* while distinguishing the zero-row constraint add
+from the data-migration apply — unattributable to `KAN-145` or `KAN-155`. Asked for both explicitly
+rather than assigning it myself. `capacity-to-date` §3: a shared-seat count is requested and carried,
+never inferred.
+
+**Open:** `cto`'s apply-leg counts for `KAN-145` and `KAN-155`; its confirmation of the wrong-value
+gap; its answer on whether `KAN-128`'s "alone and first" is scoped to the function-body hazard.
+`KAN-150` still owed once `po` sends it.
