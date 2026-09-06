@@ -354,7 +354,16 @@ is second-hand — the grounds are almost certainly right, the chain of custody 
 longer than the sentence above implies.)*
 
 **A relayed status is a timestamp, not a fact.** Provenance asks *who* said it and *how
-directly*; on a ticket changing hourly, the part that decays is *when*. Three relays went stale
+directly*; on a ticket changing hourly, the part that decays is *when*.
+
+**And it is not only tickets — a governing document decays the same way, and is easier to
+miss.** A lead spent a day re-reading every ticket before acting on its status, then carried
+`CONTRACT.md` §4.1 and a landing test from its session-start context into a live escalation
+without re-reading either. Both had been superseded six hours earlier by a ruling that quoted
+that lead's own argument back at it. **A rule read once at the start of a session is a cached
+lookup, and rulings are exactly what lands in between.** The freshness discipline is easy to
+apply to the board and silently exempt the documents that govern it — re-read the clause you
+are about to cite, not just the ticket you are about to move. Three relays went stale
 inside one day on `KAN-128` — a seat reported its AC as outstanding after it was fixed, a lead
 reported a count as awaiting confirmation after both had landed, and this seat raised a blocker
 that had cleared thirty minutes earlier. **Every one was accurate when written.** So carry the

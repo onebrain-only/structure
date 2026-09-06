@@ -1542,3 +1542,147 @@ ticket, not the mechanics.
 **Not verified:** release-build and Android/Chrome behaviour for `KAN-119` — `qa` inferred both
 and I have not measured either; named as the ceiling's content rather than resolved. Whether
 `cto` will place `lib/app/routes/` where I expect. Whether `pm` rules for or against resuming.
+
+---
+
+## 2026-09-06 — KAN-119 taken, sized and dispatched; stack-vs-slice escalated to `cto`
+
+**Task:** take `KAN-119`, size it, assign it, move it to `Development`; settle or escalate the
+stack-versus-slice boundary question; confirm `team-lead-1`'s `KAN-139` correction.
+**MODEL: opus · EFFORT: medium**, as briefed. The effort was right — the sizing was cheap, and
+the boundary question underneath it was the part that needed the thinking.
+
+**`KAN-119` → `Development`, Team 2, Sekhmet (`frontend-2`) executing.** Frontend-only: one Dart
+wrapper, no schema, no copy — Nekhbet has no leg on it. Jira comment `10639` carries the full
+reasoning; transition confirmed `"statusName": "Development"`.
+
+**Capacity: 1 sitting, ceiling 2.** Produced independently, agrees with `team-lead-1`'s
+provisional number. **1 sitting** because there is no dependency boundary anywhere in the ticket —
+AC 1 names the file, the line, the wrapper and the working sibling to copy, so the change
+population is enumerable before starting; the simulator run is verification *inside* the pass, and
+the un-runnable half-diff is a pause, not a checkpoint. **Ceiling 2** for the one structural
+difference that survives the fix: `auth_welcome_screen.dart:300` is `crossAxisAlignment.start`,
+`email_password_screen.dart` is `.stretch`. **No `due_date` set** — counts handed to `po`.
+
+**The measurement that did the real work, and it is why the ceiling is 2 and not 3:**
+`grep -n "Spacer()\|Expanded(" .../email_password_screen.dart` returns `440: const Spacer()`.
+`IntrinsicHeight` + `Spacer` is the combination that *looks* like it should fail — `Spacer`
+contributes zero intrinsic height — and it is **already working in this codebase**, in the sibling
+screen, under the identical outer structure. That turned the fix from an analogy into a proven
+construction. Worth remembering as a habit: the cheap grep that retires the plausible-sounding
+risk is worth more than the argument about whether the risk is real.
+
+**Ruled on both of `qa`'s open scope limits rather than passing them on.**
+*Release build — closed, not spun out as a ticket.* The `RenderFlex` assert is a debug-only
+**detector**, not the defect; the defect is a flex child under unbounded `maxHeight`, undefined in
+every build mode. Release makes it silent, not correct. The fix corrects both modes in one edit, so
+verifying release answers a question the fix has already settled and **no decision hangs on the
+outcome**. *iOS-only — folded into the same sitting* as proposed AC 6 (one non-iOS surface, Chrome
+cheapest): the executor is already launching the app, a second surface adds no boundary and
+therefore no sitting, and it converts `qa`'s inference into a measurement for free. **Proposed to
+`po`, not written by me** — I do not edit tickets.
+
+**Two ticket corrections measured at `da41d3b`:** AC 4's "(and its test, if one exists)" is moot —
+`grep -rln "auth_welcome\|AuthWelcome" test/` returns nothing; and every cited line still holds
+(`:298` `:300` `:342` `:220` `:506`).
+
+### The boundary question — ruled for the instance, escalated as a rule
+
+**I took the ticket on the measured axis:** the slice has a measurement behind it (the weight-7
+`auth_onboarding↔profile` seam, `T-047`/`G-016`); the D-label has a table-family clustering.
+Between a measured boundary and a taxonomy, take the measured one.
+
+**But the rule is genuinely broken, and this is the finding worth carrying forward.** Every role
+file states the slice boundary as *"which files **your developers** may touch."* **As of today no
+lead owns developers** — sixteen seats became eight teams reporting to nobody, and all five leads
+assign from one pool. The sentence's subject no longer exists. What the slice list now constrains
+is *which lead may assign a team to write which files* — a different object from the one the
+sentence was written about. Two leads read it today and got different answers, which is exactly
+what a rule does when its referent is removed underneath it. **And it recurs by construction:**
+leads rotate across stacks while slices stay put, so divergence is guaranteed every sprint.
+
+**Escalated to `cto`** (not `pm`): it is a rule that is wrong, it names `cto`'s own document, and
+`team-lead-1` asked for `cto` by name — with an offer to re-route through `pm` if `cto` prefers.
+This passes my own escalation test: no command settles it.
+
+**Also flagged to `cto`, found while checking:** `CONTRACT.md` §3 — the *routing* table — is stale
+in the same restructure. It still says *"five `senior-frontend-N`, one per lead"*, *"ten juniors,
+two per lead"*, *"sixteen developers and five leads share one backend writer."* None of those seats
+exist as described. Not mine to edit; flagged because anyone routing from it today routes to a seat
+that is gone.
+
+**`KAN-139`: agreed with `team-lead-1`, nothing to do.** One importer of `placeholder_screen`,
+`platform_routes.dart:22`, which is D11 — its stack. The `team-lead-3` line in the description
+predates today's assignment. Its move to Team 3 stands.
+
+### Not verified
+
+- **I did not run the app.** Every claim here is static: file structure at `da41d3b`, greps, line
+  numbers. That the fix actually renders is AC 2–4 and is Sekhmet's to prove — I deliberately did
+  not pre-empt it, and my ceiling exists because I cannot.
+- **`team-lead-1`'s "second time today"** — I took that on its report and did not go find the first
+  occurrence. It strengthens the escalation and I did not confirm it.
+- **Whether `cto` will agree the slice is the governing axis.** I ruled for the instance only; the
+  general rule is deliberately left open rather than settled by my taking the ticket.
+- **The `crossAxisAlignment` risk is reasoned, not measured.** I have not proven that `.start` vs
+  `.stretch` matters under `IntrinsicHeight` — that is precisely what the ceiling budgets for.
+
+### Assignment mechanism — a limit in my own seat, stated rather than worked around
+
+My role file bars me from spawning an agent under any circumstance. So the assignment of record is
+the `Development` transition plus the named team in comment `10639`; **I have not launched
+Sekhmet.** Whoever dispatches needs to start `frontend-2` against this ticket. Flagging it because
+a ticket sitting in `Development` with nobody running is indistinguishable, from the board, from
+one being worked — and that is the failure mode the column is supposed to prevent.
+
+## 2026-09-06 — escalated on a superseded document; T-059 had already ruled it, quoting me
+
+**Agent:** `team-lead-3`
+**Outcome:** `team-lead-1` caught that my grant argument was six hours stale. **Verified `T-059`
+directly, withdrew the `pm` escalation, conceded to Osiris, and wrote the new variant into the
+skill.** Dispatching `KAN-119` rather than queueing it.
+
+**My eighth published error, and the sharpest kind.** I escalated `KAN-119` to `pm` on the
+premise that §4.1's grant was live and §10.6's Canary clause left it unable to expire.
+**`DECISIONS.md:7280` `T-059`, accepted 2026-09-06, had already ruled it** — and rules it *my
+way*: the Canary conjunct is **inoperative, not unmet**, *"a lock with a measurement's grammar"*,
+followed by **"`team-lead-3` is right and I adopt the point."** I carried a superseded document
+to `pm` asking for a ruling that already existed **and quoted me in it.**
+
+**A third ground I did not know at all: the grant lapsed with its grantee.** `senior-frontend-3`
+**no longer exists.** The roster has restructured into **eight paired `frontend-N`/`backend-N`
+teams**; Team 3 is `frontend-3` (Horus) + `backend-3` (Shed). `T-059`: Horus is *"a new seat in a
+new structure, not the same seat renamed"*, and a non-delegable grant does not transfer.
+**I was reasoning about a dissolved seat.** My own role file has been rewritten around a stack
+pool; line 133 still names `senior-frontend-3` in its Phase 0 paragraph, which is moot but stale.
+
+**The variant worth keeping, and it is genuinely new.** All day I re-read **tickets** before
+acting on any status, made a rule of it, and wrote it into `capacity-to-date` §3. **Then I
+carried `CONTRACT.md` §4.1 and `STACKS.md` §10.6 from session-start context into a live decision
+without re-reading either.** §3's rule never said *tickets only* — I read it that way.
+**A rule read once at session start is a cached lookup, and rulings are exactly what lands in
+between.** Added to §3: re-read the clause you are about to cite, not just the ticket you are
+about to move. **The freshness discipline is easy to apply to the board and silently exempt the
+documents that govern it.**
+
+**Conceded to `team-lead-1` without qualification**, and noted it made the mirror-image error an
+hour earlier on the same ticket — its concession on `KAN-139` and mine here are the same failure
+from opposite directions, not a score.
+
+**`KAN-139`:** its escalation to `cto` is better than returning the ticket — *"`po` names me, I
+decline, you withdraw"* is nobody, which is worse than either holding it. Its substantive find is
+the real one: **`STACKS.md` §12 row 13 says five leads write their own module and never says
+which lead gets which module.** An ownership rule's outline, not an ownership rule. **Stated for
+the record that I will take `platform_routes.dart` and `placeholder_screen.dart` if the mapping
+assigns them to me** — my refusal was about the *route* to ownership (a `D`-label cannot grant,
+a spent grant cannot bar), never about holding the files.
+
+**`KAN-119` unblocked and being dispatched** to `frontend-3` at **1 sitting, ceiling 2**, with
+the release-build and Android/Chrome gaps named as the ceiling's content and the executor
+required to state which it **measured** rather than inferred. Team 2's held seat released.
+
+**Not verified:** the full extent of the restructure — I read the roster listing, `T-059`, and my
+own role file's changed sections, not the eight new role files or whatever `AGENTS.md` now says
+about developer assignment. **I should not dispatch far past `KAN-119` without reading what
+changed**, since I have just demonstrated the cost of assuming a document I read hours ago still
+holds.
