@@ -1,6 +1,6 @@
 ---
 name: drive-the-app
-description: Get a running Dabbler app in front of you and drive it, on the surface that actually works today. Use when a ticket must be tested end to end, when a "done" claim needs checking against real running behaviour, when a bug must be reproduced, or when you need a screenshot of the real app rather than a widget test. Covers choosing a surface (Android emulator, Chrome/CanvasKit, iOS, web integration_test), starting it, driving it by screenshot and coordinate, and the five traps that make a run lie to you.
+description: Get a running Dabbler app in front of you and drive it, on the surface that actually works today. Use when a ticket must be tested end to end, when a "done" claim needs checking against real running behaviour, when a bug must be reproduced, or when you need a screenshot of the real app rather than a widget test. Covers choosing a surface (Android emulator, Chrome/CanvasKit, iOS simulator, web integration_test), starting it, driving it by screenshot and coordinate — including tapping and typing on iOS, where simctl has no tap command — and the traps that make a run lie to you.
 ---
 
 # Drive the App
@@ -77,9 +77,13 @@ flutter test integration_test/app_test.dart -d emulator-5554 --dart-define-from-
 Measured result: **exit 0, `00:12 +1: All tests passed!`**. It leaves the git tree clean —
 `git status --porcelain` was empty afterwards.
 
-**Do not use `scripts/run_integration_tests.sh`.** **[M] 2026-09-06** — it auto-detects a
-booted *iOS* simulator and routes there, straight into the Trap 4 failure. It is an
-iOS-only script and its header says so. Call `flutter test` directly with `-d`.
+**Do not use `scripts/run_integration_tests.sh`.** **[M] 2026-09-06** — two independent reasons.
+It auto-detects a booted *iOS* simulator and routes there regardless of what you wanted; and
+**both its `exec` lines (`:40`, `:45`) omit `--dart-define-from-file=.env`**. `.env` is not in
+`pubspec.yaml`'s `assets:`, so `Environment.load()` finds no asset, falls back to
+`dotenv.testLoad(fileInput: '')`, and `_validate()` throws
+`Missing environment variables: SUPABASE_URL, SUPABASE_ANON_KEY, APP_NAME, ENVIRONMENT` before
+any test runs. Call `flutter test` directly with `-d` and the dart-define flag.
 
 **[M] This run hits LIVE Supabase and authenticates as a real user.** The measured run
 logged `FCM token saved for user ec959ff7-46ef-4bf2-aab4-3515b81f5846` and loaded 20 real
@@ -129,7 +133,104 @@ size. If a screenshot came back scaled, convert first:
 
 ---
 
-## The five traps
+---
+
+## Step 2c — Drive the app by hand (iOS simulator) **[M] 2026-09-06**
+
+```bash
+cd "/Users/moatazmustapha/Desktop/Thebes/Dabbler/dabbler-code"
+xcrun simctl list devices booted                       # get the UDID
+flutter run -d <udid> --dart-define-from-file=.env
+```
+
+`--dart-define-from-file=.env` is **not optional** here either — see the
+`run_integration_tests.sh` note in Step 2a for why the fallback cannot work.
+
+**Reach a route directly, without navigating to it:**
+
+```bash
+flutter run -d <udid> --dart-define-from-file=.env --route=/enter-password
+```
+
+Measured working: the router logs `[Router] loc=/enter-password ... allow (unauth on auth page)`.
+This is how you test a screen that sits behind a broken one. **`xcrun simctl openurl <udid>
+"dabbler:///enter-password"` does NOT work** — no router activity at all, despite the `dabbler`
+scheme and `FlutterDeepLinkingEnabled` both being set in `ios/Runner/Info.plist`. Unexplained;
+worth its own investigation, since deep links are a shipped feature.
+
+### Tapping and typing — there is no `simctl` tap
+
+`xcrun simctl` has **no tap or input command** (unlike ADB), and neither `idb` nor `cliclick` is
+installed on this machine. What works is `System Events` clicking Mac-desktop coordinates over
+the Simulator window.
+
+**Read the mapping live every session — never hardcode it; the window moves.**
+
+```bash
+osascript -e 'tell application "System Events" to tell process "Simulator" \
+  to get {position, size} of group 1 of window 1'
+# -> 670, 168, 402, 874     origin x,y on the desktop ; size in device POINTS
+```
+
+`group 1` is the device screen itself, excluding the bezel and toolbar. Screenshots come back at
+**3×** those points (1206×2622 for an iPhone 16 Pro), so:
+
+```
+mac_x = origin_x + screenshot_x / 3
+mac_y = origin_y + screenshot_y / 3
+```
+
+```bash
+# tap
+osascript -e "tell application \"System Events\" to click at {$MX, $MY}"
+
+# type — Simulator MUST be frontmost first
+osascript -e 'tell application "Simulator" to activate'
+osascript -e "tell application \"System Events\" to keystroke \"$TEXT\""
+
+# screenshot, then Read the file
+xcrun simctl io <udid> screenshot /path/out.png
+```
+
+**The silent failure that will waste your time:** typing without activating Simulator first
+*focuses* the field — you can see the purple border and the caret in the screenshot — but enters
+no text. It looks exactly like a broken text field. Activate first, every time.
+
+Typing also needs *I/O ▸ Keyboard ▸ Connect Hardware Keyboard* enabled (it was already on here;
+check with the menu-item's `AXMenuItemMarkChar` if text still will not land).
+
+**Accessibility works, and is a better handle than coordinates.** The simulator does expose a
+real AX tree — a click resolved to
+`button 1 of group 1 of … sheet 1 of group 3 of group 15 of group 1 of window …`. A shallow
+`entire contents` of `window 1` returns only the bezel buttons and hides this, so do not conclude
+from that alone that the tree is unavailable.
+
+### Two iOS-only traps that will break a scripted run
+
+**A native permission alert covers the app on first launch after install.** *"Dabbler" Would
+Like to Send You Notifications* renders over `/landing`. It is a **SpringBoard** alert outside
+the Flutter view, so `tester.tap` cannot reach it and `find.text` will not see it. A fresh-install
+`integration_test` hangs there with no useful error. `xcrun simctl privacy` has no service for
+notifications, so dismiss it by coordinate or avoid triggering the request during tests.
+
+**A persisted session makes a login test pass vacuously.** A previously-installed app boots
+straight past auth — `[Router] redirect (authed on auth page) -> /home` and an `FCM token saved
+for user <uuid>` line. Clear it first, verified working:
+
+```bash
+xcrun simctl uninstall <udid> app.dabbler.pro
+```
+
+The next launch then logs `Can't refresh session, no refresh token found` and stops on
+`/landing`. Note the bundle id is **`app.dabbler.pro`** (`ios/Runner.xcodeproj/project.pbxproj:503`)
+— the `.maestro/` flows' `com.onebrain.dabbler` is stale and would not even launch.
+
+---
+
+## The traps that make a run lie to you
+
+Trap 4 is kept as a **resolved** entry rather than deleted, because the stale version of it
+caused real damage and the correction is worth reading. Two more iOS-only traps live in Step 2c.
 
 ### Trap 1 — CanvasKit gives you no DOM **[U, inherited; measured 2026-08-29]**
 
@@ -163,26 +264,25 @@ Two independent blockers, both measured today:
 So the gap on web is **setup that was never done**, not a tool that is forbidden. See the
 `#356` note in `agent/roles/qa.md`.
 
-### Trap 4 — iOS is blocked by a space in the repo path **[M] 2026-09-06**
+### Trap 4 — RESOLVED 2026-09-06. iOS is no longer blocked. **[M]**
 
-`flutter test integration_test/app_test.dart -d <ios-udid>` fails before any Dart runs:
+This trap used to say every iOS build died in SwiftPM because the space in `One Brain` was
+percent-encoded twice (`One%20Brain` in `NSFilePath` vs `One%2520Brain` in `NSURL`), so the
+resolver looked for a directory literally named `One%20Brain`.
 
-```
-Xcode failed to resolve Swift Package Manager dependencies:
-xcodebuild: error: Could not resolve package dependencies:
-  main/Package.swift:79: Fatal error: Failed to load configuration:
-  fileNotFound("Error loading or parsing pubspec.yaml: ... NSFilePath=/Users/moatazmustapha/
-  Desktop/One%20Brain/.../pubspec.yaml, NSURL=file:///Users/moatazmustapha/Desktop/
-  One%2520Brain/.../pubspec.yaml ...")
-```
+**The `One Brain` → `Thebes` rename removed the space and the bug with it.** Measured today from
+`/Users/moatazmustapha/Desktop/Thebes/Dabbler/dabbler-code`: SwiftPM resolved all ~20 packages,
+`Running pod install... 810ms`, `Xcode build done. 162.1s`, app launched and ran on
+iPhone 16 Pro / iOS 18.5.
 
-**The file is not missing.** `ios/Flutter/ephemeral/pubspec.yaml` exists on disk at 1172
-bytes — verified. Note `One%20Brain` in `NSFilePath` against `One%2520Brain` in `NSURL`:
-the space in `One Brain` is **percent-encoded twice**, so Xcode's SwiftPM resolver looks
-for a directory literally named `One%20Brain`. Every iOS build from this checkout hits it.
+**This entry stayed stale for a while and it cost us.** Reading "iOS is blocked" stopped anyone
+opening the app on iOS, and a screen that renders blank on `/auth-welcome` sat undiscovered
+behind it. If you find a `[M]` line here that contradicts what your machine just did, **trust
+your machine and fix the line** — that is the whole point of the `[M]`/`[U]` marking.
 
-**Do not file this as a Dabbler app bug.** It is an environment/toolchain defect in the
-repo's location. If iOS coverage is needed, that is an escalation to `po`.
+What to still expect: the **first** build is ~8 minutes wall clock, almost all of it one-time
+SwiftPM clones (`firebase-ios-sdk`, `abseil-cpp-binary`, `GoogleAppMeasurement`, …). It looks
+like a hang and is not. Later launches are well under a minute.
 
 ### Trap 5 — an HTTP 200 on `*.dabbler.pro` is not evidence a file exists **[U, inherited; measured 2026-08-29]**
 
