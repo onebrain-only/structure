@@ -1942,3 +1942,79 @@ writes client code **from scratch**, not against existing code whose keys might 
 **Not a blocker on `pm`'s proposal — an argument for landing it before `Ready` is filled for D4.**
 
 **Changed:** this file. No code, SQL, copy, git or Jira.
+
+## 2026-09-07 — money-chain gate ruled: KAN-145 released, KAN-146 holds
+
+**Task.** Confirm whether the gate on `KAN-145` and `KAN-146` still holds; establish real live
+status of `KAN-138`/`KAN-140`/`KAN-128`; sequence anything startable with a capacity number.
+
+**Read first-hand, not from status files.** `T-058` (`Dabbler/dabbler-docs/DECISIONS.md:7420`),
+`T-061` (`:7768`), `T-052` amendment (`:6862`). Board read live via JQL against `KAN`.
+
+**Live status, all read from Jira 2026-09-07:**
+
+| Ticket | Status | `due_date` | Note |
+|---|---|---|---|
+| `KAN-128` | Development | 2026-09-10 | **apply has NOT happened**, and is not late — `cto`'s Wednesday 09-09 slot is two days out |
+| `KAN-136` | Development | 2026-09-08 | design-only |
+| `KAN-138` | Ready | 2026-09-13 | not pulled |
+| `KAN-140` | **To Do** | none | not started, not even in `Ready` |
+| `KAN-145` | To Do | none | ungated — see ruling |
+| `KAN-146` | To Do | none | gated — see ruling |
+
+**Ruling 1 — `KAN-145` is NOT gated; startable now.** Its dependency was on `T-061` being ruled
+and `T-061` is Accepted. `KAN-140` depends on **it** (its `INTO STRICT` asserts a guarantee only
+this FK provides), not the reverse. `KAN-136` is design-only. **One real constraint, on the apply
+leg only:** `T-052`'s amendment keeps `KAN-128` "applied alone and first", so KAN-145's apply
+queues behind it in `cto`'s queue. That hazard is about whole-body `CREATE OR REPLACE` reverting
+`KAN-128`'s `ON CONFLICT` clauses; KAN-145 touches no function body and cannot revert anything.
+**Authoring free now, apply ordered.** Flagged to `cto` as derived-not-received, for correction.
+
+**Ruling 2 — `KAN-146`'s gate HOLDS.** Both named predecessors unapplied. `T-058` forbids citing a
+green `KAN-128` as evidence the money layer works. Reported **unsizeable** per `capacity-to-date`
+§4 rather than as a caveated number — its count depends on whether the fixture chain runs clean
+with all triggers **enabled**, the opposite of the harness deviations `T-058` D3 / `T-060`
+accepted. Contingency written onto the ticket now, not left for the day: a failed demonstration is
+**blocked and reported**, never narrowed into a pass.
+
+**Capacity reported.** `KAN-145` authoring: **1 sitting, earliest 1, ceiling 2** — one migration
+file, one deliverable, one kind, population enumerable before starting; no dependency boundary
+(AC 3's "or" is satisfiable in the one file). The 1→2 gap **is** the rework budget, named as such;
+basis is that it is a money write. **Apply leg: hand-off to `cto`, no date from me** — requested
+`cto`'s own count to carry back unchanged (`capacity-to-date` §3).
+
+**Deliberately NOT transitioned to `Development`.** `agent/WORKFLOWS.md:60` puts the lead's
+transition *after* a developer pulls, and developers self-pull from `Ready`. `KAN-145` sits in
+`To Do` with no date, so nobody can pull it. Routed to `po` for the date and the `Ready`
+transition; I make the `Development` call once a `backend-N` seat picks it up. No developer
+hand-assigned.
+
+**Sent:** `po` (capacity + Ready request), `cto` (apply-leg count request + the ordering
+confirmation). Ruling comments posted on `KAN-145` and `KAN-146`.
+
+**Not verified.** That the executing seat agrees with 1 sitting — that count is mine on ticket
+content, not carried from an executor, and is revisable by whoever pulls it. Nor `cto`'s apply-leg
+count, which is requested and outstanding. Nor whether "alone and first" is meant more broadly
+than the function-body hazard — I derived that reading and asked `cto` to confirm or correct it.
+
+**Brief calibration, per the MODEL/EFFORT rule.** No MODEL/EFFORT line on this brief; treated as
+role default. The work needed high effort and got it — the brief's step 3 assumed `KAN-145` could
+be sequenced straight to `Development`, and that is wrong under `WORKFLOWS.md:60`; it needs `po`'s
+`Ready` gate first. A similar task should be briefed as "rule the gate and route the capacity",
+not "transition it".
+
+**Closed the loop, same day.** `po` converted the count and transitioned it. **Verified live in
+Jira rather than taken from the reply** (read 2026-09-07T00:38): `KAN-145` status **Ready**,
+`due_date` **2026-09-09**; `KAN-146` still **To Do**, `due_date` unset. Both match what `po`
+reported.
+
+`po`'s mapping is consistent with my count and is its own to own: earliest 2026-09-08 (1 sitting),
+ceiling 2026-09-09 (the 2-sitting ceiling), one sitting per working day — so the 1-day gap carries
+the rework budget I named. It also separated the legs correctly: the date covers **authoring
+only**, `cto`'s apply is a further date to add rather than a correction to this one, and it flagged
+the `KAN-128` 09-09/apply-slot confusion by name so nobody reads 2026-09-09 as `cto`'s apply date.
+That is the exact category error `capacity-to-date` §2 warns about, caught on the way in.
+
+**`Ready` is now stocked for this chain.** Remaining open: `cto`'s apply-leg count (requested,
+outstanding) and its confirmation of my "alone and first" reading. My next action is the
+`Development` transition, once a `backend-N` seat self-pulls `KAN-145` — not before.

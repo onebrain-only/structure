@@ -1385,3 +1385,110 @@ file's stated remit, per the audit's own warning that a name is not a fit. Full-
 would be needed before actually adopting any of the two I flagged as gaps.
 
 **Reported to:** `team-lead` (via SendMessage).
+
+## 2026-09-07 — D4 sequencing constraint on the pro/prime plan-key retirement (relayed from `team-lead-4` via `team-lead`)
+
+**Task:** re-verify `team-lead-4`'s grep findings myself, then carry the plan-key retirement
+proposal (P-038's open item) forward through `po` and `cpo` with a new sequencing constraint
+`team-lead-4` found: the `kickoff`/`pro`/`prime` → `12a` tier-name mapping must be ruled
+**before** any D4 entitlement ticket is stocked, or the first screen gets built against keys
+about to be retired.
+
+**Re-ran both greps myself against `Dabbler/dabbler-code`, don't trust the relay:**
+```
+grep -rniE "'(pro|prime)'|\"(pro|prime)\"" lib --include="*.dart" | grep -iE "plan|tier|subscri"  → no matches
+grep -rn "subscription_plans|planKey|plan_key" lib --include="*.dart"                              → no matches
+```
+Both confirmed empty. Checked the one adjacent false lead too — `tiersTable`/
+`profileTiersTable`/`sportProfileTiersTable` in `supabase_config.dart` are player skill-tier
+tables (`auth_service.dart`, `profile_creation_service.dart`, `sport_profile_service.dart`),
+unrelated to subscription plan keys. Retirement is client-safe by construction: zero rows
+(82/82 `user_subscriptions` on `kickoff`, per P-038) and zero client references, not one
+call site.
+
+**Constraint holds.** Same rework shape `cpo` already flagged for the charging side in
+`T-063`, one layer up — an entitlement ticket writes new client code against
+`subscription_plans` from scratch, so stocking one before the mapping is ruled builds it
+against keys about to move.
+
+**Moved the proposal:**
+- `po` — messaged directly: hold D4 entitlement tickets out of `Ready` until `cpo` rules the
+  mapping. Confirmed this does not touch non-entitlement D4 work (already unblocked under
+  P-038) or charging/pricing/payment-record tickets (already separately gated on `T-063`'s
+  billing tables landing). No D4 entitlement ticket found stocked yet — a forward gate, not
+  a rollback.
+- `cpo` — **could not deliver.** Not reachable in this session (`SendMessage` error: only
+  `cto`/`po`/`pm`/`main` addressable). This is the exact decision P-038 already named as
+  `cpo`'s to make. Reported the block to `team-lead` rather than substitute my own judgment
+  for `cpo`'s ruling or route around it.
+
+**What remains undecided:** the actual tier-name mapping ruling — blocked on reachability
+only, not on an open question. Handed to `team-lead` to route to `cpo`.
+
+**Reported to:** `team-lead` (via SendMessage to `main`), `po` (gate instruction).
+
+## 2026-09-07 (cont.) — `cpo` now reachable, mapping ask re-sent directly
+
+`team-lead` spawned `cpo` and briefed it with the full context (grep verification, the
+`tiersTable` false lead, `po`'s gate) — the earlier block was a reachability gap in this
+session, not an unresolved question. Sent a short direct confirmation to `cpo` establishing
+contact and asking it to send its ruling to both me and `po`. `team-lead` deliberately left
+the key set (`kickoff`/`pro`/`prime`) and `12a`'s tier count for `cpo` to establish from
+source itself rather than from the relay — correct call, those are exactly the numbers that
+travel unverified.
+
+**Status: waiting on `cpo`'s ruling.** `po`'s D4 entitlement gate stays closed until then. No
+further action on my side unless `cpo`'s ruling needs relaying or auditing once it lands.
+
+## 2026-09-07 (cont.) — `po` confirms no D4 entitlement ticket exists yet
+
+`po` checked the board directly (JQL across summary/description for "entitlement" and
+"subscription_plans") — no D4 entitlement ticket exists today; the three hits found
+(`KAN-77`, `KAN-63`, `KAN-30`) are unrelated. So there is nothing to roll back — the gate I
+asked for is purely forward-looking, as I'd assumed. `po` will check for `cpo`'s ruling
+before authoring any entitlement ticket rather than assume it's landed, and confirmed the
+gate doesn't extend to non-entitlement D4 schema/infra work (already unblocked under P-038)
+or the charging/pricing tickets (separately gated on `T-063`).
+
+**Status unchanged: waiting on `cpo`'s ruling.** Nothing further on my side.
+
+## 2026-09-07 (cont.) — `cpo` ruled `P-039`; two follow-ups opened, not closed
+
+`cpo` ruled the plan-key mapping (`DECISIONS.md` `P-039`): `kickoff`→`player_free`;
+`pro`→splits into `player_pro`+`organiser_pro` (was one key covering two products at two
+prices); `prime`→retired, nothing replaces it. Plus `organiser_free`, `venue_basic`,
+`venue_pro`, `corporate_starter`, `corporate_growth`. Corrected my/`team-lead-4`'s assumed
+"12a has five tiers" — it's persona×tier, not five, and a single `pro` key was ambiguous
+across four products. `po`'s D4 entitlement gate is open; `po` had already independently
+verified no D4 entitlement ticket exists yet, so nothing to unwind.
+
+**Two items I did not let close as settled, both handed to the right owner rather than
+decided by me:**
+
+1. **Rename mechanism + sequencing — `cto`'s call, not mine or `cpo`'s.** `key` is PK behind
+   three FKs (`user_subscriptions`, `subscription_features`, `notification_hourly_caps`).
+   Flagged to `cto` that "mapping ruled" ≠ "schema moved" — asked explicitly whether
+   entitlement ticket authorship should wait on the migration landing, the same trigger
+   shape `team-lead-4` already owns for `T-063`. Told `po` to treat `cto`'s answer as the
+   real gate, not `cpo`'s ruling alone.
+
+2. **Orphaned `prime` behavior (rank boost, hourly caps, quiet-hours bypass) — backlog
+   disposition is mine, and I ruled it cleanup, not a feature.** `cpo` confirmed no
+   committed product exists behind it in `12a` and declined to assign it a home, calling it
+   "a code ticket, not a data one." My call: this must not get read as license to scope a
+   real notification-priority product — it's dead-literal cleanup after the rename lands,
+   low priority (degrades safely today per `cpo`). Told `po` not to file it yet; asked `cto`
+   whether it folds into the same migration pass or ships as a separate follow-up, and I'll
+   relay whichever back to `po` as the ticket instruction.
+
+**Status: waiting on `cto`'s answer on both.** `po`'s gate stays open for scoping but I've
+asked it to hold on authoring any ticket that hardcodes a key-name string until `cto`
+confirms sequencing.
+
+## 2026-09-07 (cont.) — `po` acknowledged, both items held correctly
+
+`po` confirmed: no D4 entitlement ticket authored/stocked with a hardcoded key-name string
+until `cto` confirms rename sequencing (not treating `cpo`'s `P-039` mapping ruling alone as
+sufficient); `prime` cleanup left unscoped pending my ticket instruction once `cto` rules the
+mechanics. No new decision needed from me — holding for `cto`'s reply on both the sequencing
+question and whether the cleanup folds into the same migration pass.

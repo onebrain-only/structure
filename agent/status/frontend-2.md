@@ -175,3 +175,52 @@ Pure deletion, no dependents, one analyze+test cycle to verify. Nothing makes it
 
 **Correction for the record:** repo-wide analyze is **55 issues**, not 56 — 57 → 56 → 55
 across my three commits. The 56 figure predates the KAN-139 commit.
+
+## 2026-09-07 — KAN-130 client half, `ownerType` gap closed (`7d2cd47`)
+
+`team-lead-4`'s gap is real and I re-verified it myself rather than accepting it.
+`lib/data/models/wallet.dart` at HEAD had `ownerId` (from `b6b2ea9`) and no
+`ownerType`. `T-051` (`DECISIONS.md:6669`) makes the pair the design and makes
+`owner_type` **NOT NULL**; `wallets_owner_type_valid` (baseline schema `:26687`)
+constrains it to `'user' | 'venue' | 'platform'`. So the field's type and values
+came from the schema, not from guesswork.
+
+**Added** `Wallet.ownerType`, mirroring `ownerId` exactly: nullable field, required
+in the const ctor, `m['owner_type']` in `fromMap`, `'owner_type'` in `toMap`.
+`WalletLedgerEntry.userId` is a different column — untouched.
+
+**No `build_runner` step.** `Wallet` is a plain `@immutable` class, not Freezed —
+the brief's step 3 assumed otherwise. Worth knowing before the next wallet ticket.
+
+`flutter analyze --no-pub --no-fatal-infos` → 0 errors, 0 warnings, 55 infos.
+`flutter test` → 106 tests, all passed.
+
+**Size: 1 sitting.**
+
+**Two things I did not do, deliberately.**
+
+1. **Did not push.** `origin/Canary` is 14 commits behind local; 13 are other
+   agents' unshipped work. Pushing would deploy all of it to canary.dabbler.pro,
+   which is outside this ticket. Left for the lead to sequence.
+2. **Did not transition the ticket.** The SQL half has not started and is gated on
+   `cto` applying `KAN-128`. `KAN-130` is not done; only its client half is.
+
+**Discrepancy raised to `po`:** AC3 on `KAN-130` as it reads today still says only
+"rename `Wallet.userId` → `Wallet.ownerId` (four lines)" — no mention of
+`ownerType`. The brief said `po` had corrected AC3 in place. Either the correction
+did not land or I read it before it did. The code is right either way (it follows
+`T-051`, which is unambiguous), but the criterion does not yet describe it.
+
+**Discrepancy resolved (`po`, 2026-09-07).** The AC3 correction had never landed —
+`po` narrated it in comment 10659 on 2026-09-06 but did not call the edit that
+writes the description field. The ticket I read was the live one and it genuinely
+said four lines, `ownerId` only. `po` has now edited AC3 to require both fields,
+corrected the count to eight lines, and repointed the Executor section from the
+retired `senior-frontend-4` seat to `frontend-2`. `7d2cd47` satisfies the corrected
+criterion as shipped — no rework. Ticket stays in `Ready`; the SQL half is still
+gated on `cto` applying `KAN-128`.
+
+Worth carrying forward: the brief asserted a ticket edit had happened, and it had
+not. Reading the live ticket rather than trusting the brief is what caught it, and
+building from `T-051` rather than from either text is what made the commit correct
+regardless of which was right.

@@ -540,3 +540,43 @@ hardcodes `pro`/`prime`; `12c` not consulted — `12a` governs plan prices, `12c
 `T-063` untouched.
 
 **Reported to:** `pm`.
+
+## 2026-09-07 — Ruled the plan-key mapping (`P-039`). Retire `pro` and `prime`; the key must be persona-qualified
+
+**Asked by `team-lead-4`** as the D4 entitlement gate, answering the question `P-038` reserved to this
+seat. **ALIGNED WITH CONSEQUENCE.** Full entry: `Dabbler/dabbler-docs/DECISIONS.md` `P-039`.
+
+**Both counts in the request were checked and the second was wrong.** Three live keys is right —
+`select key, label from public.subscription_plans` returns exactly `kickoff`/`pro`/`prime`,
+`description` NULL on all three, and **no seed `INSERT` exists in any migration**, so the key set is
+unreadable from the repo. But **`12a` has no five tiers and no tier ladder at all**: its §A.3 matrix is
+**persona × tier** across five personas. That is the ruling — `subscription_plans.key` is
+one-dimensional and cannot express it, and **a key named `pro` is ambiguous across four products** —
+Player Pro 29, Organiser Pro 99, Venue Pro 299, and Corporate, which §E.2 grants Player Pro free.
+
+**The mapping:** `kickoff` → `player_free` (§B.1); `pro` → **two rows**, `player_pro` (§B.2) *and*
+`organiser_pro` (§C.2); `prime` → **nothing, retired** — no third player tier exists in `12a`. Also
+seed `organiser_free`, `venue_basic`, `venue_pro`, `corporate_starter`, `corporate_growth`. **Refused
+four:** `corporate_enterprise` (§E.1 *"25,000+ (custom)"* — not a catalogue row), Verified Organiser
+Certification (§C.4 *"Not a subscription tier"*), `venue_unclaimed` (§D.1 — no owner, so no subscriber),
+and **Socialiser — NOT ESTABLISHED**, handed to `po` with the test that decides it.
+
+**The consequence I measured rather than assumed.** `user_subscriptions`: 82 rows, all `kickoff`, none
+on `pro`/`prime` — retirement strands no customer. But `subscription_features` holds 9 rows per key and
+`notification_hourly_caps` 3 per key, and `prime`'s are wired into shipped functions (`:3513` rank
+boost, `:4006` caps, `:17203` quiet-hours bypass). **`12a` commits no notification-priority product** —
+§B.2's four pillars do not include it. So that is built behaviour with no committed product, and I
+declined to give it a home to make the migration tidy. `:4006` defaults an unknown plan to free, so it
+degrades safely; the `'prime'` literals become permanently false and need a ticket, not a dead branch.
+Re-checked Permanent Truth 3 again: not engaged — the score is for notifications delivered *to* the user.
+
+**Nothing becomes sellable.** §A.3 / §H.3 still bind: paid rows date from Phase 1B, per `P-038`.
+
+**Verified myself:** the three live keys and labels, four live row counts, the table definition
+(`baseline_schema.sql:24673`) and its three FKs, and `12a` read end to end. **Taken on relay:** the two
+empty client greps and the skill-tier false lead — engineering facts that do not move the product answer.
+
+**Changed:** this file and `DECISIONS.md` (`P-039`). No code, SQL, migration, Jira or Notion write.
+
+**Reported to:** `pm` and `po`. Owed: `cto` the rename mechanism and the `'prime'` literals; `po` the
+Socialiser question. **The D4 entitlement gate is open.**

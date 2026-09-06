@@ -941,3 +941,65 @@ them for the backfill.
 `enablePayments` is false, subscriptions are Month 9, nothing to migrate. **The trigger is the first
 D4 ticket that writes against subscriptions**, and D4 activating a lead is not that moment. A
 calendar date would be less accurate than the trigger.
+
+## 2026-09-07 — KAN-141 re-verification + shared-tree standard: both already ruled; §12 written; T-064 corrected
+
+Re-dispatched two items already settled as `T-064` (KAN-141) and `T-065` (shared working tree).
+Rather than re-rule, I re-measured live and closed the gap both decisions left open.
+
+**Re-verified myself, read-only, on `wtncuzcskpigqpmnxwws` (2026-09-07):**
+- `username_registry_public`: `security_invoker` absent, `has_table_privilege('anon',…,'SELECT')`
+  = true, body = `SELECT list_active_usernames()`; `list_active_usernames()` is `SECURITY DEFINER`,
+  body has no predicate but `released_at is null`. `username_registry` = **0 rows**, 3 policies.
+  Confirms `backend-4`: the zero is data, not a control. Ruling **DROP** stands.
+- `v_potential_vibes_default`: confirmed NULL-comparison zero (`spw.user_id <> p_me`,
+  `p_me := auth.uid()`). Not a control. Standing rule now written.
+- `v_recreate_quickpicks`: zero **is** mechanism-enforced, but `T-064` and `backend-4`'s migration
+  header both name the wrong object. It is DEFINER, has no `auth.uid()`, and reaches the gate via
+  `rpc_recreate_suggestions` → `v_recreate_candidates`. Verdict unchanged; **correction appended
+  to `T-064`** rather than a new decision.
+
+**Wrote `docs/CONVENTIONS.md` §12** — the section `T-064` and `T-065` both owed and which did not
+exist. 12a NULL-comparison predicates; 12b no shared tree, **`stash`/`checkout`/`reset`/`clean`
+forbidden in the shared checkout** and the sanctioned clean-tree measurement; 12c sha on every
+quoted measurement.
+
+**Open, and not mine:** migration `20260906210000_kan141_drop_list_active_usernames_and_public_view.sql`
+is written and **not applied** — the view is still live. `docs/SCHEMA.md` already reads *dropped*
+and is uncommitted. Doc and prod disagree. `devops` applies; `po` tickets if it needs one.
+
+Files: `Dabbler/dabbler-code/docs/CONVENTIONS.md` §12 (new) ·
+`Dabbler/dabbler-docs/DECISIONS.md` T-064 (correction appended). Both uncommitted.
+
+## 2026-09-07 (cont.) — KAN-140 is stale, not blocked; §12d written; SCHEMA.md disposition
+
+- **KAN-140:** no `cto` ruling is outstanding. `T-061` (2026-09-06, Accepted) answered the
+  NULL-policy question by removing it — the FK makes NULL unreachable. AC6/AC7 citing `T-061`
+  were already added to the ticket 2026-09-06T20:11. The ticket's "Not set" section is stale
+  prose from before the ruling. Not the long pole. `po` to strike the stale line; real
+  dependency is `KAN-145` FK landing first.
+- **`docs/CONVENTIONS.md` §12d** written — the `T-049` D3 / `T-061` line owed and missed when I
+  wrote §12 earlier today: constraint holds the invariant, function asserts it.
+- **`docs/SCHEMA.md:308` disposition ruled:** revert the uncommitted edit; it must land in the
+  same commit as the migration and the `check_anon_allowlist_test.sh:20` fixture line. Doc must
+  not lead prod.
+- **`devops` not spawnable this session** — KAN-141 apply has no seat. Surfaced, not routed
+  around. I did not apply it.
+
+## 2026-09-07 (cont.) — I retract the SCHEMA.md revert; §12b gains a path-scoped carve-out
+
+`team-lead` caught my §12b ruling colliding with my own revert instruction. Measured the tree
+at `7d2cd47` before answering — and the measurement killed the instruction, not the convention.
+
+`git status --short`: `docs/SCHEMA.md`, `scripts/ci/check_anon_allowlist_test.sh` (the fixture
+line already removed by `backend-4`), and untracked
+`supabase/migrations/20260906210000_kan141_...sql`. **That is the complete, coherent KAN-141
+change set — exactly the one commit I said it had to be.** Nothing to revert. My earlier
+"revert `SCHEMA.md`" was issued having looked only at that one file; the doc-leads-prod hazard
+does not exist while the edit is uncommitted. Leave all three; `devops` applies and commits
+them together. `docs/CONVENTIONS.md` (§12/§12d, mine) commits separately.
+
+`CONVENTIONS.md` §12b amended: path-scoped `git restore -- <path>` on a hunk you authored is
+permitted (blast radius = that path); the ban targets the repo-global forms. Plus a new
+standing line: **read `git status --short` before discarding anything, and unlanded is not
+the same as incorrect.**

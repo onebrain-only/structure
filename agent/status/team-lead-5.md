@@ -290,3 +290,55 @@ workaround and the limit it named — and rule 3 now applies to every figure it 
 and is therefore unsupportable under `T-065`. Recorded rather than quietly fixed. **Every figure in
 my own earlier entries today predates rule 3 and carries no sha either** — I am not retrofitting
 them; they stand as of HEAD `90ea9f7` or they do not stand.
+
+## 2026-09-07 — KAN-149 capacity: verified the defect, refused the sequencing
+
+**Task.** `po` (via the distribution layer) asked for a capacity number and a ride-along judgement on KAN-149 — the `feature_flags.dart` comment left dangling by KAN-143's deletion of `lib/data/models/rewards/`.
+
+**Verified independently at `dabbler-code` 7d2cd47.** Tree was dirty (`docs/CONVENTIONS.md`, `docs/SCHEMA.md`, `scripts/ci/check_anon_allowlist_test.sh` modified, one untracked migration). Per `CONVENTIONS.md` §12b / `T-065` I did NOT clean it — quoted the sha and state the tree was dirty.
+- `lib/core/config/feature_flags.dart:24-27` cites `lib/data/models/rewards/` as the evidence for `enableEarlyBirdCheckIn`'s narrow scope. Line 26 carries the path.
+- `ls lib/data/models/rewards` → No such file or directory.
+- `git show --stat 357c544` → KAN-143, "delete 6,239 LOC of dead code", `lib/data/models/rewards/` at 15 files / 5,209 LOC. `po`'s figures match exactly.
+- `grep -rn "data/models/rewards" lib/` → one hit, that comment. Sole surviving reference.
+
+`po`'s measurement holds. One point of emphasis added: the comment uses the deleted path as *justification*, not decoration — the rewrite must keep the reasoning, not just drop the path.
+
+**Capacity reported as a COST, not a date** (`capacity-to-date` §3 — shared single-writer surface whose queue I do not own):
+- the edit itself: well under one sitting; 2-4 comment lines, no code path, no test, no codegen.
+- the gate: one contended-file slot, which I do not hold.
+
+**Refused the sequencing, and why.** `CONTRACT.md` §3 lists `lib/core/config/feature_flags.dart` among the four CONTENDED files and `lib/core/**` as SHARED — no single writer, `cto` sign-off required, no junior enters. My measured boundary (`T-047`) is `notifications` + `lib/services/notifications/**`, 19 files / 4,259 LOC. This file is not in it. **I did not transition KAN-149 to `Development` and assigned no team.** §4 rule 4 confirms the ticket is correctly scoped as standalone cleanup; what it lacks is an owner, because a contended file has none by default.
+
+**Ride-along: none, checked not asserted.** Queried the board — 9 tickets in Ready/Backlog/Development (KAN-119, 128, 129, 130, 131, 132, 136, 137, 138). All payments/wallet SQL, profile-stack deletion, account-deletion copy, or the auth-welcome route. None opens `feature_flags.dart`; none is in the notifications slice. No carrier exists this sprint.
+
+**Sent.** `po` — verification, cost, boundary refusal, board check. `cto` — escalated the one thing measurement cannot settle: which seat holds the contended-file slot for this edit.
+
+**Not delivered.** The `CONVENTIONS.md` §12b briefing for `frontend-5` — the seat is not currently running (SendMessage: no agent reachable). **Outstanding: `frontend-5` must be told about §12b before its next measurement in the shared checkout.** It has not yet been told that stash/checkout/reset/clean are forbidden, and its own `git stash -u` during KAN-143 is what produced the rule.
+
+**Feedback on the dispatch.** The brief assumed this was mine to sequence. It was not, and the boundary check was the whole task — the sizing took minutes. A similar ticket should have its write boundary checked against `CONTRACT.md` §3 before it is routed to a lead for capacity, or the lead is asked to price work it cannot assign.
+
+### 2026-09-07 (cont.) — KAN-149 landed; number delivered, slot released
+
+`cto` ruled that `frontend-5` enters (the seat whose landed change created the defect repairs it). Committed `dc63d69`, not pushed.
+
+**Verified the landed change myself rather than relaying it.** At `dc63d69`: `git show -U0 -- lib/core/config/feature_flags.dart` → one hunk, `@@ -25,3 +25,3 @@`, three lines out / three in, that file the only one in the commit. `enableEarlyBirdCheckIn` still `false`; no flag added, removed or revalued. `grep -rn "data/models/rewards\|357c544" lib/` → **zero hits** — both the dead path and the sha are gone. The replacement rests the flag's justification on the app's actual state rather than on a path or a commit that can rot; that was the point of the addition I made to `po`'s criteria.
+
+**Delivered to `po`:** cost = well under one sitting, gate = one contended-file slot I did not hold — and the note that a `due_date` derived from my number would now be fiction, since the work has landed; use the completion date, or take the figure as a retrospective size.
+
+**§4 slot on `feature_flags.dart` released.** I hold nothing on that file.
+
+**Passed to `po` as a gate caveat:** `docs/CONVENTIONS.md` was already modified in the working copy when `frontend-5` started, so the §12b both of us complied with today is **uncommitted**. `cto` owns it and has ruled it commits separately from the `KAN-141` set. Does not affect KAN-149's correctness, but anyone checking work against §12b is checking a working-copy convention.
+
+**§12b held on its first run after the catch.** `frontend-5` measured on a dirty tree and said so, naming the three files it left alone rather than cleaning to look tidy. The briefing I could not deliver (seat not running) reached it by another route; that outstanding item from the entry above is closed.
+
+**Recorded by `cto` in `DECISIONS.md`:** a ticket's write boundary is checked against `CONTRACT.md` §3 *before* it is routed to a lead for capacity. That is the durable output of this task — the sizing itself took minutes.
+
+### 2026-09-07 (cont.) — crossed messages with `po`; corrected the board state
+
+`po` wrote that KAN-149 stays in To Do with nothing further from me until `cto` answers. That message crossed mine: `cto` had already ruled (`frontend-5` enters — the seat whose landed change created the defect repairs it), the fix is committed at `dc63d69`, and `frontend-5` moved it to `In Review` itself. Told `po` not to wait, and re-sent the short-form verification so its review gate can run.
+
+`po` amended the ticket usefully in two ways worth recording:
+- **AC1 now requires the reasoning to survive**, credited to my read — a rewrite that drops the dangling path but loses the "no broader rewards system to toggle" justification *fails* the criterion rather than merely being poor style. Verified satisfied at `dc63d69`.
+- **Struck the routing note** that framed this as a lead-capacity question, replacing it with the real gap.
+
+**The gap `po` identified is still open and is NOT closed by `cto`'s ruling.** `WORKFLOWS.md:60` assigns contended-file sequencing to "the owning `team-lead-N`", which presumes an owning slice. A slice-less contended-file ticket has none. `cto` resolved *this instance* by naming an entering seat and recorded the boundary-check-before-routing rule in `DECISIONS.md` — but the general question of **who sequences a slice-less contended-file ticket** is a separate hole and remains unanswered. Flagged to `po` to keep on the ticket or raise as its own. Anyone hitting this next will hit it again.
