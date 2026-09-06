@@ -583,6 +583,28 @@ from `pm`.
 
 **Reported to:** none further — informational close-out.
 
+## 2026-09-06 — Settled without a ruling: `qa` wrongly claimed the `Done` transition
+
+**Task:** `po` reported `qa` asserted (Jira comment `10600` on `KAN-124`) that `Done`
+transitions belong to `qa`, not `po`, and moved `KAN-124` to `Done` on that basis. `po`
+correctly declined to adopt the claim and asked whether the column-ownership table had
+genuinely changed under `G-022` (which moved `WORKFLOWS.md` custody from `analyst` to `po`)
+before updating anything.
+
+**Settled by reading, no ruling needed** — exactly the measurable-not-escalatable case:
+`agent/WORKFLOWS.md:50` states `Done | po` unambiguously, unchanged by `G-022` (which moved
+custody of the file, not the content of this table). And `qa`'s own role file contradicts
+`qa`'s claim outright: `agent/roles/qa.md:207` — *"You don't transition tickets to Done or
+[into] the `QA-Test` column."* `qa` was wrong on both the current rule and its own file.
+
+**What I did:** told `po` nothing needs updating in `WORKFLOWS.md` and their instinct not to
+adopt the claim was correct. Corrected `qa` directly with both citations, told it not to
+transition into `Done`/`QA-Test` going forward. Did not reopen `KAN-124` — `po` confirmed its
+`Done` state is correct regardless of who made the transition. Flagged to `team-lead` as an
+FYI on a boundary crossed, not as something requiring further action.
+
+**Reported to:** `po`, `qa`, `team-lead` (FYI only). Nothing further owed from `pm`.
+
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 

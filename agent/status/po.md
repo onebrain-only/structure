@@ -1134,3 +1134,47 @@ Some Bash/git/flutter commands were run directly against Dabbler/dabbler-code th
 (read-only: wc, grep, diff, flutter analyze, flutter test, git show/log/cat-file) — this is
 verification for the review gate, consistent with the seat's standing authority to test claimed
 work against the repo; no file was written and no git-mutating command was run.
+
+## Continuation 18 — 2026-09-06
+
+- Confirmed `KAN-124`'s `QA-Test` transition had landed (fresh `getJiraIssue` read); `team-lead-3`'s `Ready` report at 13:29:03 was stale, predating the transition.
+- Ran the full review gate on `KAN-125` (commit `da41d3b`) directly against the repo: `find lib/features/misc` → exactly the 3 ruled-stays files; `git show --stat da41d3b` → 9 files, 7 pure renames (`|0`) plus `platform_routes.dart`/`play_places_routes.dart` edits matching the predicted P0-4 rebucketing; zero dangling old-path imports (`grep` exit 1); golden diff `8e49b1d`→`da41d3b` on `test/app/` empty; `rewardsRoute` confirmed still at `platform_routes.dart:55`. Did not re-run `flutter analyze`/`flutter test` — accepted `sf3-125`'s clean-detached-worktree measurement as sound, not duplicated.
+- PASS on all criteria. Posted verdict comment `10596`, transitioned `KAN-125` `Ready`→`QA-Test` (transition id `3`, re-verified live).
+- Both of Phase 0's last two tickets (`KAN-124`, `KAN-125`) are now out of `Ready` and in `QA-Test`. Replied to `team-lead-3` closing the loop, carrying forward the note that Phase 0 reaching Done does not retire the `CONTRACT.md` §4.1 grant — the `STACKS.md` §10.6 Canary clause stays unmet-by-construction under the push freeze, a separate `devops`/CEO question that still blocks `KAN-129`/`KAN-132`.
+
+## Continuation 19 — 2026-09-06
+
+- `team-lead` and `team-lead-3` both messaged re-requesting the KAN-125 gate — crossed with continuation 18, already done by the time their messages landed. Replied to both confirming.
+- Independently computed KAN-124's AC8 run-count myself as a third source: mapped all 80 `_routes` identifiers (`app_router.dart:359`) to their defining module file, counted maximal same-module runs → **26**, matching `team-lead-3`'s independent count (including the identical 12/9/9 longest-run breakdown) and NOT matching `sf3-125`'s relayed **25**. Per [[verify-the-quantifier-not-the-citation]] practice, ran the count myself rather than picking a side. Posted the verified figure and method as comment `10597` on `KAN-124`, closing AC8 with 26. Non-blocking either way (26>20 and 25>20 both select the same flat-getter shape under T-056), but the ticket record now carries the checked number, not the first-reported one.
+
+## Continuation 20 — 2026-09-06
+
+- `team-lead-3` caught that my 26-vs-25 ruling on `KAN-124` AC8 (comment 10597) was itself wrong: both of us had measured the run count against HEAD (`da41d3b`, post-KAN-125), not against `8e49b1d` (KAN-124's own commit), which AC8 actually names. Re-measured directly from git objects at `8e49b1d`: **25**, confirming `sf3-125`'s original figure was right all along.
+- Posted a retraction (comment 10598) on `KAN-124` correcting AC8 to 25 and striking the "sf3-125 wrong" claim. Replied to `team-lead-3` confirming and crediting the catch.
+- Saved memory `measure-at-the-commit-the-criterion-names.md` — the general lesson: an acceptance criterion belongs to the commit it was written against; re-deriving a number at HEAD instead of that commit answers a different question, and two independent measurements agreeing is not corroboration if they share the same wrong target.
+
+## Continuation 21 — 2026-09-06
+
+- `team-lead` independently confirmed (via `git grep` on `createGameRoute` at both shas) the same 25-at-`8e49b1d`/26-at-`da41d3b` finding `team-lead-3` had already caught — crossed with my retraction in comment `10598`, already correct by the time it arrived. Confirmed alignment to `team-lead`, credited `team-lead-3`'s prior catch, noted memory already saved.
+- `qa-124` posted PASS verdict on `KAN-124` (comment `10599`) — all five criteria independently re-verified (golden diff empty, 106/10 tests, `_handleRedirect` byte-identical by md5, 85/85 route-entry equivalence closing its own earlier gap, `rootNavigatorKey` promotion mechanically checked safe). Transitioned `KAN-124` `QA-Test`→`Done` (transition id `41`).
+- Filed `KAN-139` (parented `KAN-127`) for `qa-124`'s flagged follow-up: `lib/app/routes/placeholder_screen.dart:11` missing `super.key`, the sole `use_key_in_widget_constructors` info under `lib/app/`, latent CI risk given `ci.yml`'s unpinned `channel: stable`. Left in `To Do` with no due date — no capacity available from `team-lead-3` (no active stack); asked for one when free.
+- Stray worktree pinned at `8e49b1d` under session scratchpad reported by `team-lead`/`sf3-125` — checked, already absent from `git worktree list`, nothing to clean up.
+
+## Continuation 22 — 2026-09-06
+
+- `qa-124` acknowledged its "Done belongs to qa" claim (comment 10600) overreached — sourced from a `team-lead` dispatch message, not a governing document, never checked against `agent/WORKFLOWS.md` before acting. Posted comment `10601` on `KAN-124` marking the claim contested/pending `pm`; left the transition itself (moot on this ticket either way) and left `WORKFLOWS.md` untouched, correctly deferring to `pm`'s ruling. Acknowledged back; nothing further pending on `KAN-124`.
+- Likely root cause surfaced for `pm`'s ruling: the same correction reportedly also claimed `Development`/`In Review` have never been used and tickets have jumped `Ready`→`QA-Test` — the `Done`-ownership row may have been restated incidentally alongside an unrelated routing fix rather than deliberately. Relayed to `pm` for context.
+- Board unchanged from continuation 21: Phase 0 — `KAN-121`–`124` Done, `KAN-125` in `QA-Test` awaiting its own QA pass, `KAN-139` filed/undated in `To Do`.
+
+## Continuation 23 — 2026-09-06
+
+- `pm` settled the `Done`-ownership dispute by citation, no ruling needed: `WORKFLOWS.md:50` reads `Done | po` unchanged (`G-022` moved custody of the document from `analyst` to `po`, not the table's contents), and `qa`'s own role file (`agent/roles/qa.md:207`) independently states it does not transition to `Done` or `QA-Test` — `qa`'s claim in comment `10600` was outside its authority and self-contradicted by its own brief. `pm` is messaging `qa` directly with the citation.
+- Posted closing comment `10602` on `KAN-124` recording the resolution so the ticket doesn't carry an unresolved contested note. No `WORKFLOWS.md` edit needed — the table was never wrong.
+- Board unchanged: Phase 0 — `KAN-121`–`124` Done, `KAN-125` in `QA-Test` awaiting its own QA pass, `KAN-139` filed/undated in `To Do`.
+
+## Continuation 24 — 2026-09-06
+
+- `team-lead-3` sized `KAN-139`: cost well under one sitting, but declined to date it — two real blockers, not a capacity gap. (1) `lib/app/routes/**` is exclusive to `senior-frontend-3` under the live `CONTRACT.md` §4.1 grant for five named Phase 0 tickets only; `KAN-139` isn't one of them, so no seat can take it right now. (2) The directory postdates `CONTRACT.md` §3 and has no named owner post-grant — `team-lead-3`'s own slice excludes `lib/app/**`, grant aside.
+- Posted comment `10604` on `KAN-139` recording it as blocked (not merely undated): not rework (file's own header notes the verbatim-move provenance from KAN-124, fixing it there would have tripped KAN-124's own rework trigger), cost sub-sitting, both blockers named. Left in `To Do`, undated.
+- Escalated the ownership-partition question to `cto` (not decided by me or `team-lead-3`) — `lib/app/routes/` needs a named post-Phase-0 owner before more work piles up behind the grant's expiry. Also relayed `team-lead-3`'s freeze-queue observation (`KAN-129`/`132`/`130`-client-half/`139` all stacking behind one unmade push decision) as context, not as something for me to weigh in on.
+- Board unchanged otherwise: Phase 0 — `KAN-121`–`124` Done, `KAN-125` in `QA-Test`, `KAN-139` blocked/undated in `To Do`.

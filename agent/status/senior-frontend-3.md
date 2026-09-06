@@ -44,6 +44,22 @@ not verified from here (no push under this brief).
   Open item for the reviewer, unchanged: `AppRouter._rootNavigatorKey` was promoted to a
   public top-level `rootNavigatorKey` rather than create an eighth file outside the grant.
 
+- **KAN-124 AC 8 — contiguous-run count: 25 at `8e49b1d`** (2026-09-06). >20, so T-056's flat
+  getters is the justified shape; no `cto` escalation. **The count is per-commit, not a property
+  of the route table** — it is **26 at `da41d3b`**, because KAN-125 moves four getters from
+  `platform` to `play_places`. Both posted on KAN-124 together, deliberately.
+
+  Two other seats (`team-lead-3`, `po`) independently reported 26 as a divergence from my 25;
+  both had measured the working tree instead of the ticket's commit, so their agreement was the
+  same error twice, not corroboration. Resolved by the run-start list itself: `createGameRoute`
+  can only sit in `play_places` after KAN-125. No bucketing deviation existed; `rewardsRoute` is
+  in `platform` at both commits, as §10.3 rule 2 requires.
+
+  Method worth keeping: map identifiers to modules by parsing `^RouteBase\s+get\s+(\w+)\s*=>`
+  across `lib/app/routes/*.dart`, then count maximal same-module spans — and **assert zero
+  unresolved identifiers**. A missed identifier silently *shortens* a run, so the count fails
+  low, which is the direction that falsely trips the ≤20 rework trigger.
+
 ## Standing
 
 - Owns `auth_onboarding`, `username_engine`, `app_boot` under STACKS.md §11 (`team-lead-3`).
