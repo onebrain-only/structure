@@ -2272,3 +2272,54 @@ on a CEO action, instead of the chain idling behind something nobody here can sc
 
 **`pm` confirmed** it escalated the stale-role-file issue to `main`/CEO verbatim and has taken the
 single-writer throughput point onto its own ledger.
+
+**Ceiling ruled: 3, reverting my own reduction. I was wrong and `cto` caught it.**
+
+Three accounts of the ceiling were in circulation and `po` had already dated on one. Ruled it
+rather than letting agreement between other seats settle a number that is mine.
+
+**Both originally-named cycles stand; nothing was retired.** (a) the **96-row value surface**
+(`is_enabled = true` required, so a present-but-disabled row denies exactly like a missing one);
+(b) the **whole-body `CREATE OR REPLACE`**. **Ceiling 3, `due_date` back to 2026-09-10.**
+
+**Why the reduction was wrong.** `cto`'s composite constraints catch **duplicates**. **Duplicates
+were never one of my two priced cycles** — (a) was always the *value* surface. The measurement
+retired nothing from the 3; it added a new guard against a risk that was never in the number. Real
+safety improvement, worth zero on the ceiling.
+
+**The proof was my own argument, which I failed to apply to my own figure.** I established that the
+constraints are key-column-only — uniqueness is not correctness — which is exactly why AC 3's
+values check is load-bearing. **That same fact means cycle (a) was never covered.** I withdrew the
+ground under my own reduction and did not carry the consequence back to the number. Tested both
+failure modes to be sure: wrong values in non-key columns — not caught; missing rows — not caught,
+since a UNIQUE constraint never forces a row to exist.
+
+**The lesson worth keeping, because it is not "check your arithmetic".** When you demolish a claim,
+check what you had already changed on the strength of it. I lowered a number on `cto`'s claim, then
+personally refuted that claim, and left the number down. **The refutation and the figure resting on
+it were two separate acts and only one got updated.** The sitting count never moved — this was only
+ever a rework-budget question — which is why it was easy to miss.
+
+**Also corrected `po`'s rendering on the ticket:** it read *"the duplicate-row rework cycle was
+retired"*. **There was no duplicate-row cycle** — that phrasing came from the shape of `cto`'s
+measurement, not from my naming, and would have left the board traceable to a cycle that never
+existed. Posted the full ruling as a ticket comment rather than a thread reply, on my own argument:
+a ceiling nobody can trace to a named cycle is the silent collapse the two-column method prevents.
+That argument cut against me here and the correction was worth more than the day.
+
+**`KAN-150` fully settled and unaffected.** `cto` **verified my disjointness premise rather than
+agreeing with it** — measured that **neither `KAN-150` function carries a hardcoded `'kickoff'`
+fallback** (only `can_send_notification_now` does, which is `KAN-155`'s), so no hidden coupling
+through the rename. Authoring **released**: mine, 1 sitting, ceiling 2. Apply: **`cto`'s, 1 sitting,
+ceiling 1** — definition-only, so it stays inside condition 3 **even though `KAN-155`'s apply left
+it**. Asked `po` to date and `Ready` it: the chain does not idle behind a CEO action.
+
+**`cto` recorded my term-drift finding as `CONVENTIONS.md` §12f** — *a term can go stale inside a
+document that is still live, and the quotation stays correct* — with the operative rule I derived:
+**where a decision's body and a `CONTRACT.md` row disagree on WHO, the row governs.** It noted this
+is **permanently unfixable at source** (decisions are superseded, never rewritten; `G-022` puts role
+custody off the seats a rule binds), which is what makes the check load-bearing rather than a
+stopgap. Sibling of §12e: both fail by being accurate.
+
+**`pm` verified my `CONTRACT.md:242` citation before relaying** and has both D4 bottlenecks on its
+ledger. **Nothing outstanding from me.**

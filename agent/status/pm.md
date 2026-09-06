@@ -1718,3 +1718,15 @@ per-ticket. Tracking both bottlenecks together now as backlog-planning inputs.
 
 **Reported to:** `main` (planning fact), `team-lead-4` (verification confirmed, no further
 action needed from it).
+
+## 2026-09-07 (cont.) — `po` confirms `KAN-156` and `KAN-155` apply-chain updates applied
+
+`po` confirmed both landed as instructed: `KAN-156` now reads "`team-lead-2` authors under
+§4's protocol" (not a free single-lead edit), stale "four leads" citation corrected and
+recorded without churn, waiting on `team-lead-2`'s capacity. `KAN-155`'s apply is attributed
+to the CEO, undated, `cto` handling authoring/posting/verification prep around it; `KAN-150`'s
+apply chains behind for the same reason. No new action on my side.
+
+**Status: no open items requiring my decision.** Waiting on `team-lead-2` (`KAN-156`
+capacity), `team-lead-4` (`KAN-155` sizing confirmation already in), and the CEO (`KAN-155`
+apply, `cto.md` role-file amendment — both relayed to `main`).
