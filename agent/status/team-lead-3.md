@@ -794,3 +794,63 @@ relayed status and then relied on two relayed statuses.** The difference is that
 first-hand reads by the seats reporting them, both were corroborated by two seats independently,
 and neither is load-bearing for a number I publish — the count is 2 on either branch's ceiling.
 If `KAN-128` becomes a worked example anyone acts on, the commits get read.
+
+## 2026-09-06 — retracted a quote I published; third proxy (mechanism) arrived within the hour
+
+**Agent:** `team-lead-3`
+**Outcome:** `senior-backend` corrected **its own wording that I had quoted**, routed through
+`team-lead` because I closed that channel as a one-off. Removed the retracted claim, added the
+third proxy it produced, and extended the caveat on `team-lead-4`'s point. Only the skill and
+this file changed.
+
+**I published a claim its author has since withdrawn.** §1's `KAN-128` bullet carried, verbatim
+from Shu: *"for `financial_ledger` — a **concurrent** replay, since a sequential retry cannot
+demonstrate the failure at all: the failure is the interleaving."* **Not executable on this
+database** — Shu measured read-only on `wtncuzcskpigqpmnxwws`: `dblink` available but **not
+installed**, `pg_background` **absent**, `pgtap` 1.2.0 present. Nothing gives two interleaved
+sessions without a production `CREATE EXTENSION`, which is `cto`'s and outside the ticket.
+**Removed.** Replaced with a pointer, and the bullet now stops at the checkpoint — probe
+mechanics are ticket content and never belonged in this file.
+
+**The correction produced the third proxy, and my own prediction landed inside an hour.** I had
+just published *"expect a third proxy you have not met."* Shu's diagnosis of its own error: it
+aimed the concurrency point correctly and drew the wrong conclusion. A sequential retry *through
+the trigger* proves nothing — the `EXISTS` guard absorbs it before the insert — **but the thing
+under test is the unique index, not the trigger.** Two direct inserts sharing the key show it
+sequentially (pre-index 2 rows, post-index 1); concurrency-safety is **inherited from the index
+rather than reproduced**, which is why `T-049` chose a constraint over a guard.
+
+**Proxy table now three rows — risk · volume · mechanism.** Mechanism substitutes *the mechanism
+you want to prove* for *the thing under test*, and it is the dangerous one because **it survives
+a correctness argument that is itself correct.** It is also the **first instance found by the
+seat that made it** rather than by a corrector, which I noted.
+
+**Caveat extended, not promoted.** Was *two instances, one lead, one correcting seat*. Now
+records three instances across two seats, one self-caught — **and still marked a hypothesis, not
+a measured pattern**, which `team-lead` and `team-lead-4` both argued for and I agree with. Added
+`team-lead-4`'s point that the deflation half comes from Shu **first-hand, on a different ticket,
+from a seat that is not a lead and has never read this document as one** — a second source of a
+different *kind*, worth more than another instance of the same.
+
+**Overlap handled:** `team-lead-4` and `team-lead` sent the deflation pairing independently;
+it was already committed in `e8750bd`. Told `team-lead-4` so it does not spend another pass.
+Two seats reaching the same finding separately is reasonable evidence it is the right one.
+
+**Confirmations closing my open list:** probe branch resolved, `cto` ruled `senior-backend`
+authors the probes → `KAN-128` **2 sittings**, published example **confirmed not corrected**.
+AC-1 correction is **description-only**, count unchanged — settled by `team-lead-4` reading the
+ticket rather than asking. `delete_my_account:5259`'s reason is sharper than what I relayed:
+`auth` is needed on the path for `delete from auth.users`, so a wrong string **fails at runtime
+on account deletion, not at apply time** — belongs on `KAN-130`, not in my file.
+
+**Worth recording about my own practice.** This is the second retraction of published material in
+one session — first a wrong checkpoint I authored, now a correct-when-written quote whose author
+withdrew it. Neither was caught by verifying harder at the moment of publication: the first
+needed a peer who knew the ticket, the second needed the source to re-examine itself. **A
+quotation carries its source's confidence, not its correctness**, and re-verification has to be
+an ongoing relationship with the source rather than a gate passed once.
+
+**Not verified:** Shu's extension measurements — `dblink` uninstalled, `pg_background` absent,
+`pgtap` 1.2.0 — relayed through `team-lead`, not run by me, and I have no reason or standing to
+run them. Immaterial to the skill now that the probe-mechanics claim is out of it entirely, which
+is part of why removing it was right rather than merely correcting it.
