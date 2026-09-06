@@ -1264,3 +1264,35 @@ unfilled gap.
 
 **Changed across the entire thread: this file only.** No code, no SQL, no copy, no git, no Jira.
 Every number reached a ticket through `po`. **No stack of mine is active; D4 activates 2026-09-14.**
+
+## 2026-09-06 — AC 3 rewritten; the third option landed. Addendum: a stronger reason than the one I gave.
+
+**`po` applied the rewrite** — two direct inserts into `financial_ledger` replacing the concurrent-replay
+requirement, with the **"don't go through the trigger" trap kept as an explicit note** in the criterion
+(the right call: that was the surviving half of Shu's original point and it would otherwise be lost).
+`cto`'s `T-055` folded in. **Scope decision made: AC 3 neither waits nor narrows** — the direct-insert
+probe never touches the broken trigger. `po`: no concerns.
+
+**So the third option landed.** `financial_ledger` stays in KAN-128, no new ticket, no delay, and the
+zero-row window is not spent.
+
+**Addendum worth recording, because it is a stronger reason than the one Shu and I gave.**
+`team-lead` verified independently and live that **`dblink` is not installed and `pg_background` is
+absent.** So a genuinely concurrent replay was **not mechanically authorable in this Postgres instance
+at all** — regardless of whether it was the right thing to test.
+
+Shu and I argued the requirement was **conceptually misdirected** (the index is the thing under test,
+not the trigger). `team-lead`'s finding is that it was **unsatisfiable**. If anyone later asks why AC 3
+changed, **the mechanical answer is the load-bearing one** and mine is the supporting argument. Noting
+it so the weaker reason is not the one that gets remembered.
+
+**That makes four independent reasons the original AC 3 was wrong**, found by four seats from four
+directions: Shu (wrong thing under test) · me (`T-055` makes it impossible through the trigger) ·
+`cto` (`T-055` itself — the trigger cannot run) · `team-lead` (no concurrency primitive exists here).
+**Consistent with the day's pattern: every claim that held was found more than once, and the extra
+sources sharpened rather than merely confirmed it.**
+
+**Nothing owed by this seat.** The one carried-forward obligation is unchanged and recorded in the
+previous entry: **KAN-130's client half, 1 sitting, blocked on Phase 0's landing test.**
+
+**Changed:** this file only.

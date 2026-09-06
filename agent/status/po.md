@@ -972,3 +972,34 @@ Dabbler/dabbler-docs governance file, not Jira — outside my write surface per 
 definition. Flagged back to team-lead rather than editing it.
 
 No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 13) — Third AC-3 option confirmed by senior-backend; ceiling corrected 2→3; KAN-131/137 corrected
+
+senior-backend confirmed first-hand ("that is my retraction, first-hand") that the third
+scope option for KAN-128's AC 3 is correct: keep financial_ledger fully in scope (constraint
+AND probe), verified via direct-insert probes that never touch the broken trigger. This
+matched the decision I'd already made in the prior round in substance — reinforced it with
+the explicit payment_intents-vs-financial_ledger distinction (financial_ledger has three
+insert sites so the clause lands paired, not bare) and independently verified the no-FK claim
+on booking_id/payment_intent_id myself before writing it in.
+
+Caught and fixed a real ceiling error: I had left "ceiling stays 2" in KAN-128's Set section.
+senior-backend self-corrected — a ceiling equal to the count carries no rework budget, so once
+cto's ruling closed the count at 2, the ceiling must be 3. due_date unchanged at 2026-09-10 —
+the same rework budget already existed in calendar-day form.
+
+Added a third falsifiability condition to AC 3 (does the probe's target path execute at all),
+credited to senior-backend's own account of how the dblink/T-055 mismatch arose — flagged as
+unowned rather than asserted as a standing rule.
+
+Added the "green ticket does not close the invariant" caveat explicitly to both KAN-128 and
+KAN-131, per senior-backend's and team-lead's shared warning.
+
+Corrected KAN-137's executor chain (content-manager writes → senior-frontend-1 wires →
+team-lead-1 owes the date, per CONTRACT.md:167, verified myself) and its deadline framing (tied
+to KAN-136's/D4's payment-path activation, not the general pre-launch pile) — both wrong in my
+first pass at that ticket.
+
+No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written, no git command run.

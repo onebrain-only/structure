@@ -559,6 +559,30 @@ anticipate.
 **Reported to:** `po` (both updates), `senior-backend`, `team-lead-4`. Nothing further owed
 from `pm` until `po` acts on the scope decision.
 
+## 2026-09-06 — `po` applied everything; thread closed end to end
+
+**`po` confirmed all four items from this round applied** and filed three new tickets, which
+I checked exist and are titled correctly rather than taking the confirmation on trust:
+`KAN-135` ("RULED (P-036/T-054): retain `financial_ledger` permanently and disclose"),
+`KAN-136` ("RULED (T-055): `trgfn_payment_to_ledger` references nonexistent `public.bookings`"),
+`KAN-137` ("RULED (P-036): rewrite three account-deletion strings + `delete_my_account`
+retention comment — gated on `KAN-136`"). `KAN-128`/`130`/`131` updated per `T-054`, the AC-3
+unblock, and `P-036`'s sequencing correction. PDPL softening carried into `KAN-135` item 1.
+
+**One item `po` flagged rather than acted on:** `P-036` names "the PO writes" a new Notion
+§I.4 bullet, which `po` correctly identified as outside their Jira-only write surface and sent
+to `team-lead` for scope confirmation. Not mine to resolve — noting it exists as an open
+question between `po` and `team-lead`, not blocking anything on my end.
+
+**This closes the entire KAN-128/130/131 queue-verdict thread that opened this task.** Final
+state across every sub-thread: KAN-128 scoped, sized (2 sittings), AC-3 unblocked, awaiting
+`cto`'s Wednesday apply; KAN-130/131 at 2 sittings/ceiling 3, `T-054` Decision 1 permanent;
+the erasure question resolved via `P-036` into three tracked tickets with correct gating and
+named executors; `T-055`'s dead-code finding tracked as its own ticket. Nothing further owed
+from `pm`.
+
+**Reported to:** none further — informational close-out.
+
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 

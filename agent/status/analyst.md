@@ -604,3 +604,36 @@ content. ALReq's last-modified date is not stated on the page I read. The ~25% E
 figure is W3C reporting IBM's guidelines, not a W3C measurement, and I did not open the IBM
 source. The Resolution Center appeal procedure is from secondary sources only; no Apple-owned
 page documenting it was opened.
+
+---
+
+## 2026-09-06 — `CONTRACT.md` §4.1 `lib/data/**` cell: measurement done, edit NOT made (custody)
+
+**Task:** from `team-lead-1` — correct §4.1's `lib/data/**` cell, which identifies its ten files
+by `grep -rn "misc/data/datasources"`, a grep that now returns nothing; commit locally.
+
+**Measured, all at `dabbler-code` `dbfc6bb` (HEAD, clean tree):**
+
+| §10.6 sub-test | Command | Result | Bar | Verdict |
+|---|---|---|---|---|
+| router LOC | `wc -l lib/app/app_router.dart` | **1712** | ≤450 | FAILS |
+| feature imports | `grep -c "features/" lib/app/app_router.dart` | **69** | ≤6 | FAILS |
+| route modules | `ls lib/app/routes/` | **No such file or directory** | exists | FAILS |
+| misc grep | `grep -rn "misc/data/datasources" lib/ test/` | **empty, exit 1** | empty | PASSES |
+
+`team-lead-1`'s four figures reproduce exactly. **P0-3b has not landed; the grant is live.**
+
+**Why the grep is empty:** `dbfc6bb` (KAN-122 / P0-2) `git mv`-ed the three datasource files from
+`lib/features/misc/data/datasources/` to `lib/core/data/` and rewrote 42 import lines across 39
+files. `git show --stat dbfc6bb -- lib/data/` = **10 files changed, 11 insertions, 11 deletions**
+— the §4.1 figure of 10, with `supabase_profile_repository.dart` at 2 lines. Those same 10 files
+are what `grep -rln "core/data/supabase" lib/data/` returns today. **Documentation staleness, not
+a failed measurement, and not an expired grant.**
+
+**No edit made. `CONTRACT.md` is not mine to write.** `DECISIONS.md` `G-022` (2026-09-06, ACTIVE)
+moved `MANIFESTO.md`, `CONTRACT.md` and `AGENTS.md` to the CEO, citing *these exact two prior
+amendments of mine* (`G-019`, `G-021`) as the harm. It outranks `017` (2026-08-26) and
+`CONTRACT.md:3` (`**Owner:** analyst (write)`, itself now stale) by newest-ACTIVE precedence.
+Proposed replacement text handed back to `team-lead-1` for the CEO to apply.
+
+**Nothing committed, nothing pushed, no Jira touched, no code written.** Only this file changed.
