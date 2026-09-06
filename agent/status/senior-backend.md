@@ -152,3 +152,65 @@ cycle on a money migration that has never executed against rows anywhere.
 'public','pg_temp'` in every replaced function, do not add `SECURITY DEFINER`"* is wrong for four
 of the five. They are `SECURITY DEFINER` and carry `SET search_path TO 'public'` with no `pg_temp`.
 Unchanged from my report; the instruction has now been given twice.
+
+## 2026-09-06 — KAN-130+131 capacity, and a skill quotation verified (`team-lead-4` / `team-lead-3`)
+
+**Did.** Read-only. Read `DECISIONS.md` `T-051` (`:6362`) and `T-052` (`:6475`) in full, and every
+line they cite: `wallets` (`:26677`), `wallets_pkey` (`:28296`), `wallets_user_id_fkey` (`:31858`),
+`wallets_id_unique` (`:29605`), `wallets_unique_idx` (`:29609`), `wallets_self_read` (`:34003`),
+`wallets_block_dml` (`:33999`), `financial_ledger_wallet_fkey` (`:30583`), `fn_get_wallet`
+(`:6088`–`:6102`), `_wallet_recalc` (`:1794`–`:1819`), `_wallet_after_ledger` (`:1780`),
+`request_payout:10190`, `delete_my_account` (`:5257`–`:5306`), `v_wallet_balance`,
+`v_wallet_admin_overview`.
+
+**Touched.** This file only.
+
+**Number — KAN-130+131 as one migration: 2 sittings, ceiling 3.** Same shape as KAN-128, and the
+same probe branch: sitting 1 is the whole migration ending posted in `G-002` format; sitting 2 is
+the probe pack. **3 if the erasure question below resolves "yes".** No date.
+
+**I disagree with `team-lead-4`'s "materially larger than KAN-128" read.** It is larger in
+*volume* — 6 DDL statements on `wallets`, a policy swap, four function bodies rewritten, one new
+function — but volume shifts the start, not the cost. That is `team-lead-4`'s own argument about
+the `payment_intents` cut, applied symmetrically: lighter mechanical work buys back no sitting, and
+heavier mechanical work adds none, unless it adds a **boundary**. I could not find a second
+boundary. The DDL ordering looks like a judgement and is not one — `T-051`'s six-item list fixes
+the end state, and the sequencing (dropping `user_id` takes `wallets_pkey` and
+`wallets_user_id_fkey` with it as dependents, so the new PK must be added in the same statement
+block) is craft inside a pass.
+
+**The exhaustiveness check `T-051` invites.** SQL references to `public.wallets` outside DDL are
+**exactly four**: `_wallet_recalc:1813`, `fn_get_wallet:6090`/`:6096`, `request_payout:10190`.
+Plus the policy, the PK, the FK, and two views. `v_wallet_balance` already keys on
+`owner_type`/`owner_id`/`id` and needs no change; `v_wallet_admin_overview` reads only
+`balance_aed`. **`fn_get_wallet` itself needs no edit** — its `INSERT` already omits `user_id`,
+which is precisely what the drop makes legal. `T-051`'s six dependents are complete for the SQL
+half.
+
+**Under-specified, with its holder — the answer to what `team-lead-4` asked for.**
+`T-051` item 3 makes `delete_my_account` delete the wallet before `delete from auth.users`, calling
+it "an erasure obligation, not tidiness". But **`financial_ledger` has no FK to `auth.users`** and
+`trgfn_payment_to_ledger:19219` writes `entity_type='user', entity_id=NEW.user_id`. So after
+erasure the user's uuid remains in `financial_ledger` indefinitely, and
+`financial_ledger_wallet_fkey`'s `ON DELETE SET NULL` (`:30583`) only clears `wallet_id`, not
+`entity_id`. This predates KAN-130 and is not caused by it, but KAN-130 is the ticket that opens
+`delete_my_account` and states an erasure obligation. **Cannot size that slice until it is ruled,
+and `cto` holds it** (a retention/erasure call, possibly `cpo`). If it resolves "also scrub
+`financial_ledger`", that is a judgement the rest of the migration consumes and the count goes to 3.
+
+**Two I can settle myself, noted rather than escalated.** `request_payout:10190`'s replacement
+lookup needs a `currency` predicate, which `T-051` omits — I will mirror `_wallet_recalc`'s ruled
+AED-only design rather than leave a `select … into` that takes an arbitrary row once multi-currency
+exists. And `wallets_id_unique` (`:29605`) becomes redundant once `id` is the PK — I will leave it
+rather than drop it, since dropping it is unrelated cleanup.
+
+**A third `search_path` string, which sharpens the standing correction.** `delete_my_account:5259`
+is `SECURITY DEFINER` with `SET search_path TO 'public', 'auth', 'extensions'` — not `'public'`,
+not `'public','pg_temp'`. Three distinct strings now across the functions in play. **The rule is
+restate each function's own header, read from `pg_get_functiondef`; there is no shared string.**
+
+**Confirmed for `team-lead-3`** the five points of my KAN-128 checkpoint reasoning quoted in
+`capacity-to-date`, with one wording correction and the probe branch flagged as still open.
+
+**Blocked.** Nothing. Cannot start KAN-130/131 authoring until `cto` applies KAN-128
+(`T-052` requires rebasing on live post-128 definitions). The erasure question is with `cto`.
