@@ -653,3 +653,40 @@ still stands; that distinction is correct.
 
 **Changed:** this file, `DECISIONS.md` (`P-041`, plus the name correction inside `P-040`).
 **Reported to:** `cto` and `po`. **Still owed:** the Socialiser question.
+
+## 2026-09-07 — `P-042`: ran the `11b` test myself. All three open questions close
+
+**Sequencing decided and then executed.** `po` correctly declined to sequence my seat's work, and
+`cto`'s point settled it: with the tables uniform, entitlement tickets have no positive case and
+someone manufactures a differentiating row — the exact outcome the NOT ESTABLISHEDs exist to prevent.
+So: **before** entitlement tickets, not after. Cheapest way to sequence work onto my own seat was to
+do it, so I read `11b` rather than tasking it. **ALIGNED.**
+
+**The test returned a positive result.** `11b` §C.2 (the Player Free vs Pro table) **does** attribute
+notification entitlements to Player Pro — **124** saved searches 3→unlimited, **431** quiet hours
+Standard→granular, **444** new-venue smart alerts. **None is `quiet_override_high` or an inbound cap.**
+So those two values move from NOT ESTABLISHED to **confirmed**: `false` and `5/10/20` stand on positive
+evidence, not on absence.
+
+**The trap I recorded, because a grep will find it.** 431 pairs "Quiet hours setting" with "Granular
+control" and looks like the warrant. It is not — 431 is **the user configuring** their quiet hours;
+`quiet_override_high` is **the system delivering through** them (`should_bypass_quiet_hours:17203`).
+**Opposed, not the same capability at a different grain.** Reading 431 as the warrant would let a paid
+tier interrupt a user *because* they paid — inverting §A.1 and sitting badly against the prayer-time
+and Ramadan commitments (features 432, 433, both Basic).
+
+**`cto`'s missing-positive-case concern: risk real, premise false.** The differentiation exists — §C.2,
+§D.2, §E.2 are full of it — it just does not live in these two tables. `subscription_features` is a
+**notification-delivery** matrix, not the entitlement surface. **Entitlement tickets should assert
+against `11b` §C.2; nobody needs to manufacture a row.** Uniform values across all eight keys is the
+correct end state, not a gap.
+
+**Socialiser answered: no plan row; a Socialiser holds `player_free`.** `11b` gives it no entitlement
+column and names it **once** in ~650 features — Feature 37, "Persona switch (Socialiser →
+Player/Organiser)". A persona you switch *out of*. Delta is empty, which was my own stated condition.
+A row would assert a commercial relationship §A.3 excludes from revenue. **The follow-up `INSERT` is
+not needed at all.**
+
+**Nothing in `KAN-155` changes.** **No open product questions remain on the plan-key work.**
+
+**Changed:** this file, `DECISIONS.md` (`P-042`). **Reported to:** `po`, `cto`, `pm`.

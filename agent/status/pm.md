@@ -1526,3 +1526,119 @@ date.
 
 **Reported to:** `po` (the answer + epic instruction), `team-lead` (confirmation of both,
 via `main`).
+
+## 2026-09-07 (cont.) — `KAN-155` re-confirmed to `team-lead-4`; slice-less-file pattern raised with `cto`
+
+`po` filed `KAN-155` (rename ticket, seven ACs, content-complete) under new epic `KAN-154`,
+asking the lead question again — likely a message-ordering race with my prior answer, not a
+new question. Re-sent the same answer with the same citations: **`team-lead-4`**, standing
+custodian per `STACKS.md` §11.2/§11.5, `CONTRACT.md:170/222`, `DECISIONS.md`
+5858/5941/8134 — not re-derived, just re-stated, since nothing changed.
+
+**New: `KAN-153`** (false "hidden for MVP" comment, `notification_routes.dart`) hit the same
+ownership gap as `KAN-149` — a slice-less file under `lib/app/routes/` with no owning lead.
+Two instances in one day is a pattern, not a coincidence, so raised it with `cto` directly
+as a general question (does `WORKFLOWS.md:60`'s owning-lead assumption need a fallback for
+slice-less/contended files) rather than let `po` route a third instance to me one-off. Left
+`KAN-153` unassigned pending `cto`'s answer.
+
+**Reported to:** `po` (re-confirmation + hold on `KAN-153`), `cto` (pattern flag).
+
+## 2026-09-07 (cont.) — `KAN-155` content-complete and assigned; `KAN-153` correctly left open
+
+`po` confirmed `KAN-155` now carries the full `STACKS.md`/`CONTRACT.md`/`DECISIONS.md` trail
+for `team-lead-4` and is otherwise content-complete — `cto`'s addendum caught two real
+defects in `po`'s first draft (scope was 24 rows not 96; missing fix for
+`can_send_notification_now`'s `kickoff` fallback, which would have been an unlimited-
+notifications regression), both fixed and independently re-verified by `po` against the
+baseline migration before writing them in. Nothing further needed from me — `team-lead-4`
+sizes it next.
+
+`KAN-153` stays unassigned as instructed; `po` also corrected the ticket's own text, which
+had guessed a "post-Phase-0 module owner" that `team-lead-5` confirmed doesn't exist
+(`lib/app/routes/` is `KAN-124`'s product, unowned). Consistent with the pattern I raised
+with `cto` — waiting on that ruling before this gets assigned.
+
+**Status: no open action on my side.** Waiting on `team-lead-4` (capacity for `KAN-155`) and
+`cto` (slice-less-file assignment rule for `KAN-153`).
+
+## 2026-09-07 (cont.) — `cpo` closes `P-042`: zero open product questions on plan-key work
+
+`cpo` read `T-063`'s outstanding `11b` question itself (declined to have `po` sequence its
+own seat's work) and closed three items, none altering `KAN-155`'s already-fixed content:
+Socialiser gets no plan row (drop any follow-up `INSERT` ticket being tracked for it); the
+two notification entitlement values move from NOT ESTABLISHED to confirmed (`11b` §C.2); and
+`cto`'s "no differentiating test case" concern resolves without a schema change — future
+entitlement tickets assert against `11b`, not `subscription_features`/
+`notification_hourly_caps`.
+
+Relayed the practical consequence to `po`: the product-side reason for holding D4 entitlement
+tickets is fully cleared (`P-039`–`P-042`, nothing outstanding). Narrowed `po`'s hold to the
+one gate still open — `KAN-155`'s rename-migration sequencing, still with `cto`, not `cpo`.
+
+**Status: no open action on my side.** Waiting on `cto`/`team-lead-4` for `KAN-155`
+sequencing and capacity, and on `cto` for the slice-less-file rule (`KAN-153`).
+
+## 2026-09-07 (cont.) — `cto` resolves the sequencing gate; relayed to `po` verbatim
+
+`cto` closed the last open item: entitlement tickets run in **parallel** with `KAN-155`, not
+after it — verified live (`grep -rn "plan_key\|planKey\|kickoff\|prime" lib/` → two hits,
+both false positives on `primeCache`, zero real references). Only a ticket whose ACs write a
+plan-key literal into client Dart is gated on the migration landing; everything else can be
+authored/stocked now.
+
+`cto`'s planned "no positive test case" warning (from `cpo`'s `P-041` making all eight keys
+identical in `subscription_features`) turned out moot — `cpo`'s `P-042` already found the
+real differentiation lives in `11b` §C.2/§D.2/§E.2, not that table. Relayed the working rule
+to `po` verbatim: entitlement ticket ACs must cite `11b` §C.2, never `subscription_features`;
+a ticket proposing to add/change a `subscription_features` row for differentiation is out of
+scope and routes to `cpo`, not absorbed as a fix. Also passed on `cto`'s explicit warning line
+— "`subscription_features` differentiates nothing" is the designed end state, not a gap — for
+`po` to put in the ticket/epic text so a future reader doesn't "fix" it.
+
+**Status: D4 entitlement chain (`P-039`–`P-042`, sequencing) is now fully resolved.** Only
+`KAN-153`'s slice-less-file rule remains open with `cto`.
+
+## 2026-09-07 (cont.) — Correction: `KAN-153` was already resolved, not still pending; `T-066` recorded
+
+**My error, corrected:** my last report listed `KAN-153`'s slice-less-file rule as still
+open with `cto`. It had already landed — `T-066`, ruled same day: **ownership follows
+content, not directory.** `WORKFLOWS.md:60` should read "the lead owning the content, per
+`T-066`" rather than presuming a directory owner; `cto` flagged that text edit to `po`
+(owns the file) rather than making it. `KAN-153` → `team-lead-5` by step 2 (same shape as
+`KAN-149`). No longer tracking this as open.
+
+**Structural cause, worth keeping:** `T-062` cut `lib/app/routes/` by route cohesion, so
+seven files there each carry one slice's content while sitting outside every slice's
+directory — five more instances queued behind `KAN-153`. Raising the pattern after two
+instances (rather than letting `po` bring a third one-off) converted five future
+escalations into one rule — the right call, confirmed by `cto`.
+
+**Tripwire to carry forward, mine as much as `cto`'s:** step-3 (executive) escalations on
+this should stay rare. If it starts catching more than `feature_flags.dart` and
+`supabase_config.dart`, that's a signal the slice partition has drifted from the tree — a
+backlog-structure problem, not a reason to relax `T-066`. Watch for this rather than treat
+each new slice-less file as routine.
+
+**Also relayed to `po`:** an arithmetic correction on `KAN-155` — the 96-row total is
+**84 inserted + 12 repointed** (player_free's 12 rows arrive by repointing `kickoff`'s
+existing rows, not fresh inserts), not 96 flat inserts.
+
+**Status: nothing outstanding on this thread now.** Waiting only on `team-lead-4`'s capacity
+report for `KAN-155`.
+
+## 2026-09-07 (cont.) — `po` confirms full incorporation; thread closed pending `team-lead-4`
+
+`po` confirmed: hold framing narrowed to match (product gate fully clear `P-039`–`P-042`,
+only `KAN-155` sequencing mechanical); `P-042` incorporated into `KAN-155` directly
+(Socialiser closed, no follow-up ticket; two notification values upgraded to confirmed;
+`cpo`'s Feature-431 reviewer trap added under AC3 — a `cpo`↔`po` detail I wasn't copied on,
+not chased, ticket-content is `po`'s domain); `11b`-vs-`subscription_features` assertion
+guidance added to epic `KAN-154` for future entitlement tickets.
+
+`KAN-153` routed directly to `team-lead-5` per `T-066` (no duplication — `team-lead` had
+already told it), capacity requested. `WORKFLOWS.md:60` edited by `po` to reflect `T-066`
+("content over directory"), correctly cited as uncommitted per `cto`'s §12c discipline.
+
+**Status: thread fully closed.** Nothing outstanding anywhere in this chain except
+`team-lead-4`'s capacity report for `KAN-155` and `team-lead-5`'s for `KAN-153`.

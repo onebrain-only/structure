@@ -404,3 +404,31 @@ Dates (`po`'s conversion, not mine): pt.A earliest 09-08 / due 09-09, ceiling 2,
 Substance passed on for whoever takes KAN-153: the comment says "Notifications hidden for MVP" and the redirect bounces home when `FeatureFlags.notifications` is false — **that flag is `true`** (`feature_flags.dart:21` at `dc63d69`), so the redirect never fires. Same defect class as KAN-149, a comment outliving its fact — suggests auditing the other six route modules rather than fixing this one alone.
 
 **AC8 on pt.C** (measure the real post-split line count rather than trusting my ~554): right call. That figure is arithmetic, not a measurement. If it lands materially over 500 the fourth ticket is real, and it is a genuine 2-sitting ticket — the screen's own handlers carry design judgement. `po` flags me and I size it properly rather than stocking it blind.
+
+### 2026-09-07 (cont.) — KAN-153 accepted under `T-066` step 2; defect is 3 sites, not 1
+
+`cto` ruled **`T-066`** (2026-09-07, **not yet committed** — cite with that caveat per §12c, `devops` still unspawnable). It did not overturn my refusal; it resolved the ambiguity I named. **`WORKFLOWS.md:60` binds the lead owning the CONTENT, not the directory.** `notification_routes.dart` carries notification content, so it is mine despite sitting outside my tree. KAN-149 stays with `frontend-5` under step 1. Accepted and routed into my pool.
+
+**Structural cause confirmed by `cto`:** `T-062` cut the `lib/app/routes/` modules by **route cohesion**, so all seven carry one slice's content each while sitting outside every slice's directory. **Five more instances are waiting**, not one. My "pattern, not incident" framing is what produced a rule instead of a sixth one-off ruling — worth remembering that declining to re-escalate on top of `po` and `pm`, and keeping it one thread, is what made that possible.
+
+**Measured the defect rather than taking the ticket's word for it.** Three comment sites claim the route is hidden (`:15`, `:16`, `:22`) while `FeatureFlags.notifications` is `true` (`feature_flags.dart:21`). **`:16` is the substantive one** — it claims deep-link/admin access only with UI entry points hidden, and that is false four times over: `app_top_bar.dart:135` mounts `NotificationBadge()`, and three UI sites push `RoutePaths.notifications` (`app_top_bar.dart:130`, `main_navigation_screen.dart:474`, `adaptive_destinations.dart:90`).
+
+**Judgement settled in the ticket so the developer cannot get it wrong: DO NOT delete the redirect at `:21-27`.** It is the live feature gate, not dead code — CLAUDE.md requires flag gating, and it passes because the flag is `true`. A developer reasoning "this never fires" would delete the gate. Comments are false; code is correct. Also ruled the replacement must NOT cite the flag's current value — a comment saying "currently true" is the same defect one generation later (the KAN-149 lesson).
+
+**Capacity: 1 sitting, ceiling 1.** Three comment lines, one file, no behaviour/test/codegen change, fully enumerable. **Named the absent rework budget explicitly** rather than leaving two equal columns to be read as a collapsed range — the ripple risk that justified KAN-147 pt.A's budget does not exist here. **Runs alongside the KAN-147 chain with no conflict**: `notification_routes.dart` is exactly the file A/B/C are constrained not to touch, so disjointness is guaranteed by their own criteria. Settled as a path fact rather than escalated.
+
+**Sibling audit done — reported, not fixed.** `play_places_routes.dart:163` (`// Organisers can create, players cannot (MVP)`) may carry the same rot; `enablePlayerGameCreation`/`enableOrganiserGameCreation` are computed expressions (`feature_flags.dart:42-50`). **Not my content under `T-066`** — belongs to whichever lead owns play/places. Reported per §4 rule 3. The other five modules are clean; `platform_routes.dart:41,49` describe a genuine placeholder and are accurate.
+
+**Holding `T-066` step 3 as `cto` asked.** If step 3 starts catching more than `feature_flags.dart` and `supabase_config.dart`, the reading is **the slice partition has drifted from the tree**, not that the rule needs relaxing. I am the seat likeliest to see it first, having hit this boundary twice in two days.
+
+Also flagged to `po`: `WORKFLOWS.md:60` still carries the superseded "owning `team-lead-N`" phrasing and is `po`'s to amend. The rule now binds while the document contradicts it — the stale-cached-clause trap named in `capacity-to-date` §3.
+
+### 2026-09-07 (cont.) — crossed with `po` a second time; KAN-153 nearly left unassigned
+
+`po` corrected KAN-153's text (struck its post-Phase-0-owner guess, recorded the ownerless directory, credited the pattern) and then **left it unassigned**, on the basis that `pm` was taking the general question to `cto`. That message crossed my acceptance: `cto` had already ruled `T-066`, step 2 assigns KAN-153 to this seat, and my capacity (1 sitting, ceiling 1) was already in `po`'s inbox. Told `po` to assign and date it rather than let it sit.
+
+`po`'s correction was still the load-bearing move — striking the wrong owner is what made the ownerless-directory fact visible, and its instinct to route this as a general question rather than a per-ticket ruling is what `T-066` became.
+
+Re-sent the two criteria points in case the acceptance message was unread: **redirect retained (live gate, not dead code)**, and **three comment sites, not one**, with `:16` falsified by four measured call sites.
+
+**Process observation, offered to `po` rather than pressed — it is `po`'s board.** Twice in one day our messages crossed and left a ticket in a state neither intended: KAN-149 held in To Do awaiting a landed ruling, KAN-153 nearly unassigned for the same reason. Both were cheap to fix only because each side re-stated the sha or ruling it was acting on. **Suggested carrying the ruling reference and its timestamp on the ticket itself**, so the board shows what a ticket waits on instead of requiring two seats to be in sync. This is the `capacity-to-date` §3 staleness problem showing up in board state rather than in a number — a relayed status is a timestamp, not a fact, and a ruling is exactly what lands in between.

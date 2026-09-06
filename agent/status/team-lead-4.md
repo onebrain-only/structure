@@ -2018,3 +2018,83 @@ That is the exact category error `capacity-to-date` §2 warns about, caught on t
 **`Ready` is now stocked for this chain.** Remaining open: `cto`'s apply-leg count (requested,
 outstanding) and its confirmation of my "alone and first" reading. My next action is the
 `Development` transition, once a `backend-N` seat self-pulls `KAN-145` — not before.
+
+## 2026-09-07 — KAN-155 sized (D4 subscriptions); three stale criteria found
+
+**Task.** Supply capacity for `KAN-155` (plan-key migration `kickoff`/`pro`/`prime` →
+persona-qualified keys), under new epic `KAN-154`. Custody confirmed by `pm` against `STACKS.md`
+§11.2/§11.5 — accepted. **Does not activate D4**; `STACKS.md:144` still has it as backlog.
+
+**Verified the brief before sizing on it, and both of its load-bearing claims held.** The brief
+carried two things the ticket's own criteria did not contain. Rather than size on a relay — the
+brief itself noted `cto` had corrected its restatement once already today — I read
+`DECISIONS.md` direct: `P-039` (`:5359`), `P-040` (`:5485`), **`P-041` (`:5605`)**. Both confirmed.
+`P-041` was ruled 2026-09-07 by `cpo` and **supersedes the `P-040` basis the ticket was written on**.
+
+**Capacity — authoring leg: 1 sitting, earliest 1, ceiling 3.**
+- **1 sitting.** Sequence, values, row counts and delete semantics are all ruled or measured before
+  start. No judgement inside the ticket whose output the next part consumes — §1's only test.
+- **The 4× scope growth (24 → 96 child rows) buys no sitting.** §1: heavier mechanical work adds
+  none unless it adds a *boundary*. 96 rows is 8 keys × one 12-row template at one value set.
+- **Tested the obvious checkpoint and rejected it.** "Migration written, function edit not yet" is
+  a **pause, not a boundary** — that artifact is applicable and ships the regression, so it cannot
+  be reviewed to a verdict. The half-file failure §1 names.
+- **Ceiling 3 = two rework cycles, both named:** (a) the 96-row value surface, where
+  `is_enabled = false` denies exactly like a missing row; (b) the whole-body `CREATE OR REPLACE`,
+  which has bitten this codebase twice (`T-058` D1, `T-052` amendment `:6875`).
+- **Apply leg: `cto`'s, no date from me.** Queues behind `KAN-128` ("applied alone and first").
+
+**Three stale criteria reported to `po` — the first is a live safety defect.**
+1. **AC 3 as written ships the regression `P-041` exists to prevent.** It seeds child rows for
+   `player_pro`/`organiser_pro` only (24, `P-040`'s scope) while AC 1 inserts **all eight** plan
+   rows — so six keys get no child rows, and `P-041` says those "would each grant unlimited
+   notifications to their subscribers."
+2. **No AC covers the `can_send_notification_now` edit** that `cpo` requires in the same change
+   set (`v_plan := 'kickoff'` fallback breaks once `kickoff` is deleted). Needs AC 8.
+3. **The ticket names `check_notification_rate_limit`, which does not exist.** `P-041` opens by
+   correcting exactly that; the ticket copied the pre-correction name forward.
+
+Count already assumes all three are fixed, so fixing them does not re-open the sizing.
+
+**Not verified.** `cto`'s 82/9/3 counts and the 96-row arithmetic — carried unchanged, not
+re-derived. Flagged to `po` as **single-sourced**: `P-041`'s own *Not verified* line says `cpo`
+took the arithmetic from `cto` too, so two seats citing it is one source. AC 2's
+re-measure-at-authoring requirement is the right guard and I asked for it to stay.
+
+**Owed next:** `KAN-150` sizing, after `KAN-155`'s criteria settle — its scope depends on what
+lands here.
+
+**KAN-155 re-sized against the corrected ticket — count held at 1 sitting, ceiling 3.**
+
+A hold arrived saying the ticket was missing two ACs, followed by a release saying `po` had
+applied `cto`'s addendum. **Both missing items were the ones I had already found and reported
+myself**, from reading `P-041` first-hand rather than sizing on the brief — so the corrections
+aligned the ticket with what I had costed rather than enlarging it.
+
+**Re-read the corrected ticket rather than assuming my earlier read still covered it.** It now
+carries 8 ACs: AC 3 is 96 rows phrased as *every plan row* with a values check, AC 4 is the
+`can_send_notification_now` fallback fix via `pg_get_functiondef`, and the nonexistent function
+name is gone throughout. Nothing else material changed.
+
+**Held the number against an explicit expectation that it would rise.** The brief stated both
+corrections "push the number up." They do not, and the rule is documented: `capacity-to-date` §1 —
+heavier mechanical work adds no sitting **unless it adds a boundary**. 96 rows is 8 keys × one
+12-row template at one value set; AC 3 and AC 4 do not consume each other's output; the split at
+"migration written, function edit not yet" re-tested as a **pause, not a boundary**. Risk is banked
+in the ceiling (3, two named cycles), not spent on a sitting. This is the volume proxy §1 names,
+and refusing it is the whole point of the unit.
+
+**One structural finding handed to `po`:** AC 3's before/after assertion and AC 4's behavioural
+effect **cannot be checked by the author** — only after apply, and apply is `cto`'s. So that
+verification lands in `po`'s acceptance gate, not in an authoring sitting. Counted separately per
+§2, so the number is unaffected, but `po`'s gate on this ticket is unusually heavy and it should
+know that before scheduling rather than at review.
+
+**Process note worth keeping.** `cto` found the ticket gap by re-opening the artefact instead of
+trusting `po`'s summary of what it had written — a recipient's summary faithfully reports what the
+writer believes it did, which is exactly what a partial delivery cannot reveal. My own independent
+catch came from the same move: reading `DECISIONS.md` rather than sizing on the brief that
+summarised it. Two seats, same control, same day.
+
+**Owed next:** `KAN-150`, once `po` sends it. Expect it small — `P-041` says its `'prime'` branches
+are dead-code tidying with no behaviour change — but size it by boundary test, not by analogy.

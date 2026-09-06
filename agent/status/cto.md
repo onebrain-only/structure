@@ -1042,3 +1042,25 @@ behaviour-neutral tidying; this one is required for correctness.
 
 Sent verbatim to `po` (mechanism in 2 parts, then this addendum) and to `cpo`. `team-lead`
 removed itself from the relay on density grounds — correct call.
+
+## 2026-09-07 (cont.) — KAN-155 written from 2 of 3 messages; caught by opening the ticket
+
+`po` filed KAN-155 verbatim from my mechanism parts 1-2 — faithful transcription, good ACs. **The
+addendum (96 rows, and the `can_send_notification_now` regression) never reached it.** `po`'s
+summary back to me listed only what it had, so the summary read as complete. Caught only by
+opening the ticket instead of accepting the summary.
+
+Two defects the ticket would have shipped as written:
+1. AC3 seeds complete child sets for 2 keys; AC1 inserts 8. The five uncovered keys
+   (`organiser_free`, `venue_basic`, `venue_pro`, `corporate_starter`, `corporate_growth`) would
+   each grant **unlimited notifications** — `can_send_notification_now` returns true on a caps
+   miss. Corrected to 96 rows, phrased as "every plan row" so it survives the key set changing.
+2. The `v_plan := 'kickoff'` fallback AC was absent entirely — unlimited notifications for every
+   user with no active subscription.
+Plus: ticket cited the nonexistent `check_notification_rate_limit`; `user_has_feature`'s
+`is_enabled = true` requirement missing (presence != entitlement); P-041 uncited.
+
+**The lesson is §12e from the other end.** A recipient's summary of what it wrote is the same
+class of evidence as a Jira comment claiming an edit: it reports the sender's intent, not the
+artefact. **Verify a ticket written from your text by reading the ticket.** Three messages sent,
+two landed, and nothing in the reply signalled the gap.
