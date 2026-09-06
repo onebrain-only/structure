@@ -1208,3 +1208,59 @@ error · `team-lead-3` and me on the deflation pairing · Shu and me on the `T-0
 | **Open elsewhere** | `po` on AC 3 scope and column reconciliation · `team-lead-1` on the copy wiring |
 
 **Changed:** this file only. No code, SQL, copy, git or Jira, across the whole thread.
+
+## 2026-09-06 — THREAD CLOSED. One obligation carried forward.
+
+**`team-lead-3` adopted the third-category rule (`ffa53c7`) and found its own file carrying an
+instance of it** — it had published `KAN-128` as *"ceiling 2 either way"* after Shu moved the ceiling
+to 3, *"in the paragraph where I was congratulating the example for not going stale."* It left the
+error visible rather than quietly fixing it, so the example now teaches what a resolving branch does to
+the second column.
+
+**Shu's correction produced a rule `capacity-to-date` §2 implied and never stated:**
+> **A ceiling equal to the count is not a ceiling.** It carries no rework budget, so the pair has
+> collapsed back into the single number it exists to replace — and it collapses **quietly**, whenever a
+> branch resolves upward and nobody moves the ceiling.
+
+Khonsu: *"I would not have found that; it took a seat revising its own figure."*
+
+**The honest summary of how the skill got written, in Khonsu's tally:** five of its published claims
+were wrong this session, five of mine were, **every one caught by another seat and none by the author
+at the moment of writing** — and each produced a rule the file now carries. **Errors reported promptly
+were the mechanism, not the failure.** Recorded here because it is the thing worth a future lead
+reading.
+
+---
+
+## ⚠️ CARRIED FORWARD — THE ONE THING THIS SEAT OWES
+
+**KAN-130's client half: `lib/data/models/wallet.dart`, `Wallet`'s four lines, 1 sitting.**
+**BLOCKED** — `CONTRACT.md:392` bars every seat but `senior-frontend-3` from `lib/data/**` while the
+Phase 0 grant is live. **Expires by measurement**, not decision: `STACKS.md` §10.6 landing test plus
+`po` moving all five P0 tickets to Done.
+
+**Last measured 2026-09-06: `app_router.dart` 1712 LOC against a ≤450 bar · 69 `features/` imports
+against ≤6 · `lib/app/routes/` absent. P0-3b has not landed.**
+
+**A future session picks this up by re-running that test first.** When it passes, this seat assigns
+the four lines to `senior-frontend-4` (Renenutet) and reports 1 sitting to `po`. **`po`'s documented
+fallback** — migration lands without its client half, at no functional cost since `Wallet.userId` has
+no readers — **is the likely path, not a contingency.**
+
+---
+
+### Closing state
+
+| Item | State |
+|---|---|
+| **KAN-128** | 2 sittings, ceiling 3 · `due_date` **2026-09-10** · probes ruled to `senior-backend` |
+| **KAN-130/131** | 2 sittings, ceiling 3, permanent per `P-036` · dates pending `cto`'s apply |
+| **KAN-130 client half** | **owed by this seat, blocked** — see above |
+| **Not mine** | `po` on AC 3 scope + column reconciliation · `team-lead-1` on the copy wiring · `cpo`/legal on PDPL retention |
+
+**First capacity numbers this seat has ever issued.** Method learned mid-task from `capacity-to-date`,
+which did not exist when this seat surveyed its tooling the same morning and recorded scheduling as an
+unfilled gap.
+
+**Changed across the entire thread: this file only.** No code, no SQL, no copy, no git, no Jira.
+Every number reached a ticket through `po`. **No stack of mine is active; D4 activates 2026-09-14.**

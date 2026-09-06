@@ -927,3 +927,48 @@ question per team-lead's explicit instruction, unresolved, senior-backend's numb
 ticket is sized against.
 
 No file under Dabbler/dabbler-code/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 12) — T-055 (dead payment path) worked: KAN-128 AC3 decision made, KAN-136/137 filed, KAN-131/135 corrected
+
+cto found T-055 while measuring an unrelated question: trgfn_payment_to_ledger:19195
+references public.bookings, which does not exist — independently verified (sole reference to
+that table in the schema; venue_bookings has no venue_id column, confirmed against its actual
+columns). The trigger is AFTER UPDATE OF status, so the exception aborts every attempt —
+no payment_intents row can ever reach 'succeeded', and none of the three financial_ledger
+inserts in this function can execute.
+
+**Decision made, as cto explicitly assigned it to po:** KAN-128's AC 3 does not wait for the
+repair and does not narrow to wallet_ledger only. The financial_ledger conflict-clause work
+is verified via direct-insert probes that never invoke the broken trigger — a schema-level
+constraint is valid regardless of whether the current code can reach it, and a direct insert
+into an existing table satisfies cto's "row, never a relation" condition by construction.
+Applied this decision plus team-lead's separate AC-3 rewrite (concurrent-replay probe
+withdrawn — no interleaving mechanism available on this database without production DDL;
+replaced with two direct inserts, tested pre/post-index) into KAN-128 in one pass.
+
+Filed KAN-136 for the trgfn_payment_to_ledger/public.bookings repair itself (a design question,
+not a rename — venue resolution must route through venue_spaces). Softened KAN-131's severity
+language (the platform-wallet bug has never fired and cannot, since it sits after the throwing
+line) without changing its scope, executor, or sequencing.
+
+Filed KAN-135 as a full ruling record once cpo's P-036 landed: retain financial_ledger
+permanently, disclose — the real defect is three UI strings promising total erasure, true only
+at zero rows. Independently re-verified all three string citations against the live files.
+Filed KAN-137 for the string rewrites (content-manager, EN+AR) + delete_my_account's owed
+retention comment, explicitly gated on KAN-136 per cto's sequencing correction (verified by
+pm) — financial_ledger cannot receive a row until the trigger is fixed, so this isn't urgent
+today and must not land ahead of KAN-136.
+
+Recorded, not acted on: cpo's P-036 ruling names "the PO writes it" for a new bullet in a
+Notion service-blueprint document (11 v2 §I.4). This is outside my role's defined write
+surface (Jira tickets/comments, agent/status/po.md, memory — no Notion). Flagged to
+team-lead/pm to confirm scope rather than acting unilaterally.
+
+Declined, not acted on: team-lead asked me to correct CONTRACT.md §4.1's stale grant
+description (the "10 files" cell, now empty because P0-2 already landed). CONTRACT.md is a
+Dabbler/dabbler-docs governance file, not Jira — outside my write surface per my own role
+definition. Flagged back to team-lead rather than editing it.
+
+No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written, no git command run.
