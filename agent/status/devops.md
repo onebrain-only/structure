@@ -635,3 +635,69 @@ commit changes no Dart, and `dabbler-code` is byte-unchanged (`git status` clean
 before and after the `build_runner` run). Whether the W6 rule is actually *followed*
 stays untested, which is exactly what criterion 2 exists to prove and exactly what
 is blocked.
+
+## 2026-09-06 — `store-release` skill authored (Fastlane/store-submission gap closed)
+
+**Task:** `team-lead` asked this seat to author the Fastlane / store-submission
+skill — one of the two gaps left open by the skills audit. Document only; the
+process was not exercised.
+
+**Written:** `agent/skills/store-release/SKILL.md`. Frontmatter `description` is
+written as trigger conditions, not a summary.
+
+**Credential scan first, per the brief's stop condition — clean, nothing to report
+as an incident.** `android/key.properties`, `deployment_cert.der`, `.env` and
+`android/local.properties` all exist on disk, all **untracked**, all gitignored
+(`android/.gitignore:12`, `.gitignore:208`, `.gitignore:5`). No keystore, `.p12`,
+`.p8`, `.pem`, `.mobileprovision`, `.der` or service-account file is tracked
+anywhere. No secret value went into the skill — only the names of the keys and
+where the files belong.
+
+**Measured state (2026-09-06, `Dabbler/dabbler-code`).** Exists: `pubspec.yaml:19`
+`1.7.8+174`; `build_ios.sh` + `scripts/gen_dart_defines.sh`; iOS `CODE_SIGN_STYLE =
+Automatic`, team `J5636UH8V8`, bundle `app.dabbler.pro`; Android signing off
+`android/key.properties`, `applicationId com.dabbler.dabblerapp`, `targetSdk 36`;
+both stores set up (ASC submissions filed, Play App Signing enrolled, upload key
+rotated 2026-08-30). **Does not exist:** Fastlane in any form
+(`find . -iname "*fastlane*"` → empty), `ios/ExportOptions.plist`, any store step
+in CI (`grep -rniE "ipa|apk|appbundle|aab|xcode|testflight|fastlane|app-store|play"
+.github/workflows/` → empty), an Android release build script, any runtime read of
+the version (`package_info_plus` absent, `PackageInfo` unused).
+
+**Correction to my own role file, measured.** `agent/roles/devops.md` names four
+duplicate version locations plus a rewards analytics payload. There are **three**
+literals — `lib/core/utils/constants.dart:6`, `lib/utils/constants/app_constants.dart:5`,
+`settings_screen.dart:52` — and the rewards analytics payload **does not exist**
+(`grep -rn "app_version" lib/` outside `analytics_constants.dart` → empty; its two
+hits are parameter-key names). Further: `grep -rn "\.appVersion" lib/ test/
+integration_test/` → **empty**, so two of the three literals are dead code and only
+the settings screen renders one (line 1070). The skill records this; **I did not
+edit the role file.**
+
+**Freeze stated as the skill's first section.** `G-018` Ruling 2
+(`DECISIONS.md:5672`) makes a store upload illegal today — it is a push to the most
+outward-facing remote we have. `P-030` (`DECISIONS.md:4728`) is named as governing
+the *web* path, not this one, so nobody reads "Canary is green" as permission to
+submit. The resume point is named.
+
+**Scope call made explicitly rather than padded:** the Cloudflare Production/Preview
+variable split is **out of scope** — it governs the web deploy, ships no binary,
+reaches no store, and is already carried by `CLAUDE.md` and `agent/roles/devops.md`.
+Named in the skill only so the next seat does not hunt for it.
+
+**Deploy result:** none — no build, no upload, no submission, nothing to verify.
+This was a document.
+
+**Owed elsewhere, not done:** `agent/WORKFLOWS.md` has no store-submission workflow.
+The skill states this as owed at its end; **I did not edit `WORKFLOWS.md`** — whether
+the sequence becomes a numbered `W` is a `po`/`cto` call.
+
+**Not done / not verified:** **nothing pushed, to any repo.** No PR, no merge, no
+tag, no release, no store upload. No file under `lib/` touched. No
+`.claude/settings.json` / `.mcp.json` read or edited. No credential, key or signing
+asset created. No `Co-Authored-By` trailer. `flutter analyze` / `flutter test` **not**
+run — this commit changes no Dart and `dabbler-code` is byte-unchanged. **Not
+verified:** that `build_ios.sh` still produces a working IPA (not run — building
+would be pointless under a freeze that forbids uploading it), and that the Play
+Console / App Store Connect state matches the inherited memory, which was written
+2026-08-31 and I have no console access to re-check.
