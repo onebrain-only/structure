@@ -819,3 +819,23 @@ fallback (not a decision to split now) — if the Phase 0 grant hasn't cleared b
 window, it may land without the client half, which follows once the grant expires.
 
 No file under `Dabbler/dabbler-code/` written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 7) — KAN-129 pulled back to To Do; KAN-132 ruled (T-053) and blocked by the live Phase 0 grant
+
+`cto` ruled T-053 on KAN-132: delete both dead-stack files, not rename (nothing imports either,
+so the only failure mode is a loud compile error, not a silent wrong-provider binding — sized
+as latent cleanup, not a landmine). But the file sits inside the live Phase 0 §4.1 grant
+(CONTRACT.md:392/:408/:419, independently re-verified) and the STACKS.md §10.6 landing test
+still fails (app_router.dart 1712 LOC vs ≤450, 69 features/ imports vs ≤6, lib/app/routes/
+doesn't exist). KAN-132 stays To Do with a measured release condition (re-run the landing test
+at execution time), executor senior-frontend-1 via team-lead-1 on expiry.
+
+**Caught my own earlier mistake:** cto pointed out KAN-129 is blocked by the identical grant for
+the identical reason (profiles_repository.dart is also inside lib/data/**) — I had moved it to
+Ready earlier this session. Pulled it back to To Do, added the same release condition, coupled
+the two tickets for one review once the grant clears. Verified the CONTRACT.md citations myself
+before acting on either.
+
+No file under Dabbler/dabbler-code/ written, no git command run.
