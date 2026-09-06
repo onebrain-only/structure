@@ -1182,3 +1182,61 @@ Phase 0 work pending the gate.**
 and `team-lead`'s account of its relay, and I have read neither `sf3-124`'s report nor the brief
 itself. Whether `KAN-125`'s two-module edit is complete rebucketing rather than partial; I
 matched it against §10.3's prediction by shape, not by re-deriving which entries moved.
+
+## 2026-09-06 — KAN-124 PASSED the gate; AC 8 checked and it is cosmetic (26 runs)
+
+**Agent:** `team-lead-3`
+**Outcome:** `po` ran the full acceptance gate against `8e49b1d` independently and **passed
+`KAN-124` → `QA-Test`.** Investigated its one flagged gap rather than accepting "not blocking",
+established it is cosmetic, and tasked the executor for the missing figure. **No code touched,
+no ticket transitioned by me.**
+
+**`po` verified `_handleRedirect` byte-identical by diffing the range directly.** Mine was a
+grep for lines *mentioning* it — I flagged at the time that this was strong evidence and a
+**different claim**. `po`'s is the claim criterion 7 actually asks for, so it is now properly
+closed rather than inferred. Recorded because it is the one place my diff-shape table was
+weaker than it looked.
+
+**AC 8 — why I did not accept "not blocking" at face value.** `T-056` makes the run count
+**decide** the module export shape: **≤20 runs → grouped per-run lists; >20 → flat getters.**
+The executor used **flat getters**. So a count of ≤20 would not have been a documentation gap —
+it would have fired the rework trigger *"module export shape not matching the reported run
+count."* **A missing number that determines a pass/fail shape is worth measuring.**
+
+**Measured, first-hand:**
+- **80** exported `RouteBase get` symbols across the five module files — one per top-level entry,
+  denominator matches.
+- Mapped every `_routes` identifier (`app_router.dart:359`) back to its defining module and
+  counted maximal same-module spans → **26 contiguous runs**.
+- Longest runs: **12** `profile_social`, **9** `identity`, **9** `platform`; heavy fragmentation
+  through the middle — which is precisely why no six-way concatenation reproduces declaration
+  order, and why `T-056` ruled as it did. My measurement independently corroborates the ruling's
+  premise, which I had previously taken on the ruling's word.
+- **26 > 20 → flat form required, not chosen. No rework trigger. Gap is the number only.**
+
+**Tasked `sf3-125` for its own figure and deliberately withheld mine.** AC 8 says *the executor*
+reports it; my count is a cross-check, not the executor's evidence. Told it explicitly not to
+read my number first — **if the two agree the AC closes with two independent sources; if they
+disagree that is worth more than either alone.** Applying this week's own lesson rather than
+substituting my measurement for its deliverable, which would also have been a manager doing the
+asker's job. Scoped the task to the count and nothing else, with a stop-and-escalate instruction
+if it comes back ≤20.
+
+**Affirmed `po`'s board-hygiene call.** It declined to fabricate retroactive
+`In Progress`/`In Review` states, noted the gap plainly in the verdict, and moved straight to
+`QA-Test` on an independently verified gate. **A truthful record with an acknowledged hole beats
+a tidy record implying transitions nobody made.** The gap deserves a process fix, not a backdated
+one.
+
+**`KAN-125` still `Ready`** at `da41d3b` with raw evidence posted. Flagged once more — only
+because it is the last of the five and `po` is visibly working the board — and I am not chasing
+it further.
+
+**Capacity: nothing outstanding.** Both tickets landed inside their ceilings; my chain is done
+pending gates. The AC-8 follow-up is not a sitting — one measurement and one comment.
+
+**Not verified:** `sf3-125`'s forthcoming count, by construction. Whether my 26 is the number
+`T-056` intends — I counted *maximal same-module spans over the 80 `_routes` identifiers*, which
+is the only reading I can see, but the ruling does not define "contiguous run" formally and a
+different segmentation (e.g. counting the shell route separately) could shift it by one or two.
+**Immaterial to the conclusion** — the margin to the ≤20 boundary is six.
