@@ -649,3 +649,33 @@ and the ticket cannot move, for a reason neither `po` nor `team-lead` had.
 **Method note:** the blocker was found by reading `CONTRACT.md` §4.1 before answering, not by
 taking "`lib/data/**` is SHARED" from `po`'s framing. SHARED was the status *without* the grant;
 the grant's second column is the live one.
+
+### Same day, fourth addendum — `T-054`: the `financial_ledger` erasure gap (`c3a2930`)
+
+`senior-backend` found it while sizing; `team-lead-4` escalated rather than resolving; `pm` and
+`team-lead` routed it here and to `cpo` in parallel. All claims re-verified live, read-only.
+
+- **The gap is real.** One FK on `financial_ledger` (`wallet_id → wallets(id) ON DELETE SET NULL`),
+  none to `auth.users`; `trgfn_payment_to_ledger:19219` writes `entity_id=NEW.user_id` uncoupled;
+  `delete_my_account` never touches the table. A deleted user's uuid persists indefinitely.
+- **Out of `KAN-130`'s scope; the count stays 2.** The line: **`T-051`'s wallet delete restores a
+  guarantee that exists today; a `financial_ledger` scrub would create one that never existed.**
+  Repairing what my own ruling breaks is mine; creating a new guarantee is policy. And the code
+  cannot be written before the policy is ruled — retain/anonymise/delete are three migrations.
+- **Not an exposure — measured.** RLS on, sole policy `financial_ledger_admin_read` = `is_admin()`,
+  `anon`/`authenticated` hold only `r`/`m` which RLS gates to zero rows, `is_admin()` false for
+  anon. Retention question, not a leak. Told `po` to file it, not fast-track it.
+- **Technical position for `cpo`, so its question is narrow.** Deleting the user's debit unbalances
+  a double-entry set — the platform and venue credits stand, and `v_wallet_balance` stops
+  reconciling for counterparties who never asked to be erased. Anonymising `entity_id` is illusory:
+  it is **NOT NULL**, and `booking_id`/`payment_intent_id` still lead back. **Recommended documented
+  retention — zero SQL, so the count stays 2 permanently.** `cpo` rules; I did not.
+
+**Three `T-051` corrections from Shu, all confirmed and recorded:** `fn_get_wallet` needs **no edit**
+(the drop is its fix — the largest correction to `T-051`'s implied size); non-DDL `public.wallets`
+references are **exactly four** and **no view touches `wallets.user_id`**, so the drop breaks no
+view; and `delete_my_account`'s `public, auth, extensions` is a **third** distinct `search_path`.
+
+**Also ruled today (`d939a74`):** `KAN-128` AC 3 probes are authored by `senior-backend`, with
+falsifiability owned by `cto` — each probe demonstrated **failing** without the unique index before
+it counts as passing with it. `KAN-128` confirmed at 2 sittings.

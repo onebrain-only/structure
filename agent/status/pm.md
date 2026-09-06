@@ -340,6 +340,81 @@ duplication of work already done and stated plainly.
 **Reported to:** `po` (corrected routing), `team-lead-4` (escalation closed), `team-lead`
 (acknowledgement). Nothing further owed from `pm` on either thread.
 
+## 2026-09-06 — Routed: right-to-erasure gap in `financial_ledger`, needs `cto` + `cpo`
+
+**Task:** `team-lead-4` escalated a finding from `senior-backend`'s KAN-130/131 sizing —
+a deleted user's uuid persists indefinitely in `financial_ledger.entity_id` because
+`delete_my_account` never touches that table and the only FK on it (`wallet_id → wallets`,
+`ON DELETE SET NULL`) doesn't reach `entity_id`. Correctly not decided by `team-lead-4` — a
+retention-vs-erasure tension spanning technical mechanism and policy, above their line.
+
+**Verified myself before routing, all exact:** `financial_ledger_wallet_fkey` (`:30583`) is
+the table's only FK, on `wallet_id` only; `trgfn_payment_to_ledger:19219` writes
+`entity_type='user', entity_id=NEW.user_id` uncoupled from any FK; `delete_my_account`'s
+(`:5257`) own comment block lists everything `ON DELETE CASCADE` handles on `auth.users`
+deletion and `financial_ledger` is absent from it.
+
+**What I did:** routed to `cto` (technical mechanism — anonymize, delete, or retain under a
+documented basis) and `cpo` (retention-policy call — a financial journal is normally the last
+thing you delete from; an erasure obligation points the other way, and I don't think `cto`
+should settle that half alone) in parallel, via `SendMessage` (the `Agent` tool refused a
+named `cpo` spawn — "teammates cannot spawn other teammates," flat roster — so I messaged the
+existing seat directly instead). Named the window argument explicitly: `financial_ledger` is
+at zero rows today, same "free now" logic as `T-049`, and the same fix after D4 executes
+becomes a data-migration on real settlement history. Confirmed to `team-lead-4` this doesn't
+block D4's Monday activation (already established non-blocking, separate entry above) but
+does block sizing this one slice of KAN-130/131 — Shu named it unsizeable pending the ruling,
+and the count moves from 2 sittings to 3 if the ruling adds a `financial_ledger` scrub.
+
+**Not verified:** whether Dabbler's business corpus states an existing privacy/retention
+commitment that would pre-empt needing a fresh `cpo` ruling at all — left that for `cpo` to
+say, not searched myself, since it's exactly the kind of judgment the routing exists to avoid
+my making.
+
+**Reported to:** `cto`, `cpo` (the routing itself), `team-lead-4` (confirmation). Awaiting
+either ruling before anything further is owed.
+
+## 2026-09-06 — `cto` ruled (`T-054`): scrub out of KAN-130's scope, count stays 2, not an
+exposure
+
+**`cto` answered the technical half** (`T-054`, commit `c3a2930`): the `financial_ledger`
+scrub is out of KAN-130's scope permanently, not provisionally — his reasoning is that
+`T-051`'s wallet delete *repairs* a guarantee his own change removed from the `auth.users`
+cascade, while a `financial_ledger` scrub would *create* a guarantee that never existed, which
+is `cpo`'s call, not a repair he can bundle in. Sitting count stays 2 (ceiling 3), unaffected.
+He also ruled it is **not an exposure** and gave his own live RLS check.
+
+**Verified both load-bearing claims myself before relaying, using read authority already
+established this thread:** `select relrowsecurity from pg_class where relname=
+'financial_ledger'` → `true`; `select policyname, qual from pg_policies where
+tablename='financial_ledger'` → exactly one policy, `financial_ledger_admin_read`, qual
+`is_admin()`. Combined with `is_admin(null) = false` (confirmed earlier this thread), the
+retained uuid is admin-readable only — matches `cto`'s claim exactly.
+
+**His technical framing for `cpo`'s narrower decision:** delete-the-rows breaks the
+double-entry balance (three rows per payment are a balanced set); anonymize-`entity_id` is
+illusory (`booking_id`/`payment_intent_id` still trace to the user, and `entity_id` is
+`NOT NULL` anyway). His recommendation to `cpo`: documented retention, zero SQL if agreed.
+One follow-up owed regardless of `cpo`'s answer — `delete_my_account`'s comment block should
+record whatever gets decided; `cto` flagged it as owed, barred from writing `dabbler-code`
+himself.
+
+**What I did:** relayed the full ruling to `team-lead-4` (unblocks their sizing entirely —
+KAN-130 safe to date at 2 sittings) and to `po` (safe to date; not an exposure, file normally;
+the comment-block follow-up to track once `cpo` rules on retention).
+
+**Reported to:** `team-lead-4`, `po`. Still awaiting `cpo`'s retention ruling (routed
+separately, prior entry) — nothing further owed from `pm` until that lands or `po` acts.
+
+**Addendum, same day — `team-lead-4` closed the ownerless-follow-up gap themselves.** Named
+`senior-backend` as executor for the `delete_my_account` comment-block update (`CONTRACT.md`
+§3: Supabase function bodies are Shu's authoring surface, `cto` applies as usual), told both
+Shu and `po` directly rather than leave it tracked without an owner — correctly noting an
+unowned follow-up is how this gap gets rediscovered a third time. Also self-corrected: the
+anonymize-`entity_id` option they'd relayed to me earlier was theirs, not `cto`'s, and `cto`'s
+ruling that it's illusory stands. No action needed from `pm` — informational close-out only.
+KAN-130/131 confirmed at 2 sittings/ceiling 3; `po` can date once `cto` applies KAN-128.
+
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 

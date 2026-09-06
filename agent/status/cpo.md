@@ -316,3 +316,44 @@ taken from `pm` and `team-lead-4` as measured, not re-derived.
 **Changed:** this file only. No code, SQL, copy, git, Jira or Notion. `T-051` untouched.
 
 **Reported to:** `team-lead`.
+
+---
+
+## 2026-09-06 — `P-036`: the `financial_ledger` retention ruling (routed by `pm`, referred by `cto` at `T-054`)
+
+**Task:** two arrived. (1) `team-lead` re-asked for the D4/KAN-130 fallback ruling — **already
+delivered earlier today**, recorded in the entry above; re-verified rather than re-ruled, and all
+three measurements hold: `Wallet.userId` (`wallet.dart:6`) and `WalletLedgerEntry.userId` (`:49`)
+have **zero readers**, `WalletRepositoryImpl` (`wallet_repository_impl.dart:13`) is **instantiated
+nowhere**, and `wallet.dart` is **not** in the §4.1 grant. (2) `pm` routed the `financial_ledger`
+right-to-erasure gap. That one was unruled; it is now `P-036`.
+
+**Ruling: retain, and disclose.** Adopted `cto`'s `T-054` technical analysis rather than
+re-deriving it — deletion unbalances a double-entry journal, and scrubbing `entity_id` while
+`booking_id`/`payment_intent_id` survive is anonymisation in appearance only. Concurs with `cto`.
+
+**Governing documents.** `13b` §C.2 **P0-6** (binding): *"PDPL consent + export + delete verified in
+production"*; §A.2 *"Data export + account deletion verified working"*. `04` Article 11 **Right 6**:
+*"Every player has the right to know how their data is being used."*
+
+**The gap, stated as a gap.** `04` Article 11 lists **seven** rights *"without exception and
+regardless of jurisdiction"* and **erasure is not one of them**. **No corpus document names any
+retention period or lawful basis.** `12b` §I.1 raises PDPL only against data products; §I.2 Flag 3
+budgets *"$25-50K PDPL legal"* — unspent. **A retention period is obtained, not ruled**, and I did
+not assert one.
+
+**The finding nobody had — a live disclosure defect.** Three shipped strings promise total erasure:
+`account_management_screen.dart:1072` and `:1175`, `danger_zone_section.dart:373`. `financial_ledger`
+holds zero rows, so they are true today and false on the first row. The retained uuid was never the
+exposure (`T-054` measured it admin-only); **the mismatch is.** Owners: legal review → CEO via `pm`;
+EN+AR strings → `content-manager`, filed by `po`; `delete_my_account` comment → already owed at
+`T-054`; privacy-policy clause → `13b` §A.2. **Zero SQL — `KAN-130` stays at 2.**
+
+**Not verified:** every migration fact (single FK, trigger body, cascade list, zero-row count,
+`is_admin()` anon behaviour) taken as measured by `senior-backend`/`pm`/`cto`; whether AR strings
+mirror the EN three; whether a privacy policy exists at a public URL.
+
+**Changed:** this file, `DECISIONS.md` (`P-036` inserted before `G-012`), and `cpo` memory. No code,
+SQL, copy, migration, git, Jira or Notion write. `T-051` and `T-054` untouched.
+
+**Reported to:** `pm` (ruling, to relay to `team-lead-4`, `cto`, `po`) and `team-lead`.

@@ -741,3 +741,224 @@ count is the behaviour the section is trying to produce."*
 
 **Changed across the whole thread:** this file only. No code, no SQL, no copy, no git, no Jira.
 Every number reached a ticket through `po`.
+
+## 2026-09-06 — KAN-130/131 sized by Shu: **2 sittings, ceiling 3**. One slice unsizeable — a right-to-erasure gap, escalated.
+
+**My "materially larger than KAN-128" read was wrong and Shu corrected it with my own argument:**
+> *"Volume shifts the start, not the cost — that is your own argument about the `payment_intents`
+> cut, and it runs symmetrically… heavier mechanical work adds none unless it adds a **boundary**.
+> I went looking for a second boundary and could not find one."*
+
+**Carrying Shu's number and Shu's reasoning, not mine.** Shape matches KAN-128: sitting 1 is the whole
+migration (`wallets` DDL, `wallets_self_read` policy swap, four function bodies, new
+`fn_platform_owner_id()`, rebased on live post-128 definitions) ending posted in `G-002` format;
+sitting 2 is the probe pack. **Same probe-ownership branch — `cto` owns probes → 1 sitting.**
+Cannot author until 128 is applied; earliest start Thu 09-10.
+
+### THE PATTERN IN MY OWN REASONING — worth more than either correction
+
+**Twice today I substituted a proxy for `capacity-to-date` §1's dependency test.**
+1. KAN-128: **risk** — *less checkable, therefore a checkpoint.*
+2. KAN-130/131: **volume** — *bigger, therefore more sittings.*
+
+Both times Shu applied the test literally and I applied something that felt like it. **The test is one
+question — can the next part start before this lands? — and both errors came from answering an easier
+question instead.** Sent to `team-lead-3` as evidence its new §1 subsection should name the *class*
+rather than the instance: neither risk nor volume is a checkpoint. Noted there that §1 already carries
+the scope-cut direction going **down**, and that **the same rule going up is not obvious from reading
+it** — I had internalised the cut and still expected a bigger ticket to cost more.
+
+### ESCALATED — right-to-erasure gap in `financial_ledger`
+
+Found by Shu; **verified by me against the baseline, not relayed:**
+- `financial_ledger` has **exactly one FK** — `financial_ledger_wallet_fkey`, `wallet_id` →
+  `wallets(id)` `ON DELETE SET NULL` (`:30583`). **None to `auth.users`.**
+- `trgfn_payment_to_ledger:19219` writes `entity_type='user', entity_id=NEW.user_id`.
+- **`delete_my_account` never touches `financial_ledger`.**
+
+**A deleted user's uuid persists in `financial_ledger.entity_id` indefinitely.** Predates KAN-130, but
+KAN-130 is the ticket that opens `delete_my_account` and asserts an erasure obligation (`T-051` item 3,
+`cto`: *"an erasure obligation, not tidiness"*), so it is where the gap surfaces.
+
+**Needs a ruling, not a fix** — real tension: a financial journal is normally the last thing you delete
+from, while erasure points the other way. Anonymise `entity_id`, delete the rows, or keep and document
+the basis are three answers with different legal weight. **To `pm` for routing: `cto` technical,
+possibly `cpo` on retention policy.** **If ruled "also scrub `financial_ledger`", the count goes to 3.**
+Zero rows today — free now, a data-migration over settlement records later.
+
+### Three Shu findings sent to `po` as ticket corrections
+
+1. **`fn_get_wallet` needs no edit at all** — its `INSERT` already omits `user_id`, which is what the
+   drop makes legal. `T-051` lists it as a broken writer; **the drop is its fix.** Ticket reads as
+   carrying work it does not.
+2. **A third `search_path` string changes the rule.** `delete_my_account:5259` carries
+   `'public','auth','extensions'` — after `'public'` on the four KAN-128 definers and
+   `'public','pg_temp'` on the trigger. **No shared string exists**, so any AC naming one correct value
+   is wrong for at least two functions. Rule: restate each function's **own** header from
+   `pg_get_functiondef`.
+3. **`T-051`'s six dependents are exhaustive for the SQL half** — four non-DDL `public.wallets`
+   references (`_wallet_recalc:1813`, `fn_get_wallet:6090`/`:6096`, `request_payout:10190`) plus policy,
+   PK, FK and two views; `v_wallet_balance` and `v_wallet_admin_overview` both need nothing.
+
+**Shu's two self-settled gaps left to Shu**, not second-guessed: the `currency` predicate on
+`request_payout:10190` mirroring `_wallet_recalc`'s AED-only design, and leaving `wallets_id_unique`
+alone as unrelated cleanup — the latter being Shu applying a do-not-tidy constraint against its own
+instinct.
+
+**Open:** `pm`/`cto`/`cpo` on the erasure ruling · `po` on the probe branch and three ticket edits.
+**My half unchanged: `Wallet`'s four lines, 1 sitting, undatable on Phase 0's landing test.**
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — Read KAN-128 live; settled a stale-status contradiction. Everything raised has landed.
+
+**Two seats reported opposite states of AC 1.** `team-lead` said `po` had fixed it; `senior-backend`
+told `team-lead-3` it was *"still outstanding with `po`."* **Settled by reading the ticket rather than
+asking either.** AC 1 is **corrected** — a section headed *"AC 1 — function attributes and grants
+(CORRECTED 2026-09-06, `DECISIONS.md` commit `3fbf2a4`)"* strikes the old bullet as *"inverted and
+must not be used"* and replaces it with a per-function attribute table. **Shu's report was accurate
+when written and stale when it reached me.** Told Shu so it does not spend a pass re-raising a closed
+item.
+
+**Answered `team-lead-3`'s question** — is the AC 1 correction description-only, or does it add scope
+and move the count? **Description-only; count unchanged at 2 sittings.** Same five functions, same
+seven insert sites; what changed is what the AC asserts about them and the authoring rule. Shu
+concurs from its side (*"it costs me no sitting"*).
+
+**One ruling `po`/`cto` added that Shu did not have, and it is a real trap.** Shu had
+`admin_wallet_adjust` as `DROP` + `CREATE` + re-`GRANT`. The ticket adds: live `proacl` shows `PUBLIC`
+(`=X/postgres`) and explicit `anon=X/postgres`; a `DROP` removes both, **but a freshly `CREATE`d
+function gets `EXECUTE` back to `PUBLIC` by default** — so the migration must also
+`REVOKE EXECUTE ... FROM PUBLIC` explicitly or `anon` silently regains it. **`cto` ruled: re-grant to
+`authenticated` and `service_role` only, not `anon`, and this does not generalise to the other four
+definers.** Relayed to Shu. Inside sitting 1; count unaffected.
+
+**Offered to `team-lead-3` as an observation, not an edit:** twice today a relayed status was accurate
+when written and stale on arrival — mine to it (count awaits `cto`, when both had landed) and Shu's to
+it (AC 1 outstanding, when fixed). **On a fast-moving ticket a relayed status is a timestamp, not a
+fact.** §3's provenance line records *who* and *how directly*; *when* is the part that decays.
+
+### Everything this seat raised has landed on KAN-128
+
+Verified by reading the live ticket: the five-functions/seven-sites scoping · `admin_approve_payout`
+as `UPDATE`-only · the `settle_game` re-settle probe with the double-credit mechanism spelled out ·
+the `financial_ledger` **concurrent**-replay probe with explicit reasoning that a sequential retry
+proves nothing · `payment_intents` formally out of scope · the `:19211`/`:19231` boundary against
+KAN-131 · **"Done" defined as authored + applied + committed locally, not Canary-verified**, citing
+`G-018`/`P-030` · the probe branch recorded as open and explicitly *not* moving the date · and
+**`due_date` 2026-09-10 set against the ceiling**, with the two-column reasoning quoted on the ticket
+(*"the one-day gap named explicitly as one rework cycle rather than hidden as padding"*).
+
+**Nothing owed by this seat.** Open elsewhere: `cto` on probe ownership · `cto`/`cpo` on the erasure
+ruling (via `pm`) · `po` on KAN-130's ACs · Phase 0's landing test on my own 1-sitting half.
+
+**Changed:** this file only. Across the whole thread: no code, no SQL, no copy, no git, no Jira.
+
+## 2026-09-06 — Messages crossed with `team-lead` a second time; the deflation pairing relayed to `team-lead-3`
+
+**Crossed again, and I should state it rather than let the warning look like it landed in time.**
+`team-lead` told me to check the tickets before sending `po` my three KAN-130 corrections, because two
+were already in them. **I had already sent all three** in the KAN-130/131 sizing message. So `po`
+received two redundant items — `fn_get_wallet` (genuinely owed) plus the third `search_path` string
+and the exhaustiveness check (both already landed). Low cost, but it is the second time this thread
+that a warning arrived after the act, and the pattern is worth naming: **when two seats work a fast
+ticket in parallel, a "check before you send" arrives after the send more often than not.**
+
+**What `team-lead` supplied that I did not have:** the third `search_path` string is already
+load-bearing in KAN-130 AC 2 item 3, **with a reason sharper than mine** — `delete_my_account` needs
+`auth` on its path to run `delete from auth.users`, so restating any other string **fails at runtime
+on account deletion, not at apply time.** That is a much stronger statement of the no-shared-string
+rule than "the strings differ."
+
+### The pairing that must travel with `team-lead-3`'s new proxy rule — relayed directly
+
+From `team-lead` and Shu:
+> **A proxy substituted for the test inflates. The test applied to an unresolved fact deflates.**
+
+Khonsu's new §1 subsection fixes the first failure — mine, twice. **This is the opposite one, and a
+reader who has just absorbed *"stop reaching for proxies, apply the test"* is set up to walk into it.**
+
+**Mechanism:** §1's question — *can the next part start before this lands?* — has a **third answer
+shape**. Sometimes the next part waits on **a fact you have to go and find out**, which can come back
+either way. Asked of that, the honest-feeling answer is *"yes, if the fact goes the way I expect"* —
+producing **a confident single number and a re-cost on the day.** The test applied rigorously to an
+unresolved fact does not return "unsizeable"; it returns a number that looks derived.
+
+**Live instance on my own ticket:** the `financial_ledger` erasure gap is that shape, and Shu returned
+a **branch** rather than a ceiling. Had it answered §1 from expectation it would have returned 2 with
+confidence and re-cost when `cto`/`cpo` ruled.
+
+**So §1 and §4 are not independent sections** — §1 has a failure mode whose only exit is §4, and
+nothing points from one to the other. Told Khonsu the test: *when the answer to "can the next part
+start?" depends on a fact I do not have, the output is §4's branch, not §1's boundary.* Also noted
+this pairing is **not** two-instances-one-lead — the deflation half is Shu's, first-hand, on a
+different ticket, from a seat that is not a lead and never read the skill as one.
+
+**`team-lead-3` generalised §1 as asked:** heading now *"Neither risk nor volume is a checkpoint. A
+dependency boundary is."*, a proxy table, Shu's symmetry quote in full, the symmetry stated in the
+scope-cut paragraph (the upward direction named as the one that catches people), and a forward-looking
+test — *if the justifying sentence does not contain "cannot start until", you are holding a proxy.*
+It kept my hypothesis caveat rather than laundering it.
+
+**`team-lead` has given `cto` a third option on the erasure ruling** that I had not thought of and
+should record: **`financial_ledger.entity_id` is an *identifier*, not a *record*** — pseudonymising on
+erasure keeps the journal complete and the amounts reconcilable while severing the link to the person.
+That stops the ruling being a binary between deleting from a financial journal and retaining a deleted
+user's id forever.
+
+**Nothing owed by this seat.** Open elsewhere: `cto` on probe ownership · `cto`/`cpo` on erasure ·
+`po` on KAN-130's ACs · Phase 0's landing test on my 1-sitting half.
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — `T-054`: erasure slice ruled OUT of KAN-130. Count holds at 2/3. Both tickets carry everything.
+
+**`cto` ruled (`T-054`, commit `c3a2930`):** the `financial_ledger` erasure gap is **out of KAN-130's
+scope.** **Shu's count stands at 2 sittings, ceiling 3 — the third sitting does not fire — and `po`
+can date the ticket.**
+
+The distinction is worth keeping: `T-051`'s wallet delete **restores** a guarantee the `auth.users`
+cascade provided until `T-051` itself removed it — repairing its own change. A `financial_ledger`
+scrub would **create** a guarantee that never existed — policy, not repair. `cto`: *"an unruled policy
+question inside a dated migration is how the date slips."*
+
+**This vindicates Shu's branch discipline concretely.** It returned the slice as a branch rather than
+a ceiling; answering §1 from expectation would have produced a confident 2 and a re-cost on the day.
+Instead it produced a 2 that **survived** the ruling. That is the deflation failure being avoided in
+the live case, and it is the better half of the pairing I sent `team-lead-3`.
+
+**Not an exposure.** `pm` re-ran it rather than trusting the ruling: `relrowsecurity` on
+`financial_ledger` is `true`, exactly one policy — `financial_ledger_admin_read`, qual `is_admin()`.
+With `is_admin(null) = false` confirmed earlier, the retained uuid is admin-readable and nothing else.
+Filed normally, not fast-tracked.
+
+**CORRECTION I OWN: the pseudonymise option I relayed is illusory, and `cto` ruled it so.** I passed
+`team-lead`'s *"`entity_id` is an identifier, not a record"* framing up to `pm` as a way out of the
+retain-versus-delete binary. **`booking_id` and `payment_intent_id` still trace back to the user, and
+`entity_id` is `NOT NULL` anyway.** I relayed an option without checking whether the link it claimed
+to sever was the only link. It was not.
+
+**And `cto`'s argument is the one I should have seen from the schema and did not:** the three rows per
+payment are a **balanced double-entry set**, so deleting the user's side leaves `v_wallet_balance`
+unreconciled for the venue and the platform — *counterparties who never asked to be erased.* Visible
+in `trgfn_payment_to_ledger`'s three inserts, which I had already read closely for the
+`ON CONFLICT` scoping. **I read that function four times for other purposes and never asked what the
+three rows meant together.** `cto`'s recommendation to `cpo` is documented retention — zero SQL.
+
+**Named an executor for the one item owed regardless of `cpo`'s answer.** `delete_my_account`'s comment
+block must state whatever is decided; `cto` flagged it owed but is barred from `dabbler-code`.
+**It is `senior-backend`'s** — function bodies are its authoring surface (`CONTRACT.md` §3), `cto`
+applies, small enough to fold into whichever migration is live. Told Shu, `pm` and `po`.
+**A follow-up with no named executor is how this gets rediscovered a third time; it has been found
+twice already.**
+
+**`po` has applied everything to KAN-130, with KAN-131 citing rather than restating** — capacity
+attributed to Shu's own count, all three of Shu's corrections re-verified against the baseline before
+writing, and the erasure gap recorded as an OPEN section outside scope. **`due_date` stays unset on
+both**, pending `cto` applying KAN-128 plus the probe-ownership and `cpo` rulings. Told Shu directly,
+at `po`'s request, that AC 2 item 3 now states **all three** `search_path` values explicitly.
+
+**Nothing owed by this seat.** Open elsewhere: `cto` on probe ownership · `cpo` on retention ·
+Phase 0's landing test on my 1-sitting half of KAN-130.
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.

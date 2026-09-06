@@ -872,3 +872,27 @@ where a fact was restated rather than cited. Prefer citing an existing section o
 a fact in a second place going forward.
 
 No file under Dabbler/dabbler-code/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 10) — KAN-130/131: senior-backend's combined capacity, three corrections, and a new right-to-erasure gap
+
+senior-backend returned KAN-130+131's capacity: 2 sittings, ceiling 3, same probe-ownership
+open branch as KAN-128, earliest start Thursday 2026-09-10 (after cto applies KAN-128).
+Verified all three of its ticket corrections against the baseline before writing in: (1)
+fn_get_wallet needs no edit — its INSERT already omits user_id, confirmed at :6096; (2) no
+shared search_path string exists across the two migrations — three distinct values confirmed;
+(3) the six-dependent exhaustiveness check comes back clean, confirmed independently.
+
+New finding, verified independently rather than relayed: financial_ledger's only FK is to
+wallets(id) ON DELETE SET NULL, none to auth.users; trgfn_payment_to_ledger writes a user's
+uuid into financial_ledger.entity_id unconditionally; delete_my_account never references
+financial_ledger (grep, zero hits). Recorded as an OPEN section on KAN-130, needing a ruling
+(cto/possibly cpo, already escalated by team-lead-4 to pm) — not part of this ticket's scope,
+could push the sitting count to 3 if ruled to extend erasure into financial_ledger.
+
+Wrote the combined capacity/erasure-gap content on KAN-130 only and had KAN-131 cite it rather
+than restate — applying the cite-don't-restate practice directly this time rather than as a
+retrofit.
+
+No file under Dabbler/dabbler-code/ written, no git command run.

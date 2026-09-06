@@ -214,3 +214,66 @@ restate each function's own header, read from `pg_get_functiondef`; there is no 
 
 **Blocked.** Nothing. Cannot start KAN-130/131 authoring until `cto` applies KAN-128
 (`T-052` requires rebasing on live post-128 definitions). The erasure question is with `cto`.
+
+### Addendum — my own "concurrent replay" framing is not executable here, and does not need to be
+
+**Measured live** (read-only, `list_extensions` on `wtncuzcskpigqpmnxwws`): **`dblink` is available but
+NOT installed** (`installed_version: null`), `pg_background` is absent entirely, and **`pgtap` 1.2.0
+IS installed** in `extensions`.
+
+**Consequence.** A genuinely concurrent probe needs two sessions interleaved. Nothing in this
+database provides that without `CREATE EXTENSION dblink`, which is a DDL change to production,
+`cto`'s to apply, and outside KAN-128's scope. Adding an extension to production to run one test is
+not worth it and I am not proposing it.
+
+**And it is not needed — the probe should target the constraint, not the trigger path.** My original
+point stands where it was aimed: a sequential retry through `trgfn_payment_to_ledger` proves nothing,
+because the `EXISTS` guard at `:19183`–`:19189` absorbs it before reaching the insert. But the fix
+under test is the **unique index**, not the trigger. Two **direct** inserts into `financial_ledger`
+with the same `(payment_intent_id, entity_type, entry_type)` demonstrate it exactly, and
+sequentially: pre-index both succeed (2 rows), post-index the second is absorbed (1 row). That
+satisfies `cto`'s failing-first condition cleanly. Concurrency-safety is then a property **inherited
+from the unique index** — Postgres serialises on it — not something the probe reproduces. That is
+the whole reason `T-049` ruled a constraint over the `EXISTS` guard.
+
+**Owed as a correction, because it is my phrasing that propagated.** "Concurrent replay
+demonstration" is now in KAN-128's AC 3 and in `capacity-to-date`'s worked example, in my words.
+As literally written it is not executable on this database. It should read: *a direct two-insert
+probe against the constraint, demonstrated failing pre-index* — with the note that the trigger path
+cannot be used to show the failure because its `EXISTS` guard hides it. Raised to `team-lead` for
+routing to `po` (AC 3) and `team-lead-3` (the skill).
+
+**No change to the count.** KAN-128 stays **2 sittings** — `cto` has ruled I author the probes, so
+the branch is closed at 2, not 1. This changes what sitting 2 contains, not its size; arguably it
+shrinks it, since the direct-insert probe is simpler than what I had imagined.
+
+**Also noted from `cto`'s corrected AC 1:** the `admin_wallet_adjust` re-grant is `authenticated`
+and `service_role` **only** — `anon` is deliberately dropped from the baseline's `GRANT ALL`
+(`:34693`). That is a privilege reduction, and I will not "restore" it while restating.
+
+### Close — erasure branch resolved downward; my pseudonymisation proposal was wrong
+
+`cto` ruled the `financial_ledger` erasure slice **out of KAN-130's scope** (`T-054`, commit
+`c3a2930`). **KAN-130+131 is therefore 2 sittings firm; the third does not fire.** The distinction
+is worth keeping: `T-051`'s wallet delete *restores* a guarantee the `auth.users` cascade gave until
+`T-051` itself removed it — a repair. A `financial_ledger` scrub would *create* a guarantee that
+never existed — a policy call, not a repair.
+
+**My pseudonymise-`entity_id` proposal is ruled illusory, and I should not have made it.**
+`booking_id` and `payment_intent_id` still trace to the user, so severing one identifier severs
+nothing — and `financial_ledger.entity_id` is `NOT NULL` (`:22706`), which I had **read myself**
+while sizing KAN-130 and failed to apply. `cto` also found the stronger objection: the three rows
+per payment are a balanced double-entry set, so deleting one side leaves `v_wallet_balance`
+unreconciled for counterparties who never asked to be erased. Recommendation to `cpo` is documented
+retention — zero SQL.
+
+Not an exposure: `relrowsecurity` on `financial_ledger` is `true` with one policy
+(`financial_ledger_admin_read`, qual `is_admin()`), and `is_admin(null)` is `false`.
+
+**Owed to this seat later, logged so it is not rediscovered:** whatever `cpo` rules on retention,
+`delete_my_account`'s comment block should state it. `cto` is barred from `dabbler-code`; a function
+body is this seat's surface. One-liner, folds into whichever migration is live when the ruling lands.
+
+**KAN-130 AC 2 item 3** now states all three `search_path` values explicitly, with the reason that
+beats mine: `delete_my_account` needs `auth` on its path to run `delete from auth.users`, so
+restating any other string **fails at runtime on account deletion, not at apply time.**

@@ -58,9 +58,10 @@ makes the count go above one.
   bucketing can be wrong. Sitting 1 ends at *modules exist, golden test not yet green* —
   a real checkpoint: reviewable, abandonable, and not done.
 - `KAN-128`: author one migration, then run the AC-3 probe pack. Sitting 1 ends at
-  *migration body complete and posted in `G-002` format*; sitting 2 is the probes, which need
-  fixtures and — for `financial_ledger` — a **concurrent** replay, since a sequential retry
-  cannot demonstrate the failure at all: the failure *is* the interleaving.
+  *migration body complete and posted in `G-002` format*; sitting 2 is the probes and their
+  fixtures. (An earlier version of this line carried a probe-mechanics claim, quoted from
+  `senior-backend` and since retracted by it — see the mechanism proxy below. Probe mechanics
+  are ticket content and do not belong here; the checkpoint is what this example is for.)
 
   **This example was published branched, and the branch is the lesson.** Who authored the AC-3
   probes was open: **`cto` owning them made it 1 sitting on `senior-backend`; shipping them with
@@ -106,6 +107,7 @@ like the same one. Two have now been caught on the same lead, by the same seat:
 |---|---|---|
 | **Risk** | less checkable, therefore a checkpoint | raises the odds of a rework cycle; creates no boundary (`KAN-128`) |
 | **Volume** | materially bigger, therefore more sittings | adds no boundary unless it adds one (`KAN-130`/`KAN-131`) |
+| **Mechanism** | this must be proven the way it fails in production | sizes the mechanism you want to prove, not the thing under test (`KAN-128`) |
 
 On the volume case, `senior-backend` again: *"Volume shifts the start, not the cost — that is
 your own argument about the `payment_intents` cut, and it runs symmetrically: lighter mechanical
@@ -113,10 +115,26 @@ work buys back no sitting, and heavier mechanical work adds none unless it adds 
 I went looking for a second boundary and could not find one."* The bundle came back **2 sittings,
 ceiling 3** — the same shape as the ticket it was supposed to dwarf.
 
-**Expect a third proxy you have not met.** Test a proposed sitting by naming the boundary out
+**The mechanism proxy is worth reading closely, because it caught the seat that wrote the rule
+about it.** Sizing `KAN-128`'s probes, `senior-backend` reasoned that a replay must be
+demonstrated the way it fails in production — concurrently — since a sequential retry through
+the trigger is absorbed by the `EXISTS` guard before the insert. True, and beside the point:
+**the thing under test is the unique index, not the trigger.** Two direct inserts sharing the
+key show it sequentially — pre-index 2 rows, post-index 1 — and concurrency-safety is then
+*inherited* from the index rather than reproduced, which is the whole reason `T-049` chose a
+constraint over the guard. The proxy substituted **the mechanism it wanted to prove** for
+**the thing under test**, and it survived a correctness argument that was itself correct.
+
+**Expect a fourth proxy you have not met.** Test a proposed sitting by naming the boundary out
 loud; if the sentence that justifies it does not contain *"cannot start until"*, you are holding
-a proxy. *(Two instances, one lead, one correcting seat — a hypothesis about how the test gets
-misread, not a measured pattern.)*
+a proxy.
+
+*(Three instances. Two are one lead's, caught by `senior-backend`; the third is
+`senior-backend`'s own, caught by itself. **Still a hypothesis about how the test gets misread,
+not a measured pattern** — a third instance from a second seat strengthens it and does not make
+it measured. Worth noting that the deflation half below comes from `senior-backend` first-hand,
+on a different ticket, from a seat that is not a lead and has never read this document as one:
+a second source of a different kind, which is worth more than another instance of the same.)*
 
 **Read the next paragraph with this one, or the correction overshoots.** A proxy substituted for
 the test **inflates**. The test applied to an unresolved fact **deflates**. Learning only the
