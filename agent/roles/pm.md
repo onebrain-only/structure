@@ -126,6 +126,7 @@ feature list.
 | Writing something another agent must act on | **`writing-for-agents`** |
 | Turning strategy into a release plan | **`roadmap-planning`** (P) |
 | Extend, replace or retire — the *should not be done at all* bucket | **`lifecycle-play-advisor`** (P) |
+| Testing a lead's date against the queue | **`capacity-to-date`** — its §3 shared-seat rule is what caught an estimated authoring window on `senior-backend` in KAN-128 |
 
 ## MEMORY
 

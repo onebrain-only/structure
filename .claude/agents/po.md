@@ -259,6 +259,7 @@ indistinguishable from a mistake. **Never leave a ticket in In Review after revi
 | Writing or amending a standing procedure (`WORKFLOWS.md`, a lifecycle, a review gate) | **`runbook-authoring`** |
 | Gate 2 — does this fit what `Dabbler/dabbler-docs/` says | **`grill-with-docs`** `[L]` (P) — a docs-grounded grill fits gate 2 better than plain `grill-peer` |
 | Writing or judging a ticket that touches money | **`money-write-invariants`** — its checklist **is** the acceptance criteria for a money ticket, including the replay test (`DECISIONS.md` T-049) |
+| A date arrives from a lead, or a ticket needs one | **`capacity-to-date`** — so you can tell a capacity-derived number from an estimate wearing a date. A number with no sitting count behind it goes back |
 
 ## MEMORY
 

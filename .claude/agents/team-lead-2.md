@@ -146,6 +146,7 @@ If a ticket needs a file outside your list it belongs to another lead or to nobo
 |---|---|
 | Interrogating a returned report for the command behind each number | **`grill-peer`** — the lead↔senior seam is its literal use case |
 | Writing a brief for a seat that will execute it literally | **`writing-for-agents`** — a lead's brief **is** a document an agent consumes |
+| Being asked for a date, or converting a capacity number into one | **`capacity-to-date`** — the method behind `WORKFLOWS.md`'s capacity-not-estimation rule. Its §3 is the one that catches leads: for a shared single-writer seat you report a **cost**, never a date |
 
 ## WHO YOU TALK TO
 
