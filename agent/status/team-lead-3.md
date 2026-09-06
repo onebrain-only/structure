@@ -1411,3 +1411,61 @@ can complete.
 
 **Not verified:** who actually produced the 25. Whether `qa` closes both to Done. The scratchpad
 worktree at `8e49b1d` — still present, still not mine to delete, still raised rather than removed.
+
+## 2026-09-06 — KAN-139 sized: sub-sitting cost, no date, and it is not my slice
+
+**Agent:** `team-lead-3`
+**Outcome:** `po` asked for capacity on `KAN-139`. **Gave a cost, refused a date, and declined
+the ownership** — `lib/app/routes/` is a shared surface my seat does not own. Raised the
+unresolved partition question behind it. No ticket touched, no code touched, no date set.
+
+**Premise verified first-hand:** `lib/app/routes/placeholder_screen.dart:11` is
+`const PlaceholderScreen({required this.title});` — no `super.key`, and it is the **only** widget
+class under `lib/app/`. `po`'s report is accurate.
+
+**Recorded for the ticket: this is pre-existing, not introduced.** The file header states it was
+*moved verbatim* from `app_router.dart` under `KAN-124`, underscore removal aside. The missing
+`super.key` arrived with the verbatim move, and `KAN-124`'s explicit non-goal forbade fixing
+anything in flight — **`sf3-125` was right not to touch it**; doing so would have fired the
+ticket's own rework trigger. `KAN-139` is new work, not follow-up rework, and the ticket should
+say so or a reviewer reads it as a miss.
+
+**Cost: well under one sitting** — one line plus an analyze run. Smallest thing I have been asked
+to size; it does not merit a sitting and should ride along with the next ticket that legitimately
+opens a file in that directory.
+
+**Date: none, two blockers, and the second outlives the first.**
+1. **§4.1's exclusion bars every seat but `senior-frontend-3` from `lib/app/routes/**` while the
+   grant is live** — and the grant covers only the five P0 tickets, so `senior-frontend-3` cannot
+   take `KAN-139` under it either. **Right now nobody can do this work.** Expiry runs through
+   §10.6's Canary clause → a push → the freeze → a CEO decision.
+2. **`lib/app/**` is a shared surface under `CONTRACT.md` §3/§4 and is not mine.** My role file
+   says so explicitly. **The grant made `senior-frontend-3` a temporary writer there for five
+   named tickets; it does not survive them.**
+
+**Declined the ownership deliberately.** `po` came to me because my seat executed Phase 0 — but
+**the exception was the grant, not the ownership.** Taking `KAN-139` would be acquiring a shared
+surface by having once been granted an exception to it, which is the precise move `CONTRACT.md`
+§4 exists to prevent. This is the same discipline as refusing to size a shared seat's queue,
+applied to a path instead of a seat.
+
+**The larger question I raised rather than answered:** `lib/app/routes/` **did not exist when
+`CONTRACT.md` §3 was written.** Seven new files now sit in a shared surface with **no named
+owner**; `KAN-139` is the first work to land on them and will not be the last. **Who owns
+`lib/app/routes/` post-Phase-0 is unresolved** — a `cto`/`analyst` call on the partition, not
+mine to claim. Offered to route it if `po` would rather not carry it.
+
+**Flagged for whoever holds the freeze decision:** the queue behind §10.6's Canary clause is now
+`KAN-129` · `KAN-132` · `KAN-130`'s client half · `KAN-139`. Individually trivial; collectively
+**the visible cost of one unmade decision**, which is worth stating when the push question next
+comes up. `po`'s `ci.yml` point sharpens it — the unpinned `stable` channel can turn this
+info-level lint fatal with no code change, and the fix is blocked by something unrelated to it.
+
+**Told `po` to leave it in `To Do` with no date** — not scheduled, blocked, blocker named.
+`WORKFLOWS.md`: *a ticket with no date is not scheduled, it is a wish.* A date here would be
+exactly that, and the honest board state is the undated one with a written reason.
+
+**Not verified:** whether `cto`/`analyst` would agree `lib/app/routes/` is unowned rather than
+implicitly mine — that is the question I raised, and I have deliberately not pre-empted it.
+Whether the four queued tickets are all genuinely blocked on the same clause; three of them are
+`team-lead`'s and `po`'s reports, not my reads.
