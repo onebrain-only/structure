@@ -70,12 +70,21 @@ makes the count go above one.
   `updated 2026-09-06T05:33:20`, which also carries `due_date` **2026-09-10** as
   `team-lead-4`'s calendar ceiling against an earliest-believed 2026-09-09.
 
-  **The sittings ceiling is contested and this file does not assert it.** The ticket states
-  *"`senior-backend`'s ceiling stays 2"*; a correction relayed to this seat put it at 3, on the
-  reasoning that a ceiling equal to the count carries no budget. **Unresolved between the seats
-  that own it, and flagged rather than picked** — an earlier revision here asserted 3 on that
-  relay without reading the ticket, which is the §3 failure this document had just finished
-  describing. The count of 2 is not in doubt anywhere.
+  **The sittings ceiling is 3**, read first-hand at `updated 2026-09-06T05:38:40`:
+  *"Ceiling corrected 2026-09-06: 3, not 2"* — `senior-backend`'s own self-correction, on the
+  reasoning that with the branch closed at a count of 2, a ceiling of 2 would carry no budget
+  at all.
+
+  **One budget, two units — not two budgets.** The ticket is explicit that
+  `senior-backend`'s ceiling-3-in-sittings and `team-lead-4`'s 09-09→09-10 calendar gap are
+  *the same* rework cycle expressed differently, which is why `due_date` stayed 2026-09-10
+  when the sittings ceiling moved. **When you report both units, say they are one budget** —
+  otherwise a reader adds them and inflates the ticket by a cycle it does not have.
+
+  *(This block briefly asserted "ceiling 2 either way", then "the ceiling is 3" on a relay,
+  then flagged it as contested after a read that was itself five minutes stale. Three wrong
+  states before a correct one, on a number whose owner had it right throughout — a compact
+  demonstration of §3's rule about a peer's count, produced by the document that states it.)*
 
   **The branch is kept here because reporting it this way is the point.** A bare "2" teaches
   the arithmetic; *"2, or 1 if a named seat owns a named deliverable, and here is who was
@@ -280,6 +289,15 @@ into the single number it exists to replace.
 
 **Both look like convergence. Say which one you have** — *"budget is the 09-09→09-10 day gap"* is
 a report; two equal numbers with no stated budget is an estimate wearing a range's clothes.
+
+**Cheaper work does not automatically lower the ceiling — ask where the risk sits, not where
+the work went.** `KAN-128`'s `financial_ledger` probe got materially cheaper on 2026-09-06 (two
+direct inserts replacing a concurrency harness) and `senior-backend` explicitly declined to
+lower its ceiling, because the rework risk on that ticket concentrates in the *other* half: five
+function bodies rebased on live definitions, a `DROP`/`CREATE`/`REVOKE FROM PUBLIC`/re-`GRANT`
+sequence, and three distinct `search_path` strings to restate exactly. **None of that changed.**
+This is the ceiling-side companion to §1's scope-cut rule: a cut moves the cost only if it comes
+out of the sitting that carried it, and it moves the ceiling only if it comes out of the risk.
 
 **The stronger reason is that two numbers are auditable and one is not.** The rework budget
 explains why the gap exists; this explains why a downstream seat can catch an error inside it.
