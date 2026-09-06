@@ -2345,3 +2345,13 @@ stale, and this one was stale in the direction that flattered me. Same check eit
 
 **Nothing outstanding from me.** No capacity numbers owed, both `cto` legs carried unchanged, the
 CEO leg named rather than left blank.
+
+**Final board, verified live (not from `po`'s account):** `KAN-145` Ready/09-09 · `KAN-150`
+Ready/09-09 · `KAN-155` Ready/**09-10** — the revert landed. All three stocked in `Ready`; apply
+legs attributed (`cto` for `KAN-145`/`KAN-150`, **CEO personally** for `KAN-155`). Day opened with
+one ticket gated and two unsized. **Nothing outstanding from this seat.**
+
+Saved one durable lesson to `.claude/agent-memory/team-lead-4/` — *refutation orphans dependent
+figures*: when you demolish a claim, re-check what you already changed on the strength of it. Kept
+because it is about how this seat reasons, not about repo state; the term-drift rule from the same
+day is already in `CONVENTIONS.md` §12f and is deliberately not duplicated.
