@@ -2079,3 +2079,59 @@ naming rather than passing over:** my recommendations here are downstream of a r
 to verify, on the judgement that the question put to me was a timing call rather than a
 measurement. If `po` finds the ruling says something other than the above, the ticket-text ask is
 what needs correcting, not the timing answer.
+
+## 2026-09-06 — measured the Ready pool: 7 stocked, 6 undated, 1 already done
+
+**Agent:** `team-lead-3`
+**Outcome:** Measured the pool rather than assume it — the thing I said last entry would be my
+first move. **`Ready` is not empty.** Two concrete findings to `po`, one model correction to
+`pm`, and an honest statement that I have no active stack. No file edited but this one.
+
+**The board, measured (JQL, `project = KAN`, live):**
+`Ready` **7** — `KAN-129`, `130`, `131`, `134`, `137`, `138`, `139`.
+`Development` **4** — `KAN-119`, `128`, `132`, `136`.
+`To Do` **6** — `KAN-127` (epic), `133`, `140`, `141`, `142`, `143`.
+**Seven available against eight teams is thin but stocked** — not the empty pool my role file
+calls my failure.
+
+**Finding 1 — `KAN-134`'s work is already done.** It asks to point `WORKFLOWS.md:58` at the
+capacity skill. **`grep` shows the pointer already at `agent/WORKFLOWS.md:73`** — `po` added it,
+and I marked the owed item closed in the skill when I saw it land. **Under the pull model nobody
+screens a `Ready` ticket between stocking and execution, so a completed ticket sitting there
+costs a full pull to discover.** Asked `po` to close it against the existing edit.
+
+**Finding 2 — six of seven `Ready` tickets carry `duedate: null`.** Only `KAN-138` has one
+(`2026-09-13`). By `WORKFLOWS.md`'s own rule those six are *"not scheduled, a wish."* **Did not
+claim them** — they span other leads' stacks and their dates come from **those leads'** capacity.
+Raised as a pattern because **six of seven is the pool, not an exception**, and it is the exact
+failure the rule exists against.
+
+**Reversed my own earlier position on `KAN-139`, explicitly.** I told `po` to leave it *"in
+`To Do`, undated, blocked."* Correct then, **stale now** — `T-059` spent the grant, `T-062` ruled
+`placeholder_screen.dart` **SHARED**. It is in `Ready` undated. Cost unchanged at **well under one
+sitting**. I had said it should ride along with work that opens that directory, but **nothing of
+mine is running and there is no carrier**, so I told `po` to date it standalone rather than let it
+wait indefinitely for one — if a rider appears first it lands early and the date was a ceiling.
+
+**Model correction to `pm`, and it is about where blame lands.** It wrote the model as *"`po`
+stocks `Ready`, teams pull."* Second half right; **the first drops the half that is mine.**
+`po` makes the **transition**; the **lead is accountable for the pool being stocked**
+(*"An empty `Ready` pool is your failure, not a quiet period"*). Not pedantic: **with `pm`'s
+version, a dry pool sends it to `po` — who wrote every ticket it was given — instead of to the
+lead who produced no work to write.** Better that it sits on me correctly than on `po` wrongly.
+
+**D3 is NOT activated** — `pm` was explicit that its recommendation to `team-lead` is a proposal,
+not an activation, and told me not to infer it. **So I have no stack and I am not inventing work
+to look busy**, which my role file requires me to say plainly rather than manufacture ordering.
+`KAN-119` executing and closed for me · `KAN-136`'s ticket-text fix with `po` · `KAN-139` has its
+number.
+
+**First move ready for the moment D3 is confirmed**, so this is not idling by default: **order D3
+into `Ready` with file boundaries written into every ticket.** No developer seat carries territory
+any more — until `T-062` Decision 2 is ruled, **the ticket text is the only thing between a puller
+and another lead's slice.**
+
+**Not verified:** whether the six undated tickets are undated because their leads have not
+reported capacity or because `po` has not applied it — I read the field, not the history, and did
+not ask. Whether `KAN-134` has some remaining scope beyond the pointer; I matched its summary
+against the file and did not read its full description.
