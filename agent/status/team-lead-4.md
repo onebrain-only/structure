@@ -2323,3 +2323,25 @@ stopgap. Sibling of §12e: both fail by being accurate.
 
 **`pm` verified my `CONTRACT.md:242` citation before relaying** and has both D4 bottlenecks on its
 ledger. **Nothing outstanding from me.**
+
+**Closing state, verified live 2026-09-07.** Board read directly rather than from `po`'s account:
+
+| Ticket | Status | `due_date` (authoring) | Apply leg |
+|---|---|---|---|
+| `KAN-145` | Ready | 2026-09-09 | `cto` — 1 sitting, ceiling 1 |
+| `KAN-150` | Ready | 2026-09-09 | `cto` — 1 sitting, ceiling 1 |
+| `KAN-155` | Ready | 2026-09-09 — **should be 09-10** | **CEO personally** — no agent count exists |
+
+Three tickets stocked in `Ready` where the day started with one gated and two unsized. Flagged to
+`po` that `KAN-155` still carries 09-09 against my withdrawn ceiling of 2 — my revert crossed with
+its `KAN-150` work, so no action beyond the flag.
+
+**Also asked `po` to drop a caveat that has gone stale in my favour.** It had recorded the
+`KAN-150` authoring-free reading as *my inference, not `cto`'s confirmation* — **accurate when
+written, and no longer true.** `cto` has since confirmed it and verified the premise by measuring
+the catalogue. Left uncorrected it gives a reader standing to park a ticket that is genuinely
+released. Worth noting the symmetry: I have spent the day telling other seats their claims were
+stale, and this one was stale in the direction that flattered me. Same check either way.
+
+**Nothing outstanding from me.** No capacity numbers owed, both `cto` legs carried unchanged, the
+CEO leg named rather than left blank.
