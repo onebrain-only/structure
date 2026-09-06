@@ -228,3 +228,67 @@ the three requested skills wired, the role-file `SKILL REFLEXES` table is where 
 than a silent divergence. `KAN-124` not started; not mine to open.
 
 ---
+
+## 2026-09-06 — KAN-124 (P0-3b) opened and stopped at a spec contradiction, before any `lib/` write
+
+**Status: BLOCKED. No file under `lib/` or `test/` was created, edited or deleted.** The finding
+below makes acceptance criterion 1 and the required shape of `_routes` mutually unsatisfiable, and
+it is provable without building anything, so I stopped rather than burn the sitting producing a
+diff that cannot pass its own gate.
+
+**What I read first,** in the order the brief named them: `KAN-124`'s current description including
+comments `10539` and `10564`; `KAN-123` comments `10547`, `10548` and `10551` (`10551` supersedes
+`10548` on six rows); `STACKS.md` §10.3 in full; `CONTRACT.md` §4.1; `test/app/route_inventory_test.dart`
+and `test/app/route_inventory.golden.txt`.
+
+**I re-derived the 80 top-level entries mechanically** rather than trusting the line numbers on the
+ticket. A bracket-depth scanner over `app_router.dart:444`–`:1678` (string- and comment-aware)
+segments `_routes` into **exactly 80** entries, ending at `:1678`. Their paths match `10548`'s table
+row for row, and `'${RoutePaths.error}:message'` is entry **80 of 80** (`:1665`–`:1677`).
+
+**I re-derived the bucket distribution** from `10548` as corrected by `10551` and it reproduces
+`10551`'s corrected arithmetic exactly: identity 28 · profile_social 27 · platform 18 ·
+play_places 5 · notification 1 · home_shell 1 = **80**. That is an independent check of the
+mapping, not a restatement of it.
+
+### The blocker — AC-1 and the concatenated `_routes` cannot both hold
+
+`test/app/route_inventory_test.dart:103` asserts `orderedEquals`, not set equality, over the
+depth-first flattened table. **Declaration order is frozen by the golden**, and P0-1's own "done
+when" (`STACKS.md` §10.1) required that reordering any two top-level entries *fail* the test — it
+was designed to catch exactly what P0-3b must do.
+
+`_routes` as "an ordered concatenation of the six module lists" reproduces the original order only
+if every bucket occupies a contiguous run of the 80. **Four of the six do not:**
+
+```
+identity        span 2-68  size 28  contiguous=False
+profile_social  span 23-71 size 27  contiguous=False
+play_places     span 22-32 size 5   contiguous=False
+platform        span 1-80  size 18  contiguous=False
+notification    span 33-33 size 1   contiguous=True
+home_shell      span 21-21 size 1   contiguous=True
+```
+
+So **no permutation of the six lists** yields declaration order — this is not a matter of picking a
+better bucket order. Concatenating them in any order moves **71 of the 80** top-level entries; the
+first divergence is at position 1 (`/` at `:445` is `platform` under §10.3's completion rule 1, so
+it can no longer be first). Tests 2 and 3 in the file are counts only and are order-insensitive;
+**only the golden comparison fails.**
+
+The resolution is a product call, not mine: either the golden is regenerated (forbidden by AC-1 and
+by my brief), or `_routes` keeps declaration order and is therefore not a plain six-way
+concatenation. `KAN-123`'s collision analysis (`10547`, hand-walked by `po`) found **0 cross-entry
+collisions**, so the reordering is behaviour-preserving and the golden diff would be a pure
+reordering of 71 rows — but "behaviour-preserving" is precisely the claim AC-1 was written to stop
+anyone asserting on their own authority.
+
+**Not verified:** that the split fails the golden *in a run* — I proved it from the test's
+`orderedEquals` and the bucket spans rather than by building the six modules and running it, since
+building them commits the sitting to a shape that may not survive the ruling. The six module files'
+*contents* are unaffected by the ruling and are ready to cut on the same segmentation.
+
+**Next:** `po` and `team-lead-3` to rule on AC-1 versus the concatenation. Nothing else in KAN-124
+is blocked on anything else.
+
+---
