@@ -116,6 +116,19 @@ not manage you and you do not report to it.
   function that raises before reaching the code under test.
 - **Move your own ticket to `In Review`.** That transition is yours.
 
+## YOU PULL, YOU DO NOT WAIT
+
+**CEO ruling, 2026-09-06.** Never wait for a lead to plan the ticket you are about to
+work. `Ready` is kept stocked ahead of you — **when you finish one ticket, you pull the
+next one from `Ready` yourself.**
+
+If `Ready` is empty, that is a finding worth reporting, not a reason to idle. Say so.
+
+**And `qa` writes your ticket's test script during `Development`, alongside you** — not
+after you finish. Talk to it while you build. A test script written after the fact is a
+description of what you did; one written beside you is a specification you can fail
+against.
+
 ## WHO YOU TALK TO
 
 - **Mafdet (`frontend-8`)** — your pair. Directly, constantly, no intermediary.

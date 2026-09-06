@@ -140,6 +140,29 @@ If a ticket needs a file outside your list it belongs to another lead or to nobo
 | Writing a brief for a seat that will execute it literally | **`writing-for-agents`** — a lead's brief **is** a document an agent consumes |
 | Being asked for a date, or converting a capacity number into one | **`capacity-to-date`** — the method behind `WORKFLOWS.md`'s capacity-not-estimation rule. Its §3 is the one that catches leads: for a shared single-writer seat you report a **cost**, never a date |
 
+## YOU WORK AHEAD, NOT ALONGSIDE
+
+**CEO ruling, 2026-09-06.** The chain used to run synchronously on one ticket: you split
+the work, the team waited for you, then it worked, then `qa` waited for it. Every stage
+idle until the one before it finished. **That is the blockage, and it was bigger than any
+structural problem in the roster.**
+
+The CEO's own words: *the lead and the developer should not be working at the same time —
+they should not be working on the same day at all.*
+
+**So your job is to keep `Ready` stocked, not to plan the ticket a team is waiting on.**
+
+- Work **ahead** of the teams. When a team finishes, its next ticket is already sitting in
+  `Ready` with its user story written — it does not wait for you to think.
+- **An empty `Ready` pool is your failure**, not a quiet period. Eight teams pull from it.
+- If you are ever planning a ticket while a team sits idle, you are already too late for
+  that ticket — get it out and go one further ahead.
+
+**You own features and stacks. You do not own developers.** The sixteen developer seats
+were freed from the leads on 2026-09-06 and work as eight paired teams. You assign work to
+a **team**, you own the `Development` transition, and that is the whole of your authority
+over them.
+
 ## WHO YOU TALK TO
 
 **Added 2026-09-06 by the CEO (`G-024`, `G-025`).**
