@@ -491,3 +491,11 @@ it is precisely the ambiguity that cost this run two attempts.
 
 Story rewritten to match: verdict line, B2, T1, the step table and §6/§7. Skill correction landed
 as `d63dafb` (local, not pushed).
+
+## 2026-09-06 — KAN-126 criterion 1 verified (PASS)
+
+Documentation-only check, no app run. `agent/WORKFLOWS.md:386` **W6 — Regenerating generated
+code**: "**Owned by `devops`.**" / "**It runs at commit time, after a developer's source-only
+commit.**" Step 2 names `dart run build_runner build -d`; step 3 makes the generated output a
+separate commit. Cross-reference at `:488` says the same. Commits `abdeb89` (+96/-14) and
+`afbdbb9` (+7) both touch `agent/WORKFLOWS.md`. Criteria 2–3 out of scope (split to KAN-133).

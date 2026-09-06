@@ -1039,3 +1039,98 @@ for the Notion bullet) rather than sitting unowned.
 
 No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written. agent/WORKFLOWS.md
 reviewed but not edited this round (accepted as-is).
+
+---
+
+## 2026-09-06 (continuation 15) — T-056 applied to KAN-124: declaration order wins, golden not regenerated
+
+cto ruled T-056 on a genuine contradiction senior-frontend-3 found and correctly stopped on:
+route_inventory_test.dart:107 asserts orderedEquals (verified myself), but four of the six
+P0-3b buckets are non-contiguous in declaration order, so no six-way concatenation can
+reproduce it — 71 of 80 entries would move. Ruled: declaration order wins, golden untouched,
+_routes becomes an ordered composition (grouped lists if ≤20 contiguous runs, flat getters if
+>20) rather than a bucket concatenation.
+
+Rewrote KAN-124 throughout: struck the concatenation framing, added the run-count mechanism as
+new AC 8, carried cto's ratio-based reasoning for not regenerating the golden (not doubt about
+KAN-123's 0-collision evidence — a cost/benefit call: cosmetic gain vs. a 71/80-entry production
+routing-regression risk), added the 450-LOC escalation and full declaration-order rework
+trigger.
+
+STACKS.md §10.3 also needs the same phrase struck per this ruling — flagged to team-lead/cto
+rather than edited, since STACKS.md is outside my write surface (not Jira, status file, memory,
+or WORKFLOWS.md).
+
+KAN-126 closed to Done this session too (qa's PASS verdict re-verified: WORKFLOWS.md:386's W6
+rule, commits abdeb89/afbdbb9 both confirmed).
+
+No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 16) — T-058 applied: grant rule corrected, AC 3 narrowed to P1/P2/P4/P5, KAN-138 filed, KAN-130 gains a mandatory criterion
+
+cto ruled T-058 on three findings from senior-backend's KAN-128 probe run, all re-derived by
+cto against the live database: no text→settlement_status cast exists (settle_game dead),
+wallets.owner_id blocks the recalc upsert even after T-051's rename, and anon is granted by
+name via two pg_default_acl rows for schema public — REVOKE FROM PUBLIC alone was insufficient,
+and senior-backend's first draft (following the original ticket exactly) reproduced the exact
+outcome cto had ruled against.
+
+Verified the schema-level facts myself against the baseline file before rewriting anything:
+game_settlements.status is the settlement_status enum (confirmed via v_wallet_admin_overview's
+explicit cast), settle_game's CASE expression is two untyped literals with no cast, wallets.owner_id
+NOT NULL confirmed.
+
+Rewrote KAN-128 substantially: corrected the grant rule to "revoke from PUBLIC and anon, assert
+the resulting proacl" (not "assert the revoke ran" — the exact distinction that let the first
+draft through), relabelled the five probes P1-P5, narrowed AC 3 to bind only P1/P2/P4/P5 (P3,
+settle_game, reported BLOCKED, no fixture built to route around it), added the "report as
+constraint-holds-without-the-recalc-trigger, never an unqualified pass" reporting rule for
+P1/P2/P4, and made explicit that a green KAN-128 is not evidence the money layer works (three
+dead write paths now known: trgfn_payment_to_ledger, settle_game, and wallet_ledger via
+_wallet_recalc until KAN-130 lands).
+
+Filed KAN-138 for settle_game's cast defect (sibling of KAN-136, separate root cause per cto's
+explicit instruction). Added a mandatory new criterion to KAN-130 (_wallet_recalc must supply
+owner_type/owner_id explicitly or fail 23502 even after the rename, demonstrated with the
+recalc trigger enabled) rather than filing it separately, per cto's reasoning that T-051's
+migration is the only place that can fix it coherently. Mirrored the grant-rule correction to
+KAN-130 (noted as not currently biting, since its three functions are signature-stable
+CREATE OR REPLACE) and to KAN-131 (where it does bite directly, since fn_platform_owner_id()
+is a genuinely new function).
+
+No file under Dabbler/dabbler-code/ or Dabbler/dabbler-docs/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 17) — KAN-124 review gate: PASSED, moved to QA-Test; board-hygiene gap noted, not repeated
+
+team-lead-3 flagged that KAN-124's work was committed (8e49b1d) and complete while the ticket
+sat in Ready, never transitioned, with KAN-125 already committed on top (da41d3b) — a live risk
+since a rework verdict would now arrive with a second ticket's work stacked on an ungated base.
+
+Ran the full review gate myself against 8e49b1d rather than accept team-lead-3's diff-shape
+table or senior-frontend-3's own raw-output comment (10592) at face value, though both matched
+what I independently found: wc -l → 441 (≤450), grep -c "features/" → 4 (≤6), flutter analyze →
+0 errors/0 warnings/57 infos, flutter test → 106 tests/10 files all passing, golden test 3/3
+run directly, git show --stat → 8 files all under lib/app/, _handleRedirect diffed byte-for-byte
+between 93d6619 and 8e49b1d myself → identical. Also confirmed the cited sha c6d3e4f genuinely
+doesn't exist (git cat-file -t fails) — senior-frontend-3 had already caught and corrected this
+independently.
+
+One real gap found: AC 8 (T-056's new criterion) requires the executor to report the contiguous-
+run count as evidence; the shape used (flat named getters) is verifiably correct for a >20-run
+count, but the number itself was never stated. Not treated as blocking — flagged as a cheap
+follow-up rather than rework, since the code's correctness doesn't depend on the number being
+written down.
+
+PASSED. Transitioned Ready → QA-Test directly (id 3) rather than retroactively fabricating an
+In Progress → In Review history for work already finished — noted this board-hygiene gap
+plainly in the verdict rather than hiding it, and flagged it back to team-lead-3/team-lead so
+the same sequence-skip doesn't recur silently.
+
+Some Bash/git/flutter commands were run directly against Dabbler/dabbler-code this round
+(read-only: wc, grep, diff, flutter analyze, flutter test, git show/log/cat-file) — this is
+verification for the review gate, consistent with the seat's standing authority to test claimed
+work against the repo; no file was written and no git-mutating command was run.

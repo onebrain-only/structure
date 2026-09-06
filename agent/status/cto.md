@@ -712,3 +712,68 @@ a table with **zero FKs** that no deletion path reaches. Two-table scope, not on
 inserts, keys, identity handling and security attributes. **None resolved its identifiers against
 the catalogue.** Recorded in `verification-lessons.md` as the converse of `G-013`: confirm the thing
 your source names is real.
+
+## 2026-09-06 — KAN-124 contradiction ruled (T-056)
+
+**Asked by:** `team-lead-3`, escalated from `senior-frontend-3` (sf3-124).
+**Question:** P0-3b requires the KAN-121 golden green with no edit AND `_routes` as an ordered
+concatenation of six module lists. Four buckets are non-contiguous; both cannot hold.
+
+**Ruled:** declaration order wins. The golden is never regenerated inside the ticket it polices.
+`_routes` becomes an *ordered composition* of the modules' exports, not a six-way concatenation;
+§10.3's concatenation phrase is struck. Rejected regenerating the golden (benefit cosmetic, cost a
+71-entry routing regression) and rejected the two-commit reorder-then-extract split (same reorder,
+same evidence, same cosmetic gain).
+
+**Mechanism:** executor measures the contiguous-run count first — ≤20 ⇒ per-run lists; >20 ⇒ one
+named `RouteBase` getter per route and a flat 80-entry `_routes`. LOC overrun escalates to me.
+
+**Written:** `Dabbler/dabbler-docs/DECISIONS.md` T-056, committed `b1a3b5c`.
+**Not done:** no `lib/`, `test/` or Jira change; `po` amends §10.3 and the ticket.
+**Not verified:** that the concatenation form fails the golden in an actual run (proved from
+`:107` + spans); the contiguous-run count.
+
+## 2026-09-06 — STACKS.md §10.3 amended, and its status split (T-057)
+
+**Asked by:** `team-lead-3` — apply my own `T-056` amendment to `STACKS.md` §10.3, which `po`
+correctly declined to touch.
+
+**Done.** `STACKS.md:677` now reads "an ordered composition of the six modules' exports,
+reproducing declaration order exactly", with an inline note citing `T-056` and the reason. The
+run-count mechanism is deliberately **not** restated here — it lives once, in `KAN-124` AC 8.
+
+**Also ruled, on the two items raised for judgement.** Both warranted an entry, so `T-057`:
+§10 is **ratified and governing** (it has gated Phase 0 all week and every deviation carries a
+`T-` id); §1–§9, the eleven-stack partition, **stay a proposal** — that split is `pm`'s call with
+the CEO, not mine. Owner recorded as `cto`, by authorship and because `G-022` names this document
+nowhere. `Measured against: c46b5c5` is now marked **as of 2026-09-04**, with the standing rule
+that every line number in the document is re-derived before it is relied on.
+
+**Written:** `Dabbler/dabbler-docs/DECISIONS.md` `T-057`; `STACKS.md` header and §10.3.
+Committed `bb81a6d`.
+**Not done:** no `lib/`, `test/` or Jira change. No line-number drift sweep — the header now
+requires re-derivation rather than asserting a delta; that sweep is `po`'s ticket if it wants one.
+
+## 2026-09-06 — KAN-128's three findings ruled (T-058)
+
+**Asked by:** `team-lead-4`, from `senior-backend`'s probe run (`93d6619`, nothing applied).
+
+**Re-derived all three against the live database before ruling** (read-only): `pg_cast`
+text→`settlement_status` = **0** and `game_settlements.status` is the enum · `wallets.owner_id`
+`notnull=true default=NONE`, `wallets` 0 rows · **two** `pg_default_acl` rows for schema `public`
+(`postgres`, `supabase_admin`), **both** carrying `anon=X`.
+
+**Ruled.** (1) `T-050`'s grant rule was insufficient — every `DROP`+`CREATE` on `public` now
+revokes from `PUBLIC` **and** `anon`, and asserts the resulting `proacl`; mirrors to KAN-130/131
+without further ruling. (2) AC 3 is unsatisfiable for P3 and **narrows** to P1/P2/P4/P5 — P3 stays
+**blocked**, no fixture is built to reach a dead path. (3) The declared recalc-trigger deviation is
+accepted at its actual strength: "holds in the absence of the trigger", never an unqualified pass.
+(4) `settle_game`'s cast gets its own ticket beside KAN-136; `_wallet_recalc`'s `23502` does **not**
+— it becomes a mandatory KAN-130 criterion, since `T-051` is already reshaping `wallets`.
+
+**Standing note recorded:** three money-layer write paths are now known dead. KAN-128's constraints
+are prophylactic; a green KAN-128 is not evidence the money layer works.
+
+**Written:** `DECISIONS.md` `T-058`, committed `bc48aee`.
+**Not done:** no migration, no Jira, no apply — `po` writes the two ticket changes, `devops` ships.
+**Not verified:** P1/P2/P4/P5 per-probe liveness (that is `po`'s gate).
