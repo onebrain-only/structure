@@ -458,3 +458,59 @@ entry. Confirmed against the `sed -n '1660,1672p'` output I already held: `:1665
 structure) and I recommended rather than asked. Whether citing instead of restating survives
 contact with a developer executing cold; I drew the line where I did precisely because I have
 not tested it, and the six module files stay in the ticket for that reason.
+
+## 2026-09-06 — `capacity-to-date` amended: the shared-seat gap `team-lead-4` found, plus hand-off
+
+**Agent:** `team-lead-3`
+**Outcome:** `team-lead-4` (Sobek) reported that §3 of `capacity-to-date` names who may **not**
+produce a shared seat's date and never says who **does**. Correct, and it cost four seats a
+refusal each on a deadline-bound ticket. Amended the skill in five places. **Only the skill and
+this file changed.** No ticket touched, no date set, no `WORKFLOWS.md` edit.
+
+**Verified before encoding a rule from a peer's report.** Read `KAN-128` live. It confirms
+every element and cites the skill by name in its own text: *"the `capacity-to-date` skill's §3
+rule ... was violated — `team-lead-4` had estimated `senior-backend`'s own authoring window."*
+Also confirms **`due_date: HELD, not set`**, the 2-sitting count with its checkpoint
+(sitting 1 mechanical; sitting 2 carries the `admin_wallet_adjust` signature judgement), the
+three-seat chain (authored `senior-backend` → **applied `cto`** → gated `po`), and the
+`payment_intents` scope cut. The ticket is still stuck against D4's **2026-09-14** activation.
+
+**The five amendments:**
+1. **§3 — the missing sentence.** *Then ask that seat for its own count, and carry it back
+   unchanged.* The prohibition is on **producing** the number, not requesting it; a seat sizing
+   its own work is capacity. Recorded as `team-lead`'s 2026-09-06 resolution, **not invented
+   here**, with an instruction to take it to `pm` rather than quietly resume dating.
+2. **§3 — the four-refusal case** written in as the measured cost of the silence.
+3. **§2 input 3 — `hand-off` adopted as vocabulary.** A sitting on a seat other than the author,
+   inside one ticket, that is work rather than acceptance. Gates and hand-offs are now siblings:
+   both non-author, both counted separately. Rule attached: **each leg is sized by the seat that
+   executes it.**
+4. **§1 — the scope-cut direction.** `KAN-128`'s `payment_intents` cut removed DDL volume from
+   sitting 1 and nothing from the judgement. *Ask which sitting the cut came out of.*
+5. **`KAN-126` promoted from illustration to instruction** — the required hand-back shape, with
+   the warning that a seat asked simply "when?" returns a date, which is the estimate avoided.
+
+**A consequence `team-lead-4` did not raise, sent to it as a finding.** `KAN-128` says its
+2-sitting count awaits **`cto`** confirmation. Under the rule Sobek brought me, `senior-backend`
+sizes its own authoring and `cto` sizes the **apply** leg. Asking `cto` to confirm
+`senior-backend`'s authoring count is the same error one level up, wearing diligence — and it is
+one of the two things `po` is waiting on. Encoded in §3 as a rule; routed to Sobek as actionable,
+since the ticket is its own and racing a hard date.
+
+**Also owed and named in the skill, not written:** `WORKFLOWS.md:58` says capacity comes from
+the owning `team-lead-N` and is silent on a seat no lead owns — the silence that stalled
+`KAN-128`. The resolution now lives **only** in this skill, which makes a company rule into one
+seat's note. Flagged as owed; `devops` is still in that file.
+
+**On the calendar mapping:** `team-lead-4` offered `KAN-128` as a fifth/sixth data point and
+said himself it is not clean enough to derive from. Agreed — it has a cost and **no date**, so
+no elapsed time to compare. Recorded in the open question so the next seat does not re-count it
+as evidence. Still four points, none a measured sitting-to-day ratio on a judgement ticket.
+
+**Not verified:** `team-lead-4`'s claim that `pm` and `cto` each refused, and on which grounds —
+I read `KAN-128`, which records the `cto` apply-date discrepancy and the held date, but I did not
+read either seat's status file or ask them. I took the four-refusal sequence from Sobek and have
+written it into the skill as his report; if one of those refusals was on other grounds the case
+study is wrong in its detail, not its conclusion. That `team-lead`'s resolution is a ruling
+rather than one seat's reading — it reached me second-hand through Sobek, and I encoded it with
+an explicit escalation path to `pm` for that reason.

@@ -68,6 +68,14 @@ the only Phase 0 ticket carrying design judgement.
 **Shift the start; keep the cost.** Two clean mechanical tickets buy a schedule shift and
 never a re-size.
 
+**The same rule runs in the other direction, when scope is cut mid-ticket.** Everyone's
+instinct is that a smaller ticket lands sooner, and for a judgement ticket that is usually
+false. `KAN-128` had `payment_intents` dropped from its scope on 2026-09-06 (no SQL writer
+exists for it, so a bare constraint would have been the failure `T-049` forbids). The cut
+removed DDL volume from sitting 1 and touched nothing about the `admin_wallet_adjust`
+signature judgement that makes the ticket two sittings. **Ask which sitting the cut came out
+of.** If it came out of the mechanical one, the cost is unchanged and only the start moves.
+
 ## 2. Capacity to date — the arithmetic
 
 The conversion has exactly four inputs. **A lead supplies three and never the fourth.**
@@ -75,10 +83,23 @@ The conversion has exactly four inputs. **A lead supplies three and never the fo
 1. **Sittings per ticket** — from §1, with the reason named for anything above 1.
 2. **Serialisation** — which tickets can run at the same time, and why. Phase 0: zero
    parallelism, one seat (§5).
-3. **Gates** — `WORKFLOWS.md`: *a slot frees on acceptance, not delivery.* A seat that has
-   handed work to review still holds its slot. A chain of N tickets therefore costs
-   **N sittings plus N gates**, and the gates run on other seats' clocks. Count them
-   separately; never fold a gate into a sitting.
+3. **Gates and hand-offs** — everything inside the ticket that is not the author's own
+   sitting. Both run on other seats' clocks and both are counted separately. Never fold
+   either into a sitting.
+   - A **gate** is acceptance. `WORKFLOWS.md`: *a slot frees on acceptance, not delivery* —
+     a seat that has handed work to review still holds its slot. A chain of N tickets costs
+     **N sittings plus N gates**.
+   - A **hand-off** is a sitting on a different seat than the author, inside one ticket, that
+     is *work* rather than acceptance. `KAN-128` is the shape: `senior-backend` authors the
+     migration, **`cto` applies it**, `po` gates it — two sittings, one hand-off, one gate,
+     across three seats. A hand-off serialises the ticket internally, so it is a dependency
+     as well as a cost.
+
+   **Each leg is sized by the seat that executes it** — see §3. The author does not size the
+   hand-off and the hand-off's owner does not size the authoring. Expect this shape to be
+   normal rather than exotic: `money-write-invariants` already rules that a money write is
+   `senior-backend` (schema, RPC) *plus* `senior-frontend-4` (call site, controller), and D4
+   carries 110 features.
 4. **The calendar mapping** — sittings and gates resolved onto dates under a stated
    work-week assumption. **This is `po`'s, not yours.** Hand over counts and a rate.
 
@@ -138,13 +159,42 @@ on a queue you do not own, and a lead that issues one is estimating.
 
 > **For your own developers, report a cost and a date. For a shared seat, report a cost, no
 > date, and the name of the seat that owns the queue.**
+>
+> **Then ask that seat for its own count, and carry it back unchanged.** The prohibition is
+> on *producing* the number, not on requesting it. **A seat sizing its own work is capacity,
+> not estimation** — that is the whole basis of the rule, applied one seat over.
 
-**Worked example — `KAN-126` (P0-5), owned by `devops`.** `po` left the `due_date` unset on
-purpose and recorded why: *"No capacity number exists for `devops`, and I was told not to
-estimate one."* `devops` then supplied its own number in the correct shape (`agent/status/devops.md`):
-**2 sittings — sitting 1 datable and fully parallel with `senior-frontend-3` (no shared path);
-sitting 2 undatable, its precondition outside `devops`'s control.** A partial answer from the
-seat that owns the queue beats a whole answer from one that does not.
+**Naming the owner is half the job. Stopping there orphans the count.** This section said only
+the first half until 2026-09-06, and the cost was measured: on `KAN-128` — a migration racing
+D4's 2026-09-14 activation, free only while five money tables hold zero rows — **four seats
+refused in sequence and every refusal was correct.** `team-lead-4` refused under this section;
+`po` under `WORKFLOWS.md:58`; `pm` applying the same rule to itself; `cto` under `G-025`. Four
+correct refusals, no owner, and a deadline-bound ticket standing still. `KAN-128`'s `due_date`
+is still `HELD, not set`.
+
+Resolution, reached by `team-lead` on 2026-09-06 and recorded here rather than invented here:
+**the lead asks the owning seat for its own count and carries it unchanged.** If you believe
+that reading of `WORKFLOWS.md:58` is wrong, take it to `pm` — do not quietly resume dating a
+seat you do not own.
+
+**Ask the right seat for the right leg.** On a ticket with a hand-off (§2 input 3), each leg is
+sized by the seat that executes it: `senior-backend` sizes its own authoring, `cto` sizes the
+apply. Asking one seat to confirm another's count is this same error one level up, and it looks
+like diligence.
+
+### What the owning seat should hand back — the required shape
+
+**`KAN-126` (P0-5), owned by `devops`, is the pattern to ask for by name.** `po` left the
+`due_date` unset on purpose and recorded why: *"No capacity number exists for `devops`, and I
+was told not to estimate one."* `devops` then supplied its own number
+(`agent/status/devops.md`): **2 sittings — sitting 1 datable and fully parallel with
+`senior-frontend-3` (no shared path); sitting 2 undatable, its precondition outside `devops`'s
+control.**
+
+That is the shape a shared seat owes: **a per-sitting count, which sittings are datable, and
+the named blocker on any that are not.** A partial answer from the seat that owns the queue
+beats a whole answer from one that does not. Ask for it in those terms — a seat asked simply
+"when?" tends to return a single date, which is the estimate you were avoiding.
 
 **What a lead may state about a shared seat without owning its date:**
 
@@ -228,7 +278,9 @@ Every line, or the report is not finished:
 
 - [ ] Sittings per ticket, with the checkpoint named for anything above 1.
 - [ ] What is serial, what is parallel, and the measured reason each is so.
-- [ ] Gates counted separately from sittings.
+- [ ] Gates and hand-offs counted separately from sittings, each attributed to its seat.
+- [ ] Every shared-seat count **requested from that seat and carried unchanged** — never
+      produced by you, and never confirmed by a third seat on its behalf.
 - [ ] Two columns — earliest believed and ceiling committed — with the gap named as the
       rework budget.
 - [ ] Every shared-seat dependency named with its owning seat and **no date**.
@@ -249,13 +301,28 @@ the mapping — `KAN-124` — is the one they say nothing about. **No rule is of
 lead reports sittings; the mapping stays `po`'s stated assumption until someone has enough
 data points to derive one. Whoever gets the fifth and sixth should write it into this file.
 
+**Two more points arrived on 2026-09-06 and still do not derive it.** `KAN-128` came out at
+2 sittings on `senior-backend` plus one hand-off and one gate — but its `due_date` was never
+set, so it yields a cost with no elapsed time to compare against. `team-lead-4`, who reported
+it, said plainly that its data is not clean enough to derive from. Recorded so the next seat
+does not re-count them as evidence: **four points, none of them a measured sitting-to-day
+ratio on a judgement ticket.**
+
 **Whether a sitting transfers to a non-developer seat is unruled.** `devops` used the unit for
 a documentation write plus an end-to-end demonstration and it appeared to work. Nobody has
 ruled that it generalises, and this skill does not.
 
 ## Owed elsewhere
 
-`agent/WORKFLOWS.md:58` states the capacity-not-estimation rule and points at no method.
-It should point here. **That edit is not made by this skill** — `WORKFLOWS.md` was under
-another seat's hand when this was written, and a one-line pointer is a `po`-or-`devops` edit
-routed the usual way.
+Two things belong in `agent/WORKFLOWS.md` and are not written by this skill — it was under
+another seat's hand when this was written, and both are `po`-or-`devops` edits routed the
+usual way.
+
+1. **`:58` states the capacity-not-estimation rule and points at no method.** It should point
+   here.
+2. **The shared-seat resolution in §3 currently lives only in this file.** `:58` says capacity
+   is reported by the owning `team-lead-N` and says nothing about a seat no lead owns — the
+   silence that stalled `KAN-128` through four correct refusals. The governing document should
+   carry *the lead asks the owning seat for its own count and carries it unchanged*; a company
+   rule that exists only in a skill is one seat's note, and the next seat to hit this will read
+   `:58`, not this file.
