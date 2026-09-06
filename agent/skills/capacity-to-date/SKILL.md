@@ -64,18 +64,18 @@ makes the count go above one.
   are ticket content and do not belong here; the checkpoint is what this example is for.)
 
   **This example was published branched, and the branch is the lesson.** Who authored the AC-3
-  probes was open: **`cto` owning them made it 1 sitting on `senior-backend`, ceiling 2;
-  shipping them with the migration made it 2.** It has since resolved — `cto` ruled that
-  `senior-backend` authors the probes (`DECISIONS.md` commit `d939a74`) — so the count is **2
-  and the ceiling is 3**.
+  probes was open: **`cto` owning them made it 1 sitting on `senior-backend`; shipping them with
+  the migration made it 2.** It resolved — `cto` ruled that `senior-backend` authors the probes
+  (`DECISIONS.md` commit `d939a74`) — so **the count is 2**. Read from the ticket at
+  `updated 2026-09-06T05:33:20`, which also carries `due_date` **2026-09-10** as
+  `team-lead-4`'s calendar ceiling against an earliest-believed 2026-09-09.
 
-  **Watch what the ceiling did when the branch closed, because this document got it wrong
-  first.** An earlier revision here said *"ceiling 2 either way."* That was true only in the
-  branch's other leg, where a ceiling of 2 paired with a count of 1. Once the count became 2,
-  a ceiling of 2 meant **a ceiling equal to the count, which carries no rework budget at all**
-  and defeats the purpose of the two-column pair (§2). `senior-backend` caught it and moved the
-  ceiling to 3. **A resolved branch does not just pick one number — it moves the other column
-  too.**
+  **The sittings ceiling is contested and this file does not assert it.** The ticket states
+  *"`senior-backend`'s ceiling stays 2"*; a correction relayed to this seat put it at 3, on the
+  reasoning that a ceiling equal to the count carries no budget. **Unresolved between the seats
+  that own it, and flagged rather than picked** — an earlier revision here asserted 3 on that
+  relay without reading the ticket, which is the §3 failure this document had just finished
+  describing. The count of 2 is not in doubt anywhere.
 
   **The branch is kept here because reporting it this way is the point.** A bare "2" teaches
   the arithmetic; *"2, or 1 if a named seat owns a named deliverable, and here is who was
@@ -270,10 +270,16 @@ was named as such on the epic rather than left to be discovered as slack. (This 
 an aggregated project buffer in Goldratt's sense; the vocabulary is public, the practice here
 was derived without it.)
 
-**A ceiling equal to the count is not a ceiling.** It carries no rework budget, which means the
-pair has collapsed back into the single number it exists to replace — and it does this quietly,
-usually when a branch resolves upward and nobody moves the second column. If your two columns
-have converged, you have stopped reporting a range and gone back to estimating with extra steps.
+**When two columns converge, ask where the budget went — it has moved or it has vanished, and
+those look identical on the page.** A ceiling equal to the count carries no rework budget *in
+that unit*. Sometimes that is correct because the budget lives in the other unit: `KAN-128` runs
+2 sittings with a calendar earliest of 2026-09-09 against a ceiling of 2026-09-10, so its one
+rework cycle sits in the day gap rather than in the sitting count. Sometimes it means a branch
+resolved upward and nobody moved the second column, and the pair has silently collapsed back
+into the single number it exists to replace.
+
+**Both look like convergence. Say which one you have** — *"budget is the 09-09→09-10 day gap"* is
+a report; two equal numbers with no stated budget is an estimate wearing a range's clothes.
 
 **The stronger reason is that two numbers are auditable and one is not.** The rework budget
 explains why the gap exists; this explains why a downstream seat can catch an error inside it.

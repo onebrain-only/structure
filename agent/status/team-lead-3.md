@@ -905,3 +905,48 @@ written the rule that a peer's count is undated and then published one on a rela
 mitigations: it is `senior-backend`'s own correction of its own figure, it moves the number
 *up* (the conservative direction for a ceiling), and no date of mine depends on it. If anyone
 acts on `KAN-128`'s ceiling, it gets read from the ticket first.
+
+## 2026-09-06 — read KAN-128; the ticket says ceiling 2, not 3. My sixth published error.
+
+**Agent:** `team-lead-3`
+**Outcome:** Read `KAN-128` from the board rather than relay it a third time, and **it
+contradicts a figure I had just published.** Corrected the skill, generalised the rule the error
+produced, and flagged the contradiction to `team-lead` without resolving it. Only the skill and
+this file changed.
+
+**The error, and it is the most pointed of the session.** I published *"the count is 2 and the
+ceiling is 3"* on `team-lead-4`'s relay of Shu's correction. **The live ticket says 2** —
+`updated 2026-09-06T05:33:20`, `duedate 2026-09-10`:
+> *"...change what sitting 2 contains, not its cost; **`senior-backend`'s ceiling stays 2**."*
+and *"confirmed independently by `senior-backend`'s own 2-sitting count **with a ceiling of 2**."*
+
+**I asserted a peer's revised count on a relay, in the revision immediately after committing the
+rule that a peer's count must be re-read before publishing.** Wrote the rule, did not run it.
+Caught only because I read the ticket before adding a further line — one revision late.
+
+**Corrected, and not by picking a side.** The file now states **count 2** (undisputed everywhere)
+and **flags the sittings ceiling as contested between the seats that own it**. Both readings are
+coherent and give one rework cycle — the ticket puts the budget in the **calendar gap**
+(earliest 09-09 → ceiling 09-10) leaving sittings at 2/2; the relayed correction puts it in the
+**sittings** column at 2/3. Same budget, different units, and only one is what the ticket states.
+Routed to `team-lead` for `po`/`senior-backend` to reconcile. **Nothing of mine depends on it** —
+my worked example uses the count, and no date moves either way.
+
+**The rule improved because it was too absolute.** I had written *a ceiling equal to the count is
+not a ceiling.* `KAN-128` is a live counterexample: converged sittings are fine there **because
+the budget lives in the days.** Now reads: **when two columns converge, ask where the budget went
+— it has moved or it has vanished, and those look identical on the page. Say which one you have.**
+That survives both readings and is better than what the error produced.
+
+**Running tally of my published errors: six.** Wrong checkpoint · stale `KAN-123` blocker · wrong
+commit count · retracted quote · stale ceiling re-used · **asserted ceiling 3 against the
+ticket's 2.** The last two are the same failure twice, one revision apart, which is the honest
+finding: **writing a rule does not install it.** Five were caught by other seats; this one I
+caught myself, by doing the thing the rule says — which is the first evidence the discipline
+works when actually executed rather than merely documented.
+
+**Not verified:** which of the two ceiling figures is current. I read the ticket and it says 2;
+I have not read `DECISIONS.md` or heard from `senior-backend`, whose channel I closed as a
+one-off, so I cannot say whether the ticket is stale on this point or the relay was superseded.
+**Deliberately not resolved by me** — `senior-backend` owns its ceiling and `po` owns the ticket
+text.
