@@ -2177,3 +2177,49 @@ authored-but-unapplied migrations. One seat holding every production write is a 
 for `pm` if D4 work keeps landing.
 
 **Open:** `KAN-150` sizing, once `po` sends it.
+
+**KAN-155 dated from a superseded ceiling; KAN-150 sized and its authoring released.**
+
+**Verified live before acting** (`KAN-155` Ready/09-10, `KAN-145` Ready/09-09, `KAN-150` To Do).
+`po` converted **ceiling 3**, which my revision to **2** had already superseded — we crossed.
+Asked for **09-09**, while saying plainly it is `po`'s call and that a generous ceiling is slack,
+not a defect. The reason to correct it is not the day: it is that the two-column method only works
+if the ceiling on the board is the current one, and an unexplained extra day is the silent collapse
+back to a single number the pair exists to prevent. Asked `po` to state a reason on the ticket if
+it holds 09-10 for an independent one.
+
+**`KAN-150` — 1 sitting, earliest 1, ceiling 2.** Two `CREATE OR REPLACE` bodies, fully specified,
+scope fenced to two branches by AC2; neither consumes the other's output, so no boundary — two
+functions is volume, not a checkpoint. Ceiling 2 carries one cycle: the whole-body replacement trap,
+present **twice** here.
+
+**Ruled its authoring free now — the useful part.** The ticket says "blocked on `KAN-155` landing";
+**I ruled that binds the apply, not the authoring.** `cto`'s stated reason is risk profile
+("bundling turns a trivially-revertible data change into one carrying a function rewrite") — an
+argument about landing together, not about when the file is written. The bodies are **disjoint**
+(`can_send_notification_now` vs `calculate_notification_score`/`should_bypass_quiet_hours`), so
+AC3's live-catalogue requirement is satisfiable today; and removal is behaviour-preserving on both
+sides of the rename by the ticket's own reasoning. Same shape as the `KAN-145` ruling: **authoring
+free, apply ordered.** This stocks `Ready` instead of leaving a ticket parked.
+
+**Flagged to `cto` as derived, not received** — with an explicit invitation to correct it, because
+the last sequencing constraint I inferred from `T-052` had a wrong premise that `cto` caught. If it
+meant authoring too, only the date moves; the count is unaffected either way.
+
+**Could not date `KAN-150`'s apply** — it chains behind `KAN-155`'s apply, which is `cto`'s undated
+leg. `capacity-to-date` §4: sized the sizeable part, named the blocker and its owner. Warned `cto`
+a third apply count is coming so it is not a surprise.
+
+**Accepted a correction on my own conduct.** `team-lead` recorded that its "both corrections push
+the number up" was an inference stated as a finding, and that holding the count was right. Noted
+without re-litigating: the volume proxy is exactly what §1 exists to refuse, and the same seat had
+earlier suggested me for `KAN-155` on adjacency. Useful distinction it added, which I had collapsed:
+**82/9/3 are measurements that can go stale; 96 is arithmetic that cannot while its inputs hold** —
+and `9`/`3` set the matrix width, so a tenth `feature_key` silently makes it 8 × 13. AC3's "exactly
+9 + 3 on completion" fails loudly in that case, so the guard holds; the width is the input worth
+re-deriving. `cto` separately declined to re-run its own query on the grounds that a second
+identical number from the same seat is the appearance of corroboration, not corroboration — right,
+and a sharper form of my own flag.
+
+**Open:** `po`'s decision on 09-09 vs 09-10; `cto` on the `KAN-150` authoring reading; `cto`'s
+`KAN-150` apply count once `KAN-155` has a slot.

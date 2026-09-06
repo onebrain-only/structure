@@ -1665,3 +1665,31 @@ backlog-planning/throughput signal going forward, not escalating it as urgent ye
 to `main` for visibility in case `D4` volume keeps landing on one seat.
 
 **Reported to:** `main` (CEO-action ask + throughput flag), `team-lead-4` (confirmation).
+
+## 2026-09-07 (cont.) — `KAN-156`: measured the ownership question, not named from the slice table alone
+
+`team-lead` asked who owns Play & Places content under `T-066` for `play_places_routes.dart:163`
+(`team-lead-5`'s sibling-audit finding, `KAN-156`, correctly left unassigned by `po`). Read
+the actual file rather than answer from `STACKS.md`'s slice list directly.
+
+**Content owner: `team-lead-2`.** Lines 162-163 are `createGameRoute`'s header comment,
+gating `FeatureFlags.enablePlayerGameCreation`/`enableOrganiserGameCreation` — game-creation
+content, squarely `team-lead-2`'s `games` slice (`STACKS.md` §11.2), despite also reading
+`profileType` off the profile controller (usage, not ownership).
+
+**But not a clean single-owner file like `KAN-153`.** `T-062` (`DECISIONS.md:8086`) already
+ruled `play_places_routes.dart` **CONTENDED under §4** — it straddles `team-lead-2` and
+`team-lead-1` (also carries `profile`-adjacent routes elsewhere in the file). Told `po`:
+`team-lead-2` authors the fix under §4's contended-file protocol (one writer, append not
+restructure), not a free single-lead edit.
+
+**Caught and corrected a stale figure in passing, not escalated:** `T-062`'s own row claims
+this file spans "four leads (D2/D3/D9/D1)" — that's the pre-`G-012` D-number labeling
+`STACKS.md:893-894` already flags as stale. Under the current measured partition it's two
+leads, not four. Noted for `po` so it isn't repeated; didn't raise it as a new issue.
+
+**Told `main`:** this is the second file out of `T-062`'s six-module cut to surface as an
+ownership question, same root cause each time (route-cohesion cut vs org chart) — not new
+partition drift, consistent with what `cto` already flagged.
+
+**Reported to:** `po` (ownership answer + contended-file instruction), `main` (summary).
