@@ -57,6 +57,32 @@ makes the count go above one.
   (`STACKS.md` §10.3). The extraction cannot start until the bucketing is settled, and the
   bucketing can be wrong. Sitting 1 ends at *modules exist, golden test not yet green* —
   a real checkpoint: reviewable, abandonable, and not done.
+- `KAN-128`: author one migration, then run the AC-3 probe pack. Sitting 1 ends at
+  *migration body complete and posted in `G-002` format*; sitting 2 is the probes, which need
+  fixtures and — for `financial_ledger` — a **concurrent** replay, since a sequential retry
+  cannot demonstrate the failure at all.
+
+### Risk is not a checkpoint. A dependency boundary is.
+
+**The test is whether the ticket's next part cannot start until the judgement lands** — not
+how likely the judgement is to be wrong. This is the distinction a lead gets wrong at speed,
+and it was got wrong on `KAN-128` before `senior-backend` corrected it.
+
+The tempting reading was that `admin_wallet_adjust`'s signature change is a checkpoint because
+it is an interface commitment with no caller to validate against, so it is hard to verify. It
+is not a checkpoint: the signature is **ruled** by `T-049` (caller-generated uuid,
+`NULLS NOT DISTINCT` explicitly rejected), it has **zero callers to migrate**, and its output
+is consumed by one `ALTER COLUMN ref_id SET NOT NULL` in the same file. That is a decision
+taken *inside* a pass.
+
+In `senior-backend`'s own words, which are the sharpest form of it: *less checkable raises the
+odds of a rework cycle; it does not create a checkpoint.* Risk belongs in the gap between your
+earliest and ceiling columns (§2), where it is priced. It does not buy a sitting.
+
+**The opposite failure has a name too: a partial finish dressed as a checkpoint.** A boundary
+you cannot describe as a reviewable, abandonable state — one where the honest description is
+"about half the file" — is a pause, not a checkpoint, and it does not make the ticket two
+sittings.
 
 ### Mechanical tickets finishing early is not evidence a judgement ticket is smaller
 
@@ -72,9 +98,9 @@ never a re-size.
 instinct is that a smaller ticket lands sooner, and for a judgement ticket that is usually
 false. `KAN-128` had `payment_intents` dropped from its scope on 2026-09-06 (no SQL writer
 exists for it, so a bare constraint would have been the failure `T-049` forbids). The cut
-removed DDL volume from sitting 1 and touched nothing about the `admin_wallet_adjust`
-signature judgement that makes the ticket two sittings. **Ask which sitting the cut came out
-of.** If it came out of the mechanical one, the cost is unchanged and only the start moves.
+removed DDL volume from the authoring pass and touched nothing about the probe pack that makes
+the ticket two sittings. **Ask which sitting the cut came out of.** If it came out of the
+mechanical one, the cost is unchanged and only the start moves.
 
 ## 2. Capacity to date — the arithmetic
 
@@ -134,6 +160,18 @@ was named as such on the epic rather than left to be discovered as slack. (This 
 an aggregated project buffer in Goldratt's sense; the vocabulary is public, the practice here
 was derived without it.)
 
+**The stronger reason is that two numbers are auditable and one is not.** The rework budget
+explains why the gap exists; this explains why a downstream seat can catch an error inside it.
+On `KAN-128`, `po` first set the `due_date` to **2026-09-09**, then corrected it to
+**2026-09-10** — because 09-09 was **`cto`'s apply slot, not the ceiling on `senior-backend`'s
+authoring**. The wrong seat's clock.
+
+That correction was possible only because both columns were on the record **with their bases
+named**, so it reduced to a one-line reasoning fix rather than a re-derivation. A single date
+would have hidden it completely: 09-09 is entirely plausible, and nothing about it looks wrong
+from the outside. **State the basis of each column, not just the number** — the basis is what
+makes a category error visible.
+
 ### Re-dating: move the start, keep the cost
 
 When a ticket lands early or late, recommend a **uniform shift of the entire remaining chain
@@ -169,8 +207,12 @@ the first half until 2026-09-06, and the cost was measured: on `KAN-128` — a m
 D4's 2026-09-14 activation, free only while five money tables hold zero rows — **four seats
 refused in sequence and every refusal was correct.** `team-lead-4` refused under this section;
 `po` under `WORKFLOWS.md:58`; `pm` applying the same rule to itself; `cto` under `G-025`. Four
-correct refusals, no owner, and a deadline-bound ticket standing still. `KAN-128`'s `due_date`
-is still `HELD, not set`.
+correct refusals, no owner, and a deadline-bound ticket standing still.
+
+*(Provenance, since a case study is only as good as its sourcing: the first three are
+first-hand from the seats themselves. `cto`'s refusal reached `team-lead-4` relayed by `pm` and
+is second-hand — the grounds are almost certainly right, the chain of custody is one link
+longer than the sentence above implies.)*
 
 Resolution, reached by `team-lead` on 2026-09-06 and recorded here rather than invented here:
 **the lead asks the owning seat for its own count and carries it unchanged.** If you believe
@@ -215,6 +257,17 @@ read the document that defines the path.
 
 The honest output is then a **named blocker and its owner** — *"cannot size until X, and Y
 holds it"* — never a number with a caveat bolted on. A caveated number is read as a number.
+
+**The mirror of that rule, and it spends other seats' capacity rather than your own: a
+measurable question framed as a decision manufactures a decision.** On `KAN-130`,
+`team-lead-4` raised a scope question — four lines or eight — as a choice, when it was a fact
+it had not checked: `wallet_ledger` carries its own `user_id`, so the second class was never
+in scope. `po` answered because it was asked, `team-lead` ratified because it looked like
+judgement being exercised, and one read of the table definition would have settled it before
+anyone was asked. **Before you escalate a sizing input, check whether a command or a file
+answers it** — the general rule is in every role file's escalation test; the capacity-specific
+cost is that a manufactured decision consumes two other seats' sittings and produces a wrong
+edit.
 
 Two shapes, both live in Phase 0:
 

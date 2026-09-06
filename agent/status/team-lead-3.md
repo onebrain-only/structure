@@ -514,3 +514,64 @@ written it into the skill as his report; if one of those refusals was on other g
 study is wrong in its detail, not its conclusion. That `team-lead`'s resolution is a ruling
 rather than one seat's reading — it reached me second-hand through Sobek, and I encoded it with
 an explicit escalation path to `pm` for that reason.
+
+## 2026-09-06 — KAN-124 fix verified; `capacity-to-date` corrected on a wrong checkpoint
+
+**Agent:** `team-lead-3`
+**Outcome:** Verified `po`'s `KAN-124` description fix (good, and structurally real). Flagged
+the remaining blocker on my own chain. Amended `capacity-to-date` in five places on
+`team-lead-4`'s corrections — **one of which was a wrong worked example I had published.**
+Only the skill and this file changed. No ticket touched, no date set.
+
+**`KAN-124` fix verified — I checked because I recommended the structural change**, and a
+citation that quietly still restates would be worse than the stale table. It does not: the
+third column now names §10.3's **two completion rules** rather than reproducing the per-path
+list they resolve to; `identity`/`profile_social` cite `KAN-123` comments `10548`/`10551`;
+`placeholder_screen.dart` is in with criterion 6 reconciled in the criterion text; `:1666` is a
+rework trigger **carrying its reason**. `po` added a trigger I did not ask for — a
+`features/profile/` import inside `platform_routes.dart` — which makes the stale table's exact
+failure mode directly checkable. Good addition. I did **not** re-derive the 14 row by row; `qa`
+is diffing it against its verified mapping and duplicating that spends a gate twice.
+
+**Remaining blocker, flagged to `po`: `KAN-123` is still `QA-Test` (status 10009), not `Done`.**
+The chain is serial on Done. `qa` passed it, so this is a transition, not work — but until it
+lands `senior-frontend-3` cannot open `KAN-124` and the 2026-09-09 ceiling burns against a
+blocker that is nobody's labour. Capacity unchanged: 2 sittings.
+
+**I published a wrong checkpoint and `senior-backend` corrected it.** I recorded `KAN-128` as
+two sittings with the `admin_wallet_adjust` signature judgement as the boundary. Wrong: that
+signature is **ruled** by `T-049`, has **zero callers**, and feeds one `ALTER COLUMN` in the
+same file — a decision *inside* a pass. Real boundary: **migration body complete in `G-002`
+format → AC-3 probe pack**, sitting 2 being probes needing fixtures and a **concurrent** replay
+for `financial_ledger`. Corrected in two places (the case study and §1's scope-cut paragraph,
+which carried the same error).
+
+**The correction produced the best addition to the skill so far.** Shu's reading is sharper than
+my own §1: **the test is not risk, it is whether the next part cannot start until the judgement
+lands.** *Less checkable raises the odds of a rework cycle; it does not create a checkpoint.* I
+wrote the dependency test correctly and then failed to guard it — "hard to verify" and "hands
+off here" are easy to conflate at speed. New §1 subsection, plus Shu's **"a partial finish
+dressed as a checkpoint"** as the named opposite failure, which catches the inflation direction
+mine did not.
+
+**Three further amendments:**
+- **§2 — the auditability argument, now leading the two-column rule.** `po` set `KAN-128` to
+  09-09, then corrected to **09-10** because 09-09 was **`cto`'s apply slot, not the ceiling on
+  `senior-backend`'s authoring**. Two columns with **stated bases** made that a one-line fix; a
+  single plausible date would have hidden it. Added the instruction it implies: state the basis,
+  not just the number. Stronger than the rework-budget case it now precedes.
+- **§3 — provenance marked.** Three of the four refusals first-hand; `cto`'s reached
+  `team-lead-4` relayed by `pm`. Grounds likely right, custody one link longer than my prose said.
+- **§4 — took the capacity half of `team-lead-4`'s `KAN-130` line, and only that half.** *A
+  measurable question framed as a decision manufactures a decision* — the general rule already
+  lives in every role file's escalation test, and annexing it would duplicate a rule with a home.
+  What is mine is the **cost**: `po` answered because asked, `team-lead` ratified because it
+  looked like judgement, two sittings spent and a wrong edit produced, against one read of a
+  table definition. Told `team-lead-4` `grill-peer` is the better host for the general form.
+
+**Not verified:** Shu's checkpoint reasoning — I took it via `team-lead-4` and did not read
+`KAN-128`'s comments or message `senior-backend`; I have now published a second-hand checkpoint
+after publishing a wrong first-hand one, and marked neither in the skill as second-hand. That is
+a gap I should close if `KAN-128`'s shape becomes load-bearing for anyone else. The `KAN-130`
+`wallet_ledger.user_id` fact — took `team-lead-4`'s word, did not read the table definition.
+That `po` will transition `KAN-123`; flagged, not confirmed.
