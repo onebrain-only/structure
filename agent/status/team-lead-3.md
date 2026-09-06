@@ -1686,3 +1686,63 @@ own role file's changed sections, not the eight new role files or whatever `AGEN
 about developer assignment. **I should not dispatch far past `KAN-119` without reading what
 changed**, since I have just demonstrated the cost of assuming a document I read hours ago still
 holds.
+
+## 2026-09-06 — KAN-119 claimed, sized and briefed; executor seat not running
+
+**Agent:** `team-lead-3`
+**Outcome:** Claimed `KAN-119` as owning lead, gave `po` the capacity number, wrote the executor
+brief, and handed it to `team-lead` to launch because **`frontend-3` is not reachable**.
+Reframed `pm`'s in-flight escalation rather than letting it go up on my stale premise. No code
+touched, no ticket transitioned by me.
+
+**`CONTRACT.md` is unamended and that is the real finding.** `pm` verified `:437`/`:447` directly
+and was right — I confirmed independently: §4.1's heading at **`:360`** still reads *"time-boxed,
+and it expires by measurement"*, the Canary clause is verbatim, and **`T-059` appears nowhere in
+the file.** That is deliberate — `T-059` says *"Does not amend `CONTRACT.md` — that file is the
+CEO's under `G-022`; the replacement text is proposed below for him to apply."*
+
+**So the escalation needed reframing, not withdrawal.** The operative question is answered
+(`T-059`, `cto`, accepted). What is live is a **documentation lag**: the governing file still
+asserts a superseded rule. **It has produced two errors in one hour** — `team-lead-1` claimed a
+file on the stale text; I escalated on it. Told `pm` the ask is *apply `T-059`'s proposed
+replacement text*, not *rule on the grant*.
+
+**Declined credit `pm` offered.** It wrote that I *"did the right thing holding everyone idle
+rather than dispatching around it."* **I did not** — I held them idle on a stale reading and was
+corrected by `team-lead-1`. Said so plainly rather than accepting it.
+
+**`KAN-119` claimed.** `po`'s ticket recorded *owning lead: not assigned* and *due_date: not set*.
+`auth_onboarding` is my slice under `T-047`/`G-016`, so both are mine. Gave `po`
+**1 sitting, ceiling 2** with the derivation: AC 1 names the exact wrapper and file so there is no
+in-ticket judgement whose output a later part consumes; AC 2–4's simulator run is verification
+inside the pass, not a handoff. Ceiling banks the two gaps `qa` left open. **Flagged that the
+date should count from when execution starts, not today**, since no executor is running.
+
+**Ticket read confirms the sizing.** AC 1 is exact: wrap the `Padding` at `:298` in
+`IntrinsicHeight`, matching `email_password_screen.dart:347`. The ticket also records that its
+**original premise was refuted** — a mistyped 10-character credential produced a false
+"authentication is structurally broken" report; the real one is 12. Put that in the brief so the
+executor does not rediscover it.
+
+**Brief written and handed up, not dispatched.** `SendMessage` to `frontend-3` →
+**"No agent named 'frontend-3' is reachable."** My role file forbids spawning
+(*an unrecognised `subagent_type` falls back to a generic agent with no error raised*), so I sent
+the complete verbatim brief to `team-lead` to launch. Brief covers: the one-wrapper change and
+the explicit no-other-change bound · `drive-the-app` for AC 2–4 · screenshot and raw log rather
+than assertion · login driven through the UI **without `--route`** · the credential trap with the
+path to `qa`'s story · **state which of release-build and Android/Chrome you measured versus
+inferred** · no push, no `Co-Authored-By`, nothing outside `auth_onboarding` · escalate to me or
+`po`, not to whoever launched it · status entry at the **absolute** Thebes path.
+
+**`KAN-139` position updated for `po`:** my ground-2 refusal (§4.1 exclusion) is **dead** — the
+grant is spent. Ground 1 stands: `lib/app/**` is a shared surface on no lead's list, and
+`STACKS.md` §12 row 13 names the mechanism without naming which lead gets which module.
+`team-lead-1`'s escalation to `cto` is the right route. **I will take those files if the mapping
+assigns them to me.**
+
+**Not verified:** that `team-lead` will launch `frontend-3`, or that the seat exists to launch.
+Whether `KAN-119` being in `Development` already was `team-lead-1`'s move or `team-lead`'s — I
+did not transition it and did not chase who did. The restructure beyond the roster listing,
+`T-059`, and my own role file — **I still have not read the eight new role files or the current
+`AGENTS.md`**, and I said last entry I should before dispatching far past this ticket. That
+remains true and unmet.
