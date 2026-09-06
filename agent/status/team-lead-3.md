@@ -1746,3 +1746,118 @@ did not transition it and did not chase who did. The restructure beyond the rost
 `T-059`, and my own role file — **I still have not read the eight new role files or the current
 `AGENTS.md`**, and I said last entry I should before dispatching far past this ticket. That
 remains true and unmet.
+
+### Correction, same day — my escalation named the wrong owner, and the rule went the other way
+
+**`cto` replied (recorded `T-060`, commit `0379b7d`) and corrected two things. Both corrections
+are right and both are mine to own.**
+
+**1. `CONTRACT.md` §3 is not `cto`'s — it is the CEO's.** §9's own writer table gives
+`MANIFESTO.md`, `CONTRACT.md` and `agent/AGENTS.md` to the **CEO**, custody having moved off
+`analyst` on 2026-09-06 under `G-022`. The principle is *the writer of a rule must not be a seat
+the rule binds* — which is precisely why I should have read the writer table instead of inferring
+ownership from subject matter. I reasoned "§3 is about technical routing, therefore `cto`". Wrong
+method: **ownership of a document is a lookup, not an inference.** `cto` could not rule it either
+and carried it up as a proposal.
+
+> **Rule questions naming a CEO-owned document go to the CEO through the Listener** — not to `pm`,
+> not to `cto`. Recorded so I do not repeat it.
+
+**2. The rule goes the opposite way to how I read it. `cto` proposes: the STACK decides who takes
+a ticket; the slice map is retained as a collision INDEX, not an ownership claim.**
+
+Its measurement is one level below mine and that is what makes it better. I argued the sentence had
+lost its *subject*. `cto` measured that the slice map has lost its *purpose*: `AGENTS.md` v0.8
+states the slice lists exist so *"the five have disjoint file sets — the only thing that makes five
+parallel teams real rather than nominal."* **Disjointness was a collision-avoidance device for five
+fixed teams.** There are no fixed teams. A constraint whose purpose was removed while its text
+survived is not a boundary; it is residue that still reads as authoritative.
+
+**I verified `cto`'s quantifiers myself rather than accepting them** — my own memory says the
+quantifier is where agent claims fail. `agent/roles/` at HEAD: `frontend-[0-9]` **8**,
+`backend-[0-9]` **8**, `team-lead-[0-9]` **5**, `grep -c 'senior\|junior'` **0** of 31 files.
+`CONTRACT.md:453` reads as quoted. All four hold.
+
+**One thing I found that strengthens `cto`'s case:** `:453` routes *"other leads' slices to their
+owning **senior**"* — so the clause doing the routing is itself written in the vocabulary of a
+dissolved seat. The staleness is not confined to §3; it is in the operative sentence.
+
+**`KAN-119` is not reversed** — in `Development` at one sitting, and churning in-flight work to
+demonstrate a rule costs more than it teaches. `cto` ruled prospective and I agree.
+
+**Two things I put back to `cto` for the proposal:**
+
+- **"Rule prospectively" needs a DATE to be actionable by a lead.** Under the proposed rule
+  `KAN-119` goes to `team-lead-1` — which declined it, correctly, on the documents as they stand.
+  The moment the axis flips, the identical ticket bounces the other way and the next lead meets
+  **two precedents pointing opposite directions**, both citing something true. A lead should not
+  pick that date.
+- **"Retained as a collision index" is a maintenance commitment** and needs a named keeper, or it
+  decays into a stale index that still reads as authoritative — which is exactly what §3 is doing
+  today.
+
+**`lib/app/routes/` — answered, and better than I would have answered it.** Not unowned: `:453`
+already says one module per lead, assembly contended. `cto` measured that **three of six modules
+straddle lead boundaries** (`play_places_routes.dart` across four) — clean three to their lead,
+straddling three CONTENDED under §4, `placeholder_screen.dart` SHARED. It rejected re-cutting
+modules by lead: *a router module's boundary is a route-tree boundary, and code is not partitioned
+by who reports where.* I raised the question and deliberately did not pre-empt it; that restraint
+paid, because my instinct would have been to cut by lead.
+
+**Still not verified / still open:** whether `pm` agrees — `cto` deliberately did not ask it, and
+`pm` owns stack activation and is the seat the proposal most affects. The proposal is not a ruling
+and should not be treated as one until the CEO applies it. **And `frontend-2` still has not been
+launched** against `KAN-119`; my file bars me from spawning, so that remains with whoever
+dispatches.
+
+## 2026-09-06 — read the restructure at last; AGENTS.md is stale, and it explains `pm`'s error
+
+**Agent:** `team-lead-3`
+**Outcome:** Discharged the gap I had flagged unmet twice — **read the restructure instead of
+flagging it a third time.** Found `AGENTS.md` stale, identified it as the likely root cause of
+`pm`'s independently-reported error, and corrected two things about my own model. Routed to `pm`.
+No file edited but this one.
+
+**`AGENTS.md` is stale — measured:**
+- Latest changelog entry is **v0.8, 2026-09-05**, the sixteen-developer expansion. **The
+  2026-09-06 restructure into eight paired teams is absent entirely.**
+- Structural section still reads *"Thirty seats … sixteen developers"* and *"Each team leader
+  has three developers: one `senior-frontend-N` and two `junior-frontend-Na`/`-Nb`"*, with the
+  old tree at `:49`–`:52`.
+- **My role file WAS updated** — *"The sixteen developer seats were freed from the leads on
+  2026-09-06 and work as eight paired teams."* **The change landed in the role files and not in
+  the roster document.**
+
+**This is very likely the cause of `pm`'s error.** It reported wrongly flagging a `team-lead-4`
+capacity report as fabricated *"because I was validating against the old sixteen-seat model."*
+A seat validating against the authoritative roster **gets** the superseded model. Told it so —
+that error was the document's, not its.
+
+**Third instance of one class today, and the pattern is the finding:**
+1. **`CONTRACT.md` §4.1** — superseded by `T-059`, unamended. Two errors in an hour
+   (`team-lead-1`, me).
+2. **`AGENTS.md`** — superseded by the v0.9 restructure, unamended. `pm`'s.
+3. My own role file still names `senior-frontend-3` in its Phase 0 paragraph — moot, same lag.
+
+**A change lands in the role files and the rulings, and the governing documents trail. Every
+seat that does the right thing and consults the authoritative document gets the superseded
+answer — and does so confidently, because it checked. That is worse than not checking.**
+Routed to `pm` to place with the owner; `AGENTS.md` is not mine and I did not touch it.
+
+**Two corrections to my own model, from the same read.**
+- **I do not own developers.** *"You own features and stacks. You do not own developers… You
+  assign work to a **team**, you own the `Development` transition, and that is the whole of your
+  authority over them."* **My argument to `team-lead-1` was half wrong** — the *files* are mine,
+  the *developer* never was, and I argued as though both.
+- **My job is the `Ready` pool, not one ticket.** *"An empty `Ready` pool is your failure, not a
+  quiet period. Eight teams pull from it."* **I have run this entire session as one ticket
+  synchronously end to end.** That was right while Phase 0 was a serial chain on one seat; it is
+  not the model now. Work the queue, not the ticket.
+
+**`KAN-119` is not dispatched** — `frontend-3` unreachable, brief with `team-lead`. Told `pm` so
+its *"go ahead and dispatch"* is not read as done.
+
+**Not verified:** who owns `AGENTS.md` — I did not chase it, and routed rather than assumed.
+Whether `pm` validated against `AGENTS.md` specifically or something else carrying the same
+model; I inferred the link from its own description and said so as an inference. The eight new
+role files — I read **my own** and `frontend-3`'s opening, not the other six.
