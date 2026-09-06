@@ -539,3 +539,44 @@ running, `KAN-125` Ready (09-10 ceiling). Nothing slipped.
 edits. **Nothing owed by this seat.**
 
 **Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — Thread closed. Nothing owed by this seat.
+
+**`po` recorded the KAN-130 fallback** as a comment on the ticket (10574), in the Executor section:
+if `wallet.dart` stays barred past the migration's window, the migration may land without its client
+half at no functional cost, and the 1-sitting client change follows once the grant expires. **Not
+acted on** — no reason to split while Phase 0 is on track.
+
+**`po` re-verified my zero-readers claim independently before writing it in**, and added one bound I
+had not measured: **`wallet.dart` has exactly two importers in the whole tree.** It also confirmed
+the two `entry.userId` hits are `LeaderboardEntryModel`/`LeaderboardEntry` by reading both files
+rather than trusting the grep. That is the third time on this ticket a claim of mine was re-derived
+rather than accepted, and every one of them was worth it — one of mine (the checkpoint) did not
+survive the process.
+
+**Noted, not chased:** `po`'s wording — *"your 1-sitting rename"* — implies it took the **8-line
+rename** branch over the 4-line mapping-only branch on KAN-130 AC 3. Either way it is 1 sitting
+(mechanical, fully enumerable), so the count is unaffected and I have not asked it to confirm.
+
+### Where everything sits at close
+
+| Item | State | Owner |
+|---|---|---|
+| KAN-128 count | **2 sittings**, both confirmations in (Shu authoring, `cto` apply Wed 09-09) | settled |
+| KAN-128 `due_date` | held, pending one call | `po` |
+| AC-3 probe ownership | open — `cto` owns probes → 1 sitting; ship with migration → 2 | `po` |
+| KAN-128 AC 1 `SECURITY DEFINER` error | raised twice, with Shu's consequence attached | `po` |
+| KAN-131 citation → `:19231` | raised; Shu told directly in case the edit lands late | `po` |
+| KAN-130 AC 3 line scope | raised; `po` appears to have taken the rename branch | `po` |
+| KAN-130/131 migration cost | inbound | `senior-backend` |
+| KAN-130 client half | **1 sitting, undatable** until the Phase 0 grant expires | mine, blocked |
+| KAN-130 fallback | documented on the ticket, not acted on | `po` |
+
+**What this seat got wrong across the thread, for the record:** issued a `due_date` for a shared
+seat's work (withdrawn); did `po`'s calendar mapping; folded a gate into a sitting; gave one number
+where the skill asks for two; and placed the checkpoint at the wrong boundary (corrected by Shu,
+propagated correction to `po` and `team-lead-3`). **What it got right:** held its dispatch on a
+scope it doubted, which caught the `financial_ledger` drop before Shu sized the safe half.
+
+**Changed:** this file only. No code, SQL, copy, git or Jira. This seat wrote nothing to Jira at any
+point; every number reached a ticket through `po`.

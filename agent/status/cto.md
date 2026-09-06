@@ -621,3 +621,31 @@ DEFINER engine functions insert rows"*).
 **Sitting count:** `senior-backend` returned **2**, agreeing with `team-lead-4`. My "do not soften
 it above two" was not needed. Routing the count to Shu was correct — a seat sizing its own work is
 counting, not estimating.
+
+### Same day, third addendum — `T-053`: `KAN-132` ruled, and it is blocked by the live Phase 0 grant (`fa07f6b`)
+
+`po` asked for a remedy and an executor so `KAN-132` could move to Ready with a date. Both given —
+and the ticket cannot move, for a reason neither `po` nor `team-lead` had.
+
+- **Remedy: delete both files, not rename.** The collision is **latent** — nothing imports
+  `supabase_profile_repository.dart` at all, `profile_repository.dart` is imported only by it, and
+  `lib/providers.dart` exports neither. A closed two-file island. Renaming a symbol in a file
+  nobody imports fixes nothing.
+- **Priority correction for `po`:** this is a landmine, not a defect. Its only failure mode is an
+  *ambiguous-import compile error* — loud, not silent. Size it as latent cleanup.
+- **Blocked, not schedulable.** `lib/data/repositories/supabase_profile_repository.dart` is named
+  in the Phase 0 grant's line budget (`CONTRACT.md:408`, `G-021`) and `lib/data/**` is a granted
+  path (`:392`) carrying the exclusion at `:419`. **I measured the §4.1 landing test myself:**
+  `misc/data/datasources` grep is empty ✓, but `app_router.dart` is **1712 LOC / 69 `features/`
+  imports** against a ≤450 / ≤6 bar and **`lib/app/routes/` does not exist** — `P0-3b` has not
+  landed, the grant is live. **No seat may take it, `senior-frontend-3` included**, since the grant
+  covers `P0-1`–`P0-5` only (`:381`).
+- **Executor on expiry:** `senior-frontend-1` via `team-lead-1`. **`KAN-129` is blocked by the same
+  grant for the same reason** — same seat, same surface, same release condition; schedule them
+  together on one review.
+- **Stated not acted on:** two of the grant's 42 budgeted lines are being spent rewriting imports
+  in a file `KAN-132` will delete. Known-wasted, and **not** a reason to re-cut a live grant.
+
+**Method note:** the blocker was found by reading `CONTRACT.md` §4.1 before answering, not by
+taking "`lib/data/**` is SHARED" from `po`'s framing. SHARED was the status *without* the grant;
+the grant's second column is the live one.

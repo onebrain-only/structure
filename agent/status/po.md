@@ -757,3 +757,65 @@ the edit, per standing practice.
 trap — it was my own reasoning error on which capacity figure a `due_date` should be drawn
 from. `capacity-to-date`'s rule (ceiling, not earliest-believed) applies to every date I set
 going forward, not just this one.
+
+---
+
+## 2026-09-06 (continuation 5) — KAN-123 Done confirmed; KAN-124 fixed; WalletLedgerEntry over-scoping in KAN-130 corrected; KAN-131 AC5 added; KAN-132/134 handled
+
+**Agent:** `po`. Arrived at this point independently and found much of the cascade already
+landed by a prior/parallel pass through this same session (KAN-123 Done, KAN-128's AC1/AC3/date
+already corrected, KAN-130's function-attribute fixes already in). Verified rather than
+re-litigated: re-read every ticket before touching it, made only the corrections still needed.
+
+**KAN-124 fixed and routed.** `qa`'s D-1 (stale `STACKS.md` §10.3 carve-out) confirmed by reading
+§10.3 in full myself; independently counted 14 affected entries (12 settings/help/about →
+profile_social, `/landing` + `/settings/language` → identity), matching `team-lead`'s figure.
+Restructured the bucketing table to cite §10.3 + KAN-123's mapping rather than restate it (`qa`'s/
+`team-lead-3`'s recommendation), added the missing `placeholder_screen.dart` grant, made `:1666`'s
+ordering an explicit rework trigger. Routed the corrected table to `qa` and `team-lead-3` via
+`SendMessage`, since `qa` is a gate with no signal on a description edit.
+
+**KAN-130 — one real, substantive correction: `WalletLedgerEntry` was wrongly in scope.** An
+earlier pass through this ticket had ruled the "wider reading" (rename `userId`→`ownerId` in
+*both* `Wallet` and `WalletLedgerEntry`) as a task-analysis judgment call on ambiguous wording.
+That was wrong, not ambiguous: I verified directly against the baseline schema that
+`wallet_ledger` (`:26922`) declares its **own** `user_id uuid NOT NULL` column, entirely separate
+from `wallets.user_id`, and `T-051` drops only the latter — every `wallet_ledger` insert keeps
+writing `user_id` unchanged. `WalletLedgerEntry` maps `wallet_ledger`, not `wallets`; its `userId`
+field is correctly named today and this ticket must not touch it. Corrected AC 3 to scope the
+rename to `Wallet`'s four lines only (`:6,14,28,38`), posted the correction as a comment with the
+schema citations, and noted the "ambiguous" framing in the earlier log entry doesn't hold up —
+it's a plain fact about two different tables, not a naming-hygiene call.
+
+**KAN-131 — added `cto`'s flagged AC 5** (migrated function body must still contain `KAN-128`'s
+three `ON CONFLICT DO NOTHING` clauses, checkable by reading the diff) and confirmed this ticket
+did **not** inherit `KAN-128`'s `SECURITY DEFINER` error — independently re-verified
+`trgfn_payment_to_ledger:19163`/`fn_get_wallet:6082` are both correctly stated as non-definers.
+
+**KAN-132 — messaged `cto` directly** for the rename-vs-delete ruling and executor, per
+`team-lead`'s note that this is `cto`'s call and it's idle.
+
+**KAN-134 — rescoped** to drop the roster-wiring half `team-lead` already closed (commit
+`2afe3ca`), narrowing to the one remaining item: pointing `WORKFLOWS.md:58` at the skill.
+
+**Not verified this pass:** `team-lead`'s claim that the roster half of `KAN-134` is complete and
+drift-free across all five `team-lead-N` files (taken on report); whether any file outside
+`wallet.dart` reads `WalletLedgerEntry.userId` in a way my KAN-130 correction would affect (moot,
+since that field isn't changing under this ticket).
+
+No file under `Dabbler/dabbler-code/` written, no git command run, `DECISIONS.md` not edited.
+
+---
+
+## 2026-09-06 (continuation 6) — KAN-130 fallback documented: migration/client coupling can relax
+
+`team-lead-4` found the migration/client coupling in KAN-130's Executor line is "true but
+consequence-free" — nothing reads `Wallet.userId` today, so a migration landing without its
+client half is a null-and-unread field, not a broken money path. Independently re-verified
+before writing in: `Wallet`/`WalletLedgerEntry` are constructed in exactly one place
+(`wallet_repository_impl.dart:23`/`:39`), `wallet.dart` has exactly two importers total, and the
+`.userId` hits on the two leaderboard files belong to unrelated classes. Added as a documented
+fallback (not a decision to split now) — if the Phase 0 grant hasn't cleared by this migration's
+window, it may land without the client half, which follows once the grant expires.
+
+No file under `Dabbler/dabbler-code/` written, no git command run.
