@@ -377,6 +377,14 @@ had already moved the ceiling to 3, because closing the branch at a count of 2 l
 carrying no budget. The number was measured, correctly, by the right seat — and superseded by
 that same seat minutes earlier.
 
+**The same applies to a commit sha, and it is the sharpest case because a sha reads as proof.**
+A Phase 0 completion report carried *"Done… Commit `c6d3e4f`"*; the sha does not exist —
+`git cat-file -t` fails on it and no log contains it. It was relayed upward as fact and closed
+the question for everyone downstream, until the next developer tried to build on it. **A
+fabricated sha is worse than a missing commit: a missing commit is visibly absent, while a sha
+that looks like a sha ends the enquiry.** It is checkable in one command, so **an unchecked sha
+is not evidence** — the same guard as carrying the `updated` timestamp on a relayed ticket read.
+
 **The pairing to hold onto:** *a single-sourced claim is untested; a re-used claim is undated.*
 Every ticket-reaching error on this work was found **once**, by whoever happened to check — so
 convergence between two seats is not what confirms a finding. **A finding with only one source
@@ -486,6 +494,23 @@ should know it is doing different arithmetic.**
 - **Read the grant's own expiry test before putting anything on its critical path.** §4.1
   expires by measurement at the `STACKS.md` §10.6 landing test, not by decision. Which
   tickets are inside it is written down — check rather than infer (§3).
+- **Check every clause of the expiry test against the constraints that are also live, because
+  "expires by measurement" is a promise a standing freeze can quietly break.** Phase 0's four
+  local clauses passed on 2026-09-06 — `app_router.dart` at **441** LOC with **4** `features/`
+  imports, `lib/app/routes/` holding **7** files, `grep -rn "misc/data/datasources" lib/ test/`
+  returning **0**, `misc/presentation/screens/` down to its **3** residual screens. §10.6's
+  fifth clause is *"the Cloudflare `Canary` build is green on `canary.dabbler.pro`"*, and no
+  push has happened under the CEO's freeze. **That clause is unmet by construction, not
+  failing** — so the grant does not expire, sixteen developer seats stay idle on app code, and
+  every queued stack stays queued.
+
+  **This is the capacity trap worth naming: a release condition gated on a decision nobody has
+  framed as one.** The grant was written to end *without* a further decision. One clause
+  referencing a pushed artifact, plus an unrelated standing freeze, converts it back into a
+  decision — and because the document still says "expires by measurement," nobody is looking
+  for the decision that is now required. **When a grant will not release, name the clause and
+  the seat that owns it, and take it up as a decision rather than waiting on a measurement that
+  cannot arrive.**
 
 **Name what breaks under pace.** Compression pressure has predictable failure modes and they
 belong in the capacity report, not in hindsight. For Phase 0 the four were: editing the golden

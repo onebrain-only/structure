@@ -1071,3 +1071,54 @@ grep proves no line mentioning it changed, which is strong evidence and a differ
 Whether `sf3-125` is `senior-frontend-3` under §4.1's non-delegable grant or a separate
 instance — it addressed me as its lead and is executing the right tickets, and I did not
 interrogate the seat identity.
+
+## 2026-09-06 — §10.6 local clauses verified; the grant will not expire, and that is a decision
+
+**Agent:** `team-lead-3`
+**Outcome:** `team-lead` traced `c6d3e4f` to its own relay and reported §10.6's status. Verified
+the four local clauses first-hand and added two rules to `capacity-to-date`. **The finding that
+matters to my seat and to all five leads: the Phase 0 grant does not expire, and the reason is a
+decision nobody has framed as one.** Only the skill and this file changed.
+
+**§10.6 local clauses — measured by me, not relayed:**
+`lib/app/routes/` → **7** files · `grep -rn "misc/data/datasources" lib/ test/` → **0** ·
+`app_router.dart` → **441** LOC, **4** `features/` imports · `misc/presentation/screens/` →
+**3** residual screens. All four pass.
+
+**Stated precisely, because the distinction is load-bearing: I measured the WORKING TREE, which
+carries `KAN-125`'s uncommitted renames.** The 3-screen residue is true there and not yet at
+HEAD — `KAN-125` is staged, not committed. §10.6's landing test is meant to run against a
+pushed, committed state. So even the four "passing" clauses pass in a tree nobody could deploy.
+
+**The structural finding.** §10.6's fifth clause is *"the Cloudflare `Canary` build is green on
+`canary.dabbler.pro`"*, and no push has happened under the CEO's freeze. **That clause is unmet
+by construction, not failing.** The grant therefore does not expire — **sixteen developer seats
+stay idle on app code and every queued stack stays queued, including both of mine.** `KAN-129`,
+`KAN-132` and `KAN-130`'s client half stay blocked. With the CEO now; not mine to decide.
+
+**Added to §5 as the capacity trap it is:** the grant was written to end **without** a further
+decision. One clause referencing a pushed artifact, plus an unrelated standing freeze, converts
+it back into a decision — **and because the document still reads "expires by measurement,"
+nobody is looking for the decision that is now required.** Rule: *when a grant will not release,
+name the clause and the seat that owns it, and take it up as a decision rather than waiting on a
+measurement that cannot arrive.*
+
+**`c6d3e4f` traced — `team-lead` relayed `sf3-124`'s claimed sha upward without running
+`git cat-file`, and has told the CEO so.** Added to §3 beside the relay material, because a sha
+is the sharpest case in that family: **a missing commit is visibly absent; a sha that looks like
+a sha ends the enquiry.** It closed the question for everyone downstream until the next
+developer tried to build on it. One command checks it, so **an unchecked sha is not evidence** —
+the same guard as carrying the `updated` timestamp on a relayed ticket read.
+
+**Recorded because it was credited to me and I want the reasoning kept, not the credit:** the
+criterion-6 catch on `sf3-125`'s separate commit. It proposed the split for reviewability; the
+load-bearing fact is that `KAN-125` moves seven screens under `lib/features/`, so a folded commit
+would have failed `KAN-124`'s *"no `.dart` outside `lib/app/`"* on correct work. **An instinct
+about tidiness was pass/fail on a criterion**, and only reading the criterion against the diff
+shape surfaces that.
+
+**Not verified:** the Cloudflare Canary clause — unverifiable by me by construction, and I would
+not push to test it. `sf3-125`'s analyze/test figures (0/0, 106 across 10) — I have asked for raw
+output on the ticket and have not seen it; my four clauses do not include them. Whether `KAN-125`
+is committed since my read. Whether `KAN-129`/`KAN-132`/`KAN-130`'s blocked status is as
+`team-lead` states — relayed, not read, and not mine.
