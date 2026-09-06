@@ -357,3 +357,63 @@ else's. That the sitting unit as defined matches what `po` and `devops` each mea
 used it — I read their entries but did not ask either seat to confirm the definition. That
 `KAN-124`'s two-sitting cost still holds: `KAN-123` is in QA-Test and I did not open its
 bucketing table, so the contingency branches in §4 are still live and untested.
+
+## 2026-09-06 — KAN-123 QA verdict received; KAN-124 re-cost decision — holds at 2 sittings
+
+**Agent:** `team-lead-3`
+**Outcome:** `qa` passed `KAN-123` and reported that `KAN-124`'s description contradicts
+`STACKS.md` §10.3 on 14 entries. **The re-cost question is mine and I answered it: `KAN-124`
+holds at 2 sittings.** No ticket touched, no date set, no file changed except this one.
+Capacity position + two description items sent to `po`; acknowledgement to `qa`.
+
+**Branch 2 fired; branch 3 did not — and I verified branch 3 myself.** Before `KAN-123`
+opened I pre-committed three branches for how its output would re-cost `KAN-124`. `qa`'s
+result (0 cross-entry collisions, 1 intra-entry at `:972`) is branch 2: **sparse collision
+sets make P0-3b cheaper and buy back no sitting**, because its cost is the six-file extraction
+plus the golden test, not the ordering constraint. Branch 3 — a frozen pair spanning two
+buckets — was the only upward re-cost and the only spec-breaker.
+
+**Re-derived rather than accepted** (`grill-peer` discipline, and the numbers were load-bearing):
+- `sed -n '966,1000p' lib/app/app_router.dart` → `:972` is a **single top-level `GoRoute`**
+  (`RoutePaths.myVenueSubmissions`) with `create` in its own nested `routes:` list. The
+  constraint is **intra-entry** and travels with the entry. **Not cross-bucket. Branch 3
+  closed, no `analyst`/`cto` escalation.**
+- `sed -n '1660,1672p'` → `:1668` is `'${RoutePaths.error}:message'`, last by declaration.
+- `KAN-124` live description (JQL, field `description`): **does** still carry the stale
+  `platform_routes.dart | features/{admin,error,misc}/, settings, help, about, /, /landing`
+  carve-out, and its "What stays in `app_router.dart`" list names only `_handleRedirect`,
+  `appRouter`/`AppRouter.router` and `_routes` — **no `_PlaceholderScreen` move**. `qa` correct
+  on both.
+
+**Why the pre-solved bucketing does not shrink it either.** I extended P0-3a's deliverable on
+2026-09-05 *specifically* to remove the largest unknown from P0-3b, then still sized P0-3b at 2
+with that mapping expected. The table arriving as designed is not new information. This is the
+same discipline as the P0-1/P0-2 early finish: **shift the start, keep the cost.** I note that
+the number was convenient in the shrinking direction and I did not take it.
+
+**Sent to `po`** (owns the text and the `due_date`): the 2-sitting verdict with reasoning; the
+missing `_PlaceholderScreen` → `lib/app/routes/placeholder_screen.dart` move (mechanical,
+enumerable, fits sitting 1; criterion 6 unaffected since the destination is inside `lib/app/`);
+`qa`'s two ordering carry-forwards to land in the description rather than only the verdict, with
+`:1666` framed as a **rework trigger** — it is last by *declaration*, not pattern, so nothing
+mechanical catches a misplacement and the golden test fails with no diagnostic; and a warning
+that building to the stale table fails criterion 3 by putting `features/profile/` imports inside
+`platform_routes.dart`.
+
+**Date position — reported, not set.** `KAN-124` ceiling `2026-09-09`, earliest-believed
+`2026-09-07`. Blocked on two `po`-side, same-day-able things: `KAN-123` reaching **Done** (chain
+is serial on Done, not In Review — it sits in QA-Test) and the description fix. **If the fix
+slips past 2026-09-08, `KAN-124` slips one-for-one and `KAN-125` (`2026-09-10`) with it** — the
+grant has no parallelism to absorb it. I proposed no new date; I re-derive from remaining
+sittings at the unchanged rate if asked.
+
+**This is the first live exercise of `capacity-to-date`** (committed `33e7a56` earlier today).
+§4's "decide the contingency before the fact lands" did the work it was written to do — the
+re-cost took one measurement and no improvisation, because the branches were already written.
+
+**Not verified:** `qa`'s 14-entry contradiction count — I confirmed the carve-out exists and is
+wrong, not that it lands on exactly 14 entries; `po` will hit that when editing. The full
+collision relation over all 85 patterns — I checked only the two entries whose shape decided
+branch 3, and took the 0-cross-entry figure from `qa`. That `KAN-123`'s mapping and whatever
+`po` writes into `KAN-124` will agree — flagged to `qa` as the thing to tell me about before
+`senior-frontend-3` starts, since a third source of truth would be worse than the current two.
