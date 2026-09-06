@@ -1539,3 +1539,13 @@ Nine incoming messages, board-hygiene and new-work batch.
 **`KAN-150`:** added `cto`'s confirmed disjointness (measured directly — neither of this ticket's two functions carries the hardcoded `'kickoff'` fallback that `KAN-155` fixes) and its apply-leg count (1 sitting, ceiling 1, stays inside `cto`'s condition-3 authority since it's definition-only, unaffected by `KAN-155`'s apply moving to the CEO) as a ticket comment. Still undated, chained behind `KAN-155`'s now-CEO apply.
 
 **Also added to `KAN-155`:** `cto`'s explicit ruling against splitting the migration to move its DDL half into its own authority — buys nothing since the CEO is in the loop either way, and is the exact precedent `G-002` exists to prevent. Settles a question that would otherwise resurface.
+
+## 2026-09-07 (cont.) — two stale corrections closed: date confirmed already fixed, KAN-150 caveat dropped, AC10 reworded
+**Agent:** `po`
+**Outcome:** `team-lead-4` and `team-lead` both flagged `KAN-155`'s `due_date` as still showing 09-09 — checked directly and it was already 09-10 from my prior revert; their messages had simply crossed with it. No action needed there, confirmed rather than assumed.
+
+**`KAN-150`'s "derived, not received" caveat dropped.** I'd flagged the authoring-free reading as `team-lead-4`'s inference from `cto`'s stated reasoning, not `cto`'s own confirmation for this specific ticket. That was accurate when written and stopped being accurate once `cto` measured the live catalogue directly and confirmed neither of this ticket's functions carries the hardcoded `'kickoff'` fallback `KAN-155` fixes — in its own words, *"authoring is free now."* Rewrote the section to state this as confirmed and independently verified, not as an open inference a reader could use to park a genuinely released ticket.
+
+**`KAN-155`'s AC10 reworded per `cto`'s clarification.** It had been phrased as something required before the CEO may apply — wrong, since `G-002`'s four conditions constrain `cto`'s own delegated slice of the production-write authority, not the CEO's underlying reserved authority (`019`). No agent decision gates the seat the authority belongs to. Reworded as `cto`'s own commitment instead, and made the sequencing explicit: posted after the authoring leg lands, not in parallel with it, since there's no SQL to brief before then.
+
+**Two-line lesson for the day, closing on it:** every one of today's several stale-flag near-misses resolved to either "already fixed, messages crossed" or "genuinely correct, my error" — none resolved to "I was right to leave it as-is." Worth remembering that a flag saying something is stale is worth a direct check before either defending the old text or assuming the flag is right; both directions turned up today.
