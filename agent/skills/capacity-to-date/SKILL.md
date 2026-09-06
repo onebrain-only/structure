@@ -290,6 +290,29 @@ into the single number it exists to replace.
 **Both look like convergence. Say which one you have** — *"budget is the 09-09→09-10 day gap"* is
 a report; two equal numbers with no stated budget is an estimate wearing a range's clothes.
 
+### "Cheap now, expensive later" needs the right cost — name which one grows, and what starts it
+
+A deadline derived from urgency is still a derived number, and it is wrong if you attach it to
+the wrong cost. **Two costs grow at different times and they have different clocks:**
+
+| Cost | Starts growing when | Deadline it implies |
+|---|---|---|
+| **Data** — a migration becomes a backfill | rows appear | when writes actually begin |
+| **Code** — a model change becomes rework across dependents | dependent code is written | when building against it starts |
+
+This seat argued that a schema model question needed answering before D4's 2026-09-14
+activation, on the *data* clock — the same zero-rows asymmetry that had justified `KAN-128` a
+few hours earlier. **`cpo` ruled the call right and the reasoning wrong** (`P-037`): there is no
+data-migration window, because `enablePayments` is `false` and the feature goes live months
+later, so **activating a stack is a lead taking tickets, not writes beginning.** The real
+exposure was the *code* clock — features built against a model that would have to be unwound
+across all of them, which is rework and not a backfill.
+
+**The failure was reaching for the cost model that worked on the previous ticket.** A precedent
+supplies the *shape* of an argument, never its inputs. Before quoting a deadline, say which cost
+you mean and what event starts it; if you cannot name the event, you have an urgency and not a
+date.
+
 **Cheaper work does not automatically lower the ceiling — ask where the risk sits, not where
 the work went.** `KAN-128`'s `financial_ledger` probe got materially cheaper on 2026-09-06 (two
 direct inserts replacing a concurrency harness) and `senior-backend` explicitly declined to
@@ -342,9 +365,9 @@ on a queue you do not own, and a lead that issues one is estimating.
 > not estimation** — that is the whole basis of the rule, applied one seat over.
 
 **Naming the owner is half the job. Stopping there orphans the count.** This section said only
-the first half until 2026-09-06, and the cost was measured: on `KAN-128` — a migration racing
-D4's 2026-09-14 activation, free only while five money tables hold zero rows — **four seats
-refused in sequence and every refusal was correct.** `team-lead-4` refused under this section;
+the first half until 2026-09-06, and the cost was measured: on `KAN-128` — a migration whose
+constraint is free only while five money tables hold zero rows — **four seats refused in
+sequence and every refusal was correct.** `team-lead-4` refused under this section;
 `po` under `WORKFLOWS.md:58`; `pm` applying the same rule to itself; `cto` under `G-025`. Four
 correct refusals, no owner, and a deadline-bound ticket standing still.
 

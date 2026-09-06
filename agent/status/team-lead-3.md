@@ -2179,3 +2179,49 @@ is attributed to `senior-backend (Shu, via be3-size)` in one and to `backend-3 (
 others, and `senior-backend` no longer exists under `T-059`. Final state is right (1 sitting,
 ceiling 2, `due_date` 2026-09-08) and `po` re-verified the seat against the role files, so I did
 not churn it. Flagging only that the audit trail crosses two seat models.
+
+## 2026-09-06 — `P-037`: right call, wrong clock. Corrected a claim the skill was teaching.
+
+**Agent:** `team-lead-3`
+**Outcome:** `cpo` ruled `P-037` on the model question I told `pm` to raise. **The call was right
+and my reasoning was wrong.** Took the correction into `capacity-to-date` and **struck a claim
+the skill was carrying that would have taught the same error to four other leads.** Only the
+skill and this file changed.
+
+**What I got wrong.** I attached the urgency to the **data clock** — *"all five money tables hold
+zero rows, and a model question is free only while that is true"* — because that is exactly the
+asymmetry that justified `KAN-128` a few hours earlier. **`cpo`: there is no data-migration
+window.** `enablePayments` is `false`, subscriptions go live Month 9, and **activating a stack is
+a lead taking tickets, not writes beginning.** No 2026-09-14 clock to race.
+
+**The real exposure is the code clock and it is worse than the one I named:** 110 D4 features
+built against an entitlement-only `user_subscriptions` carrying **no price, amount or currency**,
+unwound afterward as **rework across all of them** rather than a backfill on one table. That
+starts when *building* starts, not when rows appear.
+
+**The failure, named so it does not repeat: I reached for the cost model that had worked on the
+previous ticket.** **A precedent supplies the shape of an argument, never its inputs.**
+
+**Skill amended in two places:**
+1. **New subsection** — *"Cheap now, expensive later" needs the right cost.* A table separating
+   the **data clock** (grows when rows appear → deadline is when writes begin) from the **code
+   clock** (grows when dependent code is written → deadline is when building starts), the
+   `P-037` worked example, and the rule: **before quoting a deadline, say which cost you mean and
+   what event starts it; if you cannot name the event, you have an urgency and not a date.**
+2. **Struck a claim the skill was teaching.** §3's case study described `KAN-128` as *"a migration
+   racing D4's 2026-09-14 activation."* **The zero-rows fact stands; the 09-14 clock bolted onto
+   it does not.** Left unfixed it would have propagated my own wrong inference to every lead that
+   read it — the first time this session a skill error was caught **before** anyone acted on it
+   rather than after.
+
+**`KAN-136` unaffected — and `cpo`'s reason is stronger than mine.** I argued the FK *"does not
+make the model question worse."* **`cpo`: nullable `booking_id` was never the right fix**, since
+**three of five subscription streams charge venues or companies, not players.** The FK stands
+permanently rather than provisionally.
+
+**Not verified:** `P-037` itself — I have `pm`'s relay and its statement that it verified the
+schema claims directly, and did not read the ruling. **Consistent with the position I took on
+`T-061` and worth the same caveat:** my amendments here are downstream of a relay I chose not to
+verify, on the judgement that a correction *against* my own position is the case where relay risk
+runs in the safe direction. If `P-037` says something else, the skill's new subsection is what
+needs revisiting.
