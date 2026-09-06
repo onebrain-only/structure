@@ -580,3 +580,42 @@ empty client greps and the skill-tier false lead — engineering facts that do n
 
 **Reported to:** `pm` and `po`. Owed: `cto` the rename mechanism and the `'prime'` literals; `po` the
 Socialiser question. **The D4 entitlement gate is open.**
+
+## 2026-09-07 — `P-040`: `pro`'s 12 child rows. The split is **two product decisions, not twelve**
+
+**Asked by `team-lead-4`** after `cto` refused the allocation as a product call — correctly; `P-039`
+should not have parked it on `cto`'s read. **ALIGNED WITH CONSEQUENCE.** Entry: `P-040`.
+
+**Counts confirmed by re-measuring** (9 `subscription_features` + 3 `notification_hourly_caps` per
+key). **But the framing was wrong.** `subscription_features` is a **complete 9 × 3 matrix** — all nine
+`feature_key`s exist on all three plans including `kickoff`. The rows are not entitlements granted to
+`pro`, so they do not get allocated. **Eight of nine values are identical on free and paid.** `pro`'s
+entire product content over `kickoff` is **one flag** — `quiet_override_high` false→true — plus a caps
+uplift 5/10/20 → 10/25/50. Twelve rows, two decisions.
+
+**The finding that drives the ruling: the two read paths default in opposite directions.**
+`user_has_feature` (`:20776`) is an `EXISTS` join — **missing row = deny**, so an incomplete set would
+give a paying subscriber *less than Player Free* (a downgrade-on-upgrade, against §A.1).
+`check_notification_rate_limit` (`:4006`) does the reverse — `no cap rule = allow`, so **omitting caps
+rows grants unlimited**. Omission is never the cautious option; it is deny in one table and unlimited
+in the other. **So both new keys take a complete set — 24 rows. Structural, not a product claim.**
+
+**Both real decisions: NOT ESTABLISHED, set to Player Free values** — `quiet_override_high` `false`,
+caps `5/10/20`. Not a default-assignment to unblock: `false` **asserts nothing** and reproduces the one
+tier `12a` fully specifies, whereas `true` encodes a product nobody committed. **Zero subscribers on
+`pro`/`prime`, so nobody loses anything**, and it is one `UPDATE` when a product exists. Named the
+`11b` test that settles it.
+
+**The near-miss I recorded so it is not made later:** §C.2 commits *"Unlimited payment reminders +
+bulk messaging"*, which looks like this. It is not — these tables govern notifications delivered **to**
+the holder (`to_user_id`), the Organiser commitment is **outbound**. Opposite direction.
+
+**Also caught for the migration author:** the FK is `ON DELETE CASCADE` (`:31558`), so dropping `prime`
+deletes its 12 children automatically — explicit deletes will report zero rows and must not read as a
+failure. Six acceptance criteria written into `P-040` at `cto`'s request.
+
+**Still owed and NOT answered:** the Socialiser question from `P-039`. Turns on the same `11b` read;
+settling all three in one pass is the efficient shape.
+
+**Changed:** this file and `DECISIONS.md` (`P-040`). No code, SQL, migration, Jira or Notion write.
+**Reported to:** `po` and `cto`.

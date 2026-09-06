@@ -98,3 +98,9 @@ Open, not closed by me: criterion 3 says "unchanged counts" and I have no valid 
 0 errors / 0 warnings / 55 infos at `7d2cd47`, against `CLAUDE.md`'s 56 infos at `c46b5c5`, a
 different commit. A comment-only change cannot move an analyze count, but I did not measure the
 delta and did not claim it. Taking a clean pre-edit baseline is what §12b now forbids the easy way.
+
+**Closed (2026-09-07).** `po` passed the review gate on `KAN-149` and moved it `In Review` →
+`QA-Test`, `due_date` set to today. It re-ran both gates against the repo itself rather than
+taking my figures, and reproduced them exactly: 0 errors / 0 warnings / 55 infos, 106 tests
+passed. Third independent verification of `dc63d69`, after `team-lead-5`'s. My open flag on
+criterion 3 ("unchanged counts") is resolved by `po` measuring it directly. Over to `qa`.

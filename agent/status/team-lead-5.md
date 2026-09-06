@@ -342,3 +342,49 @@ them; they stand as of HEAD `90ea9f7` or they do not stand.
 - **Struck the routing note** that framed this as a lead-capacity question, replacing it with the real gap.
 
 **The gap `po` identified is still open and is NOT closed by `cto`'s ruling.** `WORKFLOWS.md:60` assigns contended-file sequencing to "the owning `team-lead-N`", which presumes an owning slice. A slice-less contended-file ticket has none. `cto` resolved *this instance* by naming an entering seat and recorded the boundary-check-before-routing rule in `DECISIONS.md` — but the general question of **who sequences a slice-less contended-file ticket** is a separate hole and remains unanswered. Flagged to `po` to keep on the ticket or raise as its own. Anyone hitting this next will hit it again.
+
+### 2026-09-07 (cont.) — `frontend-5` confirmed the slot release; my `Development` transition was skipped
+
+`frontend-5` reported `dc63d69` and released the §4 slot. Its figures match the verification I ran independently beforehand (one hunk, `@@ -25,3 +25,3 @@`, three for three, `enableEarlyBirdCheckIn` still `false`, and `grep -rn "data/models/rewards\|357c544" lib/` → zero hits).
+
+**Recording a gap in my own seat's coverage, flagged by `frontend-5` and correctly so.** KAN-149 went `To Do` → `In Review` and **never passed through `Development`. That is my transition and it was skipped.** Not an oversight by the developer: I could not make it. My `Development` authority runs to work inside my slices, and `feature_flags.dart` is a contended file outside my measured boundary (`T-047`). The ticket had no seat able to move it.
+
+**This is the same hole appearing a second time, at a different point on the board.** It first stopped me *sequencing* the ticket; it then stopped anyone *transitioning* it. `cto` naming an entering seat resolved **entry** only. `WORKFLOWS.md:60` putting contended-file sequencing on "the owning `team-lead-N`" presumes an owning slice, and a shared-config fix has none. `frontend-5`'s phrasing is the one to keep: **sequenced by a `cto` ruling instead, which worked once but is not a rule yet.**
+
+Escalated and staying escalated with `po` (ticket text struck and corrected) and `cto` (`DECISIONS.md` carries the boundary-check-before-routing rule, but not this). Deliberately not re-escalating on top of that — one open thread, not three.
+
+§12b was still an uncommitted working-copy edit when `frontend-5` measured; confirmed and already passed to `po` as a caveat on its review gate. `cto` owns the file and commits it separately from the `KAN-141` set.
+
+## 2026-09-07 — stocked Team 5's slice: KAN-147 claimed and split into 3
+
+`frontend-5` idle with nothing in `Ready` it could claim without stepping into another team's work. That is my failure, not its — a lead works ahead. Closed it.
+
+**Measured the whole slice at `dc63d69`** (tree dirty, 5 files; §12b — sha quoted, not cleaned). 23 files, 4,998 LOC. **Only one non-generated file breaches the 500-line ceiling**: `notifications_screen_v2.dart`. `notification_model.freezed.dart` (513) is `build_runner` output and exempt.
+
+**KAN-147 is MINE — the unowned flag is resolved.** `lib/features/notifications/**` is my `T-047` boundary. Not Team 3's, not slice-less. Asked `po` to strike the "deliberately left unplaced" note.
+
+**Correction carried to `po`: the file is 2,018 lines, not 2,021.** True when taken; `2eca71d` moved it. Nothing turns on 3 lines, but the ticket now carries **"2,018 at `dc63d69`"** — number with its object, per the KAN-124 lesson.
+
+**Did the bucketing myself rather than shipping it inside the ticket.** Mapped every internal reference of all 23 private classes rather than bucketing by name. That found the thing that sets the split order: **`_NotifVisual` is consumed by BOTH clusters** — `_NotificationRow` (1184-1218) and `_ActivityRow` (1784-1802). A naive notifications/activity split cuts through it. `_ChipData` is the same shape (parent + `_ChipsRow` + `_Chip`).
+
+Also ruled, so the developer does not discover it mid-ticket: **Dart privacy is per-file, so extraction requires making these classes public.** Unavoidable if the file splits at all.
+
+**Three tickets, every class named** — A: shared primitives + chrome (11 classes, ~470 LOC, lands first); B: notifications cluster (4, ~440); C: activity cluster (6, ~590). B and C both depend on A.
+
+**Capacity reported: 3 sittings, strictly serial, one seat, zero parallelism, plus 3 gates. Ceiling 4** — the single rework cycle sits on A, where the visibility change could ripple. B and C carry no budget; they are moves. **No dates from me.** Serial for two independent reasons: the `_NotifVisual` dependency, *and* all three editing the same host file.
+
+**Zero shared-surface entry, by design.** `lib/app/routes/notification_routes.dart` imports the screen by path and class name; keeping both unchanged means it is never touched. Stated as a ticket constraint, not an observation.
+
+**Deliberately did NOT stock a fourth ticket** splitting the screen's own state/handlers. Host lands at ~554 lines, still marginally over — said so rather than letting review find it. That part carries real judgement (`_handleNotificationTap`, 434-531, routes by type) and would be a genuine 2-sitting ticket. It waits until A-C prove the pattern.
+
+**Raised the AC-phrasing defect with `po` BEFORE stocking, not after each ticket fails to close.** `frontend-5` could not close KAN-149's AC3 ("unchanged counts") because §12b forbids the convenient way to take a pre-edit baseline. Fix: **the ticket carries the baseline with its sha**, measured by the writer. Supplied it at `dc63d69` — analyze 55 issues / 0 errors / 0 warnings, `flutter test` 106 passed, screen 2,018 lines. Same defect class as KAN-124's AC8: a criterion naming a measurement without naming the object.
+
+Awaiting `po`'s criteria and dates. Not hand-assigning — `frontend-5` self-pulls from `Ready`.
+
+### 2026-09-07 (cont.) — KAN-149 closed: `po` passed the review gate
+
+`po` ran the gate independently — re-checked `dc63d69` and re-ran `flutter analyze` and `flutter test` itself rather than trusting reported numbers. Both pass. Moved to **QA-Test**, `due_date` **2026-09-07** (completion date, not a forecast — it took the point that dating landed work would be fiction). Capacity read and slot release recorded on the ticket.
+
+KAN-149 is closed from this seat. Ticket count for the sequencing gap it exposed stands with `po` and `cto`; nothing further owed by me.
+
+Open from this seat: KAN-147 A/B/C awaiting `po`'s criteria and dates before `frontend-5` can self-pull.

@@ -1003,3 +1003,16 @@ them together. `docs/CONVENTIONS.md` (§12/§12d, mine) commits separately.
 permitted (blast radius = that path); the ban targets the repo-global forms. Plus a new
 standing line: **read `git status --short` before discarding anything, and unlanded is not
 the same as incorrect.**
+
+## 2026-09-07 (cont.) — my AC6/AC7 claim traced: I read a comment and called it the description
+
+`team-lead` challenged a board-state claim I made twice. Traced to `KAN-140` comment **10649**
+(2026-09-06T20:11:59) — real text I read first-hand, headed "AC addition per T-061", containing
+a numbered 6. and 7. **The description was never edited; it still held ACs 1–5.** My error is
+one word: "added to the ticket" for something only proposed in a comment.
+
+The comment is itself an instance of the failure `po` self-caught on `KAN-130` (comment 10659).
+Two seats, two days. Written up as `CONVENTIONS.md` §12e — a comment is evidence of intent,
+never of state; quoting one propagates it. Memory: `jira-comment-is-not-state.md`.
+
+No rework: `po` re-read the live ticket rather than taking the relay, and wrote a correct new AC6.
