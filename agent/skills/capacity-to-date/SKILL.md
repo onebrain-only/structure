@@ -60,7 +60,14 @@ makes the count go above one.
 - `KAN-128`: author one migration, then run the AC-3 probe pack. Sitting 1 ends at
   *migration body complete and posted in `G-002` format*; sitting 2 is the probes, which need
   fixtures and — for `financial_ledger` — a **concurrent** replay, since a sequential retry
-  cannot demonstrate the failure at all.
+  cannot demonstrate the failure at all: the failure *is* the interleaving.
+
+  **This example is deliberately left branched, because the branch is the more instructive
+  half.** Who authors the AC-3 probes is open with `po` as of 2026-09-06: **`cto` owning them
+  makes it 1 sitting on `senior-backend`; shipping them with the migration makes it 2. The
+  ceiling is 2 either way.** A count of "2" teaches the arithmetic; "2, or 1 if a named seat
+  owns a named deliverable, and here is who was asked" teaches §4 — which is the part leads
+  get wrong. Report a branch this way rather than resolving it to the number you prefer.
 
 ### Risk is not a checkpoint. A dependency boundary is.
 
@@ -75,14 +82,34 @@ is not a checkpoint: the signature is **ruled** by `T-049` (caller-generated uui
 is consumed by one `ALTER COLUMN ref_id SET NOT NULL` in the same file. That is a decision
 taken *inside* a pass.
 
-In `senior-backend`'s own words, which are the sharpest form of it: *less checkable raises the
-odds of a rework cycle; it does not create a checkpoint.* Risk belongs in the gap between your
-earliest and ceiling columns (§2), where it is priced. It does not buy a sitting.
+In `senior-backend`'s own words, confirmed first-hand: *"less checkable raises the odds of a
+rework cycle, which is why my ceiling is 2 rather than a flat 2. But §1's test is dependency,
+not risk."*
 
-**The opposite failure has a name too: a partial finish dressed as a checkpoint.** A boundary
-you cannot describe as a reviewable, abandonable state — one where the honest description is
-"about half the file" — is a pause, not a checkpoint, and it does not make the ticket two
-sittings.
+**Risk is not discarded — it is banked in the ceiling.** Say that in the same breath as the
+rule, because a lead who takes only *risk is not a checkpoint* may conclude risk goes nowhere,
+which is worse than the error it replaces. Hard-to-verify work lands in the gap between your
+earliest and ceiling columns (§2). That gap is where it is supposed to go, and pricing it there
+is what makes the two-column report do real work. It does not buy a sitting.
+
+### The opposite failure: a partial finish dressed as a checkpoint
+
+The inflation direction, and it is seductive. The worked example is `senior-backend`'s own
+first checkpoint on `KAN-128`, which it proposed and then discarded — a seat rejecting its own
+boundary, which is better evidence than a lead rejecting someone else's:
+
+> *"The migration file holds the constraints and 6 of 7 conflict clauses; `admin_wallet_adjust`
+> untouched — reviewable and abandonable, and **not applicable**, because `ref_id NOT NULL`
+> breaks `:2982` until sitting 2 lands."*
+
+It argued that the un-appliability was what made it a checkpoint. **It is the opposite.** A
+migration that cannot be applied is not a state anyone can hand off, review to a verdict, or
+abandon and still have something — it is half a file, with its incompleteness dressed up as the
+evidence for its completeness.
+
+**The tell: *"it cannot be applied yet"* sounds like a boundary and is only a middle.** Test a
+proposed checkpoint by asking what a reviewer would do with the artifact if the ticket stopped
+there. If the answer is "nothing, it doesn't work yet," it is a pause.
 
 ### Mechanical tickets finishing early is not evidence a judgement ticket is smaller
 

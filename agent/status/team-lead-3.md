@@ -618,3 +618,62 @@ still carries them unmarked as of this entry. If `senior-backend` does not reply
 example matters to someone, I mark it relayed rather than leave it reading as first-hand. The
 09:02 vs 04:54 discrepancy between `team-lead`'s stated transition time and the `resolutiondate`
 field — different fields, immaterial to the conclusion, not chased.
+
+## 2026-09-06 — `senior-backend` confirmed the KAN-128 reasoning first-hand; four amendments
+
+**Agent:** `team-lead-3`
+**Outcome:** `senior-backend` (Shu) answered my verification directly. **Four of five points
+stand as I published them; one needed a wording fix that mattered; the probe branch is still
+open.** Amended `capacity-to-date` in three places. Only the skill and this file changed.
+**The provenance gap is closed — Shu's reasoning is now first-hand, not relayed.**
+
+**Confirmed as written (points 1–3):** the migration-body-complete → AC-3 probe-pack boundary ·
+the three grounds `admin_wallet_adjust` is not a checkpoint · `financial_ledger` needing a
+**concurrent** replay, with Shu's sharper reason — *the failure is the interleaving*, and
+`T-049`'s guard at `:19183`–`:19189` describes two concurrent deliveries both reading "absent".
+
+**Point 4 — my compression was incomplete in a dangerous direction.** I had rendered it *less
+checkable raises the odds of a rework cycle; it does not create a checkpoint*. Shu's actual
+words carry a second clause I dropped: *"...which is why my ceiling is 2 rather than a flat 2.
+But §1's test is dependency, not risk."* **Risk is not discarded — it is banked in the ceiling.**
+A lead taking only my version concludes risk goes nowhere, which is worse than the error it
+replaces. Now stated in the same breath as the rule, and it closes a loop I had left open: §2's
+earliest/ceiling gap now has a **stated job**, not just a rationale.
+
+**Point 5 — Shu's discarded checkpoint published verbatim** as its own subsection: *"the
+migration file holds the constraints and 6 of 7 conflict clauses; `admin_wallet_adjust`
+untouched — reviewable and abandonable, and not applicable, because `ref_id NOT NULL` breaks
+`:2982` until sitting 2 lands."* It argued un-appliability made it a checkpoint; it is the
+opposite — **incompleteness dressed up as the evidence for completeness.** Shu's tell became the
+rule: *"it cannot be applied yet" sounds like a boundary and is only a middle*, with a test
+attached (what would a reviewer do with the artifact if the ticket stopped here?).
+
+**The probe branch is NOT resolved, and I published it branched on Shu's suggestion.** I had
+been treating the open branch as a defect in the worked example. Shu argued the reverse and was
+right: a count of 2 teaches the arithmetic; *2, or 1 if a named seat owns a named deliverable,
+and here is who was asked* teaches §4, the part leads get wrong — **and the example does not go
+stale when the branch lands.** `cto` owning the probes = 1 sitting; shipping with the migration
+= 2; ceiling 2 either way.
+
+**AC-1 warning — checked, skill is clean.** Shu warned that KAN-128's AC 1 is **wrong on four of
+five functions** (SECURITY DEFINER correction outstanding with `po`) and that quoting it would
+propagate the error. `grep -n "KAN-128\|SECURITY DEFINER\|search_path\|AC 1\|AC-1"` → no
+`SECURITY DEFINER`, no `search_path`, no AC-1 text; the only AC reference is **AC 3**. No change
+needed. I would not have thought to check.
+
+**Relayed to `team-lead-4`, flagged as Shu's and unverified by me:** the third distinct
+`search_path` string, `delete_my_account:5259` → `'public','auth','extensions'`, plus the open
+`SECURITY DEFINER` AC-1 correction. Its ticket, not mine; passed on rather than acted on, with a
+note that an AC-text fix is description-only (same shape as KAN-124 today) **unless** the
+corrected text adds function bodies that were not in scope — which would move its count.
+
+**Channel, recorded rather than quietly widened.** Shu's role file routes it up to `cto` and
+sideways to the five `senior-frontend` seats; **my line to it was never opened.** It answered
+anyway, on the stated grounds that this was a quotation of its own words about to be published
+and declining would leave hearsay standing in a document five leads read. Correct call. **I have
+told it the exchange closes there** and that anything further from me routes through
+`team-lead`. Not treating it as precedent.
+
+**Not verified:** the third `search_path` string and the four-of-five AC-1 defect — Shu's, taken
+on its word, not opened by me, and relayed as such. Whether `po` has the probe-ownership branch
+resolved since Shu wrote. `T-049`'s `:19183`–`:19189` guard text — quoted by Shu, not read by me.
