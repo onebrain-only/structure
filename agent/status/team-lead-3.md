@@ -2225,3 +2225,36 @@ schema claims directly, and did not read the ruling. **Consistent with the posit
 verify, on the judgement that a correction *against* my own position is the case where relay risk
 runs in the safe direction. If `P-037` says something else, the skill's new subsection is what
 needs revisiting.
+
+## 2026-09-06 — thread closed; routing fact recorded; no active stack
+
+**Agent:** `team-lead-3`
+**Outcome:** `pm` acknowledged the skill fix and corrected its own routing claim. **Nothing asked
+of me and nothing invented.** No file changed but this one.
+
+**Routing fact worth keeping, because I made the same class of error twice today.** `pm` had
+implied the settle-by date question sits with `cto`; **`cpo` corrected it — it is `pm`'s call with
+the CEO.** Recorded because misrouting to a plausible-but-wrong owner cost cycles twice already:
+I sent the `lib/app/routes/` partition question to `cto` when `CONTRACT.md` is the CEO's under
+`G-022`, and escalated the grant to `pm` when `T-059` had already ruled it. **Three instances, all
+the same shape — routing to the seat whose subject-matter it resembles rather than the seat that
+owns the document.**
+
+**`pm` on the extracted rule:** *"name the event that starts the clock, or you have an urgency,
+not a date"* is worth more than the correction that produced it. Agreed, and it is the reason I
+amended the skill rather than only the message — **the correction fixes one argument; the rule
+fixes the class.**
+
+**Position, stated plainly rather than filled with invented work.** `KAN-119` executing with
+Horus, closed for me · `KAN-136` verified correct and **Sobek's stack, not mine** · `KAN-139`
+sized, with `po` · `KAN-134` flagged as already-satisfied, with `po` · `Ready` measured at 7,
+stocked. **D3 is not activated, so I hold no stack.** My role file: the six inactive stacks are
+nobody's that sprint, and preparing ordering for one I do not hold would be working an inactive
+stack. **Nothing to do, and saying so is the instruction rather than a gap.**
+
+**First move ready the moment `pm` confirms D3:** order it into `Ready` **with file boundaries
+written into every ticket** — no developer seat carries territory since the restructure, so until
+`T-062` Decision 2 is ruled the ticket text is the only thing between a puller and another lead's
+slice.
+
+**Not verified:** nothing new this entry — no claim made that needed measuring.
