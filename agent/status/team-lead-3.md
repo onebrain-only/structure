@@ -301,3 +301,59 @@ pressure is authority, not method.
 **Not verified:** that the other four leads would answer the same — I am the only one that has run
 a real task. Whether `grill-peer`'s round format survives the lead→senior direction in practice;
 I have used its discipline, never its literal template.
+
+## 2026-09-06 — authored `capacity-to-date`, the estimation/capacity/scheduling skill
+
+**Agent:** `team-lead-3`
+**Outcome:** Wrote `.claude/skills/capacity-to-date/SKILL.md` — the skill my own 2026-09-06
+audit measured as missing across 74 repo skills and ~450 installed. Five sections, each built
+from a real Phase 0 ticket rather than from general estimation material. **No other file
+changed except this one.** No `WORKFLOWS.md` edit (`devops` writing there in parallel).
+
+**What it defines that existed nowhere:**
+- **The sitting**, live in `KAN-124` and used by `po` and `devops`, defined in no document
+  until now: one uninterrupted pass ending at a checkpoint. The checkpoint makes it a sitting;
+  elapsed time does not. 1 = enumerable-in-advance population; 2+ = a judgement whose output
+  the same ticket then consumes.
+- **The four-input conversion**, of which a lead supplies three and never the calendar.
+- **Ceiling vs earliest** as two reported columns with the gap named as rework budget.
+- **Shared-seat rule:** cost yes, date no, name the owning seat.
+- **Unsizeable output shape:** "cannot size until X, Y holds it" + size the sizeable half.
+- **Grant arithmetic:** headcount is not an input, total is a sum with no division, only slack
+  is compressible.
+
+**Worked examples used:** `KAN-121`/`KAN-122` (1-sitting mechanical; early finish shifts the
+start, never the cost) · `KAN-124` (the 2-sitting worked example and its checkpoint) ·
+`KAN-123` (the pre-decided three-branch thin-table contingency; the measured 80 denominator) ·
+`KAN-125` (the ceiling column) · `KAN-126`/P0-5 (`devops`'s 2 sittings with sitting 2 undatable
+— the shared-seat and unsizeable example, plus my own over-coupling error, recorded as an error).
+
+**Verified live before building on them.** JQL on cloudId `18c8e9f5-…`, fields `duedate`/`status`:
+`KAN-121` **2026-09-07** Done · `KAN-122` **2026-09-09** Done · `KAN-123` **2026-09-07** **QA-Test**
+· `KAN-124` **2026-09-09** Ready · `KAN-125` **2026-09-10** Ready. All four brief dates confirmed,
+and the conversion chain that produced them is documented in `agent/status/po.md` — so the
+worked examples are genuinely capacity-derived and the brief's stop-condition did not fire.
+**New since my last entry: `KAN-123` has advanced to QA-Test.**
+
+**One brief claim corrected.** The brief said `STACKS.md` §10 carries the two-sitting figure on
+P0-3b. It does not — `grep -rn -i "sitting" --include="*.md" .` returns **no hit anywhere in
+`STACKS.md` or `CONTRACT.md`**. The unit appears only in my own status log, `agent/status/po.md`,
+`agent/status/devops.md`, and one `WORKFLOWS.md:220` example line. It originated with me and was
+consumed downstream without ever being defined. That is precisely the gap the skill closes.
+
+**Left open inside the skill, on purpose:** the sitting→calendar-day mapping. `po` assumed
+1 sitting + 1 gate per working day; the board ran at ~2 board-days per sitting. Both stated
+assumptions, neither derived. I have no method and did not invent one — written as an open
+question with an instruction for whoever gets more data points. Also open: whether a sitting
+transfers to a non-developer seat (`devops` used it; nobody ruled it generalises).
+
+**Owed and not done:** `agent/WORKFLOWS.md:58` states the capacity-not-estimation rule and
+points at no method; it should point at this skill. Not edited — `devops` is in that file this
+session. Recorded in the skill's own "Owed elsewhere" section and reported.
+
+**Not verified:** that the other four leads would size the same way — I remain the only lead
+that has produced a real capacity number, so the skill generalises my practice and no one
+else's. That the sitting unit as defined matches what `po` and `devops` each meant when they
+used it — I read their entries but did not ask either seat to confirm the definition. That
+`KAN-124`'s two-sitting cost still holds: `KAN-123` is in QA-Test and I did not open its
+bucketing table, so the contingency branches in §4 are still live and untested.
