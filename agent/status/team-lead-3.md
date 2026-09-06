@@ -1240,3 +1240,58 @@ pending gates. The AC-8 follow-up is not a sitting — one measurement and one c
 is the only reading I can see, but the ruling does not define "contiguous run" formally and a
 different segmentation (e.g. counting the shell route separately) could shift it by one or two.
 **Immaterial to the conclusion** — the margin to the ≤20 boundary is six.
+
+## 2026-09-06 — AC 8 counts diverge (26 v 25); narrowed to one bucket; placeholder hypothesis ruled out
+
+**Agent:** `team-lead-3`
+**Outcome:** The independent cross-check produced a **divergence**, not a confirmation.
+`sf3-124` reported **25**, I measured **26**. Narrowed it to a single bucket, ruled out
+`team-lead`'s hypothesis by measurement, and handed the reconciliation to `sf3-125` as five
+boundaries rather than eighty entries. **No code touched, nothing corrected in place.**
+
+**Withholding my number paid off, and this is the first time all session the discipline produced
+a divergence rather than agreement.** Had I handed `sf3-125` my 26, it would have reported 26 and
+the two methods' disagreement would never have surfaced. Worth stating the asymmetry plainly: a
+confirmatory cross-check costs the same as an independent one and tells you nothing — **one
+divergence in a day of cross-checks is a poor yield and the only kind that ever finds anything.**
+
+**Bucket-by-bucket, mine against `sf3-124`'s reported breakdown:**
+`profile_social` 8=8 · `platform` 6=6 · `identity` 5=5 · `notification` 1=1 · `home_shell` 1=1 ·
+**`play_places` 5 vs 4.** **Five of six agree exactly.**
+
+**That changes my reading of the cause.** `team-lead` proposed a definitional difference over
+"contiguous run". **I no longer think so:** a definitional difference would perturb several
+buckets, not isolate itself to one. Two independently derived segmentations agreeing on five and
+splitting on one points at a **single entry**, not a method.
+
+**`team-lead`'s `placeholder_screen` hypothesis ruled out by measurement.**
+`grep -c "^RouteBase get" lib/app/routes/placeholder_screen.dart` → **0**. It exports the class
+and no route getters, contributes to neither count, and never entered my mapping. Reasonable
+guess — a seventh file that is not a bucket is where an off-by-one would hide — but wrong, and
+said so with the command.
+
+**The hypothesis that matters more than the number.** My source is **the code as built** (each
+`_routes` identifier mapped to its defining module file). `sf3-124`'s per-bucket breakdown
+suggests it counted from **`KAN-123`'s mapping table** — intent. If those disagree on one entry,
+**a route landed in a different module than the mapping `qa` verified row by row.** Breaks
+nothing (golden green, criterion 3 at 4 imports), but it would mean the verified mapping and the
+built artifact have drifted by one row — **a finding separate from AC 8 and worth more than it.**
+
+**Handed to `sf3-125`:** the side-by-side table, my method stated so it can be attacked, and my
+five `play_places` run-start identifiers — `sportsGamesGameIdRoute`, `sportsVenuesVenueIdRoute`,
+`sportsExploreRoute`, `myVenueSubmissionsRoute`, `createGameRoute`. Asked it to report **which
+source it counted from** alongside the number, and to **stop and tell me** if code and mapping
+genuinely disagree rather than correcting anything — §4 rule 3 applies however obviously fixable
+it looks. Told it the withhold is overtaken by events since both numbers now circulate.
+
+**`po` gets one number with its method attached, not a bare figure two competent seats derive
+differently.** That is `team-lead`'s framing and it is right.
+
+**Immaterial to the gate either way:** 25 and 26 are both > 20, the flat-getter form was required
+on either count, no rework trigger fires, and the margin to the ≤20 boundary is five or six.
+
+**Not verified:** that `sf3-124` counted from `KAN-123`'s mapping — inferred from the shape of
+its per-bucket breakdown, not read from its report, which I have never seen. Whether my
+module-file mapping is what `T-056` intends by "bucket" — the two coincide for all six route
+modules, but the ruling defines neither term formally. Which of the five `play_places` boundaries
+is the divergent one; I narrowed to the bucket, not the entry.
