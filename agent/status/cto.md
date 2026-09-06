@@ -679,3 +679,36 @@ view; and `delete_my_account`'s `public, auth, extensions` is a **third** distin
 **Also ruled today (`d939a74`):** `KAN-128` AC 3 probes are authored by `senior-backend`, with
 falsifiability owned by `cto` — each probe demonstrated **failing** without the unique index before
 it counts as passing with it. `KAN-128` confirmed at 2 sittings.
+
+### Same day, fifth addendum — `T-055`: the payment path is dead code (`9715c93`)
+
+**Found while measuring something else.** `trgfn_payment_to_ledger:19195` reads
+`FROM public.bookings`; **that table does not exist** (`information_schema` returns only
+`payment_intents` and `venue_bookings`), and `:19195` is its only reference in the schema. plpgsql
+resolves names at execution, the trigger is `AFTER UPDATE OF status ON payment_intents` (`:30007`),
+and the exception aborts the UPDATE — **no payment can ever reach `succeeded`.**
+
+**The fix is not a rename:** `venue_bookings` has no `venue_id`; venue resolution must go through
+`venue_spaces`. A design question, its own ticket, larger than it looks. Reported to `po`.
+
+**What it invalidates, all of it mine and none of it a reversal:**
+- **`KAN-128` AC 3's concurrent probe cannot be authored against this function**, and a `bookings`
+  fixture would satisfy **my own falsifiability condition** (`d939a74`) while testing a relation
+  production lacks. **Necessary, not sufficient** — repaired by *the probe runs against the schema
+  as deployed; anything it creates is a row, never a relation.* Sent to `pm` marked urgent, ahead of
+  Shu authoring.
+- **`T-052` severity:** the platform-wallet bug has **never fired** — `:19211` is unreachable. Fix
+  stands; I described a prospective harm as present.
+- **`T-049` Invariant 4** describes unreachable code. Mechanism real, path dead — my own
+  mechanism-vs-observation rule, broken by me.
+- `financial_ledger`'s zero rows are **over-determined**.
+
+**`T-054` addendum:** `senior-backend`'s pseudonymisation option is **viable**; my objection was
+right but **mislocated** — the surviving identifier is **`payment_intents.user_id`**, a bare uuid on
+a table with **zero FKs** that no deletion path reaches. Two-table scope, not one column. Still
+`cpo`'s call; the objection to *deleting rows* is unchanged.
+
+**Method failure worth naming:** four seats read this function today and all four verified its
+inserts, keys, identity handling and security attributes. **None resolved its identifiers against
+the catalogue.** Recorded in `verification-lessons.md` as the converse of `G-013`: confirm the thing
+your source names is real.

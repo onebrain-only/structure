@@ -415,6 +415,112 @@ anonymize-`entity_id` option they'd relayed to me earlier was theirs, not `cto`'
 ruling that it's illusory stands. No action needed from `pm` — informational close-out only.
 KAN-130/131 confirmed at 2 sittings/ceiling 3; `po` can date once `cto` applies KAN-128.
 
+## 2026-09-06 — `cpo` ruled (`P-036`): retain `financial_ledger` permanently; real defect is
+three UI strings, not schema
+
+**`cpo` answered the retention half** (`P-036`, `DECISIONS.md:5052`), adopting `cto`'s `T-054`
+analysis rather than re-deriving it: retain `financial_ledger`, never delete or scrub —
+`T-054` Decision 1 is now permanent, not provisional. **Verified myself before relaying:**
+the `DECISIONS.md:5052` citation is exact, and all three quoted UI strings are verbatim
+matches — `account_management_screen.dart:1072`/`:1175`, `danger_zone_section.dart:373`.
+
+**The actual finding inverts the framing `team-lead-4` and I escalated with.** The corpus has
+neither side of the tension we assumed: no documented retention basis for any table (no
+period, no lawful basis on record anywhere), and separately no right-to-erasure obligation at
+all — `04` Article 11 names seven player rights and erasure isn't among them. What's real: a
+Right-to-Information gap — three shipped strings ("permanently deleted," "cannot be undone")
+that are true today at zero rows and become false the instant `financial_ledger` gets one.
+
+**Four action items from the ruling, zero SQL except the first is a budget question:**
+(1) PDPL legal retention-period review (`12b` §I.2 Flag 3, budgeted $25-50K, unspent) —
+`cpo` named this explicitly as "CEO's call, through you"; (2) the three strings rewritten
+EN+AR — `content-manager`/`po`; (3) `delete_my_account`'s comment states the retention
+position — `senior-backend`'s, per `team-lead-4`'s earlier routing, now has an actual
+position to state; (4) a privacy-policy retention clause live at a public URL before launch
+(`13b` §A.2).
+
+**What I did:** relayed the full ruling to `team-lead-4` (KAN-130 stays permanently at 2
+sittings, nothing to re-date), `cto` (confirmed his analysis was adopted whole), and `po`
+(the three strings + filing instructions + the four items). Routed the one CEO-level item —
+the PDPL budget — to `team-lead`, named as not urgent against any live deadline (the copy fix
+removes the immediate false-promise exposure; the retention period itself only matters once
+real rows exist) but real and worth surfacing rather than left buried in a ruling only this
+thread reads.
+
+**Not verified:** whether the Arabic strings mirror the three English ones, and whether a
+privacy policy currently exists at a public URL — `cpo` named both as unverified on their own
+end too; left for `content-manager`/`po` to check, not mine to chase.
+
+**Reported to:** `team-lead-4`, `cto`, `po` (the ruling itself), `team-lead` (CEO-level budget
+routing). Nothing further owed from `pm` on this thread — it is, as far as this seat's
+involvement goes, closed.
+
+## 2026-09-06 — Urgent stop: `trgfn_payment_to_ledger` is dead code, `senior-backend` halted
+before authoring KAN-128 AC-3 probes (`cto`, `T-055`)
+
+**Task:** `cto` found `trgfn_payment_to_ledger` references `public.bookings`, which does not
+exist, and flagged it as time-critical — it must reach `senior-backend` before AC 3's probes
+are authored, or the natural workaround (fabricating a `bookings` fixture) produces a probe
+that looks falsifiable while testing a relation production doesn't have.
+
+**Verified myself before acting, live and static, given the urgency:**
+`select table_name from information_schema.tables where table_schema='public' and
+table_name ~ 'booking|payment'` → only `payment_intents`, `venue_bookings`. `grep -n
+"public\.bookings" ` on the baseline migration → exactly one hit, `:19195`. Trigger definition
+at `:30007` confirmed as `AFTER UPDATE OF status ON payment_intents`. Consequence: the
+function throws on first execution before reaching any `financial_ledger` insert; the `AFTER`
+trigger aborts the whole status update; no payment has ever completed through this path.
+`financial_ledger`'s zero rows are over-determined, not just "D4 never activated."
+
+**What I did, in order of urgency:** messaged `senior-backend` directly and immediately to
+stop before authoring the `financial_ledger`/`trgfn_payment_to_ledger` AC 3 probes, with
+`cto`'s explicit warning against fabricating a `bookings` fixture to route around it.
+Then sent `po` the scope decision this creates (narrow AC 3 to `wallet_ledger` only, unaffected
+and reachable, or wait on a new ticket for the `venue_bookings`→venue resolution design
+question `cto` says is owed — not a rename, since `venue_bookings` has no `venue_id` column).
+Then told `team-lead-4` for awareness, noting their sizing/sequencing is untouched and this is
+specifically `po`'s scope call. Relayed `cto`'s three severity self-corrections (`T-052`'s
+platform-wallet defect never actually occurred — unreachable code; `T-049` Invariant 4's
+mechanism is real but the path can't execute; the zero-row count is over-determined) and the
+`T-054` revision (Shu's pseudonymization option is viable after all, scoped to
+`payment_intents.user_id`, still `cpo`'s call) as part of the same relay rather than separate
+messages, since they came bundled in `cto`'s report.
+
+**Not verified:** the `venue_spaces` join path `cto` named as the correct way to resolve a
+booking's venue — took his `venue_bookings` column list on trust (didn't independently query
+`information_schema.columns` for it) since the urgent action was the stop, not re-deriving
+the eventual fix.
+
+**Reported to:** `senior-backend` (the stop, first), `po` (the scope decision), `team-lead-4`
+(awareness). Awaiting `po`'s scope call before anything further is owed from `pm`.
+
+## 2026-09-06 — `cto` sequencing correction: `P-036`'s copy/comment items gated on `T-055`, no
+deadline on the PDPL budget item after all
+
+**`cto` closed on `P-036`** (agrees with `cpo`'s ruling, nothing to add) but flagged a
+sequencing consequence I hadn't drawn out myself: `financial_ledger`'s only writers are the
+three `trgfn_payment_to_ledger` inserts, and `T-055` (previous entry) means that function
+can't reach them. **Verified the one new piece myself:** `data_export_service.dart:930` is a
+comment mentioning `financial_ledger`, not a write — read it directly. So `financial_ledger`
+cannot receive a row until `T-055` is fixed, which means the three misleading strings stay
+true and the retention position stays moot until then.
+
+**What I did:** told `po` the copy fix and the `delete_my_account` comment (items 2 and 3 of
+`P-036`) are gated on `T-055`'s repair, not independent work to start now — `cto`'s
+recommendation is to sequence them together so the payment path doesn't get fixed the same
+day it quietly reintroduces the false promise. Also corrected what I'd told `team-lead`
+about the PDPL budget item: there is no implied deadline on it at all — the retention number
+is needed before a row exists, not before the strings are corrected, and the strings can be
+made accurate without a number. Sent that softening to `team-lead` directly rather than let
+my earlier framing stand as more pressing than it is.
+
+**Not verified:** did not re-check whether `T-055`'s eventual fix (the `venue_bookings` design
+question, still with `po` per the prior entry) has any timeline that would itself force these
+gated items back onto a schedule — that's downstream of `po`'s scope decision, not something
+to anticipate now.
+
+**Reported to:** `po`, `team-lead`. Nothing further owed from `pm` on this thread.
+
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 

@@ -357,3 +357,57 @@ mirror the EN three; whether a privacy policy exists at a public URL.
 SQL, copy, migration, git, Jira or Notion write. `T-051` and `T-054` untouched.
 
 **Reported to:** `pm` (ruling, to relay to `team-lead-4`, `cto`, `po`) and `team-lead`.
+
+---
+
+## 2026-09-06 — `P-036` re-asked and re-verified; one factual claim in it corrected
+
+**Task:** `team-lead` asked for the `financial_ledger` retention ruling. **It was already
+delivered by this seat today and is committed** — `P-036` in `DECISIONS.md` (rode in on
+`dabbler-docs` `9715c93`), entry above. The brief was dispatched before that report landed.
+I did not re-rule it. I did re-read the corpus independently, and the ruling holds:
+**retain, and disclose.**
+
+**What the independent pass changed.** `P-036` as written claimed *"No document in the
+corpus names a retention period, a lawful basis, or a financial-records exception for
+anything."* **The first clause is wrong and I have corrected it in place.** `11` service
+blueprint **v2** (`367d4c6dd86d80c6aacdc130d6c92027`) §I.4 does carry one:
+
+> *"Data retention policies (game data 7 years; analytics 2 years; logs 90 days)"*
+
+and the deletion SLA the ruling turns on: *"Deletion (14 days SLA)"*.
+
+**The gap survives in narrowed form, and is more useful narrowed:** three categories named,
+**financial/payment records not among them** — while the same document lists Stripe as a
+required integration and enumerates *"Payment records (split records, transactions, audit
+trail)"*. So the corpus has a retention policy with a financial-records-shaped hole, not an
+absence of one.
+
+**This answers `team-lead`'s question 2 — where it gets documented.** Not a new instrument:
+a **fourth bullet in `11` v2 §I.4**, beside the three that exist. **`po` writes it** —
+Notion is read-only for me. The period still comes from the PDPL legal review (`12b` §I.2
+Flag 3, unspent); `11` v2's existing *"game data 7 years"* is the customary commercial-books
+figure and the precedent that review will confirm or displace. **I assert no number.**
+
+**Second addition to the disclosure half:** `13c` requires declaring in Google Play Data
+Safety that *"users can delete their account + data in-app"* and *"Can users request data
+deletion? → Yes."* A second public artefact the three in-app strings must stay consistent
+with, alongside the privacy policy.
+
+**Re-confirmed and unchanged:** `04` Article 11 lists **seven** rights *"without exception
+and regardless of jurisdiction"* and **erasure is not among them** — Right 2 is visibility
+control, Right 3 portability. The erasure duty is regulatory/operational (`13b` P0-6, `13c`,
+`11` v2's 14-day SLA), never constitutional. No Permanent Truth or Non-Negotiable is touched
+by retaining an admin-only uuid. `cto`'s `T-054` untouched; both defective remedies adopted
+as `cto` stated them, not re-derived.
+
+**Not verified:** every migration fact (`financial_ledger`'s single FK at `:30583`, the
+trigger at `:19219`, `delete_my_account`'s cascade list at `:5257`–`:5302`, zero rows,
+`is_admin()` anon behaviour) — I read the schema lines and they match what was reported, but
+the live-catalogue and RLS measurements are `cto`'s and `pm`'s; whether the AR strings mirror
+the EN three; whether a privacy policy exists at a public URL today.
+
+**Changed:** this file and `DECISIONS.md` (`P-036` correction block, local only). No code,
+SQL, copy, migration, Jira, Notion write, push or PR.
+
+**Reported to:** `team-lead`.

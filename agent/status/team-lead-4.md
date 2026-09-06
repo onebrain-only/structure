@@ -962,3 +962,94 @@ at `po`'s request, that AC 2 item 3 now states **all three** `search_path` value
 Phase 0's landing test on my 1-sitting half of KAN-130.
 
 **Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — A retracted claim is live in KAN-128's AC 3. Flagged, not acted on, pending Shu's confirmation.
+
+**Caught in `team-lead-3`'s closing message and it is actionable on my own ticket.** Shu retracted its
+own concurrency reasoning while Khonsu was quoting it: **the thing under test is the unique index, not
+the trigger.** Two direct inserts sharing the key demonstrate it sequentially; concurrency-safety is
+inherited from the index rather than reproduced — which is why `T-049` chose a constraint over a guard.
+
+**Khonsu struck it from the skill. Nobody struck it from the ticket.** KAN-128's AC 3 still requires
+*"a CONCURRENT replay, not a sequential retry"* and says a sequential probe *"proves nothing about the
+defect this ticket exists to fix"* — **attributed to `senior-backend`/`team-lead-4` jointly.**
+
+**Reasoned it through rather than relaying it:** the `EXISTS` guard's raciness is how the *defect*
+manifests, not the *fix's* test surface. A unique index is unique by construction and Postgres enforces
+it at index insertion — **you do not prove a unique constraint by racing it.** Shu's original point
+survives in one narrow form only: going *through* the trigger sequentially teaches nothing because the
+guard absorbs it. Testing the index **directly** sidesteps the guard. Correct probe: two direct inserts
+into `financial_ledger` with identical `(payment_intent_id, entity_type, entry_type)`, second
+conflict-handled.
+
+**Asked Shu to confirm; told `po` explicitly DO NOT EDIT YET.** It reached me second-hand, and I
+relayed an unchecked option to `pm` this morning that `cto` then ruled illusory. **Not repeating that
+on a retraction of someone else's reasoning** — the stale-relay failure has hit in both directions
+today.
+
+**Why it matters beyond tidiness:** a concurrent-replay harness — two sessions interleaved to race a
+commit — is materially harder to author than two `INSERT`s, and that probe sits in **sitting 2**, which
+is exactly the open 1-versus-2 probe-ownership branch. Removing the concurrency requirement makes the
+branch's expensive side cheaper. **Does not move the `due_date`** — ceiling is 2 either way — but it
+changes what `cto` is deciding when it rules on probe ownership.
+
+**`team-lead-3` closed out `capacity-to-date`:** the deflation pairing was already committed (`e8750bd`)
+before my message — `team-lead` and I sent the same finding independently, which Khonsu read as a sign
+it is right. My caveat extension was new and taken: the deflation half is **Shu's, first-hand, on a
+different ticket, from a seat that is not a lead and never read the document as one** — a second source
+of a different kind rather than another instance of mine.
+
+**The third proxy arrived within the hour of Khonsu publishing *"expect a third proxy you have not
+met."*** The table is now **risk · volume · mechanism**, and the third is **the first found by the seat
+that made it rather than by a corrector.** Mine were both found by Shu.
+
+**Khonsu's pushback on my self-assessment, recorded because it is a fair correction:**
+> *"neither existed until you reported an error against a document you had no obligation to read that
+> closely — twice, unprompted, including one where the correction made your own earlier report look
+> worse. The proxy table exists because you were willing to be the worked example in it."*
+
+**Open:** Shu's confirmation on the retraction → then a `po` ticket edit · `cto` on probe ownership ·
+`cpo` on retention · Phase 0's landing test on my 1-sitting half.
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — `P-036`: retention settled permanently. KAN-130/131 fixed at 2 sittings. Two additions made.
+
+**`cpo` ruled (`P-036`, `DECISIONS.md:5052`):** **retain `financial_ledger`, do not delete or scrub.**
+`T-054` Decision 1 is now **permanent, not provisional** — **KAN-130/131 is fixed at 2 sittings,
+ceiling 3, for good.** `cpo` adopted `cto`'s technical analysis rather than re-deriving it.
+
+**The finding is the opposite shape from what `pm` and I escalated.** The corpus has **no documented
+retention basis** for any table — no period, no lawful basis — **and no right-to-erasure obligation
+either** (`04` Article 11 names seven player rights; erasure is not among them). **So the
+retention-versus-erasure tension we escalated does not exist in the corpus as written.** What does
+exist is three shipped strings promising *"permanently deleted"* / *"cannot be undone"* — true today
+at zero rows, false once `financial_ledger` holds one. **A Right-to-Information gap, not a data-safety
+one.** Worth recording plainly: I escalated a real defect under a wrong frame, and the frame was
+corrected two levels up.
+
+**Two additions I made to `pm`'s four action items, both ownership/timing rather than content:**
+
+1. **Item (2) needed a wiring owner, not just an author.** `pm` routed the strings to
+   `content-manager`/`po` — right for the copy. But both files are
+   `lib/features/profile/presentation/screens/settings/account_management_screen.dart` (`:1072`,
+   `:1175`) and `.../widgets/profile/danger_zone_section.dart` (`:373`), and **`CONTRACT.md:167` puts
+   `profile` with `senior-frontend-1` + juniors under `team-lead-1`.** So: `content-manager` writes
+   EN+AR → `senior-frontend-1` wires → **`team-lead-1` owes the capacity number, not me.** Same reason
+   I named Shu for item (3). All three strings verified verbatim rather than taken on citation.
+2. **The deadline is earlier than "before launch", and nobody had said it.** Item (4) is a `13b`
+   pre-launch requirement. **Item (2) is not — it inherits D4's clock, and D4 is mine.** The strings
+   go false when **a user who has paid then deletes**. You cannot control when someone deletes, so the
+   operative bound is the earlier one: **before the first real payment**, i.e. before D4's payment path
+   goes live. That makes item (2) the only one of the four tied to D4 activation rather than to launch,
+   and it should not sit behind item (1)'s PDPL legal review in a general pre-launch pile.
+   Noted it can run parallel to item (1): `cpo` has settled the *position* (retain), so the copy knows
+   what to say and waits only on how precisely to say it.
+
+**Not mine and correctly not taken:** item (1) PDPL legal review (CEO budget call, `pm` → `team-lead`)
+and item (4) the public privacy-policy clause.
+
+**Open:** Shu's confirmation on the AC-3 concurrency retraction → then a `po` ticket edit ·
+`cto` on probe ownership · Phase 0's landing test on my 1-sitting half of KAN-130.
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.

@@ -277,3 +277,42 @@ body is this seat's surface. One-liner, folds into whichever migration is live w
 **KAN-130 AC 2 item 3** now states all three `search_path` values explicitly, with the reason that
 beats mine: `delete_my_account` needs `auth` on its path to run `delete from auth.users`, so
 restating any other string **fails at runtime on account deletion, not at apply time.**
+
+### `T-055` stop signal verified — and it does not block the revised probe
+
+**Verified independently** against the baseline: `public.bookings` **does not exist** (no
+`CREATE TABLE`), and `:19195` is its **only** reference in the whole 39,291-line schema.
+`trg_payment_to_ledger` confirmed at `:30007` as `AFTER UPDATE OF status ON payment_intents`.
+`cto` is right: `trgfn_payment_to_ledger` raises at `:19195` before reaching any
+`financial_ledger` insert, and the trigger's exception aborts the status update. The function has
+never run.
+
+**The stop applies to the probe I already retracted, not to the one I replaced it with.** The
+blocked design was the *concurrent replay through the trigger* — which needs the function to run,
+hence the `bookings` fixture `cto` rightly forbids. My replacement is **two direct inserts into
+`financial_ledger`**. It never calls `trgfn_payment_to_ledger`, never touches `public.bookings`,
+and needs no fixture at all.
+
+**Measured, and this is what makes it fixture-free:** `financial_ledger` has exactly **one** FK —
+`financial_ledger_wallet_fkey` (`wallet_id` → `wallets(id)`, nullable, `:30583`). **`booking_id`
+and `payment_intent_id` have no FK**, so both take arbitrary uuids. The only other constraints are
+two CHECKs (`entry_type ∈ {debit,credit}`, `reason ∈ {booking_payment,refund,commission,payout,
+adjustment}`, `:22713`–`:22714`). Two `INSERT`s of literals satisfy everything.
+
+**So AC 3 need not narrow to `wallet_ledger` only**, and the `financial_ledger` unique index should
+stay in KAN-128: it is **not** a bare constraint — its three `ON CONFLICT DO NOTHING` clauses land
+in the same migration, which is what `T-049` Decision 2 requires — and it is free only while the
+table is empty. That is a recommendation to `po`, not my call.
+
+**The real consequence, which should not be lost in the unblocking:** KAN-128's three `ON CONFLICT`
+clauses on `trgfn_payment_to_ledger` are correct and **unexercisable in production**. Nobody should
+read a green KAN-128 as evidence that webhook replay is handled. **`T-049` Invariant 4 stays open**
+until the `venue_bookings`/`venue_spaces` ticket lands. Worth stating on the ticket so a future
+reader does not treat the invariant as closed.
+
+**Also flagged:** `T-051`'s "both writers are dead" now has a third sense — `fn_get_wallet`'s
+`venue`/`platform` call sites are inside this dead function. `T-051`'s reasoning is unaffected
+(that `user_id` cannot represent a venue is a design fact, not a runtime one), but `KAN-131`'s
+`:19211`/`:19231` fix lands in code that cannot execute until the same ticket lands.
+
+**No change to either count.** KAN-128 stays 2, KAN-130+131 stays 2.
