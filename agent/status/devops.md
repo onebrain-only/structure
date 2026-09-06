@@ -873,3 +873,29 @@ have commit/push authority over.
 file and the KAN-141-adjacent read-only review. `flutter analyze`/`flutter test` not
 re-run — no code changed in `dabbler-code`, only pre-existing uncommitted docs/script
 diffs were reviewed, not edited.
+
+## 2026-09-07 — Committed CONVENTIONS §12 + KAN-141 trio (dabbler-code, Canary)
+
+Seat confirmed: git author `dabblersport <244900353+dabblersport@users.noreply.github.com>` on `Dabbler/dabbler-code`.
+
+Two commits, not one — CONVENTIONS.md is unrelated to KAN-141 per cto's ruling:
+- `ead67fa` docs(conventions): §12a-§12f traps (cto's, unrelated to KAN-141)
+- `be442ac` fix(security): drop username_registry_public + list_active_usernames (KAN-141) — SCHEMA.md, check_anon_allowlist_test.sh, and the new migration `supabase/migrations/20260906210000_kan141_drop_list_active_usernames_and_public_view.sql`, all reviewed consistent.
+
+**Committed the KAN-141 trio; did not hold it.** cto's ruling that the three land "at
+apply time" is about the anon-allowlist gate going stale against a still-live view —
+that's a **push** hazard, not a commit hazard. Nothing about writing this to local
+Canary history touches production. Push is still withheld: repo is level with
+`origin/Canary`, and pushing this commit before the migration is actually applied
+would desync the CI allowlist from the live view (allowlist drops the name, view
+still exists and is still anon-readable in prod). Flagged loudly in the commit body.
+
+**What has to happen before this can be pushed:** per G-028, `backend-4` applies the
+migration after `cto`'s posted confirmation (cto never applies), then `cto` confirms
+it live against KAN-141. Only then is a push to Canary safe re: this trio — and a
+push is still a live deploy needing the CEO's go-ahead regardless.
+
+Not committed: `.claude/` (untracked, out of scope for this task, unrelated to
+KAN-141/CONVENTIONS).
+
+`flutter analyze` not re-run this pass — no Dart files touched (docs/SQL/shell only).
