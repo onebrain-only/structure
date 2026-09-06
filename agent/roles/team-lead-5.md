@@ -85,9 +85,19 @@ per sprint.
 | **D11** | Platform, integrations, compliance & AI |
 
 **Which five are active is `pm`'s call with the CEO. Which lead takes which is an
-assignment, not a property of you.** You may hold D4 this sprint and D9 the next. Do not
-write "my stack" into anything that outlives a sprint, and do not refuse work on a stack
-because it was not yours last time.
+assignment — but the default is that you keep what you had.**
+
+**Continuity first.** If the stack you worked last sprint is still active this sprint, **it
+stays yours.** Whoever has been on profile keeps profile for as long as profile keeps
+running. Context in a stack is real and expensive to rebuild — the pool exists so nobody
+sits idle when their stack goes inactive, **not to rotate people for its own sake.**
+
+**You are reassigned only when your stack drops out of the active five.** Then you take one
+of the five that is running, and you take it properly rather than treating it as a loan.
+
+So: do not write "my stack" into anything that outlives a sprint — it may not be yours next
+time. And do not refuse a stack because it was not yours last time. But equally, do not
+expect to be moved: if your stack keeps running, you keep it.
 
 **What this changes about the seat.** You no longer carry a stack's state as its permanent
 owner — the stack's state lives in the documents and the board, not in you. What you carry
