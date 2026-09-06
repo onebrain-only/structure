@@ -839,3 +839,36 @@ the two tickets for one review once the grant clears. Verified the CONTRACT.md c
 before acting on either.
 
 No file under Dabbler/dabbler-code/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 8) — KAN-132 transcription error corrected: landmine, not "not a landmine"
+
+`cto` caught that I inverted its own priority correction when transcribing T-053 into KAN-132's
+description — wrote "not a landmine" when the ruling says the opposite (IS a landmine, NOT a
+defect). Fixed the ticket text with cto's own suggested field wording. Distinction matters for
+a ticket sitting in To Do a while: "not a landmine" invites a later won't-fix close; "is a
+landmine, not a defect" correctly reads as harmless-until-touched. Urgency unaffected.
+
+Also confirmed via a fresh getJiraIssue read that KAN-129's status is To Do, closing out
+team-lead's message that crossed with my prior turn's work — nothing further needed there.
+
+No file under Dabbler/dabbler-code/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 9) — KAN-130's self-contradicting ordering bullet fixed
+
+`team-lead` caught a real inversion, more dangerous than the KAN-132 wording slip: KAN-130's
+"Not set" section said the migration must land "before" KAN-128's conflict-clause work while
+parenthetically stating "128 ships first" — both directions in one sentence, contradicting the
+already-correct Sequencing section above it. Fixed by making the bullet cite Sequencing rather
+than restate the direction (same "cite, don't restate" pattern already applied to KAN-124),
+so it structurally cannot invert again. Confirmed via re-read after the edit.
+
+Noted for my own practice: this is the third inversion caught today (SECURITY DEFINER, KAN-132
+landmine wording, this ordering bullet) — all correctly measured, wrong in the retelling, always
+where a fact was restated rather than cited. Prefer citing an existing section over repeating
+a fact in a second place going forward.
+
+No file under Dabbler/dabbler-code/ written, no git command run.

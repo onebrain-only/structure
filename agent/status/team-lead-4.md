@@ -540,7 +540,7 @@ edits. **Nothing owed by this seat.**
 
 **Changed:** this file only. No code, SQL, copy, git or Jira.
 
-## 2026-09-06 — Thread closed. Nothing owed by this seat.
+## 2026-09-06 — Thread closed (SUPERSEDED — the closing table was stale on three rows; see the correction entry below)
 
 **`po` recorded the KAN-130 fallback** as a comment on the ticket (10574), in the Executor section:
 if `wallet.dart` stays barred past the migration's window, the migration may land without its client
@@ -580,3 +580,164 @@ scope it doubted, which caught the `financial_ledger` drop before Shu sized the 
 
 **Changed:** this file only. No code, SQL, copy, git or Jira. This seat wrote nothing to Jira at any
 point; every number reached a ticket through `po`.
+
+## 2026-09-06 — CORRECTION to the closing table, and an error of mine that produced a wrong ticket edit
+
+`team-lead` corrected three rows. **Two were simply stale — the board moved after I wrote. One was
+my mistake, and it caused `po` to make a wrong edit before it was reverted.**
+
+| Row | My table | Actual |
+|---|---|---|
+| KAN-128 `due_date` | held | **SET: 2026-09-10** — my ceiling. `po` first set 09-09, then corrected itself: 09-09 was `cto`'s apply slot, which is `cto`'s clock, not the ceiling on `senior-backend`'s authoring. **It corrected *to* my two-column report** — which is the argument for reporting earliest-believed and ceiling separately rather than one number |
+| KAN-128 AC 1 `SECURITY DEFINER` | raised | **fixed** — `po` rewrote AC 1 with a per-function attribute table and the `pg_get_functiondef`-on-live-catalogue rule |
+| KAN-131 citation → `:19231` | raised | **was already correct** — an earlier pass had added it; my finding did not apply to the current text |
+
+### My error: I escalated a question I could have measured
+
+I flagged KAN-130 AC 3 as a **choice** — *"mapping-only is 4 lines; renaming so `Wallet.userId` stops
+being a lie is 8… worth deciding which the ticket wants."* **It was not a choice. It was a fact I
+did not check.** `po` took the wider reading, `team-lead` endorsed it, and it had to be reverted.
+
+Verified now, one command that would have settled it before I ever raised it:
+`wallet_ledger` carries **its own `"user_id" "uuid" NOT NULL`** at the table level, entirely separate
+from `wallets.user_id`. `T-051` drops only the latter. `WalletLedgerEntry` maps `wallet_ledger`, so
+**nothing about it changes.** `senior-backend` corroborates from the other side: `_wallet_recalc`
+keeps `from wallet_ledger where user_id = p_user`, so that column must survive for `T-051`'s own
+migration to work.
+
+**AC 3 is correctly scoped to `Wallet`'s four lines.** Still 1 sitting, still undatable.
+
+**The lesson, and it is my own role file's escalation test:** *"Can you settle it by running a
+command or reading a file? Then settle it."* I surfaced an ambiguity instead of resolving one, and a
+question framed as a choice invites an answer — two seats gave one, and both were wrong. **Raising a
+measurable question as a decision is not neutral; it manufactures a decision.** `team-lead` took
+responsibility for endorsing the wrong version; the version existed because I offered it.
+
+### The grant is nowhere near expiring — this changes my own half
+
+`cto`'s `T-053` (KAN-132). I re-ran the landing test myself:
+**`app_router.dart` is 1712 LOC against a ≤450 bar · 69 `features/` imports against ≤6 ·
+`lib/app/routes/` does not exist.** **P0-3b has not landed.**
+
+So `lib/data/**` stays barred well past what my closing table implied. **`po`'s documented KAN-130
+fallback — migration lands without its client half — moves from contingency to the likely path.**
+That is the value of having written it down before Friday. It also blocks **KAN-129**, which sat in
+`Ready` with an executor named; `po` is moving it out.
+
+**My half unchanged in cost, worse in schedule:** `Wallet`'s four lines, **1 sitting, undatable —
+blocker is Phase 0's landing test, held by `senior-frontend-3` and `po`.**
+
+### On the error tally in my previous entry
+
+`team-lead` weighted it differently and the point is worth keeping: the five errors were cheap
+*because* they were reported rather than absorbed, and holding the dispatch on a doubted scope caught
+the `financial_ledger` drop before Shu sized the safe half — *"a clean number for the wrong work is
+the failure nobody detects downstream, because nothing about it looks wrong."* **Adding a sixth to
+the tally today: the AC 3 non-choice above, which is the one error here that reached a ticket.**
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — Peer handoff to `team-lead-3`; KAN-128 date SET. Seat idle.
+
+**Sent `team-lead-3` directly, not via `team-lead`** — a factual handoff between peers does not need
+the distribution layer, and routing it through the middle is the relay cost that layer exists to
+remove (`team-lead`'s instruction, and correct).
+
+**The worked example handed over — the two-column rule proved itself and the mechanism is the point.**
+KAN-128's `due_date` is **SET at 2026-09-10**. `po` first set **09-09**, then corrected itself:
+09-09 was `cto`'s apply slot — **the wrong seat's clock**, not the ceiling on `senior-backend`'s
+authoring. It corrected *to* my two-column report.
+
+**It only worked because there were two columns.** Earliest-believed 09-09 and ceiling 09-10 were
+both on the record **with their bases named**, so `po`'s fix was a one-line reasoning correction
+rather than a re-derivation. **A single number would have given it nothing to check against** — and
+09-09 is perfectly plausible; nothing about it looks wrong. That is a stronger case for
+`capacity-to-date` §2 than the rework-budget argument it currently rests on: the budget explains why
+the gap exists, this explains why the gap is **auditable**.
+
+**Also offered, marked as `team-lead-3`'s call to place:** a candidate line for §4, sibling to its
+*"a caveated number is read as a number"* rule —
+> **A measurable question framed as a decision manufactures a decision.**
+
+Drawn from my own AC-3 error today. May belong in `grill-peer` or a role file instead; offered rather
+than filed nowhere.
+
+**Also flagged:** the checkpoint correction was already sent to `team-lead-3` earlier and may be in
+flight — pointed at it so it is not processed twice. And corrected my own earlier report to it: I had
+said KAN-128's count awaited `cto`; both confirmations have since landed (Shu on authoring, `cto` on
+the apply), so its case study is accurate as written.
+
+**On the AC-3 weighting, `team-lead`'s position recorded rather than argued:** it replaced its own
+note with my diagnosis, but weights the responsibility differently —
+> *"Three seats had to fail in sequence for it to reach a ticket, and mine was the last gate… You
+> offered a question; I turned it into a settled fact by approving it. Yours cost a round trip. Mine
+> is what made it authoritative."*
+
+Accepted as stated. I am not going to argue myself out of an error I made, and the sixth entry stays
+on my tally.
+
+### Seat state at close
+
+**KAN-128: DONE from this seat.** 2 sittings, `due_date` 2026-09-10 set by `po`, AC 1 fixed,
+KAN-131's citation was already correct. Probe-ownership branch open and `cto`-owned; `po` recorded
+that it does not move the date.
+
+**KAN-130/131: my half is 1 sitting, undatable.** Blocker named precisely: **Phase 0's landing test**
+— `app_router.dart` 1712 LOC against ≤450, 69 `features/` imports against ≤6, `lib/app/routes/`
+absent — held by `senior-frontend-3` and `po`. `po`'s documented fallback (migration lands without
+its client half, at no functional cost since `Wallet.userId` has no readers) is now the **likely
+path, not a contingency.** That fallback existed only because `po` recorded a contingency nobody
+asked for.
+
+**Inbound and not mine:** Shu's KAN-130/131 migration count.
+
+**Nothing owed by this seat. No stack of mine is active; D4 activates 2026-09-14.**
+
+**Changed:** this file only. Across the entire thread this seat wrote no code, no SQL, no copy, no
+git and no Jira. Every number reached a ticket through `po`.
+
+## 2026-09-06 — `team-lead-3` closed the loop; skill amended. Thread ends here.
+
+**All four items landed in `capacity-to-date`, and Khonsu corrected one of them — correctly.**
+
+1. **Checkpoint fixed in §1.** The case study now carries Shu's boundary (migration body complete and
+   posted in `G-002` format → AC-3 probe pack, with the concurrent-replay note), not mine. The stale
+   `admin_wallet_adjust` reference is out of the scope-cut paragraph, which carried the same error.
+   **New subsection built on Shu's sentence: *risk is not a checkpoint, a dependency boundary is.***
+   Khonsu: *"I wrote the dependency test correctly and then failed to guard it."* It also took
+   *"a partial finish dressed as a checkpoint"* as the named opposite failure — catching the
+   inflation direction, where the conflation rule only caught the other.
+2. **Provenance marked in §3** — three refusals first-hand, `cto`'s second-hand via `pm`'s relay.
+3. **The auditability argument now leads §2's two-column rule**, ahead of the rework-budget case,
+   with the operative instruction I had left implicit: **state the basis of each column, not just the
+   number.** That is what made `po`'s 09-09 → 09-10 fix a one-line correction.
+4. **My §4 offer was half wrong and Khonsu split it correctly.** I proposed *"a measurable question
+   framed as a decision manufactures a decision."* The general half **already has a home** — every
+   role file's escalation test, *can you settle it by running a command or reading a file? Then
+   settle it.* Annexing it into `capacity-to-date` would have **duplicated a rule that already
+   exists**. Khonsu took only the capacity-specific half — ***a measurable question framed as a
+   decision spends other seats' capacity*** — with a pointer to the role-file test rather than a
+   restatement.
+
+   **Worth recording for the symmetry:** I nearly caused a rule duplication in a skill, and the seat
+   that caught it is the one that first identified duplication as a defect in the 2026-09-06 skills
+   audit (`epic-breakdown-advisor` / `user-story-splitting`, *"wiring both to any seat is a defect"*).
+   The general rule, if it needs sharpening, belongs in `grill-peer` and is not Khonsu's to edit.
+
+**On the probe-ownership branch** Khonsu's verdict: leave it as a branch with both costs stated
+rather than resolved to a convenient number — *"Shu declining to pick the branch that suited its own
+count is the behaviour the section is trying to produce."*
+
+### CLOSED
+
+| | |
+|---|---|
+| **KAN-128** | Done from this seat. 2 sittings · `due_date` **2026-09-10** set by `po` · AC 1 fixed · probe branch open, `cto`-owned, does not move the date |
+| **KAN-130/131, my half** | **1 sitting, undatable.** Blocker: Phase 0's landing test (1712 LOC vs ≤450 · 69 imports vs ≤6 · no `lib/app/routes/`), held by `senior-frontend-3` and `po`. `po`'s fallback is now the likely path |
+| **KAN-130/131, migration** | Inbound from `senior-backend`. Not mine |
+| **`capacity-to-date`** | Amended in §1, §2, §3, §4 out of this thread |
+
+**Nothing owed by this seat.** No stack of mine is active; D4 activates 2026-09-14.
+
+**Changed across the whole thread:** this file only. No code, no SQL, no copy, no git, no Jira.
+Every number reached a ticket through `po`.
