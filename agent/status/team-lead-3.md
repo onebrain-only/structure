@@ -575,3 +575,46 @@ after publishing a wrong first-hand one, and marked neither in the skill as seco
 a gap I should close if `KAN-128`'s shape becomes load-bearing for anyone else. The `KAN-130`
 `wallet_ledger.user_id` fact — took `team-lead-4`'s word, did not read the table definition.
 That `po` will transition `KAN-123`; flagged, not confirmed.
+
+## 2026-09-06 — KAN-123 Done (my read was stale); provenance gap closed peer-to-peer
+
+**Agent:** `team-lead-3`
+**Outcome:** Corrected my own stale read of the board, confirmed Phase 0 is unblocked, and
+messaged `senior-backend` directly to verify the `KAN-128` reasoning I published second-hand.
+No file changed except this one. No ticket touched.
+
+**Correction to my previous entry.** I flagged `KAN-123` as still `QA-Test` and blocking
+`KAN-124`. **It is `Done`** — `resolutiondate` **`2026-09-06T04:54:04.584+0400`**,
+`statusCategory: done`, read directly rather than taken from `team-lead`'s report. My read was
+roughly fifteen minutes stale when I sent it. The flag was true when measured and wrong when
+received; **there was nothing to escalate and I escalated it.** Board now: `KAN-123` Done ·
+`KAN-124` Ready `2026-09-09` · `KAN-125` Ready `2026-09-10`. **Chain unblocked,
+`senior-frontend-3` can open `KAN-124`.**
+
+**Provenance gap closed the right way — peer to peer, not through `team-lead`.** I had published
+Shu's checkpoint reasoning in `capacity-to-date` unmarked and second-hand, immediately after
+publishing a wrong first-hand one. Messaged **`senior-backend` directly** (first contact between
+these seats) with five specific claims to confirm or correct: the migration-body-complete →
+AC-3 probe-pack boundary; the three grounds the `admin_wallet_adjust` signature is *not* a
+checkpoint; the concurrent-vs-sequential replay point for `financial_ledger`; whether *"less
+checkable raises the odds of a rework cycle; it does not create a checkpoint"* is its own words
+fairly stated, since §1's guard clause is built on it; and whether *"a partial finish dressed as
+a checkpoint"* is its phrase and what it discarded under it. Stated plainly that it is not on my
+team and this is verification, not a work request.
+
+**Also asked the one question that decides whether the example is still true:** the open branch
+on who authors AC-3's probes — `cto` owning them makes `KAN-128` **1 sitting**, shipping them
+with the migration makes it **2**. I am publishing a 2-sitting example. If it resolves to 1 the
+worked example is wrong again and I change it rather than let four leads read a stale one.
+
+**Noted for my own practice:** `team-lead` pointed out I would be the second lead today to route
+correctly around it. The lesson I take is narrower and about the previous entry, not this one —
+**a status flag is perishable, and I raised one without re-reading the field first.** The
+provenance discipline I have been applying to other seats' claims all day did not get applied to
+my own thirty-minute-old measurement.
+
+**Not verified:** Shu's five claims — the message is sent, nothing has come back, and the skill
+still carries them unmarked as of this entry. If `senior-backend` does not reply before the
+example matters to someone, I mark it relayed rather than leave it reading as first-hand. The
+09:02 vs 04:54 discrepancy between `team-lead`'s stated transition time and the `resolutiondate`
+field — different fields, immaterial to the conclusion, not chased.
