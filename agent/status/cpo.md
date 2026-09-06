@@ -247,3 +247,72 @@ and it cannot be improved independently of the file.
 It did not change these answers — the corpus section carries enough of the remit.
 
 **Handoff:** `team-lead` holds this survey. Nothing changed but this file.
+
+---
+
+## 2026-09-06 — The D4 fallback ruled: the premise is wrong, and the null field is in dead code
+
+**Task:** `team-lead` asked for a pre-decided fallback for the case where KAN-130's client
+half (`lib/data/models/wallet.dart`) cannot land before D4 activates Mon 2026-09-14 — three
+options offered: accept the null, hold D4, or amend `CONTRACT.md` §4.1.
+
+**Verdict: ACCEPT (option 1), and no window needs defining in days.** Two independent
+grounds, one strategic and one measured.
+
+**1. The date is not a money commitment.** D4 activating is a lead taking tickets. `13b`
+(`37dd4c6dd86d805f9602dc53bcd725f5`) P0-5 makes **payments dormant** a binding go/no-go
+criterion — *"`paymentsLive=false` confirmed; no real charge possible"* — and §A.2 states
+*"Phase 1A takes no real payments."* §I.3 puts booking activation at **Month 9**. Nothing
+in the corpus commits money movement to 2026-09-14. `02` Pillar 1 says the Venue
+Partnership layer activates *"Day One (Year 1, Q1)"*, which is the revenue *pillar*, not a
+build date, and it names no calendar date at all. **Noted as a new corpus contradiction:
+`02` "Day One" vs `13b` "payments dormant / Month-9 booking activation".** `02` outranks
+`13b` on precedence; neither yields 09-14.
+
+**2. Severity is nil, measured not inferred.** The field is `Wallet.userId` /
+`WalletLedgerEntry.userId`, `wallet.dart:6,28` and `:49,79`. **It has zero readers.**
+`grep -rn "\.userId" lib` returns only the two declarations and two constructor params.
+The only files importing `models/wallet.dart` are `wallet_repository.dart` and
+`wallet_repository_impl.dart`; **`WalletRepositoryImpl` is instantiated nowhere** — no
+provider, no controller, no screen, no test. `getWallet()` (`:20`) does not filter on
+`user_id`; it relies on RLS. Balances read `available_cents`/`balance_cents`
+(`wallet.dart:29`), untouched by the drop. `toMap()` writes `'user_id'` but nothing calls
+it — and an insert against a dropped column fails **loudly**, not silently. `T-049`
+measured all five money tables at **0 rows**. So: not user-visible, touches no balance
+anyone reads, reaches no money movement.
+
+**The window, stated as a condition rather than a date:** the null is acceptable until the
+wallet slice acquires its first reader — a provider, controller or screen. Whoever wires
+one is blocked on `wallet.dart` first. That is measurable by anyone and does not expire
+into an accident the way a date does.
+
+**Option 3 (amend §4.1) — ruled on, since nobody had.** Permitted, and wrong. `G-019` and
+`G-021` already amended §4.1 twice, so amendment is not foreclosed; the exclusion bars
+*other seats*, which is a different clause. But the grant is scoped to **five named
+tickets** — *"Work outside those five tickets is not covered by this grant, whatever path
+it touches"* — and KAN-130 is not one. Adding the file without adding the ticket grants
+nothing; adding the ticket converts a Phase 0 refactor grant into a general write licence
+and destroys `P0-1`'s golden test as evidence, which is the grant's whole purpose.
+**Recommendation: do not amend.**
+
+**Option 2 (hold D4) — rejected.** Holding a date to protect a field nothing reads is cost
+with no benefit. Had severity been real, the corpus's own answer is not "hold" but
+**contain**: `13b` §G.4, *"Risky features (booking, payments...) sit behind flags.
+Disabling = a config change, seconds, no redeploy."*
+
+**The corpus DOES address correctness-versus-date** — three passages, all pointing the same
+way: `13b` §C.1 *"When in doubt, hold"*; §G.3 *"Never apply a destructive migration (drop
+column/table) on launch week — use additive-only changes; deprecate later"*; Appendix C
+*"No schema changes except additive + reversible"* from T-7. So this is **not** a strategy
+gap. What the corpus does not address: how an internal engineering stack activation relates
+to those launch-window rules at all — §G.3 and Appendix C are scoped to launch week, and
+the corpus has no rule for a destructive migration outside it.
+
+**Not verified:** that `T-051`'s migration drops only `user_id` and touches no other column
+`wallet.dart` maps (`cto`'s domain, taken from the brief); whether `payouts.dart` or any
+other money model carries the same field (out of scope as briefed); the timing arithmetic —
+taken from `pm` and `team-lead-4` as measured, not re-derived.
+
+**Changed:** this file only. No code, SQL, copy, git, Jira or Notion. `T-051` untouched.
+
+**Reported to:** `team-lead`.

@@ -589,3 +589,66 @@ with the KAN-126 split as a task-analysis judgment call rather than an escalatio
 **Next:** `team-lead-4`/`senior-backend` owe KAN-128's confirmed sitting count and KAN-130's
 cost; `team-lead-1` owes KAN-129's date; `cto`/a lead owe KAN-132's executor; `qa` owes
 KAN-123's verdict, still blocking `KAN-124`.
+
+---
+
+## 2026-09-06 (continuation) — Outage recovery finished: KAN-123 → Done, KAN-128/130 factual fixes landed
+
+**Agent:** `po`. Picked up where the prior instance was killed mid-action (usage limit), per
+`team-lead`'s brief. Verified the prior instance's claimed work rather than redoing it; found
+all of it landed as described (KAN-126 rescoped/passed, KAN-128/129/130/131 rewritten and
+moved to Ready, KAN-132/133/134 filed, KAN-124's description fix confirmed at 04:38:44).
+
+**KAN-123 → Done.** The one blocking action left from the prior instance. Re-confirmed `qa`'s
+PASS (comment 10557) and addendum (comment 10560, six-route correction complete, no seventh)
+were still standing, then commented and transitioned (`41`). `KAN-124` is unblocked.
+
+**KAN-128 AC 1 fixed — was factually wrong, would have failed correct work.** The bullet
+claiming none of the five functions is `SECURITY DEFINER` was inverted. Re-verified myself
+against the baseline SQL independently of `cto`'s own correction (`DECISIONS.md` commit
+`3fbf2a4`): `admin_cancel_payout:2183`, `admin_wallet_adjust:2975`, `request_payout:10168`,
+`settle_game:17080` are all `SECURITY DEFINER`/`search_path=public`; only
+`trgfn_payment_to_ledger:19163` is not, and it alone carries `pg_temp`. Rewrote AC 1, added an
+"AC 1 — function attributes and grants" section (per-function table, the
+`pg_get_functiondef`-on-live-catalogue authoring rule, and the `admin_wallet_adjust`
+DROP+CREATE+explicit-`REVOKE FROM PUBLIC`+re-grant-`authenticated`/`service_role`-only
+requirement). Added the open question on AC 3 (who authors the four verification probes —
+`cto`'s call, not mine) and recorded the sitting count is settled at 2 (conservative branch)
+while `due_date` itself stays HELD on the still-unresolved Wed-09-09-vs-09-10 apply-date
+discrepancy `cto` flagged.
+
+**First edit attempt silently dropped AC 1's content** — a markdown table embedded inside a
+numbered list item caused the Jira markdown→ADF conversion to drop that whole list item and
+renumber the rest, with no error surfaced. Caught by re-reading the ticket immediately after
+the edit rather than trusting the tool's success response. Re-authored with the table and
+prose pulled out of the numbered list into a separate section, re-verified the full text
+landed intact on the second attempt. Flagging this as a standing risk for any future ticket
+edit that puts a markdown table inside a numbered AC item — pull tables out of list items.
+
+**KAN-130 fixed — two defects, both `team-lead-4`'s findings, both independently verified
+before writing:** (1) AC 2 item 3's `delete_my_account` now carries its own confirmed
+attributes (`SECURITY DEFINER`, `search_path=public, auth, extensions` — `auth` is
+load-bearing for `delete from auth.users`) plus the same `pg_get_functiondef` authoring rule,
+and items 5/6 (`_wallet_recalc`, `request_payout`) got their own confirmed attributes too. (2)
+AC 3's `wallet.dart` citation undercounted its own file — read the file myself and confirmed
+two `@immutable` classes (`Wallet`, `WalletLedgerEntry`) each independently declare and
+construct a `userId` field beyond the four mapping lines originally cited. Ruled the wider
+reading (rename the field in both classes, not just the map keys) since the narrower reading
+leaves the model holding a field named `userId` that silently carries a venue or platform id —
+a task-analysis call, not `cto`'s or product's, since the original criterion was ambiguous
+rather than wrong.
+
+**KAN-131's citation was already correct** — re-checked against the live ticket text and
+confirmed `:19231` was already named alongside `:19211` from the prior pass. No edit needed;
+`team-lead-4`'s finding on this point does not apply to the ticket as it currently reads (it
+may have been reporting on a state before the prior instance's edit landed).
+
+**Not verified in this pass:** the live `wallet.dart` external call sites `senior-frontend-4`
+would need to grep for the `.userId` rename (I read the file's own two classes but did not
+grep the wider tree for external readers of `.userId` — left as the AC's own instruction to the
+executor, not something I need to pre-verify to write the ticket). `cto`'s resolution of the
+apply-date discrepancy and the AC-3 probe-authorship question on KAN-128 — both still owed by
+`cto`, unchanged from the prior pass.
+
+**No file under `Dabbler/dabbler-code/` written, no git command run, `DECISIONS.md` not
+edited, no code or SQL authored.** All actions were Jira comments, edits and one transition.
