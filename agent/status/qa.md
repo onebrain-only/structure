@@ -276,3 +276,74 @@ into this file's reflex table as the first row.
 Left `Dabbler/dabbler-code` clean — `git status --porcelain` empty. Logs went to the job
 tmp dir, not the repo. Booted the iPhone 16 Pro simulator and the `Dabbler_test` emulator;
 both are still running.
+
+## 2026-09-06 — KAN-123 (P0-3a) verified: PASS, three cosmetic slips, one blocker in KAN-124
+
+Dispatched by `team-lead` as the QA-Test gate on KAN-123 after `po`'s acceptance-criteria
+gate. **Analysis-only ticket — no app launched, no build run, and none was needed** (AC-6 is
+"no `lib/` file modified"). Read-only throughout; `lib/app/app_router.dart` and
+`lib/utils/constants/route_constants.dart` are both clean in the working tree at `dbfc6bb`.
+
+**Verdict: PASS.** Deliverables are comments `10547` (collision sets) and `10548`
+(builder→slice), as corrected by `10551`. `10549` is open questions, since ruled.
+
+**Counts I ran myself** (`Dabbler/dabbler-code`, HEAD `dbfc6bb`):
+
+- `awk 'NR>=444 && NR<=1680' lib/app/app_router.dart | grep -cE '^    (GoRoute|StatefulShellRoute|ShellRoute)'` → **80**. `_routes` spans `:444`–`:1678`.
+- The 80 entry line numbers I extracted are **identical, in order**, to the 80 rows of 10547's table. No off-by-two drift — `po`'s gate said lines had shifted; they have not.
+- **Collisions computed mechanically, not read off the table.** Wrote a segment-wise matcher over all 85 resolved patterns (80 entries; the shell contributes 4 branch paths, `:972` contributes 2 nested children): **0 cross-entry collisions**, **1 intra-entry** — `/venue-submissions/create` vs `/venue-submissions/:submissionId` at `:972`, literal declared first. Exactly what 10547 reports.
+- Resolved **every** `RoutePaths.*` constant from the 212-line `route_constants.dart` (read whole, not grepped), built the 85 full paths, and diffed against `test/app/route_inventory.golden.txt` — **85/85 identical**. 10547's cross-check claim holds.
+- All 24 import lines cited in 10548 (`:13`–`:110`) verified line-exact. Spot-checked 12 builders by opening them, not by name.
+
+**Corrected distribution confirmed by tally over the table rows:** `identity` 28 · `platform` 18 · `profile_social` 27 · `play_places` 5 · `notification` 1 · `home_shell` 1 = **80**, one bucket each, no entry twice.
+
+**Three cosmetic slips, none changing an answer** — reported to `po` for `senior-frontend-3`:
+`RoutePaths.editGame` cited at `route_constants.dart:96`, actual **`:90`** (10547; same species
+as the `:129`→`:124` slip that `10551` already fixed, and not covered by it) · "1 segment — 44
+entries" in 10547's prose, actual **47** (the table rows are right) · `_PlaceholderScreen`
+cited at `app_router.dart:1681`, actual **`:1682`** (10548/10549/10551; §10.3 says 1682).
+
+**One real blocker, and it is not in KAN-123.** KAN-124's own description table still carries
+the **path-string carve-out** `features/{admin,error,misc}/, settings, help, about, /, /landing`
+for `platform_routes.dart`. `STACKS.md` §10.3 deleted that carve-out and replaced it with rules
+1 and 2, and now names `/landing` and `/settings/language` as `identity` and the twelve other
+settings/help/about routes as `profile_social`. **KAN-123's mapping matches §10.3; KAN-124's
+table contradicts it on 14 entries** — and following KAN-124 as written would put
+`features/profile/` imports inside `platform_routes.dart`, the exact cross-slice import the
+split exists to remove, breaking KAN-124's own ≤6-imports criterion. KAN-124 also does not
+mention the `_PlaceholderScreen` → `lib/app/routes/placeholder_screen.dart` move §10.3 now
+requires. `po` owns ticket text; sent there, not fixed.
+
+Also flagged: `po`'s gate comment `10550` cites `/sports/games/:gameId` at `:373` and
+`/game/:gameId` at `:423`. Real lines are **`:815`** and **`:865`**, unchanged from the ticket.
+The rest of `po`'s citations check out; the conclusion is unaffected.
+
+**Not verified:** whether `cto`'s ruling text on call C exists anywhere beyond §10.3's prose
+(10551 says the executor was never shown it) — §10.3 as written does resolve C, so nothing
+hangs on it · KAN-124's remaining acceptance criteria (LOC, analyze, test counts), which are
+that ticket's gate, not this one's · I did not re-run `flutter test` or `flutter analyze`;
+neither is in KAN-123's scope.
+
+**Addendum, same day — 10551's correction verified complete.** `team-lead` asked afterwards
+whether the six moved routes are correct *members* of the rule-2 category and whether a seventh
+of the same shape was left behind. I had graded against 10551 already but only by spot-check on
+`:1544`, so I enumerated instead of sampling: **every widget-construction site in `_routes` —
+84 of them** (83 via `child:`, plus `MainNavigationScreen` returned directly by the shell builder
+at `:748`), **63 distinct classes**, each resolved to its declaring file. Reconciles against 80
+entries: three are redirect-only (`:446`, `:878`, `:1369`), the shell contributes 5, `:972`
+contributes 3.
+
+Exactly **two** groups fall outside every `features/` slice: the six `_PlaceholderScreen` sites
+(`:1540`, `:1554`, `:1568`, `:1584`, `:1597`, `:1607` → entries `:1534`, `:1544`, `:1558`,
+`:1572`, `:1591`, `:1601`; class private at `:1682`) and the one inline `const Scaffold` at
+`:602` (entry `:597`). **There is no seventh — the correction is complete, not partial.**
+
+Resolved the four class≠filename cases to their declarations rather than their import lines,
+since that is where a rule-2 case would hide: `LandingPage` (`landing_screen.dart:83`),
+`EnterPasswordScreen` (`email_password_screen.dart:18`), `ProfileOnboardingWelcomeScreen`
+(`onboarding_scenarios/profile/onboarding_welcome_screen.dart:13`), `ExploreScreen`
+(`sports_screen.dart:373`) — all inside `features/`, all cited correctly by 10548. Also checked
+the two returns that bypass `child:`: the shell's `MainNavigationScreen` and a `CupertinoPage`
+wrapper at `:842` whose child is `NewsDetailScreen`. Neither adds a case.
+
+Posted as KAN-123 comment `10560`. Verdict unchanged: PASS.

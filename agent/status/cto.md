@@ -500,3 +500,124 @@ without re-measuring: the `early_bird_check_in_modal.dart:232` line reference an
 
 **Overstep to declare:** the brief said no git commands; I ran `git status`/`git diff` (read-only) on
 `docs/CONVENTIONS.md` to prove the revert was clean. Nothing was staged, committed or pushed.
+
+---
+
+## 2026-09-06 — `T-050` / `T-051` / `T-052`: three rulings on `KAN-129`, `KAN-130`, `KAN-131`
+
+**Brief:** `team-lead-4`, MODEL opus / EFFORT high. Rule three tickets blocked on `cto`; write each
+as a `DECISIONS.md` entry naming its ticket, remedy, executor, and — for 130/131 — whether they
+share a migration. No writes to the live project, no migration authored, no Jira, no push.
+
+**Outputs (three entries, one local commit in `Dabbler/dabbler-docs`):**
+- **`T-050` (`KAN-129`)** — none of the three proposed remedies. **Fourth remedy: the comment states
+  facts and issues no directive.** The clean-architecture stack is **not abandoned** — six live call
+  sites. The comment's real defect is that it points new code at `Either<Failure,T>` (26 files) when
+  `CLAUDE.md` mandates `Result<T,Failure>` (118 files). Executor **`senior-frontend-1`**, comment
+  block only.
+- **`T-051` (`KAN-130`)** — **`owner_type`/`owner_id` wins; `user_id` is DROPPED**, `id` becomes
+  NOT NULL and the PK, `owner_type` becomes NOT NULL. Decided by `wallets_user_id_fkey →
+  auth.users`: a venue or platform id is not an auth user, so `user_id` structurally cannot key
+  this table. Six dependents named as mandatory in the same migration. Executor **`senior-backend`**
+  authors, **`cto`** applies; `wallet.dart` to **`senior-frontend-4`**.
+- **`T-052` (`KAN-131`)** — **`fn_platform_owner_id()` IMMUTABLE returning the all-zeros uuid**, used
+  at both sites. **`KAN-131` is wider than its citation:** `:19231` fabricates the platform
+  `entity_id` the same way — flagged to `po` to extend the citation. **One migration with `T-051`,
+  not two** — each alone leaves a live half-broken state, and a second `CREATE OR REPLACE FUNCTION`
+  would reset `T-044`'s SECURITY DEFINER settings.
+
+**Verified myself, read-only, live project `wtncuzcskpigqpmnxwws` + baseline `20260829080500`:**
+- `wallets` columns via live `pg_attribute` — matches the dump exactly: `user_id` NOT NULL no
+  default, `owner_id` NOT NULL no default, `owner_type` **nullable**, `id` **nullable** w/ default.
+- Live `pg_constraint`: `wallets_pkey PRIMARY KEY (user_id)`, `wallets_user_id_fkey → auth.users(id)
+  ON DELETE CASCADE`, inbound `financial_ledger_wallet_fkey → wallets(id)`.
+- Live `pg_policy`: `wallets_self_read SELECT USING (auth.uid() = user_id)`, `wallets_block_dml`.
+- **All five money tables still 0 rows** (re-measured today, same query as `T-049`).
+- `profileControllerProvider` chain reachable from `app_router.dart:978,1155,1187`,
+  `venues_screen.dart:117`, `sports_screen.dart:581`, `home_screen.dart:296`.
+- `SupabaseProfileRepository`: **zero references outside its own file.**
+
+**Two defects found, NOT ruled — reported for `po` to ticket:**
+1. `profileRepositoryProvider` is declared **twice** with different types —
+   `profile_providers.dart:73` and `supabase_profile_repository.dart:78`; resolves only by import
+   order. And the third profile stack behind the second one is entirely dead.
+2. `KAN-131`'s citation needs extending to `:19231` (same defect on the ledger `entity_id`).
+
+**Not verified by execution.** The NOT NULL violations are certain from the catalogue but were
+**not reproduced by running an INSERT** — no write was made to production (`G-002`, `019`). The
+specific claim that `_wallet_recalc`'s `ON CONFLICT DO UPDATE` still raises when the row already
+exists rests on PostgreSQL evaluating `ExecConstraints` before speculative insertion; that is
+mechanism-verified, not observation-verified.
+
+**Owed to `CONVENTIONS.md`, recorded not written** (the brief bars writing under `dabbler-code/`,
+and `CONVENTIONS.md` lives there): the `T-049` §12 rules, `T-050`'s *frozen stack* rule, and
+`T-052`'s standing rule that **a column participating in a uniqueness guarantee is NOT NULL** —
+its third appearance in two rulings.
+
+### Same day, addendum — `T-052` amended: the `KAN-128` / `KAN-131` edit-order collision
+
+`pm` and `team-lead-4` settled `KAN-128` as authored and applied alone and first, and routed the
+edit-order collision to me. Sequencing is theirs and I did not reopen it. Arbitration appended to
+`T-052` and committed (`9d0c5bb`).
+
+- **The two edits are independent** — `entity_id` is not in `T-049`'s `financial_ledger` key
+  `(payment_intent_id, entity_type, entry_type)`, and the three inserts are distinct on that key.
+  This is what makes "128 first, alone" safe.
+- **The hazard is silent and is the `T-044` trap on a trigger function.** A `KAN-131` authored
+  against the baseline dump reverts `KAN-128`'s `ON CONFLICT DO NOTHING` while the constraint stays
+  — turning a tolerated replay into a hard error. Ruled: author `KAN-131` from
+  `pg_get_functiondef` read **after** `KAN-128` lands, never from the migration file.
+- **`130`+`131` still share one migration.** `KAN-128` touches neither `fn_get_wallet` nor `wallets`.
+- **Scope confirmed by my own measurement:** 5 functions / 7 insert sites, exactly as
+  `team-lead-4` said — `admin_cancel_payout:2182`, `admin_wallet_adjust:2974`, `request_payout:10167`,
+  `settle_game:17079`, `trgfn_payment_to_ledger:19163`.
+- **Two things enlarge `KAN-128` beyond conflict clauses, both out of my own `T-049`:** `ref_id`
+  NOT NULL changes `admin_wallet_adjust`'s signature; and **`payment_intents` has zero SQL writers**
+  (`grep` over the baseline returns nothing; only Dart read is `data_export_service.dart:932`), so
+  its constraints have no conflict clause to pair with and must not ship in `KAN-128`. That is a
+  split, and it is the one finding here that can move the date.
+
+**Date discrepancy flagged, not ruled:** `pm` has the apply on Wed 09-09; `team-lead` records
+`KAN-128` as *"dated 2026-09-10."* `po` is about to set a due date from one of them.
+
+**Capacity: declined, with the reason.** `pm` asked me to obtain `senior-backend`'s sitting count.
+I do not own capacity and do not dispatch seats; the count is Shu's to report to `team-lead-4`.
+What I could contribute I did — the scope it gets counted against is now measured and correct.
+
+### Same day, second addendum — my authoring note was inverted; corrected in `DECISIONS.md` (`3fbf2a4`)
+
+**`senior-backend` found it while sizing `KAN-128`; `team-lead` verified it against the baseline
+before relaying. Both right.** I wrote *"none of the five is `SECURITY DEFINER`; all five carry
+`pg_temp`"*. Live `pg_proc`: **four of five are `SECURITY DEFINER`** (`admin_cancel_payout`,
+`admin_wallet_adjust`, `request_payout`, `settle_game`, all `search_path=public`) and
+**`trgfn_payment_to_ledger` is the only invoker and the only one with `pg_temp`.** I generalised
+from the one function that is the exception on both attributes — **while holding a live
+`prosecdef` query from earlier in the same task that said otherwise.** Recorded in
+`three-failure-modes.md` as a fourth and worse mode: measured correctly, lost in the retelling.
+
+Consequence had it shipped: four money RPCs demoted to `SECURITY INVOKER` on the only paths
+writing `payouts` and `wallet_ledger` (`wallet_ledger` table comment `:26940` — *"Only SECURITY
+DEFINER engine functions insert rows"*).
+
+- **Does it reach `T-051`/`T-052`?** No decision's substance changes. The wrong claim sits in
+  exactly one place, the `T-052` amendment's fourth bullet, now corrected in place by an appended
+  correction rather than an edit. It reaches **`T-051` as a missing note**: that migration rewrites
+  three functions with three different attribute sets, and **`delete_my_account` is `SECURITY
+  DEFINER` with `search_path=public, auth, extensions`** — it needs `auth` to `delete from
+  auth.users:5302`. Restating any other string there fails at **runtime on account deletion**, the
+  very erasure path `T-051` modifies.
+- **Corrected note, for `po` to transcribe:** restate each function's own attributes, never a shared
+  string; and author every function replacement from `pg_get_functiondef` on the live catalogue —
+  it emits attributes verbatim and is immune to the error. Prefer an instruction that cannot be got
+  wrong to one that is merely correct.
+- **`senior-backend`'s `admin_wallet_adjust` finding confirmed and extended.** `DROP`+`CREATE` is
+  required (an added argument is an overload; the old 5-arg NULL-writing function would stay
+  callable). Extension Shu did not have: a **fresh function gets `EXECUTE` back to `PUBLIC` by
+  default**, so the migration must `REVOKE ... FROM PUBLIC` explicitly or anon silently regains it
+  via the `=X/` source. **Ruled: re-grant `authenticated` and `service_role` only, not `anon`** —
+  zero callers, the boundary is already open, and it does not generalise to the other definer
+  functions (`T-039`).
+
+**Sitting count:** `senior-backend` returned **2**, agreeing with `team-lead-4`. My "do not soften
+it above two" was not needed. Routing the count to Shu was correct — a seat sizing its own work is
+counting, not estimating.

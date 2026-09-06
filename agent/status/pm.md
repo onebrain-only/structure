@@ -10,6 +10,271 @@ still gets one.
 
 # LOG
 
+## 2026-09-06 — Queue verdict: KAN-128 dated 2026-09-10 holds; KAN-128 authored alone, first, not bundled with KAN-130/131
+
+**Task:** `team-lead` asked me to weigh `senior-backend`'s queue against `team-lead-4`'s
+proposed `due_date` for KAN-128 and take a sequencing position on bundling it with KAN-130/131.
+Decision-only, no ticket/code/SQL written.
+
+**What I did:** pulled the live Jira board myself (`project = KAN AND statusCategory != Done`,
+12 open issues, cloudId `18c8e9f5-d139-4e03-b5d8-89122cc14937`), read KAN-119/128/129/130/131
+in full, read `T-049` (`DECISIONS.md:6090`), `CONTRACT.md` §4.1 and its exclusion table, and
+`STACKS.md` §10.0. Independently verified `G-018` Ruling 2 (`DECISIONS.md:~5679`) rather than
+taking `team-lead-4`'s citation on trust — confirmed accurate.
+
+**Queue state (measured):** nothing ahead of KAN-128. Of the 12 open tickets, only
+KAN-128/130/131 touch `senior-backend` at all. KAN-120/123/124/125/126 are Phase 0, exclusive
+to `senior-frontend-3` — `senior-backend` is explicitly named free to run `supabase/**` work in
+parallel by both `CONTRACT.md` §4.1's exclusion table and `STACKS.md` §10.0. KAN-129 names no
+backend writer. KAN-119 (QA-auth blocker) is `To Do`, unassigned, undated, and owned by `cto`
+(route ruling) + `qa-tester` (implementation) — not a committed backend item, so it does not
+compete. `agent/status/senior-backend.md` shows one entry, a read-only survey, closing "no
+follow-up owed." `CONTRACT.md` §3 confirms no other project is staffed, so no cross-project
+draw on the seat either.
+
+**Verdict on the date:** **2026-09-10 stands** — no queue contention displaces it, and
+`team-lead-4`'s capacity breakdown (author 2 days / `cto` applies 1 day / review+rework 1 day /
+3 days deliberate slack before the 2026-09-14 window shuts) is the lead's call, not mine to
+re-derive. Flagged one correction to what the date proves: `G-018` Ruling 2 (no push off One
+Brain) sits above the `main` freeze (`P-030`) and means the Canary deploy leg of `T-049`'s
+execution chain cannot run right now — 09-10 is "migration authored, applied to
+`wtncuzcskpigqpmnxwws` by `cto`, committed locally," not a verified Canary deploy. Told
+`team-lead-4` to make sure `po` writes the due date's definition of done against that, not
+against the Canary leg.
+
+**Sequencing:** agreed with `team-lead-4`'s position — KAN-128 authored and applied alone,
+first, not bundled with KAN-130/131. KAN-128 is ruled and time-boxed; KAN-130/131 are neither
+(KAN-131's own ticket text says it "depends on KAN-130... being resolved first," and KAN-130
+is still awaiting a `cto` wallet-design ruling). Bundling would make a ready, time-boxed fix
+wait on rulings that don't exist yet, eight days before the window shuts — the exact failure
+`T-049` exists to prevent. `T-049`'s "one migration" language binds KAN-128's own constraint
+and its `ON CONFLICT DO NOTHING` together; it does not fuse all three tickets. The one real
+collision — both KAN-128 and KAN-131 edit `trgfn_payment_to_ledger` — is `cto`'s to arbitrate
+on edit order, not a queue question; flagged it to be raised alongside the KAN-130/131 ruling
+request rather than reopening `team-lead-4`'s sequencing call.
+
+**No disagreement to report to `po`.** Both questions `team-lead-4` asked me (is KAN-119
+landing on `senior-backend` this week; does another project hold the seat) answered no, cited
+above.
+
+**Not verified:** I did not re-measure `team-lead-4`'s function-body/insert-site count (5
+functions, 7 insert sites) against the migration file myself — took the file:line citations as
+given since the sizing call is the lead's, not mine. Did not ask `cto` to confirm the
+`trgfn_payment_to_ledger` edit-order question myself; flagged it as owed rather than answered.
+
+**Reported to:** `team-lead` (task assigner) and `team-lead-4` (verdict delivered directly, per
+brief), via `SendMessage`.
+
+**Addendum, same day — buffer correction and an ask escalated to `cto`.** `team-lead-4`
+corrected their own slack claim: 2026-09-12/13 are the weekend (2026-09-06 confirmed Sunday),
+so the real margin behind the 09-10 date is **one working day (Fri 09-11)**, not three. Date
+unchanged — pulling it to 09-09 deletes the review day rather than buying margin. But one
+working day of recovery is thin against a hard 09-14 given `cto` is concurrently ruling
+KAN-130/131 the same week, so I sent `cto` a direct request to commit to applying KAN-128's
+migration on **Wednesday 2026-09-09 specifically**, rather than best-effort alongside those
+rulings, and folded in `team-lead-4`'s `trgfn_payment_to_ledger` edit-order finding (128's
+edit is additive, 131's is an identity change — 128 should land first) for `cto` to settle
+alongside the KAN-130/131 rulings. Awaiting `cto`'s answer; will relay to `team-lead-4` and
+`po` once it lands rather than let 09-10 stand on an assumed apply slot.
+
+**Second addendum, same day — a gap the `capacity-to-date` skill caught in my own review, not
+in `team-lead-4`'s.** The skill's §3 rule: sizing a shared single-writer seat's work is
+estimating, not counting — a lead reports cost and no date for a seat it doesn't own the queue
+for. `team-lead-4`'s Mon–Tue "author" window for KAN-128 sizes `senior-backend`'s work; Shu
+never reported that sitting count, `team-lead-4` estimated it, and I endorsed the resulting
+date without catching that this specific piece wasn't theirs to size. Sent a follow-up to
+`cto` (senior-backend's reporting line) to confirm the real sitting count for authoring
+KAN-128 rather than accept the estimate, and told `team-lead-4` plainly what I'd missed. If
+`cto` confirms 2 sittings, 09-10 stands as-is; if not, it moves before `po` sets it. My
+Wednesday-apply-commitment ask to `cto` (first addendum, above) was already the correct move
+under this same rule — getting the owning seat to commit rather than accepting an estimate —
+I just hadn't applied it consistently to both halves of the chain.
+
+**Third addendum, same day — date withdrawn; queue answers reconfirmed; refined ask sent to
+`cto`.** `team-lead-4` withdrew 2026-09-10 entirely (correctly) and replaced it with a sitting
+count for `senior-backend` to confirm: 2 sittings (sitting 1 mechanical/enumerable — 3 indexes
++ `ON CONFLICT DO NOTHING` on the enumerated sites in 4 named functions; sitting 2 gated on a
+signature change to `admin_wallet_adjust` for the `T-049`-required caller-generated
+`ref_id` uuid), plus 1 apply hand-off (`cto`) and 1 acceptance gate (`po`), counted separately.
+Re-asked their three narrower questions and answered from what I already had — KAN-119 still
+not landing on Shu (unassigned, undated, owned by `cto`+`qa-tester`); no other project holds
+the seat (`CONTRACT.md` §3). On "ask Shu for its own number": routed to `cto` rather than to
+Shu directly — same rule `team-lead-4` corrected themselves on binds me too, and Shu reports
+through `cto`. Sent `cto` the exact 2-sitting breakdown to confirm or correct, in the shape
+`devops` used on KAN-126. Sequencing (128 alone, first, 131 rebases) unchanged and doesn't
+depend on the date question. Flagged the skill-wiring/`WORKFLOWS.md:58` pointer gap to `po`
+as a housekeeping item rather than deciding doc ownership myself.
+
+**Fourth addendum, same day — `cto` responded: apply commitment given, scope split found, my
+"concurrent rulings" premise was stale.** `cto` committed to applying KAN-128 Wednesday 09-09
+(one sitting, gated on the migration being in hand, not on his capacity) and noted T-050/
+T-051/T-052 (KAN-130/131's rulings) are already committed today, 2026-09-06 — my earlier
+"concurrent with 130/131 rulings" risk no longer holds. He also surfaced a real scope defect
+I verified myself before relaying: `payment_intents` has **zero writers anywhere in the
+repo** (grepped `supabase/functions/**` and `lib/**` myself — confirmed exactly: no SQL
+insert, no edge-function reference, only a config constant and one read in `lib/`). Consequence:
+KAN-128's `payment_intents` unique-key half can't ship this round — a bare constraint with no
+insert site to attach `ON CONFLICT DO NOTHING` to is the exact failure `T-049` Decision 2
+forbade. `cto` ruled it holds until a writer exists. He confirmed `team-lead-4`'s 5-function/
+7-insert-site scope exactly, with line numbers, for `wallet_ledger` alone, and declined (rightly,
+under `G-025`) to produce Shu's own sitting count himself. Relayed the scope split, the
+confirmed line cites, and `cto`'s KAN-131-authoring rule (must read `pg_get_functiondef` after
+128 lands, never the migration file, or it silently reverts 128's `ON CONFLICT`) to
+`team-lead-4`. Flagged the scope split to `po` directly since it changes what the ticket
+covers and is `po`'s to re-scope, not mine. Also told `cto` the 09-10 figure he saw was the
+stale original brief, not a live second date — nothing for him to reconcile. Ball is with
+`team-lead-4` to get Shu's actual sitting count against the corrected, narrower scope.
+
+**Fifth addendum, same day — `team-lead-4` confirmed convergence (crossed messages), no
+outstanding disagreement.** `team-lead-4` had independently withdrawn the date to `po` on the
+same estimation grounds ~20 minutes before my flag landed — both of us caught it from opposite
+ends. They verified my two load-bearing citations themselves (`CONTRACT.md:117-118` one-seat-
+per-project; `senior-backend.md:141` Up→`cto` escalation) rather than trusting me, both exact.
+They also read KAN-131 in full and found the pairing is naturally 130+131 together, with 128
+the one never in that group — a stronger version of the sequencing position than either of us
+had argued, and I confirmed it's consistent with `cto`'s ruling. Their message crossed with
+`cto`'s scope-split answer, which I'd already relayed one message earlier (fourth addendum,
+above) — resent the summary so nothing is missed, and checked their two new citations myself
+(`senior-backend.md:141`, `:63`/`:93`) before confirming them, exact as stated. Two items
+`team-lead-4` is carrying forward and I am not acting on: KAN-130/131 due dates are theirs to
+size once `cto` rules (unsizeable now — the skill's own "fact does not exist yet" case), and
+the `trgfn_payment_to_ledger` edit order is `cto`'s call, now actually settled by his answer.
+Nothing outstanding on this thread from either of us; waiting on `team-lead-4` to return with
+Shu's sitting count.
+
+**Sixth addendum, same day — my own relay had a scope error; `team-lead-4` caught it.** I had
+compressed `cto`'s split as "wallet_ledger + the five named functions," which is
+self-contradictory: `trgfn_payment_to_ledger` (one of the five) writes its three inserts into
+`financial_ledger`, not `wallet_ledger`. `team-lead-4` flagged it before dispatching to Shu
+rather than acting on a scope that silently dropped `T-049` Invariant 4 — the one invariant the
+ruling says is *currently failing*. Verified their citation myself against the migration file
+before doing anything else: `:19215`/`:19226`/`:19237` exact, three distinct
+`(entity_type, entry_type)` pairs under the ruled key, `financial_ledger` carries three plain
+btrees and no unique index (`idx_ledger_payment:28701` is the one `T-049` named as the failing
+guard), and unlike `payment_intents` it has live insert sites to attach `ON CONFLICT DO
+NOTHING` to. `cto`'s stated reason for cutting `payment_intents` (no insert site) doesn't reach
+`financial_ledger`. Sent `cto` a one-line confirmation ask rather than let `team-lead-4` assume
+it. Sitting count is unaffected either way, per `team-lead-4`'s own correct read: the checkpoint
+is the `admin_wallet_adjust` judgement, not DDL volume — cutting `payment_intents` shifts the
+mechanical volume down, not the sitting count. Also authorized `team-lead-4` to brief `Shu`
+directly for this ticket rather than route through me, since `cto` already opened that channel
+by declining to size the work himself — scoped to this coordination, not a standing change to
+`team-lead-4`'s talk-to list.
+
+**Seventh addendum, same day — `cto` corrected my routing premise and gave three sitting-shape
+corrections; closed out 09-09/09-10 for good.** I had told `cto` I was asking him rather than
+Shu directly because "senior-backend reports through you" — wrong premise, accepted the
+correction: `senior-backend` is a shared seat under no lead; `cto` holds apply authority only,
+not a managerial hop, and relaying a capacity question through him would recreate the hop the
+routing table removes. Conclusion unchanged (I'd already told `team-lead-4` to ask Shu
+directly, for a different reason) but the reasoning was wrong and worth recording correctly.
+`cto`'s three corrections to the sitting shape, each checked before relaying: sitting 1 is 2
+index creations, not 3 (`payment_intents` cut removes one I still had in); six conflict-clause
+sites, not seven (`admin_wallet_adjust:2982` alone in sitting 2, confirmed by my own
+`grep -rl "admin_wallet_adjust" lib/ supabase/` — zero callers, only the migration file and an
+archived schema-fix file); sitting 2 therefore carries no caller migration, only the
+uuid-origin decision. Relayed a guardrail (`_wallet_recalc` is AED-only by construction, not
+KAN-128's to fix) and a verified non-finding (`admin_wallet_adjust`'s `anon` grant is real at
+`:34693` but the `is_admin()` guard blocks it — took `cto`'s live DB verification on trust,
+checked the static grant myself) to `team-lead-4` for their log. Told `cto` definitively: no
+live "09-10" exists, `team-lead-4` withdrew it, `po` holds the field open — his Wednesday
+apply commitment stands independent of whatever `po` eventually calendars.
+
+**Eighth addendum, same day — thread closes: scope confirmed, my own read-authority error
+corrected and independently re-verified, `team-lead` resolved the sitting-count deadlock.**
+`cto` confirmed `financial_ledger` stays in KAN-128 (only `payment_intents` cuts), gave the
+final two-unique-index shape (`wallet_ledger (ref_type, ref_id, direction)`;
+`financial_ledger (payment_intent_id, entity_type, entry_type)` partial), and flagged the
+partial predicate's null-opt-out trap for the index comment. Relayed to `team-lead-4`.
+Separately, `cto` corrected a real error of mine: I'd told him I had "no DB read authority"
+to verify `is_admin(null)` and took his live check on trust. Wrong — `CONTRACT.md:74/241`:
+read is open to every seat except `qa` (NO READ), and I'm not `qa`. Checked the contract text
+myself, then ran `select public.is_admin(null::uuid), public.is_admin();` against
+`wtncuzcskpigqpmnxwws` directly — `false, false`, matching `cto`'s report exactly, now
+independently confirmed rather than inherited. Lesson for myself: I have full read authority
+on this project and should be using it to verify rather than defaulting to trust on anything
+checkable.
+
+`team-lead` then closed the sitting-count deadlock: `team-lead-4` (under `CONTRACT.md` §3),
+I (by extension of the same rule), and `cto` (under `G-025`) had each correctly *declined* to
+size `senior-backend`'s work, which left nobody positioned to *ask* for it — a structural gap
+in how the rule was being applied, not a mistake by any of the three. Resolution: a seat
+sizing its own work is capacity, not estimation, so `team-lead` went direct to Shu. Told
+`team-lead-4` to stand down; told `team-lead` I'd relayed that and that the gap is worth
+`team-lead-3` folding into `capacity-to-date` (not mine to edit). `cto` also confirmed
+`T-050`/`T-051`/`T-052` already rule KAN-130+131 as one migration landing after 128, so their
+due-date question (once it returns to `team-lead-4`) is now a sitting count against a defined
+shape, not an open design question.
+
+**Final state:** no `duedate` on KAN-128. `senior-backend` sizing its own work directly to
+`po`, copying `team-lead-4` and me. Nothing further owed from this seat until that number
+lands or `po` acts on the scope split already flagged to them.
+
+**Ninth addendum, same day — `senior-backend`'s count copy confirmed 2 sittings
+(ceiling 3), matching `team-lead-4`'s figure; two ticket defects found and flagged to `po`.**
+Shu sized its own work: 2 sittings (ceiling 3, the third a rework cycle) plus 2 gates
+(`po`'s AC-3 review, `cto`'s apply) — no date, correctly. Pulled the live KAN-128 text myself
+to check two things Shu raised before relaying either as fact:
+
+1. **AC 1's `SECURITY DEFINER` claim is wrong, verified directly against the migration
+   file.** It says none of the five functions is `SECURITY DEFINER`. Checked all five:
+   `admin_cancel_payout:2183`, `admin_wallet_adjust:2975`, `request_payout:10168`,
+   `settle_game:17080` all carry `LANGUAGE plpgsql SECURITY DEFINER` with
+   `SET search_path TO 'public'` (no `pg_temp`); only `trgfn_payment_to_ledger:19163` lacks
+   `SECURITY DEFINER`. The AC generalized from checking one function of five — followed
+   literally, it would demote four money RPCs to `SECURITY INVOKER`. Flagged to `po` for
+   correction, plus Shu's note that `KAN-130`/`KAN-131` cite the same functions and may have
+   inherited the identical claim (unverified by either of us).
+2. **The ticket's "pm and team-lead disagreed on apply date" note (comment `10558`) is
+   stale, not open** — it's from the original brief that opened this whole thread, already
+   closed out directly with `cto` (his own words: "closed... your account is better than
+   mine"). Flagged to `po` to remove as a resolved non-issue rather than leave it reading as
+   an unresolved disagreement.
+
+Also independently verified `is_admin(null)` = `false` against the live project earlier this
+thread (see eighth addendum) using read authority `cto` correctly pointed out I have and I'd
+wrongly assumed I didn't.
+
+**Thread genuinely closed.** No `duedate` set; sizing, scope, and sequencing all confirmed by
+the seat doing the work; two ticket-text defects hand off to `po`. Nothing further owed from
+`pm`.
+
+## 2026-09-06 — Escalation: KAN-130's client half collides with the Phase 0 grant, zero slack
+against D4's 2026-09-14 activation
+
+**Task:** `team-lead-4`, sizing KAN-130/131 per `team-lead`'s direct-to-`senior-backend`
+resolution above, found a real permission collision rather than a measurement gap: KAN-130's
+client half (`lib/data/models/wallet.dart`) needs editing so a money-model field doesn't go
+silently null, but `lib/data/**` is barred to every seat but `senior-frontend-3` under the
+Phase 0 exclusive grant (`CONTRACT.md` §4.1), and `wallet.dart` isn't one of the 10 files that
+grant already covers — barred to `senior-frontend-3` too. Escalated to me rather than worked
+around.
+
+**What I checked before escalating further:** Phase 0's actual ticket state, not assumed. On
+schedule, not slipped: `KAN-123` `QA-Test` against 09-07 ceiling, `KAN-124` `Ready`/unstarted
+at 09-09 ceiling, `KAN-125` `Ready` at 09-10 ceiling. If all three land on schedule and `po`
+transitions all five Phase 0 tickets to Done same-day, the grant expires 09-10 and KAN-130's
+client half gets exactly **one day (Friday 09-11)** before D4 activates Monday — the same day
+already absorbing Phase 0's own rework buffer.
+
+**What I did:** told `team-lead-4` their reading is right (not pushing `analyst` for a grant
+exception; §4.1 forecloses it explicitly) and that the schedule, while not yet broken, has
+zero margin. Escalated to `team-lead`: this is a live contingency, not yet a failure, and
+`cto`/`cpo` should pre-decide the fallback (accept a silently-null field for a short window
+post-activation, or hold D4's Monday date) before Friday rather than discover it that day.
+Did not decide the fallback myself, did not ask for a grant exception, did not move D4's
+activation date — all three are calls for other seats. Offered `team-lead` the choice of
+routing the `cto`/`cpo` ask themselves or having me take it directly.
+
+**Not verified:** whether `senior-frontend-3` is actually free on 09-11 for the client-half
+work even if Phase 0 clears exactly on schedule (Phase 0 rework absorption could still occupy
+that day) — flagged as one of three conditions that all have to hold, not independently
+checked with `senior-frontend-3` or `po`.
+
+**Reported to:** `team-lead-4` (confirmation + escalation notice) and `team-lead` (the
+escalation itself), via `SendMessage`. Awaiting response before anything further is owed.
+
+---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 
 **Task:** `team-lead` asked me to resolve the contradiction between `agent/AGENTS.md` §1 (D2, D6

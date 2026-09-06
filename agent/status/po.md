@@ -500,3 +500,92 @@ ruling that has not been made.
 
 No file under `Dabbler/dabbler-code/` written, no git command run, `DECISIONS.md` not edited,
 no Phase 0 ticket transitioned.
+
+---
+
+## 2026-09-06 — Six tickets worked as four inbound messages landed: KAN-128/129/130/131/126, plus KAN-132/133/134 filed
+
+**Agent:** `po`
+**Outcome:** Session-long task (`team-lead` brief) to act on `KAN-123/126/128/129/130/131` as
+`cto`, `devops`, `team-lead-4`, `pm` and `qa` reported in. Worked each ticket the moment its
+input arrived, per instruction not to stall.
+
+**KAN-128 — date set then withdrawn, twice.** `team-lead-4` first sent `due_date` 2026-09-10
+(applied), then withdrew it (own error, caught by the new `capacity-to-date` skill — a lead
+may not date a shared seat's queue). `team-lead` then relayed 2026-09-10 as "settled," then
+corrected that too — held per `team-lead`'s explicit instruction, `duedate` cleared back to
+null. Independently re-verified all of `team-lead-4`'s four scoping findings (five ledger
+writers not four/three, `settle_game` re-settle double-credit, `payment_intents` DDL-only,
+push-freeze scope) against the baseline migration before writing them into AC 1/AC 3. Read
+`cto`'s `T-052` amendment (`DECISIONS.md`, commit `9d0c5bb`) in full and folded in its ruling:
+`payment_intents` constraints **pulled entirely out of scope** (adding them alone was ruled
+the exact failure `T-049` Decision 2 forbids), `:19211`/`:19231` marked out-of-bounds (KAN-131's
+territory), `search_path` restatement rule added, and the KAN-128/131 edit-order arbitration
+(KAN-131 must be authored from `pg_get_functiondef` read post-KAN-128, never from the baseline
+file) written into KAN-128's own sequencing section. Flagged, not resolved: `cto` found `pm`
+and `team-lead` gave contradictory apply dates for this ticket — recorded verbatim, not
+adjudicated. Stays in **Ready**, `duedate` null, cost recorded as 2 sittings (not yet
+`cto`-confirmed).
+
+**KAN-129 → rewritten per `T-050`, moved to Ready.** `cto` rejected all three original
+remedies (stack is live on six call sites, not abandoned) and ruled a fourth: state facts,
+issue no directive; `features/profile` is `Either`-based, live, and **frozen**. Re-verified
+the provider chain (`profile_providers.dart:73/88/94`, three router call sites, one screen
+`invalidate`), the `Either`/`Result` file counts (got 27 vs `cto`'s 26, one-file discrepancy
+not chased), and the zero-external-reference claim on `SupabaseProfileRepository` (3 total
+grep hits, all self-contained) before writing anything in. Executor named (`senior-frontend-1`
+via `team-lead-1`), no date — `team-lead-1` owes it.
+
+**KAN-130 → rewritten per `T-051`, moved to Ready.** `owner_type`/`owner_id` wins, `user_id`
+dropped (not nullable) — the deciding fact is `wallets_user_id_fkey → auth.users`, which no
+venue/platform id can satisfy. Verified all six named constraints/policies/dependents directly
+against the baseline SQL before transcribing (`wallets_user_id_fkey:31858`,
+`wallets_unique_idx:29609`, `delete_my_account:5300`'s cascade comment, `wallets_self_read`
+policy, etc.). Executor: `senior-backend` + `senior-frontend-4` (same ticket, for
+`wallet.dart`'s silent-null read). No date — shared-queue seat, cost not yet reported.
+
+**KAN-131 → rewritten per `T-052` + its same-day amendment, moved to Ready.** Verified
+`team-lead`'s relay of this ticket was complete against the primary `DECISIONS.md` source
+myself, rather than trusting the "may have been truncated" caveat at face value. Citation
+extended to `:19231` (confirmed second `gen_random_uuid()` site) per `cto`'s instruction.
+Carried the edit-order arbitration into this ticket as the operative section — same
+`pg_get_functiondef`-post-`KAN-128` requirement as KAN-128 now states, plus the confirmed
+"inert alone" dependency on KAN-130 landing in the same migration. No date — coupled to
+KAN-130's cost.
+
+**KAN-132 filed (new).** The duplicate `profileRepositoryProvider` `cto` found while ruling
+`T-050`, reported to `po` rather than ruled on. Re-verified both declarations and the
+dead-stack claim myself before writing the ticket. Parented under `KAN-127`, To Do,
+unassigned pending a `cto`/lead executor decision (rename vs. delete).
+
+**KAN-126 review gate — PASS on a narrowed scope, moved to QA-Test; KAN-133 filed as the
+split-off remainder.** `devops` reported criterion 1 met (re-verified: `WORKFLOWS.md:362`'s
+W6 rule, commits `abdeb89`/`afbdbb9` both confirmed via `git log`) and criteria 2/3 **not
+demonstrable** — no trigger exists, and the `CONTRACT.md` §4.1 grant structurally blocks any
+regeneration commit in the paths the 52 generated files occupy, independent of any trigger.
+Also independently confirmed `devops`'s criterion-quality finding: sampled 5 `dabbler-code`
+commits, all authored under the single `dabblersport` identity — `git log --format=%an`
+genuinely cannot distinguish "developer" from "devops" the way the original criterion assumed.
+Took `devops`'s own recommendation: rescoped KAN-126 to criterion 1 alone (already satisfied,
+passed gate 1+2, transitioned to QA-Test) and split criteria 2/3 into **KAN-133**
+(event-blocked, not queue-blocked, reworded criterion to assert on changed paths/message
+rather than authorship), parented under `KAN-120`.
+
+**KAN-134 filed (new, low priority).** `pm`'s housekeeping flag — wire the new
+`capacity-to-date` skill to every `team-lead-N` and point `WORKFLOWS.md:58` at it, since both
+`team-lead-4` and `pm` independently made the shared-queue-dating error this session before
+catching it with that skill. Did not resolve the `analyst`/`devops` single-writer question `pm`
+raised on who edits `WORKFLOWS.md` — flagged in the ticket for `team-lead`/`cto`, not decided
+here.
+
+**KAN-123 — no `qa` verdict arrived this session.** Left in `QA-Test`, untouched; the fifth
+piece of the original brief remains outstanding.
+
+**Not verified across this batch:** the live zero-row counts on `wtncuzcskpigqpmnxwws` (all
+re-quoted from `cto`'s `T-049`/`T-051` measurements, not re-run); `devops`'s 200-commit scan
+and 52-file `build_runner --output` diff (taken as reported); whether `pm`/`team-lead` agree
+with the KAN-126 split as a task-analysis judgment call rather than an escalation.
+
+**Next:** `team-lead-4`/`senior-backend` owe KAN-128's confirmed sitting count and KAN-130's
+cost; `team-lead-1` owes KAN-129's date; `cto`/a lead owe KAN-132's executor; `qa` owes
+KAN-123's verdict, still blocking `KAN-124`.
