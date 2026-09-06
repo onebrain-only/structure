@@ -1693,3 +1693,28 @@ ownership question, same root cause each time (route-cohesion cut vs org chart) 
 partition drift, consistent with what `cto` already flagged.
 
 **Reported to:** `po` (ownership answer + contended-file instruction), `main` (summary).
+
+## 2026-09-07 (cont.) — Second D4 bottleneck: `KAN-155`'s apply is CEO-only, verified
+
+`team-lead-4` reported `cto` withdrew its `KAN-155` apply count after re-reading `G-002`:
+condition 3 covers schema/privilege/definition only, and `KAN-155` mutates 82 live
+`user_subscriptions` rows plus inserts/deletes — user data. Verified directly against
+`CONTRACT.md:242` before relaying, rather than trust the citation: *"User-data mutation is
+CEO-only (`019`) except security-remediation changes meeting `G-009`'s three tests."*
+`KAN-155` is monetization, not security remediation — doesn't qualify. `team-lead-4` also
+caught its own near-miss: `G-002`'s "the PO" is Moataz (pre-dates `po` as an agent seat),
+would have misrouted to `Horemheb` uncorrected.
+
+**Practical effect:** this apply leg sits in nobody's agent queue — undatable by me, no
+sitting count available the way a lead reports one. `po` told to name the CEO as its holder.
+Authoring leg (`Ready`, 1 sitting/ceiling 2) and `KAN-145`/`KAN-141`/`KAN-150` (confirmed
+definition-only, stay `cto`'s) unaffected.
+
+**Relayed to `main` as a standing D4 planning fact, not urgent:** a second bottleneck exists
+alongside `cto`'s single-writer schema queue — every D4 migration touching existing rows
+hits the CEO-only gate, and `D4` is 110 features on a live billing rail. Not asking for the
+rule to change; flagging so the CEO has it as a known property of D4 rather than a surprise
+per-ticket. Tracking both bottlenecks together now as backlog-planning inputs.
+
+**Reported to:** `main` (planning fact), `team-lead-4` (verification confirmed, no further
+action needed from it).

@@ -1086,3 +1086,23 @@ against me — the number may hold, the seat was wrong.
 definition/DDL, inside condition 3. Counts stand at 1 sitting each. Also named a cost I had not
 been counting: G-002 condition 1 requires the migration posted as a Jira comment in KAN-67 format
 BEFORE applying, plus G-006's claim-comment — inside the sitting, but real.
+
+## 2026-09-07 (cont.) — §12f: a term goes stale inside a live rule, and the quote stays correct
+
+`team-lead-4` found that my accurate quotation of `G-002` condition 3 — *"requires the PO to apply
+it personally"* — routed KAN-155's apply (82 live `user_subscriptions` rows) to `po`, a seat with
+no such authority. In `019`/`G-002` "the PO" means the **human decision-maker**, written before
+`po` existed as an agent seat; `CONTRACT.md:242` is the same rule in current vocabulary and says
+**CEO-only**. I reached the same correction independently; the messages crossed.
+
+Recorded as `CONVENTIONS.md` §12f. Operative rule: **`CONTRACT.md` is the translation layer —
+where a decision's body and a `CONTRACT.md` row disagree on WHO, the row governs.** Sibling of
+§12e; both fail by being accurate. Noted as **permanently unfixable at the source** (decisions are
+superseded not rewritten; `G-022` keeps role custody off the bound seats), so the check is the
+only defence.
+
+**Apply ledger as it now stands:** KAN-141 (DROP VIEW+FUNCTION) mine, 1 sitting. KAN-145 (ADD
+CONSTRAINT) mine, 1 sitting ceiling 1. KAN-150 (2x CREATE OR REPLACE) mine, 1 sitting ceiling 1 —
+authoring free now, verified the two functions carry no `'kickoff'` literal so no coupling to the
+rename. **KAN-155 apply: CEO only, in no agent's queue.** Every count now includes posting the
+`G-002` condition-1 comment, which I had been under-counting all day.
