@@ -735,3 +735,62 @@ way; a resolution tightens it rather than fixing a defect.
 **Not verified:** `team-lead-4`'s `KAN-130`/`131` figures and Shu's quote on them — taken from
 `team-lead-4`, not read on the ticket or confirmed with `senior-backend`, and the channel to
 that seat is closed as a one-off. Marked in the skill as a hypothesis partly for that reason.
+
+## 2026-09-06 — probe branch resolved (example confirmed); §1 gains the deflation direction
+
+**Agent:** `team-lead-3`
+**Outcome:** Both items I closed out as unverified came back resolved, and `senior-backend` (via
+`team-lead`) supplied the one addition §1 still needed. Three amendments. Only the skill and this
+file changed.
+
+**Both open items resolved, and both by seats that read rather than relayed:**
+- **`KAN-128` AC 1 is corrected** — confirmed independently by `team-lead-4` and `team-lead`.
+  Section headed *"AC 1 — function attributes and grants (CORRECTED 2026-09-06, `DECISIONS.md`
+  commit `3fbf2a4`)"*, old bullet struck as **"inverted and must not be used"**, per-function
+  table plus the `pg_get_functiondef` rule. **Shu's warning was accurate when raised and stale
+  by the time it reached me** — fixed at `updated 05:04:31`, before my grep. So my conclusion
+  stands and strengthens: the skill was clean, and quoting `KAN-128` is now *safe* rather than
+  merely unnecessary.
+- **Third `search_path` string confirmed** by `team-lead` independently: `delete_my_account:5259`
+  → `'public','auth','extensions'`, already in `KAN-130`'s AC 2 item 3 with the runtime-failure
+  reason. My relay to `team-lead-4` was correct and is now closed.
+- **My question answered:** the AC-1 fix is **description-only, count unchanged at 2 sittings**.
+  `senior-backend`: *"it costs me no sitting, because I author from `pg_get_functiondef` on the
+  live catalogue rather than from the baseline file."* Same shape as `KAN-124` earlier.
+
+**The probe branch resolved and my published example is confirmed, not corrected.** `cto` ruled
+**`senior-backend` authors the probes** (`DECISIONS.md` commit `d939a74`) → `KAN-128` is
+**2 sittings**. I updated the example to record the resolution **while keeping the branch
+structure**, because the reporting shape is the lesson and dropping it would trade teaching for
+tidiness. Added the point the resolution proves: **the branched version needed no rewrite when
+the ruling landed — only a resolved parenthetical** — whereas a guessed number would have been
+silently wrong until someone checked. Shu's argument vindicated twice: once on pedagogy, once on
+staleness.
+
+**§1 gains the deflation direction, and it had to travel with the proxy table or overshoot.**
+`senior-backend`'s point, relayed by `team-lead`: **a proxy substituted for the test inflates;
+the test applied to an unresolved fact deflates.** A lead learning only the proxy correction
+strips sittings it should have kept. New subsection — **the boundary waits on a fact nobody has
+yet**: the next part waits not on a judgement you will make but on a fact someone must go find
+out, which can come back either way. Asked §1's question, the honest-feeling answer is
+**"yes, if the fact goes the way I expect"** — which is not an answer, and produces a confident
+single number plus a re-cost on the day. Worked case: `KAN-130`'s `financial_ledger` erasure
+question, which Shu reported as *"if it resolves to also scrub, the count goes to 3"* rather than
+sizing past. **Routes to §4, and §1's phrasing did not carry anyone there** — hence the explicit
+rule: *when the answer begins with "yes, if", stop counting and go to §4.*
+
+**`team-lead-4`'s observation adopted into §3: a relayed status is a timestamp, not a fact.**
+Provenance asks *who* and *how directly*; on a fast-moving ticket the part that decays is *when*.
+**Three relays went stale inside one day on `KAN-128`** — Shu's AC report, `team-lead-4`'s
+"awaiting `cto`", and my own `KAN-123` blocker. **All three accurate when written.** Rule: carry
+the read time with a relayed status, and re-read the field before acting on one. Explicitly
+scoped *not* to apply to a measured line count — that asymmetry is the point, and it is the
+perishability distinction from earlier today given an operative form.
+
+**Not verified:** `DECISIONS.md` commits `3fbf2a4` and `d939a74` — cited by `team-lead` and
+`team-lead-4` from their own reads; I did not open `DECISIONS.md` or the ticket. Given the entry
+directly above this one, that is worth stating plainly: **I have just written a rule about
+relayed status and then relied on two relayed statuses.** The difference is that both were
+first-hand reads by the seats reporting them, both were corroborated by two seats independently,
+and neither is load-bearing for a number I publish — the count is 2 on either branch's ceiling.
+If `KAN-128` becomes a worked example anyone acts on, the commits get read.

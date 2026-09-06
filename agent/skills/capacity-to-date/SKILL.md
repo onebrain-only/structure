@@ -62,12 +62,17 @@ makes the count go above one.
   fixtures and — for `financial_ledger` — a **concurrent** replay, since a sequential retry
   cannot demonstrate the failure at all: the failure *is* the interleaving.
 
-  **This example is deliberately left branched, because the branch is the more instructive
-  half.** Who authors the AC-3 probes is open with `po` as of 2026-09-06: **`cto` owning them
-  makes it 1 sitting on `senior-backend`; shipping them with the migration makes it 2. The
-  ceiling is 2 either way.** A count of "2" teaches the arithmetic; "2, or 1 if a named seat
-  owns a named deliverable, and here is who was asked" teaches §4 — which is the part leads
-  get wrong. Report a branch this way rather than resolving it to the number you prefer.
+  **This example was published branched, and the branch is the lesson.** Who authored the AC-3
+  probes was open: **`cto` owning them made it 1 sitting on `senior-backend`; shipping them with
+  the migration made it 2 — ceiling 2 either way.** It has since resolved — `cto` ruled that
+  `senior-backend` authors the probes (`DECISIONS.md` commit `d939a74`), so the count is **2**.
+
+  **The branch is kept here because reporting it this way is the point.** A bare "2" teaches
+  the arithmetic; *"2, or 1 if a named seat owns a named deliverable, and here is who was
+  asked"* teaches §4, which is the part leads get wrong. And note what happened when the ruling
+  landed: the branched version needed **no rewrite**, only a resolved parenthetical, while a
+  version that had guessed the number would have been silently wrong until someone checked.
+  Report a branch this way rather than resolving it to the number you prefer.
 
 ### Neither risk nor volume is a checkpoint. A dependency boundary is.
 
@@ -112,6 +117,30 @@ ceiling 3** — the same shape as the ticket it was supposed to dwarf.
 loud; if the sentence that justifies it does not contain *"cannot start until"*, you are holding
 a proxy. *(Two instances, one lead, one correcting seat — a hypothesis about how the test gets
 misread, not a measured pattern.)*
+
+**Read the next paragraph with this one, or the correction overshoots.** A proxy substituted for
+the test **inflates**. The test applied to an unresolved fact **deflates**. Learning only the
+first produces a lead who strips sittings it should have kept.
+
+### The third answer shape: the boundary waits on a fact nobody has yet
+
+§1's question has an answer neither `KAN-128` nor `KAN-130` had. Sometimes the next part waits
+not on a judgement you will make, but on **a fact someone must go and find out** — and it can
+come back either way.
+
+Asked *"can the next part start before this lands?"* of that shape, the honest-feeling answer is
+**"yes, if the fact goes the way I expect."** That is not an answer. It produces a confident
+single number and a re-cost on the day the fact arrives, which is the worst of both: the
+certainty of a firm estimate with none of its basis.
+
+`KAN-130`'s `financial_ledger` erasure question is exactly this shape — it needs a `cto`/`cpo`
+ruling, and `senior-backend` reported it as *"if it resolves to also scrub `financial_ledger`,
+the count goes to 3"* rather than sizing past it.
+
+**This routes to §4, not to a sitting count.** The output is *"cannot size until X, and Y holds
+it"*, with everything that does not depend on X sized anyway. §1's question does not carry you
+there on its own — that is why this paragraph exists. **When the answer begins with "yes, if",
+stop counting and go to §4.**
 
 ### The opposite failure: a partial finish dressed as a checkpoint
 
@@ -267,6 +296,15 @@ correct refusals, no owner, and a deadline-bound ticket standing still.
 first-hand from the seats themselves. `cto`'s refusal reached `team-lead-4` relayed by `pm` and
 is second-hand — the grounds are almost certainly right, the chain of custody is one link
 longer than the sentence above implies.)*
+
+**A relayed status is a timestamp, not a fact.** Provenance asks *who* said it and *how
+directly*; on a ticket changing hourly, the part that decays is *when*. Three relays went stale
+inside one day on `KAN-128` — a seat reported its AC as outstanding after it was fixed, a lead
+reported a count as awaiting confirmation after both had landed, and this seat raised a blocker
+that had cleared thirty minutes earlier. **Every one was accurate when written.** So carry the
+read time with a status you relay, and re-read the field before acting on a status someone
+relayed to you. This does not apply to a measured line count, which does not move unless
+somebody edits the file — that asymmetry is the whole point.
 
 Resolution, reached by `team-lead` on 2026-09-06 and recorded here rather than invented here:
 **the lead asks the owning seat for its own count and carries it unchanged.** If you believe
