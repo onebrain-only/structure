@@ -450,3 +450,44 @@ create a user in the live project. Provisioning is outside this seat.
 
 Verdict unchanged: **FAIL**, and B1 (`/auth-welcome` blank) remains the headline — it is
 independent of any account.
+
+**Second addendum, same day — LOGIN PASSES. I was wrong twice and the record is now corrected.**
+
+`team-lead` was right and I was not. The first credential was **10 characters**; the real one is
+**12**. Supabase's `Invalid email or password` was correct and unremarkable — a wrong password,
+nothing more.
+
+**Then I made a worse mistake and nearly filed it as a second failure.** On the retry I skipped
+the pre-flight screenshot because the previous launch had been clean. It was not: the
+notification alert was already up, so the email keystrokes, the password keystrokes and the
+*Login* tap all went into a **SpringBoard alert** and never reached Flutter. The screen afterwards
+looked exactly like a rejected login — empty form, no session. **The log is the only reason I
+caught it**: zero auth activity, no router transition, no `FCM token saved`. No login had been
+attempted at all. Had I trusted the screenshot I would have reported a defect that did not exist.
+
+**The rule I am adopting and have written into the story and the skill:** screenshot before you
+type, every time, and confirm the app — not a dialog — has focus. **Never report a login failure
+without a log line proving the attempt reached the network.**
+
+**Clean run, verified at each step.** `17_preflight.png` shows 12 characters and the right email
+*before* submit. Then: `[Router] loc=/enter-password auth=false` → `auth=true` ·
+`FCM token saved for user a3ba3271-3556-4b4e-b15d-bc0851f8a64b` ·
+`[Router] redirect (post-login welcome) -> /welcome` · **"Welcome Back! 👋"** for `Dabbler-Test`
+/ *Sports player* · *Continue* → `GoRouter: INFO: going to /home`. The predicted post-auth marker
+(`welcome_screen_title_returning`) was exactly right.
+
+**Verdict revised: PASS on login, FAIL on the route to it.** The whole auth path — form,
+validation, Supabase round trip, session, post-login redirect, onboarding gate — is **sound**.
+**B1 (`/auth-welcome` renders blank) is the single real defect** and is unaffected: a user still
+cannot reach the login screen through the UI. I only got there with `--route`.
+
+**Also learned, and now in the skill:** there are **two** native alerts on a fresh install, not
+one — notifications, then location, and the location one has **three** buttons, so a script
+assuming two will mis-tap. Both swallow input silently.
+
+B2 is closed as resolved, not as a defect. The `.env` placeholders still want replacing —
+bookkeeping. The `email not confirmed` collapse at `:159` **remains a real ticket** regardless:
+it is precisely the ambiguity that cost this run two attempts.
+
+Story rewritten to match: verdict line, B2, T1, the step table and §6/§7. Skill correction landed
+as `d63dafb` (local, not pushed).

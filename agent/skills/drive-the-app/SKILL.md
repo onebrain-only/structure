@@ -207,11 +207,23 @@ from that alone that the tree is unavailable.
 
 ### Two iOS-only traps that will break a scripted run
 
-**A native permission alert covers the app on first launch after install.** *"Dabbler" Would
-Like to Send You Notifications* renders over `/landing`. It is a **SpringBoard** alert outside
-the Flutter view, so `tester.tap` cannot reach it and `find.text` will not see it. A fresh-install
-`integration_test` hangs there with no useful error. `xcrun simctl privacy` has no service for
-notifications, so dismiss it by coordinate or avoid triggering the request during tests.
+**TWO native permission alerts fire on a fresh install, not one.** *"Dabbler" Would Like to
+Send You Notifications*, then *Allow "Dabbler" to use your location?* — and the location one has
+**three** buttons (*Allow Once*, *Allow While Using App*, *Don't Allow*), so a script written for
+a two-button alert mis-taps. Both are **SpringBoard** alerts outside the Flutter view:
+`tester.tap` cannot reach them, `find.text` will not see them, and a fresh-install
+`integration_test` hangs. `xcrun simctl privacy` has no service for notifications, so dismiss by
+coordinate or avoid triggering the requests during tests.
+
+**They swallow input silently, and that is the dangerous part — worse than hanging.** With an
+alert up, every tap and keystroke goes to the alert and never reaches Flutter. The screen
+afterwards is **indistinguishable from a login that was attempted and rejected**: empty form, no
+session, no error. **[M] 2026-09-06 — this cost a full run and was nearly filed as an app
+defect.** Only the absence of any auth activity in the log revealed that no attempt had been made.
+
+> **The rule: screenshot before you type, every time, and confirm the app — not a dialog — has
+> focus. Never report a failure from a screenshot alone; require a log line proving the action
+> reached the network.** A clean launch last run is not evidence of a clean launch this run.
 
 **A persisted session makes a login test pass vacuously.** A previously-installed app boots
 straight past auth — `[Router] redirect (authed on auth page) -> /home` and an `FCM token saved
