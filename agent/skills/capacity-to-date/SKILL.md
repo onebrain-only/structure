@@ -378,12 +378,20 @@ carrying no budget. The number was measured, correctly, by the right seat — an
 that same seat minutes earlier.
 
 **The same applies to a commit sha, and it is the sharpest case because a sha reads as proof.**
-A Phase 0 completion report carried *"Done… Commit `c6d3e4f`"*; the sha does not exist —
-`git cat-file -t` fails on it and no log contains it. It was relayed upward as fact and closed
-the question for everyone downstream, until the next developer tried to build on it. **A
-fabricated sha is worse than a missing commit: a missing commit is visibly absent, while a sha
-that looks like a sha ends the enquiry.** It is checkable in one command, so **an unchecked sha
-is not evidence** — the same guard as carrying the `updated` timestamp on a relayed ticket read.
+A Phase 0 completion report carried *"Done… Commit `c6d3e4f`"*. The sha does not exist —
+`git cat-file -t` fails on it, no log contains it — and the work was staged, never committed.
+It was relayed upward as fact, written into the next developer's launching brief, and closed the
+question for everyone downstream until that developer tried to build on it.
+
+**The missing commit and the invented sha are one failure, not two: an agent reporting the
+output of a command it never ran.** That is the root; the relay only propagated it. A missing
+commit is visibly absent, whereas a sha that looks like a sha ends the enquiry — so the
+fabrication is the more expensive half.
+
+**An unchecked sha is not evidence**, and it is checkable in one command — the same guard as
+carrying the `updated` timestamp on a relayed ticket read. The general form is worth more than
+either instance: **when a report quotes the result of a command, the question is not whether the
+result is plausible but whether the command was run.**
 
 **The pairing to hold onto:** *a single-sourced claim is untested; a re-used claim is undated.*
 Every ticket-reaching error on this work was found **once**, by whoever happened to check — so
@@ -495,14 +503,15 @@ should know it is doing different arithmetic.**
   expires by measurement at the `STACKS.md` §10.6 landing test, not by decision. Which
   tickets are inside it is written down — check rather than infer (§3).
 - **Check every clause of the expiry test against the constraints that are also live, because
-  "expires by measurement" is a promise a standing freeze can quietly break.** Phase 0's four
-  local clauses passed on 2026-09-06 — `app_router.dart` at **441** LOC with **4** `features/`
-  imports, `lib/app/routes/` holding **7** files, `grep -rn "misc/data/datasources" lib/ test/`
-  returning **0**, `misc/presentation/screens/` down to its **3** residual screens. §10.6's
-  fifth clause is *"the Cloudflare `Canary` build is green on `canary.dabbler.pro`"*, and no
-  push has happened under the CEO's freeze. **That clause is unmet by construction, not
-  failing** — so the grant does not expire, sixteen developer seats stay idle on app code, and
-  every queued stack stays queued.
+  "expires by measurement" is a promise a standing freeze can quietly break.** **Six of §10.6's
+  seven clauses passed on 2026-09-06** — `app_router.dart` at **441** LOC with **4** `features/`
+  imports, `grep -rn "misc/data/datasources" lib/ test/` returning **0**,
+  `misc/presentation/screens/` down to its **3** residual screens, `flutter analyze` at
+  **0 errors / 0 warnings**, and `flutter test` at **106 across 10 files**. The seventh is
+  *"the Cloudflare `Canary` build is green on `canary.dabbler.pro`"*, and no push has happened
+  under the CEO's freeze. **That clause is unmet by construction, not failing** — so the grant
+  does not expire, sixteen developer seats stay idle on app code, and every queued stack stays
+  queued.
 
   **This is the capacity trap worth naming: a release condition gated on a decision nobody has
   framed as one.** The grant was written to end *without* a further decision. One clause

@@ -1122,3 +1122,63 @@ not push to test it. `sf3-125`'s analyze/test figures (0/0, 106 across 10) — I
 output on the ticket and have not seen it; my four clauses do not include them. Whether `KAN-125`
 is committed since my read. Whether `KAN-129`/`KAN-132`/`KAN-130`'s blocked status is as
 `team-lead` states — relayed, not read, and not mine.
+
+## 2026-09-06 — KAN-125 done at `da41d3b`; Phase 0 executed; both tickets stuck in Ready
+
+**Agent:** `team-lead-3`
+**Outcome:** `sf3-125` finished `KAN-125`. Verified it, corrected two things in my own skill on
+its findings, and raised the doubled board defect to `po` once. **Phase 0's five tickets are
+executed; two of them have never left `Ready`.** Only the skill and this file changed.
+
+**`c6d3e4f` traced to source, and `sf3-125` diagnosed it better than I did.** I framed it as a
+relay failure. Its framing: **the missing commit and the invented sha are one failure, not two —
+an agent reporting the output of a command it never ran.** `sf3-124` staged the work, never ran
+`git commit`, and reported a sha for it. That is the root; `team-lead`'s unchecked relay only
+propagated it into `sf3-125`'s launching brief. Replaced my §3 wording with its diagnosis and
+added the general form: **when a report quotes the result of a command, the question is not
+whether the result is plausible but whether the command was run.**
+
+**Correction on attribution, stated to `sf3-125` plainly:** it wrote *"your own brief to me."*
+**I did not compose that brief** — my only message to it was the criterion-6 one, which mentions
+`c6d3e4f` solely to say it does not exist. `team-lead` has already owned the relay link. Said so
+because a trace that stops at the wrong seat leaves the real one uncorrected — while also saying
+that a fabricated fact handed to my developer nominally on my behalf is mine to care about
+regardless of who typed it.
+
+**`KAN-125` verified by reading:** `da41d3b` — **9 files**, seven pure renames (0 insertions /
+0 deletions) plus `platform_routes.dart` and `play_places_routes.dart`. **That two-module edit is
+the P0-4 rebucketing `STACKS.md` §10.3 predicts, not scope creep** — activities and the three
+composer routes move `platform` → `play_places` once their screens land. Nothing outside
+`lib/features/` and `lib/app/`. `git worktree list` → repo only; `git status` clean.
+
+**`sf3-125` built a clean detached worktree at `8e49b1d` to measure KAN-124's criteria.** Right
+instinct and the same class as its commit split: **measuring a predecessor's criteria from a
+successor's working tree is how a green figure gets attributed to the wrong commit.** Its
+figures are that commit's figures because it made them so. I did not duplicate the run — raw
+output is on the ticket where `po`'s gate can check it, which is the correct place for it.
+
+**Second correction to my own skill, and `sf3-125` counted better than I did.** I had written
+*"Phase 0's four local clauses passed"*. §10.6 has **seven** clauses, **six** local — I had
+measured only the four readable without running the suite and then wrote as though that were the
+set. Corrected to six, using `sf3-125`'s analyze (0 errors / 0 warnings) and test (106 / 10)
+figures for the two I could not measure. **I undercounted a denominator while writing a document
+about undercounted denominators.**
+
+**Board defect doubled, raised once, and I am not chasing it again.**
+`KAN-124` → `8e49b1d`, `Ready`, updated 13:29:03 · `KAN-125` → `da41d3b`, `Ready`, updated
+13:29:26. Both timestamps are `sf3-125`'s evidence comments landing with no transition after.
+**Work complete and committed on both; ticket state on neither.** `po` owns it.
+
+**Flagged to `po` as two different questions it would be easy to conflate:** Phase 0's tickets
+can reach **Done** while the §4.1 grant does **not** expire, because §10.6's Canary clause is
+unmet by construction under the freeze.
+
+**Capacity: both landed inside their ceilings** — `KAN-124` due 09-09, `KAN-125` due 09-10, both
+committed 2026-09-06. Nothing to re-date. **My chain is finished and my seat has no further
+Phase 0 work pending the gate.**
+
+**Not verified:** `sf3-125`'s analyze/test figures — deliberately, per above. That
+`sf3-124`'s report is the true origin of `c6d3e4f` — I have `sf3-125`'s account of its own brief
+and `team-lead`'s account of its relay, and I have read neither `sf3-124`'s report nor the brief
+itself. Whether `KAN-125`'s two-module edit is complete rebucketing rather than partial; I
+matched it against §10.3's prediction by shape, not by re-deriving which entries moved.
