@@ -398,6 +398,33 @@ Every ticket-reaching error on this work was found **once**, by whoever happened
 convergence between two seats is not what confirms a finding. **A finding with only one source
 has simply not been tested yet.**
 
+### Convergence corroborates only when the error modes differ
+
+**An acceptance criterion belongs to a commit, and it is measured at that commit.** Run it
+against HEAD instead and you get a number that is correct and answers a different question.
+
+`KAN-124`'s AC 8 asked for the contiguous-run count. Its executor measured **25** at `8e49b1d`,
+the ticket's own commit, in a fresh detached worktree. A lead and the `po` each computed **26**
+independently, matched each other bucket for bucket, and recorded the executor's answer as
+wrong. Both had counted the working tree — which was `da41d3b`, one commit later, where
+`KAN-125` has moved four route getters from `platform` to `play_places` and the count is
+genuinely 26.
+
+**Two independent sources agreed and both were wrong, because independence of *seat* is not
+independence of *method*.** Same tree, same shortcut, same error — and the agreement read as
+proof strong enough to overrule the one seat who had done it correctly. The executor was told it
+was wrong by two seats holding a right answer to the wrong question.
+
+**So before treating agreement as corroboration, ask what the two sources share.** If they read
+the same artifact the same way, they can only confirm each other's blind spots. The cheap guard
+is to state the *object* alongside the number — "25 at `8e49b1d`" survives this collision;
+a bare "25" does not.
+
+**Related, from the same ticket:** a run-count script must **assert that every identifier
+resolves**. An unresolved one silently shortens a run and the count comes out *low* — the
+direction that would have falsely tripped `T-056`'s ≤20 rework trigger. A count with no such
+assertion fails toward the dangerous answer.
+
 Resolution, reached by `team-lead` on 2026-09-06 and recorded here rather than invented here:
 **the lead asks the owning seat for its own count and carries it unchanged.** If you believe
 that reading of `WORKFLOWS.md:58` is wrong, take it to `pm` — do not quietly resume dating a

@@ -1295,3 +1295,63 @@ its per-bucket breakdown, not read from its report, which I have never seen. Whe
 module-file mapping is what `T-056` intends by "bucket" — the two coincide for all six route
 modules, but the ruling defines neither term formally. Which of the five `play_places` boundaries
 is the divergent one; I narrowed to the bucket, not the entry.
+
+## 2026-09-06 — I was wrong: AC 8 is 25. I measured HEAD, not the ticket's commit.
+
+**Agent:** `team-lead-3`
+**Outcome:** **`sf3-125` was right on every point and I was wrong.** There was no divergence, no
+bucketing deviation, and no mapping-vs-code discrepancy — all three were manufactured by my own
+error. Retracted to `po`, corrected to `sf3-125`, and wrote the lesson into the skill. No code
+touched, no ticket edited by me.
+
+**Verified from git objects before conceding, both commits, one script:**
+`8e49b1d` → **25 runs**, `play_places` **4**, `createGameRoute` → `platform_routes`.
+`da41d3b` → **26 runs**, `play_places` **5**, `createGameRoute` → `play_places_routes`.
+80 getters / 80 entries / **zero unresolved** at both. Every other bucket identical.
+
+**AC 8 is `KAN-124`'s criterion and `KAN-124` is `8e49b1d`. The answer is 25.** My 26 is a
+correct count of the wrong commit — `KAN-125` moves four getters `platform` → `play_places`,
+merging `activitiesRoute` into the `sportsExplore` run and splitting the old `platform` run,
+net +1.
+
+**The worst version of my own error, and the ordering is the point.** Earlier today I praised
+`sf3-125` for measuring in a detached worktree and wrote the reason in this log: *measuring a
+predecessor's criteria from a successor's working tree is how a green figure gets attributed to
+the wrong commit.* **I then did exactly that**, reported its correct number as a divergence, and
+sent it hunting a bucketing deviation that does not exist. **I built the guard in prose and
+walked into the trap it guards.** My reconciliation table also mislabelled the 25 as
+`sf3-124`'s — it was `sf3-125`'s, at the other commit, posted four minutes before I wrote.
+
+**The proof was inside my own evidence and I did not read it.** I sent `sf3-125` five
+`play_places` run-starts including **`createGameRoute`** — which can only sit in `play_places`
+*after* `KAN-125`. My own list proved I had measured HEAD.
+
+**`po` made the identical error and posted 26 on the ticket as the closing figure**, recording
+`sf3-125`'s 25 as wrong. **Two seats, independently, same wrong number — and the agreement read
+as proof strong enough to overrule the one seat who did it correctly.** Retraction sent with the
+measurements and the mechanism.
+
+**Written into the skill as its own subsection — `Convergence corroborates only when the error
+modes differ`.** Independence of *seat* is not independence of *method*: same tree, same
+shortcut, same error. **The cheap guard is to state the object alongside the number** — *"25 at
+`8e49b1d`"* survives this collision, a bare *"25"* does not. Also took `sf3-125`'s better check:
+a run-count script must **assert every identifier resolves**, because an unresolved one silently
+*shortens* a run and the count fails **low** — the direction that falsely trips the ≤20 rework
+trigger. My script had no such assertion until this run; its did from the start.
+
+**The stray worktree is my session's.**
+`/private/tmp/claude-501/…/e8b948fa-8370-4b74-83dc-ff4a273c5595/scratchpad/kan124` at `8e49b1d`,
+detached — that is this session's scratchpad path. **I did not create it and have not removed
+it**, in case another agent is mid-work inside; raised rather than deleted. `sf3-125` was right
+to flag it and right about why: a stale checkout at a superseded commit is how somebody measures
+the wrong number next. That warning aged about ten minutes.
+
+**Running tally: seven published errors.** Wrong checkpoint · stale `KAN-123` blocker · wrong
+commit count · retracted quote · stale ceiling re-used · asserted ceiling 3 against the ticket ·
+**wrong-commit run count, plus two fabricated hypotheses and a misattribution built on top of
+it.** This last is the largest, because it cost another seat real work chasing a defect that
+never existed.
+
+**Not verified:** whether `po` will correct the ticket. Whose worktree that is. Whether
+`sf3-124` produced any run count at all — `sf3-125` believes not, which fits a seat that also
+reported a commit it never ran.
