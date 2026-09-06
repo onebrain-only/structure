@@ -12,6 +12,84 @@ still gets one.
 
 _No entries yet._
 
+## 2026-09-06 — KAN-128 AUTHORED, both sittings (`team-lead` dispatch)
+
+**Did.** Authored the migration and the AC-3 probe pack. **Nothing applied to
+`wtncuzcskpigqpmnxwws`; nothing pushed.** Live Supabase access was read-only throughout
+(`pg_get_functiondef`, `pg_proc`, `pg_default_acl`, `information_schema`, row counts).
+
+**Touched.** `Dabbler/dabbler-code/supabase/migrations/20260909090000_kan128_ledger_unique_keys_and_on_conflict.sql`
+(new), `Dabbler/dabbler-code/supabase/tests/kan128/` (new: harness prelude, fixtures, probe
+pack, `run.sh`), this file. Local commit `93d6619`. Committed by explicit path — another agent
+had `lib/app/` changes staged in that repo's index and they are untouched.
+
+**Sitting 1 — the migration.** `ALTER COLUMN ref_id SET NOT NULL`; `UNIQUE (ref_type, ref_id,
+direction)` on `wallet_ledger`; partial `UNIQUE (payment_intent_id, entity_type, entry_type)
+WHERE payment_intent_id IS NOT NULL` on `financial_ledger`; `T-049`'s table-comment correction
+("append-only" → amount-immutable); seven `ON CONFLICT DO NOTHING` clauses across five
+functions. `admin_wallet_adjust` is `DROP` + `CREATE` + `REVOKE` + re-`GRANT`. One transaction.
+
+**Live catalogue vs baseline: NO DRIFT.** All five definitions match the baseline text exactly,
+and the attributes match the corrected table in KAN-128 — four `SECURITY DEFINER` with
+`search_path` `'public'`, `trgfn_payment_to_ledger` neither. Every body authored from
+`pg_get_functiondef` regardless.
+
+**Sitting 2 — probes, executed pre and post.** Built a throwaway local harness
+(`supabase/postgres:15.8.1.060`, which ships the supabase roles, `auth.users` and `auth.uid()`);
+the baseline loads into it with **zero errors**. Every probe demonstrated failing pre-index and
+passing post-index. `P1a` 2 rows → `23505`; `P1b` 2 → 1 absorbed through the writer; `P2`
+reversal still 2 on both sides (no regression); `P4` arity 5 → 6, distinct keys not collapsed,
+null `ref_id` rejected; `P5` 2 → 1, and NULL-`payment_intent` rows still 2 (the partial index
+does not over-collapse). `P3` blocked — see below.
+
+**One defect the probes caught in my own first draft.** `REVOKE ... FROM PUBLIC` is **not
+sufficient** on this project. `pg_default_acl` carries two function entries for schema `public`
+(grantors `supabase_admin` and `postgres`) and **both include `anon=X`**, so a freshly created
+function is granted to `anon` **by name**, not only via `PUBLIC`. Measured live. My first draft
+followed the ticket exactly and left `anon=X/postgres` standing on the new
+`admin_wallet_adjust` — the precise outcome `cto` ruled against. Added an explicit
+`REVOKE ... FROM anon`; `proacl` now reads `{postgres=X/postgres,authenticated=X/postgres,
+service_role=X/postgres}`. **The ticket's grant trap is incomplete as written** and needs this
+correction, or the same mistake recurs in `KAN-130`/`KAN-131`.
+
+**Three dead money paths, not one. None changes the migration; all change what AC 3 can claim.**
+
+1. **`settle_game` cannot execute — a `T-055`-shaped defect nobody had found.** Its
+   `game_settlements` insert passes `case when p_finalize then 'settled' else 'pending' end`
+   into `status`, which is `settlement_status`. Two unknown literals in a `CASE` resolve to
+   `text`, and there is **no cast from `text` to `settlement_status`** — confirmed live:
+   `pg_typeof(...)` = `text`, `pg_cast` count = 0, `status` is `settlement_status`. It raises
+   `42804` before reaching the credit insert. **AC 3 says this probe "is genuinely live, not
+   dormant." It is not.** Falsifiability condition 3 — the one I added — is what caught it.
+2. **`_wallet_recalc` blocks every `wallet_ledger` write, and no fixture works around it.**
+   `trg_wallet_ledger_recalc` fires on every insert/update/delete; `_wallet_recalc` upserts
+   `wallets(user_id, balance_aed, held_aed)` and omits `owner_id`, which is `NOT NULL` with no
+   default (all confirmed live). Postgres enforces `NOT NULL` at tuple formation, **before** the
+   `ON CONFLICT` arbiter is consulted, so it fails `23502` **even when a `wallets` row already
+   exists**. `wallets` holds 0 rows. So today **no row can be written to `wallet_ledger` at
+   all**, by any of its four writers. This is `KAN-130`/`T-051` territory, not mine to fix.
+3. **`trgfn_payment_to_ledger`** — already known (`T-055`), unchanged.
+
+**Consequence for AC 3, stated plainly.** Probes `P1`–`P4` all write `wallet_ledger` and
+therefore **cannot run against the schema as deployed**. I ran them under a **declared harness
+deviation** — `trg_wallet_ledger_recalc` disabled — which is a departure from falsifiability
+condition 2 ("the schema as deployed"). It is sound for what is under test (a recalc trigger has
+no bearing on whether a `UNIQUE` index holds) but it is **weaker than an unqualified pass**, and
+the probe pack says so in its own output rather than hiding it. `P5` needs no deviation. `P3`
+fails condition 3 on **both** sides and is reported blocked, not passing.
+
+**Decided.** Left `idx_wallet_ledger_ref` and `idx_ledger_payment` in place (unrelated cleanup).
+Added an explicit `ref_id_required` guard in `admin_wallet_adjust` so the failure names its
+cause. Placed `p_ref_id` **fourth**, not last — it carries no `DEFAULT` (a per-call mint is the
+guarantee `T-049` refuses) and a non-defaulted parameter cannot follow defaulted ones.
+
+**Did not verify.** That the migration applies to `wtncuzcskpigqpmnxwws` — that is `cto`'s slot
+and this seat may not. The harness is not the deployed database: it differs in the extensions
+the `--schema-only` dump omits and in platform tables no probe touches.
+
+**Blocked.** Nothing on this ticket. Owed to `po`/`cto`: the `anon` grant correction, and a
+ruling on whether AC 3 is satisfiable as written given findings 1 and 2.
+
 ## 2026-09-06 — Skills audit of this seat (survey, `team-lead` dispatch)
 
 **Did.** Read-only survey. No SQL run, no migration touched, no Supabase call of any kind.
