@@ -610,13 +610,14 @@ ruled that it generalises, and this skill does not.
 
 ## Owed elsewhere
 
-Two things belong in `agent/WORKFLOWS.md` and are not written by this skill — it was under
-another seat's hand when this was written, and both are `po`-or-`devops` edits routed the
-usual way.
+**Closed 2026-09-06 by `po`:** `agent/WORKFLOWS.md`'s capacity-not-estimation rule now points
+here for the method — *"See `agent/skills/capacity-to-date/SKILL.md` for how a lead's capacity
+number becomes a `due_date` without either side estimating."* The prohibition and the method are
+no longer separated.
 
-1. **`:58` states the capacity-not-estimation rule and points at no method.** It should point
-   here.
-2. **The shared-seat resolution in §3 currently lives only in this file.** `:58` says capacity
+**Still owed, and not written by this skill** — a `po` edit routed the usual way:
+
+1. **The shared-seat resolution in §3 currently lives only in this file.** `:58` says capacity
    is reported by the owning `team-lead-N` and says nothing about a seat no lead owns — the
    silence that stalled `KAN-128` through four correct refusals. The governing document should
    carry *the lead asks the owning seat for its own count and carries it unchanged*; a company
