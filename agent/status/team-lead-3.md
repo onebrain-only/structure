@@ -1007,3 +1007,67 @@ failure one revision apart, on either side of committing the rule against it.
 read every claim I publish from the **ticket**, which quotes them, but not from `DECISIONS.md`
 itself. No number I publish depends on the distinction; flagged so the next reader knows which
 artifact was actually opened.
+
+## 2026-09-06 — KAN-124 committed but never gated; KAN-125 started on an ungated base
+
+**Agent:** `team-lead-3`
+**Outcome:** `sf3-125` raised a discrepancy before starting `KAN-125`. Verified the whole picture
+myself — its report was accurate when written and stale on arrival. **Affirmed its call, checked
+`KAN-124`'s commit against every criterion readable from a diff, and raised a board-state defect
+to `po`.** No ticket transitioned by me, no code touched, no date changed.
+
+**`sf3-125`'s judgement was right and I told it so plainly.** It proposed committing `KAN-124`'s
+staged tree separately before starting `KAN-125`, to keep the diffs independently reviewable.
+**That is not tidiness — it is the only reason `KAN-124` can pass its own criterion 6**
+(*"no `.dart` file outside `lib/app/` is changed by this diff"*), because `KAN-125` moves seven
+screens under `lib/features/`. Folded into one commit, correct work would have been a formal
+rejection.
+
+**Verified state, first-hand:**
+- HEAD **`8e49b1d`** — *"KAN-124 — split app_router.dart into six route modules"*, on `93d6619`
+  (`KAN-128`). **So `KAN-124` IS committed** — `sf3-125`'s "not committed" was true when written
+  and superseded by its own action.
+- `git cat-file -t c6d3e4f` → **`fatal: Not a valid object name`**. Confirmed independently.
+- Working tree: **seven staged renames** out of `lib/features/misc/presentation/screens/` into
+  `activities`/`games`/`rewards` — `KAN-125` is underway.
+- Jira: **`KAN-124` is `Ready`**, `updated 2026-09-06T13:09:27`, due `2026-09-09`.
+  `KAN-125` `Ready`, due `2026-09-10`.
+
+**The defect I own and raised: work complete and committed, ticket never transitioned.** The
+chain is serial on **Done**, and `KAN-125` is now building on a base that has passed no gate.
+This is the failure I have flagged all week arriving from the **opposite** direction — not a
+transition lagging a claim, but a transition never made at all. A board that is behind the tree
+is as dangerous as a report that is ahead of it.
+
+**Diff-shape verification, done because it is a lead's job and not more work for the executor:**
+criterion 2 — **441 LOC** ≤ 450 · criterion 3 — **4** `features/` imports ≤ 6 · criterion 6 —
+**8 files, all inside `lib/app/`** · criterion 7 — **zero** `+`/`-` lines matching
+`_handleRedirect` · criterion 1's no-edit half — **the golden file is not in the diff at all**.
+That last is the one that cannot be checked after someone has edited it, and it is the whole
+proof of behavioural equivalence. Stated to `po` explicitly as a **diff-shape check, not a
+substitute for its gate.**
+
+**Told `sf3-125` to proceed**, keeping `KAN-125` in its own commit, and warned it that its base
+has not passed a gate so a `KAN-124` rework moves it. Restated: no push, no `Co-Authored-By`
+(it already had that right), nothing outside §4.1's granted paths.
+
+**Asked both seats to trace `c6d3e4f`.** Somebody handed the executor a sha that never existed.
+**A fabricated sha in a handoff is worse than a missing commit, because it reads as
+verification** — the whole session's theme in one artifact.
+
+**Capacity unchanged: 2 sittings, ceiling `2026-09-09`.** The work landed inside the window;
+nothing here moves a date. The only exposure is a rework verdict arriving with `KAN-125` staged
+on top, which `sf3-125`'s separate-commit instinct already mitigates.
+
+**I did not transition `KAN-124` myself**, though the `In Progress` transition is mine. Its work
+is finished, so `In Progress` is a formality, and I did not want to move a ticket into a state
+`po` was about to move it out of — offered to make it if `po` wants the board to show the real
+sequence. Flagged rather than acted, which is the same call I made on the ceiling.
+
+**Not verified:** the golden test actually passing, `flutter analyze` clean, `flutter test` at
+106/10 — asked `sf3-125` to paste raw output rather than assert it; I read diffs, I do not run
+the suite. Whether `_handleRedirect` is byte-identical across the full `:149`–`:443` range — my
+grep proves no line mentioning it changed, which is strong evidence and a different claim.
+Whether `sf3-125` is `senior-frontend-3` under §4.1's non-delegable grant or a separate
+instance — it addressed me as its lead and is executing the right tickets, and I did not
+interrogate the seat identity.
