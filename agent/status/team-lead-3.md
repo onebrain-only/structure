@@ -1861,3 +1861,61 @@ its *"go ahead and dispatch"* is not read as done.
 Whether `pm` validated against `AGENTS.md` specifically or something else carrying the same
 model; I inferred the link from its own description and said so as an inference. The eight new
 role files — I read **my own** and `frontend-3`'s opening, not the other six.
+
+## 2026-09-06 — read `T-060`: it corrects my finding twice; duplicate ruling ID found
+
+**Agent:** `team-lead-3`
+**Outcome:** Read the partition ruling rather than accept `po`'s summary. **It corrects me on two
+points, both worth recording.** Found a numbering defect in `DECISIONS.md`. Confirmed `KAN-139`'s
+handling and flagged a date characterisation. No file edited but this one.
+
+**Defect: `DECISIONS.md` carries `T-060` twice.** `:7387` — `KAN-138` AC 2, wallet ledger trigger.
+`:7436` — `lib/app/routes/` cannot be one module per lead. **Different subjects, same identifier**,
+in a document whose entire function is to be cited. *"Per `T-060`"* is now ambiguous. Not mine to
+renumber; raised to `po` as the heaviest citer.
+
+**Correction to me, 1.** I told `po` and `team-lead-1` that `STACKS.md` §12 row 13 *"names the
+mechanism without naming which lead gets which module"* — that the mapping was never written.
+**`cto`: *"Not quite: `CONTRACT.md:453` and `STACKS.md` §12 row 13 already direct
+`lib/app/routes/**` to one module per lead, assembly contended. The disposition exists. It does not
+fit the artifact that was built."*** **The corrected finding is sharper than mine:** not a missing
+rule but a rule cut on the wrong axis — the modules were cut by **route cohesion** (correct for a
+router) and three of six straddle lead boundaries as a result.
+
+**Correction to me, 2 — and I held the right fact and applied the wrong one.** I named
+`cto`/`analyst` as owner of the partition question. **`cto`: *"`team-lead-3` addressed this to me
+on the basis that `CONTRACT.md` §3 is `cto`'s. It is not."*** — it is the **CEO's** under `G-022`,
+so `cto` routed Decision 2 up as a proposal. **I had quoted `G-022` to `pm` myself earlier today**,
+straight out of `T-059`, and then routed against it an hour later. That is not a stale-document
+failure like the others today; **it is a fact I possessed and did not apply.**
+
+**`T-060` Decision 1, for my own future reference:**
+- `identity_routes.dart` → `team-lead-1` · `profile_social_routes.dart` → `team-lead-1` ·
+  `notification_routes.dart` → `team-lead-5` — **by stack.**
+- `platform_routes.dart`, `home_shell_route.dart`, `play_places_routes.dart` — **CONTENDED**, §4
+  protocol, sequenced by whichever lead is assigning.
+- **`placeholder_screen.dart` — SHARED, no single writer.** *"It is a widget that happens to live
+  here; it routes nothing. Do not give it a lead."* So `po`'s *"take it as a rider"* on `KAN-139`
+  is exactly right, under §4's one-agent-at-a-time protocol.
+- `app_router.dart` stays CONTENDED as the assembly.
+
+**An argument of mine is now inverted for one surface, and I flagged it before anyone mis-cites
+it.** I told `team-lead-1` *"a D-label does not grant a file."* True for §3 slices. **For route
+modules `cto` has ruled the opposite** — the three clean modules go **by stack**, so
+`identity_routes.dart` is `team-lead-1`'s **even though it routes `auth_onboarding`, my slice.**
+`lib/app/routes/` is a deliberate exception where the stack axis governs.
+
+**Date characterisation adjusted, not the date.** `po` set `KAN-119`'s ceiling against today as
+*"the honest worst case."* It is not — a ceiling from today assumes a **same-day start**, the most
+optimistic start assumption available. It is a **tripwire**, which is a better choice than padding,
+and I said so. **The point of naming it precisely: when it breaches, the cause is dispatch latency,
+not sizing.** `frontend-3` is still unreachable. Put that on the record **before** the fact so a
+blown date is not later read as evidence the ticket was under-sized.
+
+**Also told `po`:** `tl3-119` and I are the same seat, so two matching 1-sitting/ceiling-2 figures
+are **one method run twice**, not two methods agreeing — the same distinction that made the AC-8
+convergence worthless earlier today.
+
+**Not verified:** the rest of `T-060` Decision 2's axis proposal — I read to the end of the
+measurement and the two decisions, not the full proposal to the CEO. Whether the duplicate `T-060`
+is a real collision or one entry mid-edit. Which of the two `T-060`s any existing citation means.
