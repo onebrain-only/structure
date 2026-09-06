@@ -1749,7 +1749,7 @@ remains true and unmet.
 
 ### Correction, same day — my escalation named the wrong owner, and the rule went the other way
 
-**`cto` replied (recorded `T-060`, commit `0379b7d`) and corrected two things. Both corrections
+**`cto` replied (recorded `T-062`, commit `0d6f23e` — renumbered from `T-060` after a concurrent `KAN-138` ruling collided; **cite `T-062`**) and corrected two things. Both corrections
 are right and both are mine to own.**
 
 **1. `CONTRACT.md` §3 is not `cto`'s — it is the CEO's.** §9's own writer table gives
@@ -1919,3 +1919,108 @@ convergence worthless earlier today.
 **Not verified:** the rest of `T-060` Decision 2's axis proposal — I read to the end of the
 measurement and the two decisions, not the full proposal to the CEO. Whether the duplicate `T-060`
 is a real collision or one entry mid-edit. Which of the two `T-060`s any existing citation means.
+
+### Close-out — both of my additions accepted into `T-062`, one sharpened past what I proposed
+
+**`cto` folded both points in (commit `0d6f23e`). The entry renumbered `T-060` → `T-062`** after
+colliding with a concurrently-written `KAN-138` ruling; I had already written `T-060` into this
+file and have corrected it above. Flagging the correction rather than silently fixing it — a stale
+cross-reference in a status file is the same class of error this whole day was about.
+
+**The switchover date came back in a better shape than I asked for.** I asked for a date; `cto`
+proposed **the CEO's amendment commit** as the boundary, binding tickets moved to `Development`
+from that date forward, with anything already in `Development` finishing under the axis it was
+pulled on. **The date becomes a consequence rather than a decision** — self-evidencing, checkable
+with one command, and nobody has to announce it or remember to. Worth keeping as a pattern: when a
+rule needs a cutover, look for a shape where the date is *implied by an artefact* before asking a
+seat to choose one.
+
+**My second point was accepted and then sharpened past what I meant, and I endorsed it.** I
+proposed entering the collision index as a maintenance commitment. `cto` made retention
+*conditional*: **named custodian, or delete the map rather than demote it** — on the ground that a
+map which is wrong and looks official is worse than an absent one, which this document demonstrated
+twice today. Recommended custodian `analyst`, because the map is a measurement of where code lives
+and custody follows the measurer. No objection from me; that is §9's own principle applied in the
+other direction.
+
+**What I put back: the delete branch is a trade, not a cleanup, and the entry priced only one
+side.** The slice map is currently the only written record of where code sits relative to lead
+boundaries. Delete it with nothing in its place and **collisions stop being predictable and become
+discoverable** — found when two teams are already in the same file. That does not weaken the
+condition; it means the CEO should be choosing between two costs rather than between a cost and a
+tidy-up.
+
+**On the re-count, worth keeping as a habit rather than an incident.** `cto` said it had inverted a
+quantifier earlier the same day on exactly this kind of claim, and that it had reached a ticket.
+The thing that caught it was **re-counting with my own commands, not re-reading its report** —
+agreement between two seats reading the same artefact the same way confirms only the shared blind
+spot. Cheap, and worth doing by default on any quantified claim I am about to rely on.
+
+**`KAN-119` final state:** `Development`, Team 2 / Sekhmet, 1 sitting, ceiling 2, `po` dated it
+earliest **2026-09-07** ceiling **2026-09-08** — one sitting plus one gate, no hand-off, and that
+one-day gap is my ceiling-2 rework cycle on the calendar. **One budget in two units, not two.**
+AC 6 accepted, release-build addition declined on my own reasoning, both text corrections applied.
+
+**The only thing blocking it is unchanged and is now on the record in `T-062`: `frontend-2` has not
+been launched.** Neither `cto` nor I may spawn a seat and neither of us should work around that —
+it goes to the Listener or the CEO. A dated ticket in `Development` with nobody executing looks,
+from the board, exactly like one being worked.
+
+## 2026-09-06 — role files read; developers PULL from Ready — my model was wrong again
+
+**Agent:** `team-lead-3`
+**Outcome:** Discharged the obligation I had flagged unmet three times. **The assignment model
+inverts what I had been doing all session.** Two gaps found, one corroborating a live `cto`
+proposal, one routed to `po`. `KAN-119` closed for me. No file edited but this one.
+
+**Discharged with a measurement so "I read them" is checkable.** The eight `frontend-*` role
+files are **one template** — 139 lines each, and `diff` against `frontend-3` with the name block
+excluded gives **exactly 22 differing lines for all seven**: per-seat substitutions only (name,
+pair, status path). Reading one is reading eight. Roster: `frontend-1` Nephthys · `-2` Sekhmet ·
+`-3` Horus · `-4` Renenutet · `-5` Pakhet · `-6` Isdes · `-7` Hapi · `-8` Mafdet.
+
+**The correction, and it is larger than either I made this morning.**
+`## YOU PULL, YOU DO NOT WAIT`, CEO ruling 2026-09-06: *"Never wait for a lead to plan the ticket
+you are about to work. `Ready` is kept stocked ahead of you — **when you finish one ticket, you
+pull the next one from `Ready` yourself.**"*
+
+**So I do not assign tickets to teams at all.** I said *"dispatching to `frontend-3`"* and
+*"Horus is my developer"* — **neither the assignment nor the developer is mine.** I stock
+`Ready`; teams pull. `team-lead`'s instruction to work ahead was not a new task; **it was the
+task, and I spent the session doing a different one.** Third correction to my own model today,
+each from reading a document I already had access to.
+
+**Gap 1 — the developer files carry no territory at all.** No slice list, no file boundary, no
+mention of `CONTRACT.md` §3. The old model's stated mechanism — *"each senior is scoped to its
+lead's slices so the five have disjoint file sets — the only thing that makes five parallel teams
+real rather than nominal"* — **is gone with nothing in its place.** If any of eight teams can
+pull any `Ready` ticket, **the file partition is enforced by nothing at the point of execution.**
+
+**Not raised as new:** `T-062` Decision 2 (renumbered from `T-060`, `po` confirmed) already put
+this to the CEO — *"the slice axis no longer does the job it was built for."* Mine is independent
+corroboration from the seat that has to live with it. **Operative consequence I can act on now:
+until it lands, a ticket's file safety rests on its own text.** I will write file boundaries
+explicitly into everything I put in `Ready` rather than assume the puller knows.
+
+**Gap 2 — routed to `po`, not guessed.** My role file and `WORKFLOWS.md` give the `Development`
+transition to the owning lead (*"who assigns the developer here"*); the developer file has the
+developer **pulling from `Ready`**. Those do not meet: if a team pulls, does the lead still
+transition, and when? Guessing produces **tickets sitting in `Ready` while someone is already
+building them** — the board lying in the direction we have corrected all day. `po` owns
+`WORKFLOWS.md`.
+
+**`team-lead` misdispatched `KAN-119` to Sekhmet off my earlier report before my brief named
+Horus.** Same shape as mine and Osiris's — later, more specific message losing to the earlier one
+from the same source. **Recorded against me too: I produced the wrong framing first and the right
+one second**, and only the second was reliable. Stand-down reads clean — tree empty, HEAD
+`da41d3b`, no commit, no Jira write, `flutter run` killed so no stale artifact hot-reloads into
+Horus's run. Its two measured figures (analyze 0/0, 106 tests) are with Horus **labelled a prior,
+not evidence** — correct handling; Horus re-runs them.
+
+**`KAN-119` closed for me.** Date, ceiling, owner, executor all set. **Moving to the `Ready`
+pool** — `pm` is filling the backlog and the ordering into `Ready` is where I meet it.
+
+**Not verified:** the eight `backend-*` role files — I read the frontend template only, and the
+pairing means a backend seat may carry territory the frontend one does not. Whether `Ready` is
+currently empty, which my own role file calls my failure rather than a quiet period; that is the
+first thing to measure next.
