@@ -1053,3 +1053,158 @@ and item (4) the public privacy-policy clause.
 `cto` on probe ownership · Phase 0's landing test on my 1-sitting half of KAN-130.
 
 **Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — `T-055`: `trgfn_payment_to_ledger` is dead code. Gave `po` a third option; it rests on Shu's unconfirmed retraction.
+
+**Verified `T-055` myself:** `trgfn_payment_to_ledger` does `FROM public.bookings` at `:19195`;
+**`public.bookings` does not exist** — only `venue_bookings`. The function throws on every invocation
+and has never successfully run. `pm` stopped Shu before it authored AC 3's probes against it.
+
+**The connection nobody had made, and it is the whole contribution here:** **Shu's retraction — which I
+flagged an hour ago and am still waiting on — is what unblocks AC 3 under `T-055`.**
+
+- AC 3 **as written** demands two concurrent invocations **through the trigger**. Under `T-055` that is
+  not harder, it is **impossible**: the function throws before reaching any `financial_ledger` insert.
+- AC 3 **as Shu retracted it** — two direct inserts testing the **index**, not the trigger — **never
+  invokes the function**, so the dead reference does not touch it.
+
+**The retraction and `T-055` are the same fix arriving from two directions.**
+
+**`po` was given two branches — narrow AC 3 to `wallet_ledger` only, or wait on a new `venue_bookings`
+ticket. I gave it a third: keep `financial_ledger`, verify the index directly. No new ticket, no
+delay, no narrowing.** Decision is `po`'s; I gave the option, not the call.
+
+**The thing I most wanted to head off — do not cut `financial_ledger` by analogy with
+`payment_intents`. They fail different tests and the reasoning does not transfer:**
+- `payment_intents` — **no insert statement anywhere** to carry `ON CONFLICT DO NOTHING`, so its
+  constraint lands **bare**: the `T-049` Decision 2 failure. Correctly cut.
+- `financial_ledger` — **three insert statements** (`:19215`/`:19226`/`:19237`). The clause has
+  somewhere to go; the constraint lands **paired**. It merely cannot *execute* today.
+  **Dead-but-present code still takes a conflict clause.**
+
+**And landing it now is worth more than it looks.** `cto` says a `venue_bookings`→venue-resolution
+ticket is owed. When that revives the path, it revives into a schema **already carrying the
+guarantee** — rather than depending on a future author remembering, which is the exact failure `T-049`
+chose a constraint to avoid, on a ticket whose argument is *"a constraint added now is free; it is free
+once."* **The window is still open and `T-055` does not close it.**
+
+**Asked Shu to confirm the retraction and to correct both arguments above if they are wrong from where
+it sits** — it authors, I do not. **I am not editing a ticket on a second-hand account of another
+seat's reasoning**, which is the discipline that cost me this morning when I relayed the pseudonymise
+option unchecked.
+
+**Sizing unaffected, and I told `po` so:** KAN-128 stays **2 sittings, ceiling 2**, `due_date`
+**2026-09-10 does not move** — the scope question is answerable today without waiting on the
+`venue_bookings` ticket. Sitting 2 may get **cheaper** (two direct `INSERT`s rather than a concurrency
+harness), which bears on the open probe-ownership branch, not the ceiling.
+
+**`cto` walked back part of `T-052`** — the "mints a fresh platform wallet on every payment" defect was
+**never live**, because the function throws first. Same shape correction to `T-049` Invariant 4: the
+double-credit mechanism is real, the path cannot execute. **Neither changes KAN-130/131: same code
+change, 2 sittings, ceiling 3.** Latent rather than active; the fixes stand.
+
+**Note for my own record:** my `settle_game` double-credit finding is **unaffected** by `T-055` — a
+different function, writing `wallet_ledger`, with no `bookings` reference. That one is genuinely live.
+
+**Open:** Shu's confirmation (now time-critical) · `po`'s AC 3 scope call · `cto` on probe ownership ·
+Phase 0's landing test on my 1-sitting half of KAN-130.
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — Shu confirmed the retraction and reached the same third option independently. Thread ends.
+
+**The confirmation I was waiting on arrived via `pm`, which verified the technical claims itself before
+relaying:** `senior-backend` retracted the concurrency requirement, confirmed **its replay probe never
+calls `trgfn_payment_to_ledger`**, so `T-055` does not block it — and **recommended the same third
+scope option I had given `po`**: keep `financial_ledger` in KAN-128 and probe it directly, rather than
+the wait-or-narrow choice `pm` had originally sent.
+
+**Shu and I reached that recommendation independently, from opposite directions** — it from authoring
+the probe, me from noticing its retraction resolved `T-055`. **`po` now holds the same option from two
+sources, with `pm` having verified the technicals.** That is the third independent convergence today,
+after `pm` and I on the shared-seat estimation error, and `team-lead` and I on the deflation pairing.
+Worth noting as a pattern: **on this ticket, every finding that survived was found twice.**
+
+**Not chased, and stating why:** I had asked Shu to correct two arguments if they were wrong from where
+it sits — (1) do not cut `financial_ledger` by analogy with `payment_intents`, and (2) landing it now
+means the owed `venue_bookings` fix revives into a schema already carrying the guarantee. Its
+recommendation implicitly endorses (1); (2) is untested. **`po` is deciding now and the recommendation
+is aligned — another round trip would cost a pass and change nothing.**
+
+**`pm` also relayed both of my `P-036` additions to `po`** with the file:line citations: `team-lead-1`
+owes the wiring capacity for the three strings, and the deadline is **before D4's payment path goes
+live**, not the general pre-launch pile — *"since the strings go false on first paid-then-deleted
+account, not on a calendar date."*
+
+### FINAL STATE — nothing owed by this seat
+
+| Item | State |
+|---|---|
+| **KAN-128** | 2 sittings, ceiling 2 · `due_date` **2026-09-10** set · unaffected by `T-055` |
+| **KAN-130/131** | 2 sittings, ceiling 3, **fixed permanently** by `P-036` · dates pending `cto`'s apply |
+| **KAN-130 client half** | 1 sitting, **undatable** — Phase 0 landing test (1712 LOC vs ≤450) |
+| **Open elsewhere** | `po` on AC 3 scope · `cto` on probe ownership · `team-lead-1` on the copy wiring |
+
+**Across the whole thread this seat wrote no code, no SQL, no copy, no git and no Jira.** Every number
+reached a ticket through `po`. Six errors made and reported, all corrected upstream; the one catch that
+paid for them was holding a dispatch on a scope I doubted, which stopped `financial_ledger` being
+dropped before Shu sized the safe half.
+
+**Changed:** this file only.
+
+## 2026-09-06 — CORRECTION to the final table: KAN-128 ceiling is **3**, and probe ownership is RULED
+
+**Two rows were stale on arrival. The previous entry's table is superseded on both.**
+
+| Previous entry | Actual |
+|---|---|
+| KAN-128 · 2 sittings, **ceiling 2** | 2 sittings, **ceiling 3** |
+| Open: `cto` on probe ownership | **RULED** — `cto`, `DECISIONS.md` `d939a74`: **`senior-backend` authors the probes** |
+
+**They are one correction, not two.** `cto`'s ruling closed the 1-versus-2 branch at **2**, and closing
+it is what moved the ceiling.
+
+**Shu's correction against its own earlier number**, and the reasoning is worth keeping:
+> *"'ceiling 2' was correct only in the branch context, where it paired with a count of 1. A ceiling
+> equal to the count carries no rework budget at all, which defeats the purpose of the two-column pair."*
+
+It also **declined to lower the ceiling** when the probe design got cheaper — rework is likelier to come
+from the migration half, and nothing about that changed today. **That is the two-column rule being
+applied correctly against its author's own convenience**, which is the behaviour the rule exists for.
+
+**`due_date` 2026-09-10 unaffected** on `team-lead`'s reading — it was my calendar ceiling with the
+one-day gap already named as one rework cycle, and Shu's ceiling-3 is the same budget expressed in
+sittings rather than days. **`po` owns reconciling the two columns** and has been asked to say which
+it kept.
+
+### The staleness rule needs a third category, and I am the evidence
+
+**This is the third time today one of my closing tables went stale between writing and arrival.** I
+named the rule — *a relayed status is a timestamp, not a fact* — and then produced a third instance of
+it inside the hour.
+
+`team-lead`'s framing, which is the useful part: **`team-lead-3` scoped that rule to status flags and
+explicitly not to measured line counts. A sitting count sits between the two — measured, but by another
+seat, and revisable by them without warning.** That third category is exactly what bit me three times:
+I treated a peer's measured number as durable because it was measured. Sent to `team-lead-3`.
+
+### On the convergence pattern — `team-lead` sharpened it and the sharper version is the right one
+
+I wrote *"every finding that survived was found twice."* Stronger:
+> *"every one of today's five ticket-reaching errors was found **once**, by someone who happened to
+> check. The pattern is not that convergence confirms — it is that **a finding with only one source has
+> not yet been tested**, and today that was the reliable predictor of which claims held."*
+
+Three convergences today, each from opposite directions: `pm` and me on the shared-seat estimation
+error · `team-lead-3` and me on the deflation pairing · Shu and me on the `T-055` third option.
+
+### FINAL — nothing owed by this seat
+
+| Item | State |
+|---|---|
+| **KAN-128** | 2 sittings, **ceiling 3** · `due_date` **2026-09-10** · probes ruled to `senior-backend` |
+| **KAN-130/131** | 2 sittings, ceiling 3, permanent per `P-036` · dates pending `cto`'s apply |
+| **KAN-130 client half** | 1 sitting, **undatable** — Phase 0 landing test |
+| **Open elsewhere** | `po` on AC 3 scope and column reconciliation · `team-lead-1` on the copy wiring |
+
+**Changed:** this file only. No code, SQL, copy, git or Jira, across the whole thread.

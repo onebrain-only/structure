@@ -896,3 +896,34 @@ than restate — applying the cite-don't-restate practice directly this time rat
 retrofit.
 
 No file under Dabbler/dabbler-code/ written, no git command run.
+
+---
+
+## 2026-09-06 (continuation 11) — KAN-128 probe-authorship closed; KAN-130 erasure gap ruled out of scope by T-054; KAN-135 filed
+
+cto ruled two things this round, both applied:
+
+**KAN-128 AC 3 (probe authorship): senior-backend authors its own probes, stays 2 sittings.**
+Caught my own citation error before it stood: I first wrote "T-055" for this ruling, which
+does not exist — it's an appended subsection under T-053 (commit d939a74), no independent
+T-number. Corrected the citation. Added the falsifiability criterion the same ruling carries
+(each probe must be demonstrated failing pre-migration before counting as passing
+post-migration) to all five AC-3 probes.
+
+**T-054: the financial_ledger erasure gap is real but permanently out of KAN-130's scope**,
+regardless of cpo's eventual retention ruling, and is not an exposure (RLS confirmed). This
+supersedes what I wrote in my own previous entry ("could go to 3 if ruled to extend") — that
+was accurate as a live open question at the time, now overtaken by cto's ruling. Rewrote
+KAN-130's OPEN section to CLOSED with the reasoning, removed the sitting-count-conditional
+language, unconditional 2/ceiling-3.
+
+**Filed KAN-135** for the retention question itself, per cto's explicit "po: file it, do not
+fast-track it" instruction in T-054 — routed to cpo, carrying cto's technical costing of the
+three named answers (delete/anonymise/retain) so cpo rules on the retention policy alone, not
+the SQL feasibility.
+
+Recorded both team-lead-4's and senior-backend's positions on KAN-130's "materially larger"
+question per team-lead's explicit instruction, unresolved, senior-backend's number is what the
+ticket is sized against.
+
+No file under Dabbler/dabbler-code/ written, no git command run.

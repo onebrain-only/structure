@@ -521,6 +521,44 @@ to anticipate now.
 
 **Reported to:** `po`, `team-lead`. Nothing further owed from `pm` on this thread.
 
+## 2026-09-06 — `senior-backend` unblocks AC-3 (superseding my scope message);
+`team-lead-4` names item-2's wiring owner and real deadline
+
+**Two updates landed close together, both requiring a correction to messages I'd already
+sent `po`.**
+
+**1. `senior-backend`'s replay-probe redesign means `T-055` doesn't block AC 3 after all.**
+Their probe does two direct `INSERT`s into `financial_ledger` sharing the ruled key — never
+calls `trgfn_payment_to_ledger`, no `bookings` table touch, no fixture. Verified myself before
+relaying: `financial_ledger` has exactly one FK (`wallet_id → wallets`, confirmed at `:30583`,
+same as earlier this thread); `booking_id`/`payment_intent_id` carry no FK at all; the only
+other constraints are two `CHECK`s at `:22713`/`:22714`; `dblink` is not installed
+(`pg_extension` query, empty result) — confirming why Shu retracted the original
+concurrent-replay-through-the-trigger design. Sent `po` a superseding message: AC 3 isn't
+blocked, and `senior-backend`'s third option — keep `financial_ledger` in KAN-128, probe
+directly — is recommended over the wait-or-narrow choice from my earlier message. Flagged for
+the ticket record that KAN-128's `ON CONFLICT` clauses on `trgfn_payment_to_ledger` remain
+correct but unexercisable in production until `T-055`'s fix lands, so a green KAN-128 proves
+the index, not the invariant — same issue noted for KAN-131's platform-identity fix, which
+lands in the same dead function.
+
+**2. `team-lead-4` named two gaps in `P-036`'s item 2 I'd left open:** a wiring owner (the
+three strings sit in `profile` slice, `CONTRACT.md:167` — `senior-frontend-1`/`team-lead-1`,
+not `content-manager` or me) and the actual deadline (tied to D4's payment path going live,
+not the general pre-launch pile, since the strings go false on first paid-then-deleted
+account rather than on a calendar date). Relayed both to `po` with citations.
+
+**What I did:** sent `po` two follow-ups (AC-3 unblock + third option; item-2 ownership +
+deadline), confirmed the technical verification back to `senior-backend`, and told
+`team-lead-4` both items were relayed. Neither sitting count moved.
+
+**Not verified:** did not independently confirm `team-lead-1`'s actual capacity for the
+wiring work — that's `team-lead-1`'s number to give once `po` routes it, not mine to
+anticipate.
+
+**Reported to:** `po` (both updates), `senior-backend`, `team-lead-4`. Nothing further owed
+from `pm` until `po` acts on the scope decision.
+
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live
 

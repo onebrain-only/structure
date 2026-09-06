@@ -64,9 +64,18 @@ makes the count go above one.
   are ticket content and do not belong here; the checkpoint is what this example is for.)
 
   **This example was published branched, and the branch is the lesson.** Who authored the AC-3
-  probes was open: **`cto` owning them made it 1 sitting on `senior-backend`; shipping them with
-  the migration made it 2 — ceiling 2 either way.** It has since resolved — `cto` ruled that
-  `senior-backend` authors the probes (`DECISIONS.md` commit `d939a74`), so the count is **2**.
+  probes was open: **`cto` owning them made it 1 sitting on `senior-backend`, ceiling 2;
+  shipping them with the migration made it 2.** It has since resolved — `cto` ruled that
+  `senior-backend` authors the probes (`DECISIONS.md` commit `d939a74`) — so the count is **2
+  and the ceiling is 3**.
+
+  **Watch what the ceiling did when the branch closed, because this document got it wrong
+  first.** An earlier revision here said *"ceiling 2 either way."* That was true only in the
+  branch's other leg, where a ceiling of 2 paired with a count of 1. Once the count became 2,
+  a ceiling of 2 meant **a ceiling equal to the count, which carries no rework budget at all**
+  and defeats the purpose of the two-column pair (§2). `senior-backend` caught it and moved the
+  ceiling to 3. **A resolved branch does not just pick one number — it moves the other column
+  too.**
 
   **The branch is kept here because reporting it this way is the point.** A bare "2" teaches
   the arithmetic; *"2, or 1 if a named seat owns a named deliverable, and here is who was
@@ -260,6 +269,11 @@ The live board carries the ceiling column exactly (verified 2026-09-06: `KAN-123
 was named as such on the epic rather than left to be discovered as slack. (This column pair is
 an aggregated project buffer in Goldratt's sense; the vocabulary is public, the practice here
 was derived without it.)
+
+**A ceiling equal to the count is not a ceiling.** It carries no rework budget, which means the
+pair has collapsed back into the single number it exists to replace — and it does this quietly,
+usually when a branch resolves upward and nobody moves the second column. If your two columns
+have converged, you have stopped reporting a range and gone back to estimating with extra steps.
 
 **The stronger reason is that two numbers are auditable and one is not.** The rework budget
 explains why the gap exists; this explains why a downstream seat can catch an error inside it.

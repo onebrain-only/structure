@@ -316,3 +316,27 @@ reader does not treat the invariant as closed.
 `:19211`/`:19231` fix lands in code that cannot execute until the same ticket lands.
 
 **No change to either count.** KAN-128 stays 2, KAN-130+131 stays 2.
+
+### Correction to my own entry above — the pseudonymisation error was narrower than I logged
+
+I logged *"my pseudonymise-`entity_id` proposal is ruled illusory, and I should not have made it."*
+`cto` has since measured further (`T-055`): **`payment_intents` holds `user_id` directly and has
+zero foreign keys**, so no deletion path reaches it. The surviving link is
+**`payment_intents.user_id`**, not the `booking_id`/`payment_intent_id` columns originally named.
+**Pseudonymisation is viable and technically sound; its scope is two tables, not one column.**
+
+**The honest split: the idea survived, my analysis did not.** I named the wrong column
+(`financial_ledger.entity_id`, which is `NOT NULL` and severs nothing) and reasoned from a
+tracing argument that was itself wrong. Being directionally right by accident is not the same as
+being right, and the original entry's self-criticism stands on the analysis even though the
+conclusion has partly turned. `cto`'s objection to *deleting* rows is unchanged and correct —
+a double-entry set cannot lose one side. Still `cpo`'s call, now a narrower one.
+
+**New falsifiability condition, from `T-055`:** *the probe runs against the schema as deployed, and
+anything it creates is a row, never a relation.* My direct-insert probe satisfies it by
+construction — it writes rows to `financial_ledger` only, creates no relation, and needs no rows in
+any other table, because `booking_id` and `payment_intent_id` carry no FK.
+
+**Waiting, not choosing.** AC 3's scope (wait on the `:19195` fix vs narrow to `wallet_ledger`) is
+`po`'s. I sent `pm` a measured third option — keep the `financial_ledger` index and probe it
+directly — explicitly as a recommendation, and I am not acting on it.
