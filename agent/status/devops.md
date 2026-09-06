@@ -701,3 +701,104 @@ verified:** that `build_ios.sh` still produces a working IPA (not run — buildi
 would be pointless under a freeze that forbids uploading it), and that the Play
 Console / App Store Connect state matches the inherited memory, which was written
 2026-08-31 and I have no console access to re-check.
+
+---
+
+## 2026-09-06 — `scripts/qa.sh` built; `run_integration_tests.sh` repaired
+
+**Why:** the CEO's complaint that QA is too slow and too expensive is correct. QA
+spent a session driving the iOS simulator by screenshot to test one login. Every
+screenshot is a large image in an agent's context, and — the worse problem —
+**screenshots lie**: QA drove a full login into a SpringBoard alert and the
+aftermath was indistinguishable from a rejected login. Only the *absence* of auth
+activity in the log revealed no attempt had been made
+(`.claude/agent-memory/qa/stories/login-ios.md`, B2).
+
+### The two-line repair
+
+`scripts/run_integration_tests.sh:40` and `:45` both ran `flutter test` with **no
+`--dart-define-from-file=.env`**. `.env` is not in `pubspec.yaml`'s `assets:`, so
+`Environment.load()` (`lib/core/config/environment.dart:44`) fell through to
+`dotenv.testLoad(fileInput: '')` and `_validate()` (`:102`) threw
+`Missing environment variables`. The only documented way to run an integration
+test could not reach the app. Added the flag to both exec lines (and the two echo
+lines that quote them). **Verified**, not assumed:
+
+```
+$ ./scripts/run_integration_tests.sh integration_test/app_test.dart
+00:07 +1: All tests passed!      EXIT=0
+```
+
+### `scripts/qa.sh`
+
+One command, PASS/FAIL, **no image capture of any kind**. Reads the booted UDID
+rather than hardcoding it (QA's coordinate-mapping lesson: hardcoded environment
+facts rot), boots and waits for `Booted` if none is up, pre-grants location,
+runs `flutter test` and exits with the test's own status.
+
+**Location dialog: suppressed, and verified rather than assumed.** `xcrun simctl
+privacy <udid> grant location|location-always app.dabbler.pro` writes through to
+locationd — `clients.plist` records `Authorization => 4`
+(`kCLAuthorizationStatusAuthorizedAlways`) for `app.dabbler.pro`. Verified on a
+`--fresh` run (uninstall → grant → install), where the dialog would otherwise fire.
+`qa` asked me to check its claim that the command exists but works; **it works.**
+
+**Notifications cannot be pre-granted, and the script says so instead of pretending.**
+`simctl privacy` has no notifications service — the list is calendar, contacts,
+contacts-limited, location, location-always, photos, photos-add, media-library,
+microphone, motion, reminders, siri. `qa` checked this and I re-checked it. The
+script prints a warning naming the permanent fix as a guard at
+`lib/services/notifications/push_notification_service_mobile.dart:39`. **I did not
+make that change** — Phase 0's exclusive grant (`CONTRACT.md` §4.1) reserves `lib/`
+and it is a developer's change that has not been authorised. **Owed, not done.**
+
+**`--fresh` is opt-in and off by default**, per the CEO's explicit requirement that
+the install and its session persist between runs. The help text says why it matters
+in both directions: without it a login test can pass **vacuously** on a persisted
+session, and with it the notification alert comes back.
+
+**A bug I introduced and fixed rather than shipped.** The first watchdog was a
+backgrounded subshell. It inherits stdout, so its still-sleeping `sleep` held the
+pipe open after the test exited: `./scripts/qa.sh | tail` hung forever with the
+verdict stuck in the pipe — a hang that looks exactly like the hang the watchdog
+exists to expose. Rewritten as a foreground poll loop; the comment at the site
+records why, so nobody re-introduces it.
+
+**Verified:**
+
+```
+$ ./scripts/qa.sh app
+==> Simulator: iPhone 16 Pro (80F6AA6A-D5DD-420A-B241-18C3A04EDDEA)
+==> Granting location permissions to app.dabbler.pro
+    granted: location
+    granted: location-always
+00:06 +1: All tests passed!
+PASS  integration_test/app_test.dart on ios      EXIT=0
+```
+
+Six seconds on a warm build, against roughly a session of screenshot-driving.
+
+### What it cannot do
+
+- **The notification alert on a fresh install.** Not suppressible from outside the
+  app; the fix is in `lib/` and is not mine. The script warns rather than hangs
+  silently, and the `--timeout` watchdog (default 1200s) kills a blocked run and
+  names the alert as the likely cause — a hung run and a slow run must not look
+  the same.
+- **`integration_test/` holds only `app_test.dart` today.** There is no
+  `login_test.dart`; `./scripts/qa.sh login` therefore errors with the list of
+  what exists rather than silently running the whole suite. **Writing that test was
+  not authorised and I did not write it** — the script runs whatever is there.
+- **The Chrome path is plumbed but UNVERIFIED.** `test_driver/integration_test.dart`
+  was missing and I added it (runner plumbing, not app code). `chromedriver` is
+  **not installed on this machine**, so `-d chrome` has never been executed. It
+  fails with the install instruction rather than a stack trace, but I make no claim
+  that it passes.
+
+**Not done / not verified:** nothing pushed — no push, no PR, no merge, no tag; the
+freeze is live. No file under `lib/` touched. No `.claude/settings.json` or `.mcp.json`
+read or edited. No credential written anywhere: `.env` still holds placeholder
+`TEST_EMAIL`/`TEST_PASSWORD` and the script reads them at run time. No
+`Co-Authored-By` trailer. `flutter analyze` not run — no Dart under `lib/` changed.
+**Not verified:** `-d chrome` (no chromedriver), and the `--timeout` kill path was
+reasoned through and never actually triggered.
