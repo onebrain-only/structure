@@ -457,3 +457,10 @@ practice, with three developers, that means **at most three concurrent code task
 disjoint file sets, plus `devops`, plus `analyst`** — and only one of those inside a contended
 file at a time. Parallelism beyond that produces conflicts faster than it produces work, which
 is also why only two stacks are active (`AGENTS.md` §1).
+
+**The one contended surface this section does not cover is a command, not a file.**
+`dart run build_runner build -d` rewrites the 52 generated files — 45 of them under
+`lib/data/` — and two concurrent runs collide in files nobody authored. That lock is
+`devops`'s and the procedure is **W6** (§5): regeneration runs at commit time, after a
+developer's source-only commit, and lands as a commit of its own. The four-file check at
+step 1 does not catch it, because no agent declares a *command* in its file set.

@@ -556,3 +556,82 @@ read-only survey.
 
 **Not done, deliberately:** no git command of any kind, no `flutter`, no
 `build_runner`, no file created or edited except this entry, no escalation.
+
+## 2026-09-06 — KAN-126 (P0-5) executed: criterion 1 met, 2 and 3 reported not demonstrable
+
+Dispatched by `team-lead` to execute KAN-126 to its three acceptance criteria and
+supply a `due_date`. Local commits only, no push (CEO freeze in force).
+
+**Criterion 1 — met, and it was already met before I started.** The brief's
+starting-state claim ("`agent/WORKFLOWS.md` has no `build_runner` ownership rule")
+is **wrong**, and I was told to verify rather than trust it. `W6 — Regenerating
+generated code` sits at `agent/WORKFLOWS.md:362`, landed in `abdeb89` on 2026-09-06,
+and satisfies the criterion verbatim: *"**Owned by `devops`.**"* and *"**It runs at
+commit time, after a developer's source-only commit.**"* W1 step 3 and step 7 plus
+both W1 table rows already carry the source-only / regeneration-commit split.
+**I wrote no duplicate rule.** I added one 7-line cross-reference at the end of §7
+(the contention protocol) pointing to W6, because §7 is where an agent checking
+contention looks and W6 referenced §7 without the reciprocal pointer existing.
+§7 names four contended *files*; the `build_runner` lock is a contended *command*
+and the four-file check at dispatch does not catch it.
+
+**Criteria 2 and 3 — NOT DEMONSTRABLE. Reported, not manufactured.** Three
+independent measurements, each reproducible:
+
+1. *No pre-existing commit pair.* Scanned the last 200 commits of `dabbler-code`
+   for any commit whose changed paths are all generated (`*.g.dart`,
+   `*.freezed.dart`, `lib/l10n/**`). **Zero.** No generated-only commit has ever
+   been made in this repo.
+2. *No Phase 0 ticket owes regeneration.* `866e2f1` (P0-1) touches `test/` only.
+   `dbfc6bb` (P0-2) touches 42 files; **not one has a `.g.dart`/`.freezed.dart`
+   sibling**. An import-path rewrite regenerates nothing. This confirms the
+   2026-09-05 sizing entry above, now against committed history rather than a
+   working tree.
+3. *Nothing is stale anywhere in the repo.* Ran `dart run build_runner build
+   --output=<scratch> --delete-conflicting-outputs` — the `--output` form writes a
+   merged tree and does **not** write in place, so `lib/` stayed clean (0 dirty
+   paths before and after, verified both sides). Exit 0, 65s, 80 outputs. Diffed
+   all **52** committed generated files against the fresh build: **52 checked,
+   0 stale.** Every one is byte-identical. **There is no regeneration owed to
+   commit**, so there is no honest diff to hang criterion 2 on.
+
+**A fourth reason, structural, that outlives the first three.** Even if a
+regeneration were owed, `CONTRACT.md` §4.1's exclusion — *"no seat other than
+`senior-frontend-3` writes any path in the table above. Not a lead, not another
+senior, **not `devops`**"* — covers `lib/data/**` and other leads' slices. All
+**45** of the 52 generated files under `lib/data/models/**` and the remaining 7
+under `lib/features/**` sit inside that table. **While the §4.1 grant is live,
+`devops` may not commit a regeneration commit anywhere the generated files
+actually live.** Criteria 2 and 3 are therefore blocked by the grant itself, not
+merely by the absence of a trigger.
+
+**Criterion-quality finding for `po`.** Criterion 2 asks for *"one by the
+developer... and a second, later commit by `devops`"*. Every seat commits as the
+same identity — `dabblersport <244900353+dabblersport@users.noreply.github.com>`
+(`agent/roles/devops.md:93`). **`git log` cannot distinguish a developer commit
+from a `devops` commit by author.** The pair can only ever be told apart by
+content and message. The criterion as written is not verifiable the way it says
+it is.
+
+**Capacity (`capacity-to-date`).** Sitting 1 (criterion 1) is **consumed**, today.
+Sitting 2 (criteria 2+3) remains **1 sitting, undatable** — *cannot size until a
+source change lands whose output is `*.g.dart` / `*.freezed.dart` / `lib/l10n/**`,
+and `devops` does not hold that trigger.* Its owners are `content-manager`'s lead
+(first `.arb` commit) or the first developer seat to touch a Freezed model after
+the §4.1 grant expires by the §10.6 landing test. Per the skill I gave `po` a
+count and a named blocker, **not a caveated number**, and recommended `po` either
+split criteria 2+3 into a follow-up ticket or hold `duedate` unset. **I set no
+Jira field.**
+
+**Committed:** `agent/WORKFLOWS.md` §7 cross-reference + this entry, in the
+**Thebes** repo, locally.
+
+**Not done / not verified:** **nothing pushed, to any repo.** No PR, no merge to
+`main`, no Jira field set, no file under `lib/` touched or created, no
+`.claude/settings.json` / `.mcp.json` edit, no dependency or `pubspec.yaml`
+change, no Fastlane/store skill written. No `Co-Authored-By` trailer
+(`attribution.commit` unset). `flutter analyze` / `flutter test` **not** run — this
+commit changes no Dart, and `dabbler-code` is byte-unchanged (`git status` clean
+before and after the `build_runner` run). Whether the W6 rule is actually *followed*
+stays untested, which is exactly what criterion 2 exists to prove and exactly what
+is blocked.
