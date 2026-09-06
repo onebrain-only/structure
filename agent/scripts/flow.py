@@ -1464,7 +1464,7 @@ buildNodes(); buildSeatRail(); buildStatics(); measure();
 setInterval(measure, 250);
 
 function poll() {
-  fetch("/api/state").then(function (r) { return r.json(); }).then(function (d) {
+  fetch("/api/state" + (location.search || "")).then(function (r) { return r.json(); }).then(function (d) {
     if (d.error) { document.getElementById("coreLabel").textContent = "NO TRANSCRIPT"; return; }
     ingest(d); buildData(); render();
   }).catch(function () { /* server restarting — keep the last frame on screen */ });
@@ -1505,7 +1505,7 @@ def main():
     ap.add_argument("--port", type=int, default=7373)
     a = ap.parse_args()
     d = project_dir()
-    print("One Brain — agent flow")
+    print("Thebes — agent flow")
     print("  workspace   :", ROOT)
     print("  transcripts :", d or "NOT FOUND")
     print("  seats       :", len(roster()))
