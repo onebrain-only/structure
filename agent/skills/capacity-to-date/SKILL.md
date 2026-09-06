@@ -338,6 +338,26 @@ read time with a status you relay, and re-read the field before acting on a stat
 relayed to you. This does not apply to a measured line count, which does not move unless
 somebody edits the file — that asymmetry is the whole point.
 
+**There is a third category between those two, and it is this document's own subject: a sitting
+count from another seat.** It is *measured*, so it reads as durable like a line count. It is
+also **revisable by the seat that produced it, without warning**, like a status. A status flag
+announces its own volatility — nobody reads `Ready` as permanent. A line count is inert. A
+sitting count looks like the second and behaves like the first, which is why it is the one that
+keeps getting re-used stale.
+
+> **A count from another seat is that seat's current position, not a measurement you hold.
+> Re-read it before you publish it, and cite when it was given.**
+
+This file did it too: it published `KAN-128` as *"ceiling 2 either way"* after `senior-backend`
+had already moved the ceiling to 3, because closing the branch at a count of 2 left the ceiling
+carrying no budget. The number was measured, correctly, by the right seat — and superseded by
+that same seat minutes earlier.
+
+**The pairing to hold onto:** *a single-sourced claim is untested; a re-used claim is undated.*
+Every ticket-reaching error on this work was found **once**, by whoever happened to check — so
+convergence between two seats is not what confirms a finding. **A finding with only one source
+has simply not been tested yet.**
+
 Resolution, reached by `team-lead` on 2026-09-06 and recorded here rather than invented here:
 **the lead asks the owning seat for its own count and carries it unchanged.** If you believe
 that reading of `WORKFLOWS.md:58` is wrong, take it to `pm` — do not quietly resume dating a
