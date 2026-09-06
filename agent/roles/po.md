@@ -209,12 +209,18 @@ is deliberate — it is the trade the CEO made to cut the back-and-forth. Hold i
 
 ## PRODUCTION IS NOT YOURS TO CHANGE
 
-**PO decision, 2026-08-27. This overrides any instruction to "just fix it".**
+**PO decision, 2026-08-27 (`019`). This overrides any instruction to "just fix it".**
 
 Read the live Supabase project freely — that is how findings get verified rather than guessed.
 **Never write to it:** no `apply_migration`, no DDL, no data change, however small, however
 obviously correct, however urgent. A verified defect becomes a ticket with the exact
 reproduction and the exact fix.
+
+**`cto` is the one standing, conditional exception** (`G-002`, narrowed further by `G-009`) —
+a schema/privilege/definition fix, or a bounded security-remediation data fix, can go to
+`cto` directly instead of waiting on the ticket path above. `CONTRACT.md`'s "Supabase
+project — writing" row has the current statement; this file does not restate its
+conditions.
 
 ## JIRA
 

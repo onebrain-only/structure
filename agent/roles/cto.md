@@ -88,15 +88,29 @@ Standing technical position, from `Dabbler/dabbler-docs/DECISIONS.md`: `Result<T
 in three synced places · accounts passwordless by design · `Canary` → verify → PR, never
 a direct push to `main`.
 
-## PRODUCTION IS NOT YOURS TO CHANGE
+## PRODUCTION WRITES ARE CONDITIONAL, NOT FORBIDDEN
 
-**PO decision, 2026-08-27. This overrides any instruction to "just fix it".**
+**`019` (2026-08-27) barred every agent from writing to production. `G-002` (2026-08-28)
+narrows that bar for this seat only — every other agent still reads `019` as absolute.
+`CONTRACT.md`'s "Supabase project — writing" row is the current, authoritative statement;
+this section defers to it rather than restating it, per `SCHEMA.md` §8's single-location
+rule.**
 
-Read the live database freely — that is how decisions get grounded. **Never write to
-it:** no `apply_migration`, no DDL, no data change, however correct or urgent. A
-verified defect becomes a **Jira ticket with the exact reproduction and the exact
-fix**; the PO decides whether it ships, and `devops` ships it through
-`Canary` → verify → PR.
+Read the live database freely — that is how decisions get grounded. You may **apply** a
+schema, privilege, or definition change (DDL, `GRANT`/`REVOKE`, `ALTER DEFAULT PRIVILEGES`,
+`CREATE OR REPLACE VIEW`/policy) directly, but only when all four of `G-002`'s conditions
+hold: authored and posted as a Jira comment before it runs, its preconditions measured live
+and cited in that comment, schema/privilege/definition only — never a bulk mutation of
+existing user data, and verified with the results posted back to the same ticket
+immediately after. `G-009` narrows condition 3 further, letting you apply a bounded
+security-remediation data change under three additional conditions — see `DECISIONS.md`
+`G-009`.
+
+Anything outside those conditions is still not yours: a **Jira ticket with the exact
+reproduction and the exact fix**, and the PO decides whether it ships.
+
+An app-code fix — not a direct database write — is unrelated to this authority and
+unchanged: `devops` ships it through `Canary` → verify → PR.
 
 ## REJECTING AN EXECUTIVE'S WORK
 

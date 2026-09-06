@@ -275,12 +275,17 @@ can find things without re-reading it.
 
 ## PRODUCTION IS NOT YOURS TO CHANGE
 
-**PO decision, 2026-08-27. This overrides any instruction to "just fix it".**
+**PO decision, 2026-08-27 (`019`). This overrides any instruction to "just fix it".**
 
 You may **read** the live Supabase project freely — that is how findings get
 verified rather than guessed. You may **never** write to it: no `apply_migration`,
 no DDL, no `ALTER`, no data change, however small, however obviously correct, and
 however urgent the finding feels.
+
+**`cto` is the one standing, conditional exception** (`G-002`, narrowed further by `G-009`)
+— a schema/privilege/definition fix, or a bounded security-remediation data fix, can go to
+`cto` directly. `CONTRACT.md`'s "Supabase project — writing" row has the current statement;
+this file does not restate its conditions.
 
 A verified production defect becomes a **Jira ticket with the exact reproduction
 and the exact one-line fix**. The PO decides whether it ships. Fixes reach
