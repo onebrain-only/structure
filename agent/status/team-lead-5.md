@@ -89,3 +89,204 @@ rather than an error. Not chased — read-only survey.
 every claim about what a lead *needs* is reasoning from the boundary documents, not from
 experience, and is weaker than lead 3's on exactly that point. That `senior-backend` would agree
 its relation to me is X-as-a-service; I did not ask it.
+
+---
+
+## 2026-09-06 — stock `Ready`: the client and platform half (Wepwawet)
+
+**Brief:** work ahead, not alongside. Return what should be in `Ready` that is not, in order,
+with a team and a sittings cost per item. No code, no tickets, no dates, no agents spawned.
+None were.
+
+**Board read first** (cloudId `18c8e9f5-…`, `status != Done`, 2026-09-06 ~20:05 +0400).
+`Ready` holds 7: `KAN-129 130 131 134 137 138 139`. It is **not empty** — but six of the seven
+are `team-lead-2`'s money layer or `po` document work. **Nothing in `Ready` is notifications.**
+
+### What I am proposing, and the source for each
+
+| # | Item | Source that establishes it |
+|---|---|---|
+| A | `KAN-130` client half needs a team | `KAN-130` "Executor": *"Dart change at `wallet.dart` — `senior-frontend-4`, same ticket, 1 sitting, undatable — blocked on the Phase 0 grant's landing test."* Seat dissolved; blocker spent by `T-059` (`DECISIONS.md:7280`) |
+| B | `KAN-139` + `notifications_controller.dart:90:53` bundled | `KAN-139` (Ready, undated). Second one measured: `flutter analyze --no-pub --no-fatal-infos` → `avoid_renaming_method_parameters`, `lifecycleState` vs `state`. No ticket exists for it |
+| C | `notifications_screen_v2.dart` is **2,021 lines** | `wc -l`; ceiling is 500 (`/Users/moatazmustapha/CLAUDE.md`, "Keep files under 500 lines"). 4x over, inside my exclusive slice, unticketed |
+
+### `notification_routes.dart` — asked, answered: **no work needed**
+
+32 lines, one `GoRoute`, clean single-feature footprint — `T-062` Decision 1 assigns it to me
+and the measurement behind that is in `DECISIONS.md`'s module table. One cosmetic defect only:
+its comments say *"hidden for MVP"* / *"Route kept for deep links/admin access but UI entry
+points hidden"*, but `lib/core/config/feature_flags.dart:20` is `static const bool
+notifications = true`, and I measured **three live UI entry points** —
+`adaptive_destinations.dart:90`, `main_navigation_screen.dart:474`, `app_top_bar.dart:130`.
+The redirect at `:21-26` is a dead branch and the comment is false. **Too small for a ticket
+of its own — folded into C**, which is the only ticket that will open that file's neighbours.
+
+### Two boundary findings I am NOT deciding
+
+1. **`KAN-139` is not mine and is not anybody's.** `T-062` Decision 1: *"`placeholder_screen.dart`
+   is SHARED — no single writer. It is a widget that happens to live here; it routes nothing.
+   Do not give it a lead."* I can sequence it, I cannot own it. Routed to `po` to name the
+   sequencer. This is why I bundled it rather than claiming it.
+2. **`KAN-130`'s client half is `lib/data/models/wallet.dart` — SHARED under `CONTRACT.md` §4
+   and money-layer by stack, i.e. `team-lead-2`'s.** I was dispatched to route it and have,
+   but the §4 sequencing on that file belongs with lead 2, not me. Flagged, not taken.
+
+### Capacity — sittings, method per `capacity-to-date`
+
+- **A — 1 sitting, ceiling 1.** Mechanical: the whole change population is enumerable before
+  starting. **Measured first-hand, not relayed:** `Wallet.userId` is declared at
+  `lib/data/models/wallet.dart:14` and `:60` and has **zero readers anywhere in `lib/`**
+  (`grep -rn "\.userId" lib/ | grep -i wallet` returns only those two declaration lines).
+  That corroborates the ticket's "zero known readers" claim from `team-lead` at a different
+  time by a different command. No boundary → no second sitting.
+- **B — 1 sitting, ceiling 1.** Two one-line lint fixes, both `info`-level today. The reason
+  to do them at all is `CLAUDE.md`'s own warning that `ci.yml` pins `channel: stable`
+  unpinned, so an SDK bump can make a lint fatal with no code change — the mechanism that
+  killed `deploy-web.yml`.
+- **C — 2 sittings, ceiling 3.** The checkpoint is real and is the `KAN-124` shape: deciding
+  **which widgets become which files** is a judgement whose output the extraction consumes,
+  and it can be wrong. Sitting 1 ends at *sub-files exist, screen not yet reassembled* —
+  reviewable and abandonable. Ceiling 3 banks the rework risk on a 2,021-line file with two
+  existing test files (`test/features/notifications/…`) that must stay green.
+  **Not a proxy:** the boundary sentence contains *"the extraction cannot start until the
+  split is settled"*, which is the test, not volume.
+
+**No date set by me.** `po` converts. **A and B are one budget each in one unit only** — there
+is no calendar column here to add to the sittings.
+
+### Teams
+
+- **Team 2 (Sekhmet / Nekhbet)** — A, then B. Both 1 sitting; consecutive, not merged.
+- **C — next free team, and I do not know which that is.** I was told only that Team 2 is free.
+  Team 3 is on `KAN-119`. `po`/`pm` should place C rather than me guessing at availability.
+  **Do not give C to Team 3** — `KAN-119` is live on the login flow.
+
+### Measured vs taken from a document
+
+**Measured by me, this session:** the 2,021-line count; the controller lint and its exact rule;
+`notification_routes.dart` at 32 lines and its three live entry points; `feature_flags.dart:20`
+being `true`; `Wallet.userId`'s zero readers; the `Ready` column's actual seven keys.
+**Taken from a document, unverified:** `T-062`'s module-ownership table (read, not re-derived);
+`T-059`'s grant-expiry finding; `KAN-130`'s "four lines" figure and `senior-backend`'s
+2-sittings-ceiling-3 count for the SQL half, which is **not mine to confirm** and which I have
+not re-used as a number of my own.
+
+**Not verified:** whether any team but 2 is free. Whether C collides with `qa`'s current work.
+
+### Same day, later — `frontend-2` returns on A and B
+
+**A landed. Re-derived rather than accepted** (`Dabbler/dabbler-code`): `git cat-file -t b6b2ea9`
+→ `commit`; `git show --stat` → `lib/data/models/wallet.dart | 8 ++++----`, **4 insertions,
+4 deletions, that file only** — exactly the "four lines" `KAN-130` AC 3 claims. `ownerId` now at
+`:6,14,28,38`; `userId` still at `:49,60,79,90`, which is `WalletLedgerEntry` and correctly out of
+scope. **Cost held: 1 sitting, ceiling 1, no rework.**
+
+**Not transitioned, correctly.** One ticket, two halves, SQL blocked on `KAN-128` until 2026-09-10.
+`In Review` would assert the migration is done. `po` shapes that transition; I do not.
+
+**B — half done, and the shortfall is my planning error, not the executor's.** The unticketed lint
+is closed at `2eca71d`, **suppressed with a recorded reason rather than renamed**. I checked the
+reasoning, not just the outcome: `NotificationsController extends StateNotifier<NotificationsState>`
+at `notifications_controller.dart:57`, so the base parameter `state` would genuinely shadow
+`StateNotifier.state` in the body. An `ignore` survives an SDK bump promoting the lint to fatal,
+which was B's entire purpose. `KAN-139` untouched — `T-062` Decision 1 rules its file SHARED with
+no writer, and the executor asked `po` rather than claiming it.
+
+> **The error is mine and it is a `capacity-to-date` §4 error.** I flagged `KAN-139`'s ownership as
+> unresolved *and bundled it into a 1-sitting ticket in the same breath*. §4 is explicit: the
+> blocked half should have been reported separately as *"cannot size until the sequencer is named,
+> and `po` holds it"*, with the sizeable part still sized. A bundle cannot absorb a blocker — it
+> just converts one blocked item into one ticket that cannot close. **Do not bundle across a
+> blocker, even when both halves are one line.**
+
+**Escalated to `cto` — concurrent agents share one working tree.** Reported first-hand by
+`frontend-2`: another agent's `git reset` silently unstaged its `git add` between the add and the
+commit, and 26 unrelated deletions were in flight while it took its `analyze`/`test` measurements.
+`git commit -o <path>` protected its own file and stops nothing else. Routed as technical, naming
+`devops` as the possible better owner. **Not mine to solve and I proposed no solution.** The reason
+it is not merely an inconvenience: it silently decouples a measurement from the tree the reader
+will see, which is the failure mode this roster has already paid for repeatedly.
+
+**Provenance:** the race and the 26 deletions are `frontend-2`'s account, relayed — I did not
+observe it. The shas, the `wallet.dart` line numbers, the `StateNotifier` superclass and the commit
+traffic are mine, re-run today.
+
+**Measured by the executor and not re-run by me:** `flutter analyze` at 56 issues / 0 errors /
+0 warnings, and `flutter test` at 106. I have no reason to doubt either and did not re-derive them;
+the 57→56 delta is consistent with the one lint it closed.
+
+### B closed — `KAN-139` unblocked by `po` and landed
+
+`po` ruled `placeholder_screen.dart` SHARED / first-to-pull and opened it, which is the sequencer
+answer I asked for. **Re-derived, not accepted:** `git cat-file -t 90ea9f7` → `commit`;
+`git show --stat` → `1 file changed, 1 insertion(+), 1 deletion(-)`; `:11` reads
+`const PlaceholderScreen({super.key, required this.title});`. Repo-wide
+`flutter analyze --no-pub --no-fatal-infos` → **55 issues, 0 errors, 0 warnings**, run by me.
+The 57→56→55 chain across `2eca71d` and `90ea9f7` is one lint per commit, which is what
+demonstrates each fix took rather than merely being present.
+
+**A and B both closed at 1 sitting, at ceiling, nothing spilled.** `KAN-130` stays in `Ready` per
+`po` with the client half recorded in a comment — correct, since its SQL half has not started.
+
+**My §4 bundling error cost nothing in the end**, because `po` cleared the blocker faster than the
+ticket ran. That is luck, not vindication: the rule stands unchanged. **Do not bundle across a
+blocker.**
+
+**C is still unplaced and is the only open item from this dispatch** — the 2,021-line
+`notifications_screen_v2.dart`, 2 sittings / ceiling 3. I hold no free team for it and placement is
+`po`/`pm`'s.
+
+**Dispatch-tuning feedback, from the executor and worth carrying:** all three commits were
+mechanical code; the only judgement exercised was the two refusals — declining to transition a
+two-part ticket, and declining to claim a SHARED file. **A bundle of this shape can run at lower
+effort provided the brief names who to ask on each open question.** That is a cheap property to
+write into a brief and it is what kept both stops from becoming escalations to me.
+
+### `cto` ruled the shared-tree escalation — `T-065` (commit `8bc316d`)
+
+**The escalation was correct and was answered.** `cto` split it: the **standard** is `cto`'s
+(`CONVENTIONS.md` territory — *"'may agents share a tree' is not a tooling question, it is a
+question about whether a measurement can be trusted"*); the **mechanism** goes to `devops` to
+choose and **prove**, with `EnterWorktree` explicitly not mandated because neither `cto` nor I
+have tested it. Both of us declining to mandate an untested mechanism is the right shape.
+
+**The standard, in force now:** writers hold an isolated tree · a seat quoting a measurement holds
+an isolated tree **or states the sha** · **every quoted measurement carries its sha** · read-only
+seats may share · `git commit -o <path>` is a workaround and must not be recorded as the fix.
+**Rule 3 binds this file from here on.**
+
+**`cto` measured what I could only relay, and found the concurrency is the normal state, not an
+incident:** one shared tree plus one detached worktree (`KAN-119`), and **six commits in 7m15s
+from six unrelated tickets**.
+
+**My error, owned: I cited an author's count as a measurement.** I relayed `357c544` as 6,239
+deletions. `git show --stat` says **6,256**; 6,239 is the figure in the commit *message*. I took it
+from `git log --oneline` and did not open the stat. `cto` called it a small instance of exactly the
+failure the ruling is about, and it is. **The commit message is the author's count; the stat is the
+tree's.**
+
+**The concrete case, and the negative result matters more than a collision would have.**
+`b6b2ea9` (20:11:28) made the `T-051` rename; `357c544` (20:16:03) deleted the two wallet
+repository files. **It did not destroy the work and the deletion was correct** — re-verified by me
+at HEAD **`90ea9f7`**: `grep -rn "models/wallet.dart\|WalletRepository\|walletRepository" lib/ test/`
+returns nothing, no `Wallet` reference exists outside the model file, `flutter analyze` clean at 55.
+`cto` reported this negative deliberately, having been one step from declaring a collision that
+does not exist — *"that would have cost your team a day."*
+
+**What is real is smaller: `lib/data/models/wallet.dart` is orphaned.** Its only consumers were the
+two deleted files. `KAN-130`'s client half was correct work applied to a file that became dead four
+minutes later. **Neither agent was wrong; nobody could have detected it in the moment.** That is a
+better argument for the standard than the abstract one, and it is the one to cite.
+
+**Routed, not decided by me:** to `po` — whether `KAN-130` AC 3 and `T-051`'s "client consequence"
+get restated, and whether `wallet.dart` is deleted or kept for the 2026-09-10 SQL half. The file is
+SHARED and money-layer by stack, so **`team-lead-2` is the sequencer** and I asked `po` to loop it
+in rather than treat my note as a recommendation.
+
+**Relayed to `frontend-2` as `cto` directed:** its instinct was right on both counts — the
+workaround and the limit it named — and rule 3 now applies to every figure it reports to me.
+
+**`cto` bound itself by the same rule**, noting `T-062`'s "106 tests across 10 files" carries no sha
+and is therefore unsupportable under `T-065`. Recorded rather than quietly fixed. **Every figure in
+my own earlier entries today predates rule 3 and carries no sha either** — I am not retrofitting
+them; they stand as of HEAD `90ea9f7` or they do not stand.

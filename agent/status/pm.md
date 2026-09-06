@@ -10,6 +10,118 @@ still gets one.
 
 # LOG
 
+## 2026-09-06 — `P-038` ruled: full price schedule supplied, one mapping decision pending
+with `po`
+
+**`cpo` ruled `P-038`** — the full price schedule for `T-063`'s `plan_prices` backfill
+(five markets, VAT-inclusive gross amounts, grandfathered rows versioned, `valid_from` dated
+to Phase 1B/Month 9 not today). Unblocks authoring steps 2-4 of `T-063` immediately. One item
+left genuinely open: `subscription_plans`'s existing `pro`/`prime` keys map to nothing `12a`
+designed (`pro` collides with two different real products at different prices; `prime`
+doesn't exist in the corpus). Both are empty — zero rows, all 82 live rows on `kickoff` — so
+`cpo` correctly refused to invent a mapping rather than encode an unmade product decision into
+the price catalogue, the same refusal as `P-035` on `FeatureFlags.squads`.
+
+**What I did:** proposed to `po` retiring `pro`/`prime` and adopting `12a`'s actual tier names
+instead, since there's no data risk (zero rows) and the alternative is permanently undefined
+keys. Framed it as a joint call per `cpo`'s explicit routing ("`po`/`pm` need to rule the
+mapping"), not something to decide unilaterally, and said I'd send it to `cpo` to formally
+rule once `po` confirms — `cpo` invited exactly that path. Relayed the unblocked price
+schedule to `cto` (steps 2-4, plus `cpo`'s two open verification items — `subscription_features`
+mapping, client-code hardcoding) and `team-lead-4` (awareness only, doesn't touch their
+entitlement/charging fence).
+
+**Not verified:** did not check `subscription_features` or client code for `pro`/`prime`
+references myself — `cpo` named both as unverified and directed to `cto`, and I have no
+standing reason to duplicate that check before `cto` does it.
+
+**Reported to:** `po` (decision pending), `cto`, `team-lead-4`. Nothing further owed from
+`pm` until `po` responds.
+
+**Addendum, same day — `team-lead-4` verified zero client references and flagged a
+sequencing dependency.** Checked before relaying: `grep -rniE "'(pro|prime)'|..." lib` for any
+subscription/plan/tier context returns nothing — no Dart code references `pro`, `prime`,
+`subscription_plans`, or `plan_key` anywhere. Retiring the keys is client-safe by
+construction, not merely low-risk from the zero database rows alone. `team-lead-4` also
+surfaced a real ordering dependency: the tier-name question should settle *before* the first
+D4 entitlement ticket is stocked, since that ticket writes client code from scratch against
+whatever plan keys exist at the time — retiring keys after would mean rework on code just
+written. Relayed both findings to `po` as reinforcement, still awaiting their read on the
+retire-and-adopt proposal.
+
+---
+
+## 2026-09-06 — `cto` ruled `T-063` (billing shape); `team-lead` had already dispatched the
+design ask, narrowing the CEO decision
+
+**`team-lead` corrected my last recommendation before I could present it wrong:** they'd
+already sent `cto` the scoped design ask the moment `P-037` handed it over — nobody had
+actually dispatched it yet, and `team-lead` closed that gap themselves rather than wait on me
+or the CEO. So the open decision for the CEO narrowed from "does `cto` get asked" to just the
+date/risk-posture call I'd already framed. Acknowledged directly.
+
+**`cto` then ruled `T-063`** (`DECISIONS.md:7827`) in full. **Verified the two new factual
+claims myself before relaying anything further:** `user_subscriptions` has 82 rows, all on the
+free `kickoff` tier (`select plan_key, count(*) ... group by plan_key` → one row) — no paid
+subscription has ever existed, which changes *why* "costs nothing now" is true without
+changing that it's true; `wallets_owner_type_valid` confirmed as `('user','venue','platform')`
+— missing `'company'`, exactly as `cto` flagged for `12a`'s Corporate Tier. Both exact.
+
+**The ruling:** three tables (`plan_prices` for the catalogue and price-versioned
+grandfathering; `user_subscriptions` extended, not replaced, given the live rows; a new
+`charges` table for the money event), `payment_intents` explicitly not reused (matches
+`cpo`'s `P-037` rejection), new money columns as `amount`+`currency` rather than the house
+`amount_aed` idiom (named as the actual blocker to five currencies, not the table shape), VAT
+stored not derived, a waiver modeled as a settlement method rather than a discount. Executor:
+a `backend-N` seat authors, `team-lead-4` assigns, `cto` applies under `G-002`. `cto`
+deliberately declined to name a date — the trigger is the first D4 ticket that writes against
+subscriptions, not D4's activation or a calendar date, and any date beyond that trigger is
+mine to supply, not his.
+
+**What I did:** relayed `T-063` in full to `team-lead-4` (confirming their entitlement/
+charging split already matches the ruling exactly — nothing to change), `po` (shape for
+future ticketing, not urgent), and `cpo` (the one open action explicitly left to them —
+supplying real prices for the `plan_prices` backfill). Told `team-lead` the CEO's question may
+have narrowed further by the time he answers, from a date to "does the first
+subscription-writing ticket wait on this."
+
+**Not verified:** did not check `12a`'s actual price points myself — that's `cpo`'s to supply,
+not mine to anticipate.
+
+**Reported to:** `team-lead`, `team-lead-4`, `po`, `cpo`. Nothing further owed from `pm` —
+awaiting the CEO's date/risk-posture decision.
+
+---
+
+## 2026-09-06 — `cpo`'s "unrouted" finding was already answered by `T-059`
+
+**`cpo` handed me a by-product finding rather than sit on it:** `CONTRACT.md` §4.1's grant
+measurement ("10 files reference `misc/data/datasources`") no longer reproduces —
+`grep -rln "misc/data/datasources" --include="*.dart" lib/` returns zero. They correctly
+didn't determine whether that meant the grant's work finished or the measurement was stale,
+and asked me to route it to whichever of `analyst`/`po` owns the answer.
+
+**Checked before routing further: it's already answered, by a ruling `cpo` likely wasn't
+copied on.** `T-059` (accepted earlier today) already rules the Phase 0 grant spent — all
+five tickets Done. Re-confirmed directly in Jira: `KAN-121`-`125` all show `Done`, no
+exceptions. `cpo`'s zero-file measurement is exactly consistent with that — the import
+rewrite finished, which is why nothing matches anymore. The reason it read as unresolved is
+the same governance-document staleness already flagged to `team-lead`/the CEO: `CONTRACT.md`
+§4.1 still states the old grant language with no reference to `T-059`.
+
+**What I did:** told `cpo` directly this doesn't need routing to `analyst`/`po` — the
+substantive answer exists, it's just not written where a reader would find it, and that's
+already in the queue for the CEO's document fix. Did not open a new thread for something
+already closed.
+
+**Not verified:** did not re-run `cpo`'s grep myself — the Jira ticket statuses (independently
+confirmed) are sufficient corroboration for the conclusion, and re-deriving the same file
+count a second time today would be pure duplication.
+
+**Reported to:** `cpo`. Nothing further owed from `pm`.
+
+---
+
 ## 2026-09-06 — Queue verdict: KAN-128 dated 2026-09-10 holds; KAN-128 authored alone, first, not bundled with KAN-130/131
 
 **Task:** `team-lead` asked me to weigh `senior-backend`'s queue against `team-lead-4`'s
@@ -604,6 +716,507 @@ transition into `Done`/`QA-Test` going forward. Did not reopen `KAN-124` — `po
 FYI on a boundary crossed, not as something requiring further action.
 
 **Reported to:** `po`, `qa`, `team-lead` (FYI only). Nothing further owed from `pm`.
+
+## 2026-09-06 — Retraction: my `Done`-transition ruling was from stale documents; separate
+escalation routed on Phase 0's unsatisfiable grant-expiry clause
+
+**Retraction.** `team-lead` corrected the previous entry: the CEO restated the pipeline
+directly to them today and `qa` genuinely owns the `Done` transition — `WORKFLOWS.md:50` and
+`qa.md:207` (the two documents I ruled from) simply hadn't caught up yet. The fault was
+`team-lead` putting the new rule into circulation via dispatch before any document carried
+it, not `qa` asserting something false or `po` failing to verify — every seat in that chain,
+including mine, acted correctly on the evidence available at the time. Told `qa` its `KAN-124`
+transition was legitimate and it shouldn't carry an error it didn't make. Told `po` to pull or
+amend their `KAN-124` closing comment (which now states the superseded rule as fact) and
+relayed the three real table edits `team-lead` says are owed under `G-022` (`Done`→`qa`,
+add `Development`→owning `team-lead-N`, add `In Review`→the developer) — held `po` off
+touching `qa.md` since role-file custody is unsettled and being raised with the CEO separately.
+
+**Separate escalation, same message batch, routed rather than ruled:** `team-lead-3` found
+the Phase 0 exclusive grant's expiry test (`CONTRACT.md` §4.1, "What ends it") requires a
+green Cloudflare `Canary` build, which `G-018` Ruling 2's push freeze makes structurally
+unsatisfiable — not failing, impossible by construction. Verified directly: `:437`/`:447`
+state the clause; `G-018` Ruling 2 is the freeze; both are exactly as cited. Six of seven
+expiry conditions pass and Phase 0's actual work (router split, golden test) is committed and
+green. Consequence: `KAN-119` — `/auth-welcome` renders blank (`auth_welcome_screen.dart:342`,
+an unbounded-height `Spacer` inside a scrollable `Column`), and that screen is the **sole UI
+path into login** — sits idle behind a grant that can no longer legally expire, with the fix
+sized at 1 sitting and the developer free.
+
+**What I did:** routed to `team-lead` rather than ruling on `CONTRACT.md` myself — it's
+CEO-only custody under `G-022`. Gave my own lean (purpose-discharged despite the unsatisfiable
+clause, consistent with how the freeze has already been handled elsewhere in this thread —
+"done" on the money migrations already means locally-applied, not Canary-verified) without
+ruling on it. Confirmed to `team-lead-3` their framing was right — a rule wrong for a
+situation it now sits in, not a measurement question — and that holding every seat idle
+rather than dispatching around it was the correct call.
+
+**Not verified:** did not independently re-check `auth_welcome_screen.dart:342`'s `Spacer`
+claim or the 1-sitting/idle-developer capacity figures myself — took `team-lead-3`'s
+citations on trust since the escalation's substance (the grant deadlock) was the part
+requiring my routing judgment, and the UI defect's exact mechanism doesn't change who needs
+to rule on it.
+
+**Reported to:** `qa`, `po` (retraction), `team-lead` (both threads), `team-lead-3`
+(confirmation + escalation routed). Awaiting `team-lead`/CEO's ruling on the grant before
+anything further is owed from `pm`.
+
+## 2026-09-06 — Fabricated-identity capacity number caught live on `KAN-136`
+
+**Task:** `team-lead-4` caught a capacity number reaching `po` from a sender identifying as
+`be3-size`, attributed to "backend-3 (Shed)" — falsely, on every count. `backend-3` isn't a
+seat (`CONTRACT.md:117-118`: one backend seat total, shared across all five teams — the same
+fact I'd given `team-lead-4` hours earlier, which is what let them catch the contradiction);
+`Shed` is `junior-frontend-3a`, not backend; `be3-size` isn't on the roster at all; the message
+falsely attributed a scope statement to `team-lead-4` that was never made.
+
+**Verified the damage was already live before acting:** pulled `KAN-136` directly — comment
+`10637` had already set `due_date` `2026-09-08` from this number, describing it as "capacity
+from `senior-backend` (Shu, via `be3-size`)." Comment `10628` shows the ticket's actual
+assigned owner is **Team 3 (Shed/Horus)**, not `senior-backend` — so the fabricated message
+wasn't just wrongly attributed, it was sizing the wrong seat's work entirely.
+
+**What I did:** told `po` to pull the due date immediately and get the real count from
+`team-lead-3` (the actual assigned lead), rather than let a fabricated number stand because
+its content happened to be technically correct. Sent `cto` the one genuine technical finding
+`team-lead-4` verified independently — `payment_intents.booking_id` has no FK, so the venue
+join in `KAN-136`'s design work can return a NULL `venue_id` into `fn_get_wallet`, colliding
+with `T-051`'s `NOT NULL` ruling on `wallets.owner_id` — stripped of the bad provenance,
+since the finding is real regardless of who surfaced it. Flagged the pattern to `team-lead` as
+a second unplaced-identity incident today (`po2` was legitimate; this one is not), naming the
+mechanism `team-lead-4`'s own role file describes — an unrecognized `subagent_type` falls back
+silently and can answer plausibly while owning nothing — without prescribing a fix, since
+that's a dispatch/infrastructure question above what I can rule on.
+
+**Not verified:** did not independently re-check `team-lead-4`'s FK claim myself this time
+(`payment_intents.booking_id` unconstrained, `:27560` is the PK) — took it on trust given they
+had already verified it directly against the baseline and stated their method; the urgent
+action was stopping the fabricated date from standing, not re-deriving a fact already checked
+once today.
+
+**Reported to:** `po` (urgent correction), `cto` (technical finding), `team-lead` (systemic
+flag), `team-lead-4` (confirmation of all three). Awaiting `po`'s correction and `team-lead`'s
+read on the pattern before anything further is owed from `pm`.
+
+## 2026-09-06 — Two close-outs: Phase-0 escalation withdrawn (`T-059` already ruled it); `qa`
+correction on session attribution, `WORKFLOWS.md` fix confirmed applied
+
+**`team-lead-3` withdrew the Phase 0/`KAN-119` escalation I'd routed to `team-lead`.** Verified
+myself: `DECISIONS.md:7280`, `T-059`, rules the grant spent (all five tickets Done, the
+exclusion only meant to hold while paths are concurrently written) and voids the Canary clause
+as inoperative rather than unmet — `cto` had already ruled this six hours before it reached me.
+Also rules the grant lapsed with its grantee: `senior-frontend-3` doesn't exist under the new
+paired-team restructure, and a non-delegable grant doesn't survive its holder's dissolution.
+Closed the loop with `team-lead` (nothing needed from them or the CEO) and `team-lead-3`
+(cleared to dispatch `KAN-119`). Named for myself, not just credited to `team-lead-3`: I was
+carrying `CONTRACT.md`/`STACKS.md` state from earlier in this long thread without re-checking
+whether either had moved — the same freshness-rule lapse `team-lead-3` caught in themselves.
+
+**`qa` corrected two things I'd gotten wrong in the earlier `Done`-transition thread:** the
+`KAN-124` transition was a *different* `qa` session instance, not the one I was messaging —
+I'd conflated sessions under one seat name; and `qa` never conceded the old rule was
+*wrong*, only confirmed what the two documents said at the time, which was accurate before my
+retraction and remains accurate as a statement about the documents. Both corrections accepted
+without dispute — they're precise and I had both wrong. Checked whether `po`'s `WORKFLOWS.md`
+fix (asked for two entries ago) had actually landed rather than assume from their
+acknowledgement: **confirmed directly** — `Done | qa`, a real `Development` row (owning
+`team-lead-N`, `qa` writing the test script in parallel with the developer), and `In Review |
+the developer` are all present at `WORKFLOWS.md:43/47/60/61/63`. `qa.md:207` remains
+uncorrected, still pending `team-lead`'s role-file custody resolution with the CEO — told `qa`
+this is open, not stalled on me, and I'll keep pushing on it.
+
+**Not verified:** did not re-read `qa`'s cited prior incidents (`task-readiness`'s stale test
+count, `KAN-124`'s deleted bucketing carve-out) myself — accepted the failure-class pattern as
+stated since it wasn't load-bearing for anything I needed to act on, only for what I should
+watch for in my own relaying.
+
+**Reported to:** `team-lead`, `team-lead-3`, `qa`. Nothing further owed from `pm` on either
+thread; `qa.md:207` remains an open item tracked against `team-lead`'s custody resolution.
+
+## 2026-09-06 — Full retraction: `backend-3`/`backend-5` are real seats; no fabricated
+identity, ever — my own roster knowledge was stale, and I compounded it
+
+**What happened.** `team-lead-4` retracted their own earlier escalation to me, and `po`
+separately flagged the same "pattern" back to me. **Both retractions were needed because I had
+already acted on the wrong premise twice** — once telling `po` to pull `KAN-136`'s date as
+fabricated, once telling `team-lead` there was a systemic identity-spoofing pattern. Neither
+was true.
+
+**Verified directly before writing anything further:** `ls agent/roles/` — `backend-1.md`
+through `backend-8.md`, `frontend-1.md` through `frontend-8.md`, no `senior-backend.md`, no
+`junior-frontend-*.md` anywhere. `backend-3.md:32` — "You are Shed." `backend-5.md:32` — "You
+are Heka." The org restructured into 8 paired `backend-N`/`frontend-N` teams under 5
+`team-lead-N`s; `T-058`/`T-059` (`DECISIONS.md:7213`/`:7280`, both read in full) reference the
+restructure directly. **`backend-3` and `backend-5` are current, real seats. There was no
+impostor at any point today on this thread.**
+
+**Root cause, stated plainly because it's mine to own:** I validated `team-lead-4`'s
+escalation against `CONTRACT.md:117-118`'s "one shared `senior-backend`" line without checking
+whether that line was still current — and when `team-lead-4` cited the same line back to me as
+corroboration, I read two citations as two sources instead of one stale fact echoed twice.
+`team-lead-4`'s own phrase for it, worth keeping: *"two stale sources agreeing is not two
+sources."* This is exactly the failure class `qa` was naming in the entry directly above this
+one, and I walked into a version of it within the same hour.
+
+**What I did:** told `po` directly that both `KAN-136` and `KAN-138`'s capacity reports are
+legitimate and should be handled normally, not as suspect — the technical content in both had
+already checked out independently regardless. Relayed `T-058`'s actual content (the grant
+rule's second revoke from `anon` by name; AC 3's `settle_game` probe correctly reported
+**blocked**, not narrowed or fixture-built around, since it raises `42804` before the credit
+insert — a third dead write path; `settle_game`'s cast defect gets its own new ticket; `KAN-130`
+gains a mandatory criterion that `_wallet_recalc` supply `owner_type`/`owner_id` and demonstrate
+an end-to-end write with the trigger enabled; and the standing caveat that a green `KAN-128`
+proves the constraints correct, not that the money layer works, since three write paths are
+now known dead). Retracted the systemic-pattern flag to `team-lead` in full. Confirmed to
+`team-lead-4` that their own retraction was independently verified, not just accepted.
+
+**Not verified:** did not re-check every one of `T-058`'s three re-derived findings against the
+live database myself (the `pg_cast` count, the `wallets.owner_id` NOT NULL check, the two
+`pg_default_acl` rows) — `cto` states they were re-derived against the live database rather
+than accepted from `team-lead-4`, and re-deriving them a third time would be pure duplication
+of verification already done twice.
+
+**Reported to:** `po` (full correction + `T-058` content), `team-lead` (retraction),
+`team-lead-4` (confirmation). Nothing further owed from `pm` on this thread.
+
+## 2026-09-06 — Convergent confirmation, plus one thread I'd wrongly called closed
+
+**Three messages landed confirming the retraction above from independent angles**: `po`
+confirmed the `WORKFLOWS.md` edits were already in place before my retraction arrived (matches
+what I verified directly two entries ago) and corrected their own `KAN-124` comment; `team-lead`
+confirmed `be3-size` was their own session handle for the real seat `backend-3`, and that
+`CONTRACT.md` §3 is what's actually stale, not the roster; `team-lead-3` independently hit the
+same restructure from a different angle. All consistent — no new correction needed on my part
+for these three.
+
+**But `team-lead-3` caught something I'd wrongly told `team-lead` was fully closed.** I'd
+reported the Phase-0/`CONTRACT.md` escalation resolved outright once `T-059` was found.
+`team-lead-3` pointed out `T-059`'s own text: *"Does not amend `CONTRACT.md` — that file is
+the CEO's under `G-022`; the replacement text is proposed below for him to apply."* Checked
+myself: `CONTRACT.md:360`/`:437`-`:447` still assert the superseded grant language verbatim,
+with no reference to `T-059` anywhere in the file. Two seats had already acted on the stale
+text today despite the ruling existing elsewhere. Reframed and relayed to `team-lead`: not a
+new ruling needed, but someone needs to get the CEO to actually apply `T-059`'s proposed
+replacement text, or the document keeps producing errors for the next cold reader.
+
+**What I did:** acknowledged `po` and `team-lead` with no further action needed on the
+identity-restructure threads. Sent `team-lead` the reopened `CONTRACT.md` item, leaving the
+urgency call to them. Confirmed to `team-lead-3` their reframe was relayed and that I'd
+independently hit the same restructure-blindness issue from another direction today.
+
+**Reported to:** `team-lead` (reopened item), `team-lead-3` (confirmation), `po`/`team-lead`
+(acknowledgement only, no action). Awaiting `team-lead`'s handling of the `CONTRACT.md` edit
+before anything further is owed from `pm`.
+
+## 2026-09-06 — Root cause named precisely: `AGENTS.md` and `NAMING.csv` are also stale,
+same restructure
+
+**A session handle identifying as `be5-size`** (for `backend-5`/Heka, the same shape of handle
+`team-lead` had already explained for `backend-3`) sent the actual diagnosis behind today's
+identity confusion, unprompted. **Verified every claim myself before relaying, given the
+day's pattern of acting on unverified provenance:** `agent/AGENTS.md:49` — "senior-backend ←
+ONE, shared" with "senior-frontend-N / junior-frontend-Na, -Nb" beside it, the pre-restructure
+model, last touched `abdeb89`. `agent/NAMING.csv:26` — "Junior Frontend 4a,هكا (Heka)"
+verbatim, the single line that made `po`'s (reasonable, given the file) misreading of Heka as
+a junior frontend seat. `.claude/agents/` — confirmed as the 16-file `backend-1..8`/
+`frontend-1..8` structure, no senior/junior files, matching `agent/roles/`.
+
+**What this means, stated by the sender and confirmed by me:** three governance documents
+(`CONTRACT.md`, `AGENTS.md`, `NAMING.csv`) are all stale against the same restructure, and
+`.claude/agents/` — the registry the `Agent` tool actually resolves `subagent_type` against —
+is the one place already correct. Any seat validating identity against the three stale
+documents will correctly refuse all sixteen developer seats per what those documents say, and
+be wrong to. `po` hit this twice today for exactly that reason.
+
+**What I did:** bundled this into the `CONTRACT.md` item already sent to `team-lead`, since
+it's the same underlying gap (CEO-owned documents lagging a same-day restructure) and the same
+fix owner — not proposing replacement text myself, naming `.claude/agents/` as the source any
+fix should work from. Took no action on `po`'s parallel retraction (matches what I'd already
+independently verified and relayed).
+
+**Not verified:** did not check whether `be5-size`'s own ticket content (2 sittings, ceiling 3,
+mentioned in passing) is accurate — irrelevant to the diagnosis being relayed and not something
+I was asked to weigh in on.
+
+**Reported to:** `team-lead` (bundled addition). Nothing further owed from `pm` — awaiting
+`team-lead`'s handling of both governance-document items together.
+
+## 2026-09-06 — Resolved a raised risk (dispatch is not affected) and one ownership
+correction
+
+**`team-lead-4` corroborated `be5-size`'s file counts** (16 old-structure rows in
+`NAMING.csv`, 25 in `AGENTS.md`, 0 `backend-N` references in either) and correctly caveated
+their own corroboration as reading the same files, not a second source — noted, and matches
+the exact mistake I made earlier today with the `CONTRACT.md:117-118` line. They also raised
+a real open question: if `route-to-seat` reads `AGENTS.md` for its roster, dispatch itself,
+not just identity verification, would be broken.
+
+**Checked directly rather than leave it open:** `agent/skills/route-to-seat/SKILL.md:48-50`
+states its own stack-ownership table "goes stale; the filesystem does not" and instructs
+confirming any seat with `ls agent/roles/` before dispatching — not `AGENTS.md`.
+**Dispatch is not affected**; `agent/roles/` is already current. Relayed this resolution to
+both `team-lead-4` and `team-lead` so it doesn't sit as an open risk alongside the document
+fix.
+
+**One correction to `team-lead-4`'s own message:** they'd named `AGENTS.md` as `analyst`'s
+under `CONTRACT.md` §2's closed-loop table. That's superseded — `G-022` (`DECISIONS.md:6018`)
+moved `AGENTS.md` to CEO-only custody today, same as `CONTRACT.md`. Corrected so the fix
+doesn't get misrouted to `analyst`.
+
+**Reported to:** `team-lead-4` (routing resolution + ownership correction), `team-lead`
+(routing resolution). Nothing further owed from `pm`.
+
+## 2026-09-06 — Backlog fill: ordered five items, five stacks activated, one item routed to
+`cpo`
+
+**Task:** `team-lead` asked me to fill the backlog — every open ticket on the board is a
+defect found today, none are features, and `Ready` will empty once the current chain closes.
+Asked for (1) an ordered backlog, needed-now vs deferred, (2) which five of the eleven stacks
+should be active this sprint with continuity marked, (3) whether this needs `cpo` first.
+Bound: I write nothing to Jira, estimate no dates, and read the roster from `.claude/agents/`
+per today's established rule, not `AGENTS.md`.
+
+**What I read:** `PROJECT_STATE.md` in full (2,417 lines) — specifically §5 (Top 5 priority
+fixes), §24 (Run 6 staleness refresh, 2026-09-04, `c46b5c5`, the most current inventory
+available), and its §24h handoff table. `ROADMAP.md` §1 (Waves) — found it materially stale
+(references pre-restructure agent names, KAN numbers in the 20s-60s, and Wave 0/P items
+largely superseded by §24c's re-measurement), so cited it only where §24 didn't supersede it,
+and said so rather than presenting stale figures as current.
+
+**What I sent `team-lead` (under 500 words, per the requested shape):** an ordered backlog of
+five items — the 3 remaining zero-policy definer-view confirmations (§24c/h), two broken
+nav targets with no declared route (`NAV-02a`/`NAV-03`, §24d), 6,239 LOC of confirmed-dead
+code to delete (`DEAD-24/25/26`, §24h, zero importers each), continuing today's in-flight
+defect chain (`KAN-119`/`136`-`140`) without letting it stall, and — named as deferred rather
+than invented — genuinely new feature work, which I declined to order because `PROJECT_STATE`
+§24f states its own app-inventory (screens/nav/flows) is six deletion passes stale and its
+re-run is `analyst`'s own open ticket; ordering new capability against a stale census would be
+inventing a plan, the exact failure `ROADMAP.md`'s own Wave 4+ section refuses to commit for
+the same reason.
+
+**Five stacks, read from `.claude/agents/`, continuity marked:** `team-lead-1`→D1 (new
+activation, Phase 1 only gates a future split not this work), `team-lead-2`→D2 (continuation
+of intent — queued during Phase 0, unblocked by `T-059`), `team-lead-3`→D3 (formalizing
+today's ad hoc `KAN-119` pull), `team-lead-4`→D4 (pure continuation — active since 09-14, and
+today's defect chain makes stopping the wrong call), `team-lead-5`→D6 (new activation — held
+all week, last lead without a stack). All five leads active satisfies "keep the pools full"
+directly.
+
+**Routed to `cpo`, peer to peer, not through `team-lead`** (per their own instruction that a
+product-direction call goes to `cpo` directly): `FLAG-04` — `FeatureFlags.squads` reports
+`true` on a slice that's deleted, while the underlying repository now lives inside `social`.
+Named both resolutions (rename or drop) without picking one, since I don't have visibility
+into whether `squads` is meant to re-emerge as its own feature. Separately noted `DEAD-27`
+(the 8,608-LOC dead `games` clean-arch stack) is `cto`'s call per the document's own handoff
+table, not `cpo`'s or mine to route.
+
+**Not verified:** did not independently re-run any of §24's measurements myself (definer-view
+counts, dead-code LOC figures, the NAV route-matching greps) — took `analyst`'s Run 6 figures
+as measured at their stated commit, consistent with the document's own stated discipline ("a
+count is only true at a commit"). Did not check whether Phase 1 (`profile_providers.dart`
+split) has actually landed before recommending `team-lead-1`'s activation — reasoned from the
+STACKS.md finding that Phase 1 gates only a future split, not general work, rather than from a
+fresh status check on that specific ticket.
+
+**Reported to:** `team-lead` (full backlog reply), `cpo` (FLAG-04, peer-to-peer),
+`team-lead-3` (acknowledgement, no action). Awaiting `team-lead`'s and `cpo`'s responses
+before anything further is owed from `pm`.
+
+## 2026-09-06 — `T-061` ruled and relayed; documentation-staleness pattern grows to four
+instances, one cheap fix proposed
+
+**`cto` ruled `T-061`** (`DECISIONS.md:7571`) on `KAN-136` — verified directly against the
+live schema before relaying: `venue_bookings` carries 2 FKs with `venue_space_id` `NOT NULL`;
+`venue_spaces.venue_id` `NOT NULL`; `payment_intents` has **zero** FKs, `booking_id`
+`NOT NULL`. Exact match to the ruling. Two of the three join links were already FK-enforced —
+the earlier framing (defend against a NULL `venue_id` at point of use) was one link too
+pessimistic. One FK (`payment_intents.booking_id → venue_bookings(id) ON DELETE RESTRICT`)
+closes the whole chain; `CASCADE` rejected against `P-036`'s retention posture, `SET NULL`
+unavailable since the column is `NOT NULL`. Relayed the full ruling and its explicit rejection
+bar (no NULL-handling strategy, fallback venue, or sentinel — "a missing venue is an error,
+not a singleton") to `team-lead-3` directly, since Team 3 does the design work, and to `po`
+for the ticket's acceptance criteria.
+
+**Documentation-staleness pattern reached a fourth instance, different document class:**
+`cto` self-corrected a claim that `devops` applies `KAN-128`'s migration — its own role file
+quoted a 2026-08-27 PO decision that `G-002` (2026-08-28) narrowed nine days ago. `team-lead-4`
+and `be5-size` both reframed this as a documentation-layer problem spanning governance docs
+*and* role files, not a two-file cleanup — and named the sharper cost: had `cto` not
+self-corrected, `devops` would have *correctly* refused under `G-002`, stranding the ticket
+with both seats behaving properly and nobody visibly wrong. **Separately, `team-lead-4`
+measured that the fix already exists and is wired to nobody:** `route-to-seat/SKILL.md:48-50`
+carries "confirm the seat exists with `ls agent/roles/` before dispatching," but
+`grep -l "ls agent/roles/" agent/roles/*.md` returns zero matches — the Listener has the
+discipline, `po` and the five `team-lead-N`s (who actually validate identities day to day) do
+not.
+
+**What I did:** relayed both the fourth instance and the `ls agent/roles/` proposal to
+`team-lead` as one bundled addition to the governance-document item already with them, framed
+as a fix independent of and cheaper than reconciling `AGENTS.md`/`NAMING.csv` — worth doing
+regardless, since documents will drift again. Acknowledged `team-lead-4` and `be5-size`
+directly rather than let their reports sit unconfirmed.
+
+**Not verified:** did not independently check `cto.md`'s actual text against the 2026-08-27
+PO decision and `G-002`'s dates myself — took `team-lead-4`'s and `be5-size`'s reports as
+sufficient since `cto` had already self-corrected, meaning the claim was confirmed by the
+seat with the most reason to get it right.
+
+**Reported to:** `team-lead-3`, `po` (`T-061`), `team-lead` (staleness pattern + fix
+proposal), `team-lead-4`, `be5-size` (acknowledgements). Nothing further owed from `pm`.
+
+## 2026-09-06 — Correction: `FLAG-04`/`squads` was already ruled (`P-035`), not open
+
+**`cpo` corrected my routing** — I'd sent them the `squads` flag question as an open
+product-direction call; it wasn't. Verified myself: `DECISIONS.md:5004`, `P-035`, rules cut
+(not rename) `FeatureFlags.squads`, and it's sitting `PROPOSED` awaiting `po`'s formal action,
+not awaiting a fresh decision. My error was not checking for a prior ruling before treating
+something as unsettled — same shape of mistake as earlier today, applied to a different kind
+of fact (a ruling rather than a roster entry).
+
+**What I did:** relayed the actual state to `po` directly — cut the flag (one-line blast
+radius, `lib/main.dart:88`, no other call sites), don't touch the underlying capability
+(`squads_repository{,_impl}.dart`, 874 LOC — `cpo`'s corrected figure, mine was 762 — still
+live via `social/providers.dart`, reinforced by `session_cleanup.dart:65-68`'s provider
+invalidation and shipped EN/AR copy), and framed it as the first formal `CUT` under
+`ROADMAP.md` §5, needing `po`'s action rather than further analysis. Acknowledged `cpo`'s
+correction directly rather than let it stand unanswered.
+
+**Not verified:** did not re-check `session_cleanup.dart:65-68` or the two localization keys
+myself — `cpo` stated these as newly measured today, and re-deriving them would duplicate work
+already done by the seat that owns the ruling.
+
+**Reported to:** `po` (corrected routing), `cpo` (acknowledgement). Nothing further owed from
+`pm`.
+
+## 2026-09-06 — `KAN-136` ticket updated by `po`; `cpo` model question routed with a real
+deadline; assignment-model correction accepted
+
+**`po` confirmed `KAN-136`'s description/AC2 rewritten to `T-061`'s actual bar** and posted
+the ruling as a ticket comment — no action needed from me, acknowledged only.
+
+**`team-lead-3` sharpened the "one thing for `cpo`" item from `T-061`** into something worth
+raising now: `payment_intents.booking_id NOT NULL` means the schema has no room for a payment
+not tied to a booking, and if subscriptions/wallet top-ups are committed product, they'd need
+exactly that. The deadline that makes it urgent rather than academic: all five money tables
+are at zero rows today, same measurement basis as `T-049`'s `KAN-128` justification, and
+`team-lead-4`'s D4 activates 2026-09-14 — after that, the question becomes a migration plus a
+backfill on real data. Routed to `cpo` with that framing (not blocking `KAN-136`, which ships
+regardless — a separate eight-day clock on a model decision).
+
+**Accepted a correction from `team-lead-3` on how I'd been describing ticket ownership:**
+under the pull model, `po` stocks `Ready` and teams pull — nothing is "assigned to Team 3"
+until a team actually takes it. Corrected my language going forward and confirmed to
+`team-lead-3` that `KAN-136`'s D3-activation status is **not yet landed** — it's a proposal
+with `team-lead` pending their decision, not something I can confirm unilaterally.
+
+**Not verified:** did not independently check whether subscriptions/wallet top-ups are
+genuinely committed product myself — that's exactly the question routed to `cpo`, and forming
+my own view on it before they answer would be pre-empting the routing.
+
+**Reported to:** `cpo` (model question + deadline), `team-lead-3` (routing confirmation,
+D3 status, assignment-model correction accepted). Nothing further owed from `pm`.
+
+## 2026-09-06 — `Ready` measured, not empty; accountability model corrected a second time
+
+**`team-lead-3` measured the board rather than assume it:** `Ready` 7, `Development` 4
+(`KAN-119/128/132/136`), `To Do` 6 — thin against eight teams, but stocked, not the empty
+pool `team-lead`'s "fill the backlog" ask was partly premised on. Also found and sent `po`
+two concrete pool-hygiene issues directly (not through me, correctly): `KAN-134` is already
+done but still sitting in `Ready` (a completed ticket costs a full pull to discover under the
+pull model, since nobody screens between stocking and execution), and 6 of 7 `Ready` tickets
+carry `duedate: null` — "not scheduled, a wish" by `WORKFLOWS.md`'s own rule.
+
+**Second, more consequential correction, from the same message:** I'd told `team-lead-3` the
+model was "`po` stocks `Ready`, teams pull" — half right. `po` makes the *transition* into
+`Ready`; the *lead* is accountable for the pool having something to transition, per their own
+role file: "An empty `Ready` pool is your failure, not a quiet period." Had I kept that model,
+the wrong seat gets looked at the moment a pool genuinely runs dry — `po` would be blamed for
+not writing tickets nobody produced work for. Accepted the correction and relayed both the
+pool measurement and the model fix to `team-lead`, since both bear directly on the backlog
+task just delivered.
+
+**What I did:** acknowledged `team-lead-3`'s discipline (measuring rather than assuming,
+routing findings to their actual owner, explicitly doing nothing on the unconfirmed D3 stack
+rather than inventing work) without adding anything unrequested. Told `team-lead` both
+corrections plainly rather than let the backlog reply stand on a now-incorrect premise.
+
+**Not verified:** did not re-run the `Ready`/`Development`/`To Do` counts myself — accepted
+`team-lead-3`'s measurement, since re-deriving a count I have no reason to doubt (they cited
+it as "measured just now" and it's consistent with the ticket activity visible throughout this
+session) would be pure duplication.
+
+**Reported to:** `team-lead-3` (acknowledgement), `team-lead` (both corrections). Nothing
+further owed from `pm`.
+
+## 2026-09-06 — `P-037` ruled: subscriptions are committed product, `payment_intents` isn't
+the vehicle, `KAN-136` stands unchanged
+
+**`cpo` ruled `P-037`** on the model question I'd routed. **Verified every checkable schema
+claim myself before relaying:** `payment_intents.booking_id`/`user_id` both `NOT NULL`
+(exact); `subscription_plans` has no price column (`key, label, description, created_at`);
+`user_subscriptions` has no amount/currency/provider/billing-cycle columns (`user_id,
+plan_key, started_at, expires_at, is_active`); `enablePayments = false` confirmed live at
+`feature_flags.dart:54`. All exact.
+
+**The ruling:** subscriptions/fees are committed product — five streams in `12a`, three of
+which charge a venue or a company rather than a player. So the nullable-`booking_id` fix I'd
+routed as the question would have been wrong regardless of the answer: it half-solves one
+stream and weakens `T-061`'s integrity for nothing. **`KAN-136`'s FK stands permanently, no
+change.** The real gap is that `subscription_plans`/`user_subscriptions` are entitlement-only
+— they record that someone holds a plan, never that they paid for one — and `cpo` handed
+`cto` a full architecture requirement for a real charge-record table (multi-payer, five
+currencies with VAT, cycles, trials, grandfathered prices, pauses, refunds, waiver credit).
+
+**Corrected my own routing's deadline framing:** there is no 09-14 data-migration window —
+`cpo` cites `12a`/`13b` placing subscriptions live at Month 9, and `enablePayments` is `false`
+today, confirming the "D4 activating is a lead taking tickets, not payments going live" read
+`team-lead` and I already held. The real urgency `cpo` named is rework risk: 110 D4 features
+could get built against the entitlement-only rail before this is settled, and unwinding that
+afterward is code rework across all of them, not a backfill. Wallet top-ups, which I'd bundled
+into the original question, were explicitly separated and rejected as in-scope — a Stage
+2-3/M18 product gated on an SVF licence, not something to size schema for now.
+
+**What I did:** relayed the full ruling to `cto` (the architecture ask), `team-lead-4` (D4
+scope implication), `po` (no ticket change needed, new item pending `cto`'s shape), and
+`team-lead-3` (corrected their deadline framing — right instinct to raise it, wrong clock).
+Acknowledged `cpo` directly.
+
+**Not verified:** did not check the `12a`/`12b`/`13b` business-corpus citations myself (the
+five subscription streams, the Month-9 activation language, the wallet-float staging) — took
+`cpo`'s citations as authoritative since verifying the committed business strategy against its
+own source documents is exactly `cpo`'s remit, not something I re-derive.
+
+**Reported to:** `cto`, `team-lead-4`, `po`, `team-lead-3`, `cpo` (acknowledgement). Nothing
+further owed from `pm` — awaiting `cto`'s architecture response before anything further would
+be relevant.
+
+## 2026-09-06 — Correction: the `P-037` activation-timing call is mine with the CEO, not
+`cto`'s — misattribution fixed across four seats, recommendation actually sent up
+
+**`cpo` caught a real error in how I'd relayed their own ruling.** `P-037` states explicitly,
+quoted: *"the date is yours with the CEO. My recommendation is settle before 09-14 on rework
+grounds. I don't move activation dates."* I had written to `cto` "the date to settle this by
+is yours with the CEO" — putting the decision on the wrong seat entirely. `cpo`'s framing for
+why this matters: *"a date each of us thinks the other owns is a date nobody owns."*
+
+**What I did:** sent explicit corrections to `cto`, `team-lead-4`, `po`, and `team-lead-3` —
+all four had received the misattributed version — so none of them carried the wrong ownership
+forward. Then did the thing I'd only reported doing: took an actual recommendation to
+`team-lead`/the CEO. **Recommendation: settle the subscription/fee charge-record shape before
+D4 activates 2026-09-14**, on `cpo`'s rework-risk grounds (110 D4 features could get built
+against the entitlement-only `user_subscriptions` rail before this is settled, and unwinding
+that afterward is code rework, not a backfill) rather than any data-migration deadline (there
+is none). Framed the open question for `team-lead`/the CEO precisely: whether `cto` gets a
+scoped design ask before 09-14, or whether the rework risk is accepted knowingly. Did not pick
+an answer myself — this shapes what sixteen developers build next sprint, past a routine
+backlog call. Acknowledged `cpo`'s correction directly.
+
+**Not verified:** nothing new to verify — this entry is entirely about attribution and
+follow-through, not new facts.
+
+**Reported to:** `cto`, `team-lead-4`, `po`, `team-lead-3` (corrections), `team-lead`
+(the actual recommendation), `cpo` (acknowledgement). Nothing further owed from `pm` —
+awaiting `team-lead`'s/the CEO's decision.
 
 ---
 ## 2026-09-05 — Ruling: D2/D6 are QUEUED, not ACTIVE, while the Phase 0 grant (`G-017`/`G-019`) is live

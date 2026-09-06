@@ -777,3 +777,167 @@ are prophylactic; a green KAN-128 is not evidence the money layer works.
 **Written:** `DECISIONS.md` `T-058`, committed `bc48aee`.
 **Not done:** no migration, no Jira, no apply — `po` writes the two ticket changes, `devops` ships.
 **Not verified:** P1/P2/P4/P5 per-probe liveness (that is `po`'s gate).
+
+## 2026-09-06 — T-059: the Phase 0 exclusive grant is spent
+
+**Brief:** `team-lead` — is `CONTRACT.md` §4.1's Phase 0 exclusive grant still in force? Four
+tickets parked on the answer. MODEL: opus · EFFORT: medium.
+
+**Ruling:** The grant is spent; the exclusion binds no seat. Three grounds, any one sufficient:
+its scope is five tickets and all five are closed; its named grantee is non-delegable and left the
+roster; and the exclusion is stated as conditional on the grant being live, protecting a concurrent
+write that no longer exists. The `Canary` conjunct of the §10.6 landing test is **void, not unmet** —
+an expiry trigger conditioned on an action the CEO has forbidden (`P-030`) cannot be read to extend
+the grant it was written to end. New general rule stated: an exclusive non-delegable grant **lapses**
+with its seat and does not transfer to a successor.
+
+**Verified myself:** all five Phase 0 tickets `Done` (JQL on `KAN`, `KAN-121`/`122`/`123`/`124`/`125`,
+status `Done`, category `done`) · the roster (`ls agent/roles/` — 8 `frontend-N`, 8 `backend-N`,
+5 `team-lead-N`, no `senior-*`/`junior-*`) · §4.1 in full including its stall and expiry paragraphs.
+
+**Not verified:** the §10.6 local measurements (441 LOC, 4 imports, empty grep, analyze 0/0, 106/10)
+— `team-lead`'s and `po`'s, and my ruling does not rest on them · whether the four tickets are
+otherwise ready (`po`'s gate) · which `lib/app/routes/` module `KAN-139` needs.
+
+**Output:** `DECISIONS.md` `T-059`, with the struck-through §4.1 replacement text proposed for the
+CEO to apply under `G-022`. Unblocks `KAN-129`, `KAN-132` (lifting `T-053`'s block), `KAN-139`, and
+the client half of `KAN-130`. I did not edit `CONTRACT.md`, Jira, or `lib/`.
+
+## 2026-09-06 — T-060: KAN-138 AC 2 is met with the recalc trigger enabled
+
+**Brief:** `team-lead-4` — one question: does KAN-138 AC 2 require `trg_wallet_ledger_recalc`
+enabled (making KAN-138 depend on KAN-130), or is a disabled-trigger probe acceptable?
+
+**Ruled: neither — Option A, and stronger.** The trigger stays **enabled** and the `23502` is the
+evidence. Verified read-only: `trg_wallet_ledger_recalc` is `AFTER INSERT … FOR EACH ROW`, enabled
+(`tgenabled='O'`), calling `_wallet_after_ledger`. An AFTER-ROW trigger cannot fire until the row is
+inserted, so an abort inside `_wallet_recalc` **proves** the credit insert was reached — which is
+exactly what AC 2 asks to see ("reaches the credit insert — not that the function compiles"). AC 2
+never said *committed*; reading that in would manufacture a dependency the criterion does not state.
+
+**Cap carried forward from `T-058` D3, narrowed:** reportable as *the credit insert is reached*;
+**not** as *`settle_game` settles end to end*. End-to-end stays KAN-130's mandatory criterion.
+
+**Consequence:** KAN-138 has no dependency on KAN-130; sitting 2 is datable once KAN-128 is applied.
+Executor must record SQLSTATE **and** the raising function — a bare `23502` with no origin proves
+nothing.
+
+**Written:** `DECISIONS.md` `T-060`. **Not done:** no ticket edit (`po`'s), no re-scope, no
+re-estimate, no write to the database. **Not verified:** that the post-KAN-128 `settle_game` body is
+otherwise executable to that point — executor's demonstration, `po`'s gate.
+
+### Same day, sixth addendum — `T-062` (was `T-060`): the route-module partition, and the slice axis (`0379b7d`)
+
+Two questions, one from `po` (relaying `team-lead-3`) and one escalated by `team-lead-3` at
+`team-lead-1`'s request. They are the same question seen twice, and `T-059` left the first open.
+
+- **`po`'s premise corrected.** `lib/app/routes/` is not unowned — `CONTRACT.md:453` and
+  `STACKS.md` §12 row 13 already direct it to *one module per lead, assembly contended*. **The
+  disposition does not fit the artifact.** Measured each module's feature footprint: **three of six
+  are clean, three straddle** (`play_places_routes.dart` spans **four** leads), and
+  `placeholder_screen.dart` routes nothing.
+- **Ruled:** clean three to their lead by stack (`identity`→TL1, `profile_social`→TL1,
+  `notification`→TL5); **straddling three CONTENDED under §4**; `placeholder_screen.dart` SHARED;
+  `app_router.dart` stays the contended assembly. **Rejected re-cutting the modules by lead** — a
+  router module's boundary is a route-tree boundary, and code is not partitioned by who reports
+  where. Phase 0's win holds: 1,712 contended lines became three modules.
+- **The axis question is a PROPOSAL, not a ruling — `CONTRACT.md` is the CEO's, not mine**
+  (`CONTRACT.md` §9 table, custody moved off `analyst` by `G-022`). `team-lead-3` addressed it to me
+  believing §3 was mine; worth correcting so the next escalation goes straight to the CEO.
+- **The technical finding, which is mine:** the slice map existed to give **five fixed teams**
+  disjoint file sets (`AGENTS.md` v0.8). Verified: `agent/roles/` now holds **8 `frontend-N`, 8
+  `backend-N`, 5 leads, no `senior-*`/`junior-*`** — one pool, no fixed teams. **The mechanism's
+  precondition is gone.** Proposed: **stack decides the ticket; the slice map becomes a collision
+  index**; §4 sequencing handles collisions. `KAN-119` **not reversed** — `team-lead-3` ruled
+  correctly under the documents as they stand; rule prospectively.
+- **Owed to the CEO, flagged not written:** §3's *"five of them, one per lead"*, *"ten of them, two
+  per lead"*, *"sixteen developers … one backend writer"* all name dissolved seats, and §3 is the
+  routing table. And *"which files your developers may touch"* in five lead role files has no
+  referent — no lead owns developers. **`pm`'s view is owed before the CEO applies any of it.**
+
+**Converted one restated figure back to first-hand.** `T-059` recorded the §10.6 numbers as
+*"re-stated here, not re-run by me."* I re-ran them: `flutter test` **exit 0, 106 tests, 10 files**;
+`flutter analyze --no-pub --no-fatal-infos` **57 issues**, sampled tail info-level. Cheap, and the
+exact failure this session produced five times.
+
+**Addendum (same day), from `backend-5`'s re-derivation — accepted and folded into `T-060`:** my
+evidence clause said "name the raising function" without saying how. A SQLSTATE cannot carry origin;
+the probe must capture `GET STACKED DIAGNOSTICS PG_EXCEPTION_CONTEXT` and print the frame stack. It
+will also show the pre-fix `42804` failing first, so the pack demonstrates old-path-dies-before-insert
+against new-path-dies-after-it. `backend-5` additionally confirmed `tgtype=29` and that
+`_wallet_after_ledger` has no `EXCEPTION` block, so the `23502` propagates uncaught — no false-success
+path. Premise strengthened, ruling unchanged, sizing unchanged.
+
+### Same day, seventh addendum — `T-061`: `KAN-136` venue resolution (`6c8c9ff`)
+
+`pm` relayed a `team-lead-4`-verified finding that had reached the board through an impersonated
+sender. **I re-measured everything first-hand rather than relying on the relay** — a tainted source
+is a reason to re-measure, not to discard a finding that may be true. It was true, and narrower than
+framed.
+
+- **Measured the chain: two of three links are already closed.** `venue_bookings.venue_space_id` is
+  NOT NULL with an FK to `venue_spaces`; `venue_spaces.venue_id` is NOT NULL with an FK to `venues`.
+  **Given a booking row, `venue_id` cannot be NULL.** The only hole is
+  `payment_intents.booking_id` — **NOT NULL, no FK**. So **one FK closes the whole chain**, and
+  `KAN-136`'s design work is much smaller than the two-option framing implied.
+- **Ruled: `FOREIGN KEY (booking_id) REFERENCES venue_bookings(id) ON DELETE RESTRICT`.** CASCADE
+  rejected — it would delete payment records against `P-036`. SET NULL **unavailable** — `booking_id`
+  is NOT NULL, so it fails at runtime. Both tables at **0 rows**: free now, free once.
+- **The raise is not an alternative to the FK, and that distinction is the ruling.** Per `T-049`
+  Decision 2 — *the constraint makes the guarantee*. Choosing the raise instead would put the
+  protection inside the thing `CREATE OR REPLACE` replaces, which is how this function acquired its
+  defects. `INTO STRICT` on the two-hop join gives the assertion in one keyword.
+- **Guard-rail for the design review:** a fallback venue, a sentinel or a tolerated NULL is a
+  rejection. `T-052`'s sentinel exists because the platform is a real singleton; **a missing venue is
+  an error, not a singleton.**
+- **Owed to `CONVENTIONS.md` §12:** *where a constraint can hold an invariant, the constraint holds
+  it and the function asserts it — never the reverse.*
+- **Flagged to `cpo`, not blocking:** `booking_id` NOT NULL forecloses non-booking payments
+  (subscriptions, wallet top-ups). Correct for the schema as it stands.
+
+**Second addendum — I was wrong about the apply owner, and `backend-5` caught it.** I wrote
+"`devops` ships that, not me" about the `KAN-128` apply. `CONTRACT.md:242` is explicit: writing to
+`wtncuzcskpigqpmnxwws` is **`cto` only**, under `G-002`. `devops` would have been right to refuse.
+**Root cause worth keeping:** my role file's `PRODUCTION IS NOT YOURS TO CHANGE` section quotes the
+**2026-08-27** PO decision, which `G-002` narrowed on **2026-08-28**. The role file is stale by one
+decision and it is what I read first; it also conflates the repo path (`devops`/`Canary`, still true)
+with the direct-Supabase path (mine since `G-002`, never `devops`'s). `po`'s and `team-lead-4`'s
+dating against "cto's Wednesday apply slot" was correct throughout — only my reading was wrong.
+**Escalated to the CEO under `G-022`:** `agent/roles/cto.md` is a generated agent definition; I do
+not amend it on an agent's say-so. Recorded as the second addendum to `T-060`.
+
+### Same day, eighth addendum — `T-063`: the billing rail shape (`39cd9fd`)
+
+`cpo`'s `P-037` handed the billing-schema shape to me. **Measured the catalogue before asserting the
+gap** — the entitlement rail is complete (`subscription_plans`, `user_subscriptions`,
+`subscription_features`); only the money rail is missing. `cpo`'s framing was exact.
+
+**Two findings `cpo` and `pm` did not have:**
+1. **`user_subscriptions` holds 82 rows, not zero** — but the distribution is **`kickoff=82`** with
+   `pro` and `prime` empty. So no paid subscription has ever existed and there is nothing to
+   backfill. The "free now" framing survives, **for a different reason than assumed**; stating it
+   wrongly invites the next reader to re-open it on seeing 82 rows.
+2. **The real blocker is a naming convention.** This schema encodes currency in the column name —
+   `space_prices.price_per_hour_aed`, `venue_price_rules.price_aed`, `wallet_ledger.amount_aed`,
+   `wallets.balance_aed`. **A five-currency product cannot be built on `amount_aed`.** Ruled: new
+   money columns are `amount` + `currency`, a deliberate departure recorded so nobody "corrects" it
+   back to match the neighbours. The existing `*_aed` columns are a systemic constraint, not a
+   style — `T-051` found the same in `_wallet_recalc`. Conversion is not in scope.
+
+**Shape ruled: three tables, because each changes on a different clock.** `plan_prices`
+(**grandfathering = versioning the price row, never mutating a price**), extend `user_subscriptions`
+rather than replace 82 live rows, and a separate `charges`. **`payment_intents` is not reused** —
+relaxing its NOT NULL `booking_id` would undo `T-061` to half-solve one of five streams, which
+`P-037` already rejected. Payer identity reuses `T-051`'s `owner_type`/`owner_id`; the CHECK needs
+`company` added deliberately. **VAT stored, not derived** — the gross is what the user agreed to.
+**The waiver is a settlement method, not a discount**, or it destroys the number Principle 8 audits.
+`T-049`'s invariants bind from day one.
+
+**Executor:** `backend-N` authors (no `senior-backend` seat exists), `team-lead-4` assigns, `cto`
+applies under `G-002`. Four ordered steps in the entry. **I do not invent prices** — `cpo` supplies
+them for the backfill.
+
+**On the date, which `cpo` left to me and the CEO: I did not give one.** There is no data deadline —
+`enablePayments` is false, subscriptions are Month 9, nothing to migrate. **The trigger is the first
+D4 ticket that writes against subscriptions**, and D4 activating a lead is not that moment. A
+calendar date would be less accurate than the trigger.

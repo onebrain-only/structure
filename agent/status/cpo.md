@@ -411,3 +411,132 @@ the EN three; whether a privacy policy exists at a public URL today.
 SQL, copy, migration, Jira, Notion write, push or PR.
 
 **Reported to:** `team-lead`.
+
+---
+
+## 2026-09-06 — `pm` peer question on `FeatureFlags.squads`: already ruled at `P-035`, re-verified, unchanged
+
+**Task:** `pm` asked peer-to-peer whether to rename or drop `FeatureFlags.squads` (`FLAG-04`,
+`PROJECT_STATE.md` §24d/§24h). **Already ruled 2026-09-04 as `P-035` — cut it, do not rename.**
+Re-verified rather than re-ruled; nothing changed, and I did not re-open it.
+
+**Every `P-035` figure holds at HEAD:** `feature_flags.dart:75` `static const bool squads = true`;
+exactly one consumer, `main.dart:88`; `lib/features/squads/` absent; `squads_repository.dart` (112)
++ `_impl` (762) = 874 LOC live via `social/providers.dart:8-9`.
+
+**Two measurements `P-035` did not carry, both reinforcing it.** `lib/core/auth/session_cleanup.dart:65-68`
+invalidates three squad providers on sign-out — the capability is wired deeper than "a repository
+with 3 importers". And the word is **user-visible in shipped copy**: `nav_trend_community_title` =
+"Growing squads" / "Squads بتكبر" (`app_localizations_en.dart:1356`, `app_localizations_ar.dart:1326`).
+The concept is neither dead nor its own slice — it lives inside `social`, which is an argument
+*against* renaming, since a rename attaches the name to a slice boundary that does not exist.
+
+**`pm`'s third framing — hold it as a placeholder if squads returns — `P-035` already rejects:** if
+squads is later ruled in scope the correct state is the flag at **`false`**, tracking an unbuilt
+client, never `true`. All three framings resolve to "delete now"; only "leave it `true`" is wrong
+under every ruling.
+
+**Not mine to close.** `P-035` is **`PROPOSED`, awaiting `po`** — and under `ROADMAP.md` §5 it
+would be the first formal CUT, so it needs a decision id on approval.
+
+**Changed:** this file, and a dated re-verification note appended inside `P-035`. No code, flag,
+copy, SQL, git or Jira write.
+
+**Reported to:** `pm`.
+
+---
+
+## 2026-09-06 — `P-037`: subscriptions need a charge record; `payment_intents` is not it, and `KAN-136`'s FK stands permanently
+
+**Task:** `pm` routed `cto`'s `T-061` model question — does the committed subscription/top-up model
+require a `payment_intents` row with no `booking_id`, and is there an eight-day clock before D4
+activates 2026-09-14? Not blocking `KAN-136`.
+
+**Ruling: ALIGNED WITH CONSEQUENCE — but the consequence is not the one asked about.**
+
+**Product half, decisive.** `12a` designs **five** subscription streams in full, every one a
+recurring charge with no booking: Player Pro §B.2 (AED 29/mo), Organiser Pro §C.2 (AED 99/mo),
+**Venue Basic listing fee §D.2 (AED 99/mo, charged to a venue)**, **Venue Pro §D.3 (AED 299/mo)**,
+**Corporate §E.1 (AED 7.5–25K/yr, annual, by invoice)**. `12b` §J.2 confirms two rails — Stripe
+Billing for subscriptions vs Stripe Connect for marketplace. `12a` §A.2 **Principle 8** is an
+explicit instruction to make billing-schema room ahead of the feature.
+
+**The correction that matters — nullable `booking_id` would be the wrong fix.** `payment_intents`
+(`baseline_schema.sql:23491`) is `booking_id` NOT NULL **and** `user_id` NOT NULL, RLS owner-read on
+`user_id` (`:32824`). **Three of the five streams are not charged to a player at all.** Relaxing
+`booking_id` half-solves one stream, leaves three unrepresentable, and weakens the integrity `T-061`
+just added. **`payment_intents` is the booking rail; the FK should stand permanently.**
+
+**The real gap — the subscription rail records no money.** `subscription_plans` (`:24673`) is
+`key, label, description, created_at`, **no price**. `user_subscriptions` (`:24897`) is
+`user_id, plan_key, started_at, expires_at, is_active` — **no amount, currency, provider, cycle or
+payment linkage.** Entitlement-only. Nothing today can record a subscription charge.
+
+**The clock — real, but not eight days of the kind claimed.** `12a` §A.3 *"During Phase 1A (Months
+0-9, pre-booking), ALL features are free for everyone"*; §H.3 *"Month 9 (Phase 1B): Subscriptions go
+live"*; `12b` §A.1 streams 1/2/5 at M9; `13b` **P0-5** `paymentsLive=false`. **The zero-row window
+closes at Phase 1B M9, not 09-14 — there is no data-migration deadline.** There *is* a **rework**
+deadline: 110 D4 features built against an entitlement-only rail encode "subscriptions carry no
+money", and fixing that after is code rework, not a backfill. Sufficient reason to settle before
+09-14; costs nothing now, since `12a` holds every input.
+
+**NOT ESTABLISHED — wallet top-ups.** `pm` paired them with subscriptions. The corpus commits no
+user-initiated top-up. `12b` §F.4 Stream 13 is *Wallet Float* — organiser fee collection, M18,
+gated on a Central Bank UAE **SVF licence above AED 50K** (§I.2 Flag 1), with the standing rule
+*"keep wallet balances below threshold via fast payouts."* Do not size schema for it.
+
+**Owed:** `KAN-136` unchanged; the charge-record shape is **`cto`'s** architecture call and I handed
+over the product requirement, not a design; the date recommendation is **`pm`'s with the CEO** —
+I do not move activation dates.
+
+**Not verified:** whether any D4 ticket already assumes a charge shape; whether `wallet_ledger` or
+`financial_ledger` could carry it (`cto`'s); `T-061`'s migration text, taken as described.
+
+**Changed:** this file, `DECISIONS.md` (`P-037`). No code, SQL, migration, Jira or Notion write.
+`T-061` and `T-049` untouched.
+
+**Reported to:** `pm`.
+
+---
+
+## 2026-09-06 — `P-038`: the `plan_prices` schedule, supplied in full — and the plan-key mapping that blocks the backfill
+
+**Task:** `T-063` step 1 — *"`cpo` supplies the numbers; I do not invent prices."* Supplied, from
+`12a` verbatim, in `T-063`'s own column shape.
+
+**The blocker `T-063` step 1 hits immediately.** `subscription_plans` holds `kickoff`, `pro`,
+`prime`. **`12a` designs no such ladder and no third player tier** — its player ladder is exactly
+two, Player Free (§B.1, *"AED 0, forever"*) and Player Pro AED 29 (§B.2); the other three committed
+tiers are venue- and company-scoped, not player-scoped. `kickoff` = **0** is safe and may be
+backfilled now. **`pro` and `prime` are NOT mappable and I did not invent them** — `12a` has *two*
+different "Pro" products at different prices (Player AED 29, Organiser AED 99), and `prime` has no
+counterpart at all. Naming `pro` at 29 would encode an unmade product decision into the price
+catalogue, where it then reads as committed — the `P-035` error. **`po`/`pm` rule the mapping;
+`T-063` steps 2–4 are unblocked.**
+
+**Checked and cleared a suspicion rather than raising it.** `prime` buys a score boost, so I checked
+Permanent Truth 3 (*"the discovery feed... treat every player as equally indexable"*).
+`calculate_notification_score` (`baseline_schema.sql:3473`) scores notifications delivered **to** the
+prime user — delivery priority for yourself, not visibility over others. **No conflict.** Recorded so
+the next reader does not re-raise it. This is [[stay-in-evidence-domain]] working as intended.
+
+**Supplied in full:** Player Pro and Organiser Pro × 5 markets, monthly and annual; Venue Basic and
+Venue Pro × 4 markets; Corporate three tiers (UAE, annual, invoice); plus the grandfathered rows
+§K.2 says never move — Founding Organiser AED 49 for life, Founding Player AED 19 year 1, Founding
+Venue 6 months free, and the §J.2 save offers. **VAT is inclusive** (§F.3 *"All displayed prices are
+final prices"*): `amount` is gross and `vat_amount` decomposes out of it — `cto`'s store-not-derive
+is right, and this is the direction. **`valid_from` dates from Phase 1B (§A.3, §H.3), not today** —
+a row valid now asserts a price was sellable during the free phase.
+
+**Gaps in `12a` flagged, not filled:** no RoW USD VAT rate; Venue Basic has no annual price anywhere;
+Venue Pro annual exists only in AED; Corporate has no non-UAE prices and Enterprise is *"25,000+
+custom"*, not a catalogue row; §F.2 warns Egypt may launch subscription-light so its rows may never
+activate.
+
+**Not verified:** whether `subscription_features` implies a mapping (`cto`'s); whether client code
+hardcodes `pro`/`prime`; `12c` not consulted — `12a` governs plan prices, `12c` is downstream (§L.3).
+
+**Changed:** this file, `DECISIONS.md` (`P-038`). No code, SQL, migration, Jira or Notion write.
+`T-063` untouched.
+
+**Reported to:** `pm`.

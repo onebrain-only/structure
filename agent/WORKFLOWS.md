@@ -1,7 +1,11 @@
 # agent/WORKFLOWS.md — Workflows and Handoffs
 
 **Owner:** `po` (write) · all agents (read) — moved from `analyst` 2026-09-06, `G-022`
-**Last updated:** 2026-09-05 — W6 added (regeneration), W1 amended to match
+**Last updated:** 2026-09-06 — W1 corrected: `Development` is a real column, not a dropped
+one (see below); ownership table given its `Development` row and `Done` corrected to `qa`.
+§2's column line changed from restating the column list to citing §1's table, after the
+restatement went stale there while §1 was fixed — one fact, one place, from here on.
+Previously: 2026-09-05, W6 added (regeneration), W1 amended to match.
 **Purpose:** The procedure. `AGENTS.md` carries the shape of the roster; this carries how
 a task that crosses two or three agents actually moves, end to end.
 
@@ -16,26 +20,34 @@ final message, not this repo. If the board does not show it, it did not happen.
 CEO request
    → Epic (the container)
       → child Tasks (the trackable units)
-         → To Do → Ready → In Progress → In Review → QA-Test → Done
+         → To Do → Ready → In Progress / Development → In Review → QA-Test → Done
 ```
 
-**Six columns inside three states.** Jira has exactly three `statusCategory` values, and the
-board's columns live inside them. This is the model the CEO built and it is the one to reason
-with — a column is a position within a state, never a state of its own:
+**Seven columns inside three states — corrected 2026-09-06.** This document previously said
+six and stated flatly that `Development` "does not exist and is not coming back." That was
+wrong: `Development` is a real status (`status id 10010`, transition id `4`, category **In
+Progress**), and `getTransitionsForJiraIssue`/JQL confirm real tickets sitting there
+(`KAN-119`, `KAN-128`, `KAN-132`, `KAN-136` as of 2026-09-06) — the first time it has been
+used. **Correction, same day:** an earlier version of this line credited the transitions to
+`team-lead-1` and `team-lead-4` by name. `team-lead-4` denied making any transition this
+session, and the Jira changelog cannot settle it either way — every API call in this workspace
+authenticates as the one account (`Moataz Mustapha`), so `changelog.histories[].author` never
+names the agent seat that issued the call, only the shared credential. **Do not cite the Jira
+changelog as evidence of which seat performed an action** — it proves a transition happened
+and when, never who. Jira has exactly three `statusCategory` values; the board's columns live
+inside them. A column is a position within a state, never a state of its own:
 
 | State (Jira `statusCategory`) | Columns |
 |---|---|
 | **To Do** | `To Do` · `Ready` |
-| **In Progress** | `In Progress` · `In Review` · `QA-Test` |
+| **In Progress** | `In Progress` · `Development` · `In Review` · `QA-Test` |
 | **Done** | `Done` |
 
-**`In Development` does not exist and is not coming back.** The restructure spec called for a
-seventh column of that name. It was dropped deliberately: nobody ever defined what separated
-it from `In Progress`, so it would have been a column no seat knew when to use.
-
 **The CEO's spoken labels are not the board's names.** He says *Backlog* for `To Do`,
-*Development* for `In Progress`, *Testing* for `QA-Test`. Those are conversational, and no
-transition call may use them. **Documents and API calls carry the exact status names above.**
+*Development* for `In Progress` (a conversational label, not to be confused with the real
+`Development` status above — check `getTransitionsForJiraIssue` rather than assuming which one
+a spoken instruction means), *Testing* for `QA-Test`. Documents and API calls carry the exact
+status names above, never the spoken ones.
 
 **Who moves a ticket into each column** — a transition made by the wrong seat is a process
 failure, not a shortcut:
@@ -45,9 +57,10 @@ failure, not a shortcut:
 | To Do | `po` |
 | Ready | `po` |
 | In Progress | the owning `team-lead-N` |
+| Development | the owning `team-lead-N`. **Correction, 2026-09-06:** the lead does not hand-assign the developer — the CEO's `YOU PULL, YOU DO NOT WAIT` ruling (in every developer role file) has developers pulling their own next ticket from `Ready` when free, with no lead in that loop. The lead's actual job at this transition is (a) confirming the ticket is genuinely ready to start (slice state, sequencing on any contended/shared file per §4) and (b) making the transition itself once a developer has picked it up — not choosing which developer. Two leads independently naming different executors for the same ticket today (`KAN-119`) is the direct cost of this ambiguity; the ticket's named executor is whoever actually pulled it, verified on the ticket, not whoever a lead's brief assumed. **`qa` writes the test script for the ticket during `Development`, in parallel with the developer — not after, and not at `QA-Test`.** |
 | In Review | the developer who finished it |
 | QA-Test | `po` — **only after its review gate passes** (§3) |
-| Done | `po` |
+| Done | `qa` |
 
 **Writing is `po`-only.** No other seat creates, edits or re-words a ticket. The `pm` says
 what is needed; the `po` writes it.
@@ -56,7 +69,9 @@ what is needed; the `po` writes it.
 
 - **No ticket without a `due_date`.** A ticket with no date is not scheduled, it is a wish.
 - **The date comes from capacity, not estimation.** Capacity is reported by the owning
-  `team-lead-N`. The `po` may not estimate it and may not ask a developer directly.
+  `team-lead-N`. The `po` may not estimate it and may not ask a developer directly. See
+  `agent/skills/capacity-to-date/SKILL.md` for how a lead's capacity number becomes a
+  `due_date` without either side estimating.
 - **A slot frees on acceptance, not delivery.** A developer who has handed work to review is
   still holding that slot until the gate passes it. This is what stops the board filling with
   work that is "done" and not accepted.
@@ -98,7 +113,7 @@ what is needed; the `po` writes it.
 | Site | `dabbler.atlassian.net` |
 | cloudId | `18c8e9f5-d139-4e03-b5d8-89122cc14937` |
 | Project key | `KAN` — "Dabbler Team", **team-managed** |
-| Columns | To Do · Ready · In Progress · In Review · QA-Test · Done — six, inside three states (§1) |
+| Columns | See §1's table — do not restate the list here; a second copy is exactly how `Development` went missing from this section before. |
 
 **Epics do not render as cards on a team-managed board. Tasks do.**
 
@@ -115,6 +130,7 @@ back from `getTransitionsForJiraIssue` with `includeUnavailableTransitions: true
 | `To Do` | 10004 | `11` | To Do |
 | `Ready` | 10008 | `2` | To Do |
 | `In Progress` | 10005 | `21` | In Progress |
+| `Development` | 10010 | `4` | In Progress |
 | `In Review` | 10006 | `31` | In Progress |
 | `QA-Test` | 10009 | `3` | In Progress |
 | `Done` | 10007 | `41` | Done |

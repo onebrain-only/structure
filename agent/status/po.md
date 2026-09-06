@@ -1178,3 +1178,246 @@ work against the repo; no file was written and no git-mutating command was run.
 - Posted comment `10604` on `KAN-139` recording it as blocked (not merely undated): not rework (file's own header notes the verbatim-move provenance from KAN-124, fixing it there would have tripped KAN-124's own rework trigger), cost sub-sitting, both blockers named. Left in `To Do`, undated.
 - Escalated the ownership-partition question to `cto` (not decided by me or `team-lead-3`) — `lib/app/routes/` needs a named post-Phase-0 owner before more work piles up behind the grant's expiry. Also relayed `team-lead-3`'s freeze-queue observation (`KAN-129`/`132`/`130`-client-half/`139` all stacking behind one unmade push decision) as context, not as something for me to weigh in on.
 - Board unchanged otherwise: Phase 0 — `KAN-121`–`124` Done, `KAN-125` in `QA-Test`, `KAN-139` blocked/undated in `To Do`.
+
+## 2026-09-06 — Board cleanup + Ready restocked for eight-team pull model
+
+**Closed:**
+- **KAN-120** (Phase 0 epic) — all five children (KAN-121–125) verified Done. Closed.
+- **KAN-135** (financial_ledger retention ruling) — closed as an informational ruling record, not a dev ticket. AC1 (cpo's retain+disclose ruling) final; AC2 satisfied by KAN-137 (now stocked separately); AC3 (privacy-policy clause tracked) flagged to `pm`/`content-manager` rather than held open — not po's to verify independently.
+
+**KAN-119 — confirmed stale, rewritten, restocked (not merely closed or left alone):**
+Original premise ("QA cannot authenticate — every authenticated flow is structurally untestable") is stale — `qa` authenticated successfully on iOS simulator 2026-09-06 (`.claude/agent-memory/qa/stories/login-ios.md`). Rewrote summary/description/AC to the real, narrower defect: `/auth-welcome` renders blank (missing `IntrinsicHeight` wrapper at `auth_welcome_screen.dart:298`, cf. working `email_password_screen.dart:347`) — the only UI route to login. Stocked to Ready with a developer-facing user story. Added beyond the brief's named list because it was genuinely pullable.
+
+**KAN-127** (audit-findings epic): confirmed it does have real children — KAN-128,129,130,131,132,134,135,136,137,138,139 — none yet Done. Stays open; no action needed, it isn't an empty epic.
+
+**Stocked to Ready (developer user story added to each), before count 4 → after count 7:**
+- KAN-119 (see above)
+- KAN-136 — `trgfn_payment_to_ledger` references nonexistent `public.bookings`; developer must determine the real venue-resolution join path. Flagged by team-lead as the most consequential item on the board.
+- KAN-138 — `settle_game` raises 42804 on an untyped CASE against the `settlement_status` enum; needs explicit cast, must reach the credit insert.
+- KAN-139 — `PlaceholderScreen` missing `super.key`; one-line fix, team-lead-3's stack.
+- (KAN-128, KAN-130, KAN-131 were already in Ready with dates/rulings — untouched.)
+
+None of the six carry a `due_date` — no capacity numbers supplied by any lead this pass; each comment names who owes the number (team-lead-4/pm for 136/138, team-lead-3 for 139, owning-slice-TBD for 119).
+
+**Stayed blocked, with named owners (not stocked):**
+- **KAN-134** — carries its own unresolved question (who edits `WORKFLOWS.md`: `analyst` vs `devops` vs `cto`) that only `team-lead`/`cto` can settle. Not po's to resolve or guess past.
+- **KAN-137** — its own AC5 forbids landing before KAN-136, and KAN-136 has no executor yet. Held in To Do so no team pulls it out of sequence. Owner: team-lead-1, once coordinated against KAN-136's date.
+- **KAN-129, KAN-132** — held per instruction, pending `cto-grant`'s ruling on the Phase 0 §4.1 exclusive grant. Messaged `cto-grant` for status; no reply landed within this session. Unresolved — do not treat as cleared.
+
+**What I did not verify:** whether `cto-grant`'s ruling has since landed (message sent, no reply received in-session); whether any lead has since supplied capacity numbers for the six newly-stocked tickets; KAN-134's WORKFLOWS.md ownership question was surfaced, not resolved, by design (not po's call).
+
+## 2026-09-06 (cont.) — team-lead correction: KAN-129/132/134 unblocked, stocked
+
+`team-lead` relayed `cto`'s `T-059` ruling (`dabbler-docs` `809b03f`): the Phase 0 §4.1 exclusive grant is spent (scope exhausted, non-delegable grantee lapsed with the seat, exclusion was never free-standing, §10.6 Canary conjunct void not unmet). Also: `agent/WORKFLOWS.md` is `po`'s under `G-022`, so KAN-134 had no real blocker either — I had over-read an open question as unsettled when it wasn't.
+
+**Stocked, with constraints carried onto the tickets, not dropped:**
+- **KAN-129, KAN-132** — moved to Ready. `lib/data/**` reverts to SHARED per the ruling; both tickets now say explicitly they are sequenced, not parallelised, and the owning lead orders them.
+- **KAN-134** — moved to Ready, noted as effectively self-assigned (po-owned document) rather than a developer pull.
+- **KAN-139** — addendum added: must name its specific `lib/app/routes/` module before a lead sequences it (currently only names `team-lead-3`, not the module).
+
+**KAN-137 unchanged** — correctly still blocked (its own AC forbids landing before KAN-136, which has no executor).
+
+**Ready count now 10** (128, 129, 130, 131, 132, 134, 136, 138, 139, and 119 — the last not a KAN-127 child). team-lead's own count of "nine" was scoped to KAN-127's children only; 119 is the tenth, filed under the pre-existing KAN-119 lineage.
+
+**What I did not verify independently this pass:** `T-059`'s commit `809b03f` in `dabbler-docs` — took `team-lead`'s citation on trust rather than reading the commit directly, since the ruling was already relayed as settled by the seat authorized to relay it.
+
+---
+
+## 2026-09-06 — board clean + Ready stocked (second pass, raced with a concurrent `po`)
+
+**Dispatched by `team-lead`** to close finished tickets, re-check a stale one, judge an epic, and stock
+`Ready` ahead of eight teams needing work.
+
+**Closed two:**
+
+* **KAN-120** (Phase 0 epic) → `Done`. All five children verified `Done` **by direct JQL, not by report**:
+  KAN-121, 122, 123, 124, 125. It was sitting in `Ready` occupying a pull slot no team could ever take.
+* **KAN-135** (`P-036`/`T-054` retention ruling) → `Done`. Not stocked, because there is no work in it:
+  AC 1 is a closed ruling, AC 2 is tracked in KAN-137, AC 3 is `pm`'s. Its own body already said it was
+  closeable once KAN-137 existed. Two follow-ups flagged rather than ticketed (CEO-level PDPL review via
+  `pm`; privacy-policy clause via `content-manager`/`devops`), plus two open questions named: the Notion
+  §I.4 edit (`cpo` said *"the PO writes it"* — Notion is **not** `po`'s write surface) and `payment_intents`
+  retention (`cpo`'s call, no speculative ticket filed).
+
+**KAN-119 — premise REFUTED, ticket rewritten, not closed.** Its title claimed *"QA cannot authenticate —
+every authenticated flow is structurally untestable."* False: `qa` authenticated on the iOS simulator today
+(`auth=false → auth=true`, FCM token saved, `/welcome` → `/home`). The original basis is recorded in
+`.claude/agent-memory/qa/stories/login-ios.md` as **B2 — RESOLVED**: a mistyped 10-character password where
+the real one is 12. Nothing in the app was wrong. Rewritten to `qa`'s **B1**, which is real and smaller:
+`/auth-welcome` renders blank in debug (`RenderFlex … unbounded` at `auth_welcome_screen.dart:293`–`:299`,
+missing the `IntrinsicHeight` wrapper that `email_password_screen.dart:347` has). It is still the **only UI
+route to login**, so a returning user cannot log in through the app. Stocked to `Ready` with both of `qa`'s
+uncleared scope limits carried forward honestly: **debug-only** (the check is an `assert`, release not tested)
+and **iOS-only** (Android/Chrome untested; "it's layout logic so it reproduces everywhere" is an inference,
+not a measurement).
+
+**KAN-127 — STAYS OPEN.** Eleven children; one (`KAN-135`) closed today, nine in `Ready`, one blocked. It
+carries no work of its own, which makes it closeable *when its last child closes* and only then. Closing it
+now would orphan ten live tickets. Not in `Ready` and should not be — an epic in the pull pool is a slot a
+team cannot take.
+
+**Stocked into `Ready`, each with a user story written for the developer:**
+
+| Ticket | User story (one line) |
+|---|---|
+| KAN-119 | As a returning user, I want `/auth-welcome` to render so I can tap through to the login form. |
+| KAN-129 | As a developer opening `profiles_repository.dart`, I want its comment to say the stack is live and frozen, not read as an instruction to delete it. |
+| KAN-132 | As a developer navigating profile code, I want the dead stack deleted, not renamed, so there is one live implementation. |
+| KAN-136 | As a player completing a payment, I want the payment to actually complete — the trigger aborts on a nonexistent table and no payment ever has. |
+| KAN-137 | As a user deleting my account, I want the confirmation to tell the truth about what is retained. |
+| KAN-138 | As a player whose game is settled, I want the settlement to credit my wallet instead of raising `42804` on its first statement. |
+| KAN-139 | As the team owning CI, I want `super.key` forwarded so an SDK bump can't turn this lint fatal with no code change. |
+
+**KAN-129/132 unblocked by `cto`'s `T-059`** (grant SPENT: scope exhausted, non-delegable grant lapsed with
+the departed `senior-frontend-3` seat, exclusion never free-standing; §10.6 Canary conjunct ruled **VOID, not
+unmet** — an expiry trigger conditioned on an action `P-030` forbids can't extend the grant it was written to
+end). Constraints carried into both tickets: `lib/data/**`/`lib/core/**` revert to **SHARED**,
+`app_router.dart`/`providers.dart` **CONTENDED**, and **129/132 are SEQUENCED against each other, not
+parallel** — the owning lead sequences them. KAN-132's summary, which still read "blocked … until it expires",
+was corrected.
+
+**Answered the question `cto` left open on KAN-139** (it unblocked the ticket without reading its body):
+module is `lib/app/routes/placeholder_screen.dart:11`, owning lead **`team-lead-3`**, one module not the
+assembly (`STACKS.md` §12 row 13) — so safely parallel, unlike 129/132.
+
+**Flagged as stale rather than silently followed:** KAN-137's "Executor chain" names `senior-frontend-1` /
+`team-lead-1` per `CONTRACT.md:167`. **That roster no longer exists** (dissolved today: `d365870`, `bccb925`,
+`eed7ffc`). The `profile` slice attribution holds; the seat names do not resolve. Body left intact so the
+original reasoning stays legible; correction lives in the comment.
+
+**Blocked, with the owner named:**
+
+* **KAN-134** — blocked on *who may edit `agent/WORKFLOWS.md`* (`analyst`'s possible single-writer status vs
+  `devops`'s tooling domain). **Owner: `cto`, with `team-lead`.** `po` will not guess. My judgement was to hold
+  it in `To Do`: `Ready` is what the eight paired dev teams pull from, and this is an agent-governance doc
+  edit no frontend/backend pair would take — when `cto` names the writer, that seat edits it directly and
+  needs no pull slot. **A concurrent `po` pass had already moved it to `Ready`; my attempt to move it back was
+  denied by the permission classifier, so it stands in `Ready` against my recorded verdict.** Disagreement
+  logged, not resolved. Half of this ticket is already done (`2afe3ca`) and must not be redone; `devops`
+  remains deliberately unwired, recorded as owed.
+* **KAN-137** — stocked, but **must not *land* before KAN-136**. The copy work itself is not gated (`P-036`
+  supplies accurate language without the PDPL period number); only the merge is. No Jira dependency link
+  exists between them — AC 5 and my comment are the only guard.
+
+**`Ready` count: 4 before → 11 after** (119, 128, 129, 130, 131, 132, 134, 136, 137, 138, 139). Of those, ten
+are mine or were already stocked; KAN-134 is the contested one above.
+
+**No due dates set on anything.** No lead supplied a capacity number this pass, and `po` does not estimate.
+Every ticket carries a written reason in place of a date, and each names the lead that owes the number.
+
+**What I did not verify:**
+
+* **`T-059` itself.** I took `cto`'s relay at face value — I did not read `DECISIONS.md` or confirm the ruling
+  is committed. `cto` says it is written and uncommitted in `dabbler-docs`, with `devops` to commit it. If it
+  never lands, four tickets are stocked on an unrecorded ruling.
+* **The `T-059` grounds.** I did not independently re-run the §10.6 landing test or re-verify that
+  `senior-frontend-3` is off the roster; I relied on `cto`'s JQL and the commit hashes it cited.
+* **KAN-136/138's SQL claims.** I did not open the live catalogue this pass — the line numbers, the
+  `pg_cast` count 0, and `venue_bookings`'s column list are cited from the tickets' own prior `po`
+  verification, not re-measured today.
+* **Whether the concurrent `po` pass and this one have left any other collision** beyond KAN-134. I checked
+  `Ready`'s membership, not every field on every ticket.
+
+## 2026-09-06 (cont.) — T-059 verified committed by team-lead; KAN-134 closed out
+
+`team-lead` verified `T-059` is committed (`809b03f`, `dabbler-docs/DECISIONS.md`, clean tree) — the earlier "uncommitted" caveat I carried is resolved, not just relayed.
+
+**KAN-134**: leaving as-is in `Ready`. It is self-assigned work for this seat (`agent/WORKFLOWS.md` is po's under `G-022`), not a developer pull — cosmetic which column it sits in now that it can't be mistaken for a team's ticket. No further passes on this one.
+
+Nothing further owed this pass — `team-lead-1`/`team-lead-4` distributing from `Ready` (11 held). Will act again only if a lead sends back a capacity number or a new decision lands.
+
+## 2026-09-06 (cont.) — WORKFLOWS.md fix + KAN-129/KAN-132 AC corrections
+
+**`agent/WORKFLOWS.md`** (po-owned, `G-022`): §1 corrected to seven columns / `Development` real, ownership table given a `Development` row and `Done` → `qa`. On re-read, §2's line (`:108`) still said "six" and cited §1 while contradicting it, and I had left it as a restatement rather than a citation — fixed: `:108` now points at §1's table instead of re-listing columns, so a future correction to §1 can't leave a stale sibling behind again. The transition-id table (`:120-128`) already carried the `Development` row (10010/4) when I checked — no separate fix needed there, contrary to the report's claim it was missing.
+
+**KAN-129**: AC1 restated — no longer asks for a fixed "six call sites," which `team-lead-1` found stale (router lines moved under KAN-124; a fresh grep found 36 references, not six). Now requires citing slices by name plus a re-runnable grep. `T-050`'s ruling itself unaffected.
+
+**KAN-132**: AC1 struck as moot — it gated on a `STACKS.md` §10.6 test tied to a `Canary` conjunct `T-059` ruled void, the same ruling that unblocked the ticket. Ticket already sitting in `Development` (moved by `team-lead-1`); edit did not disturb that status.
+
+**Not independently re-verified this pass:** whether the transition-id table was really missing `Development` at the time team-lead reported it (my read showed it present) — flagging the discrepancy rather than assuming either party was wrong.
+
+## Continuation 25 — 2026-09-06
+
+- Completed `agent/WORKFLOWS.md`'s board-ownership correction per the CEO's direct statement (relayed by `team-lead`): found the file already partially updated (Development column, seven-state table, Done→qa) by the time I went to edit; filled remaining gaps (§1 flow diagram, §2's stale "six columns" line, missing `Development`/10010/4 row in the transition-id table, qa-writes-test-script-during-Development detail). Left the `In Progress`-vs-`Development` relationship explicitly open, per team-lead's own flag — not mine to resolve. Noted the file has since been further refined by another hand (cite-don't-restate applied to §2, capacity-to-date skill referenced) — consistent with my edits, no conflict, accepted as current state.
+- Invoked `capacity-to-date` skill for `KAN-136`'s capacity report from `senior-backend` (via `be3-size`): 1 sitting/ceiling 2 for a read-only design pass (venue-resolution join path, NULL policy question for `cto`). Carried the count unchanged per the skill's rule.
+- Caught a scope mismatch before dating: `KAN-136`'s existing ACs covered the *entire* fix (design+authoring+verification, 5 ACs), but the capacity only covered the design step. Split the ticket rather than date the whole thing off a partial number — narrowed `KAN-136` to pt.1 (design only, dated earliest 2026-09-07/ceiling 2026-09-08), filed `KAN-140` for pt.2 (authoring, parented `KAN-127`, linked blocked-by `KAN-136`, unsized/undated).
+- Board: Phase 0 fully closed (`KAN-121`–`124` Done, `KAN-125` in `QA-Test`). `KAN-136` pt.1 dated, `KAN-139` and `KAN-140` blocked/undated in `To Do`, pending `cto` (partition call, NULL-policy ruling respectively).
+
+## Continuation 26 — 2026-09-06
+
+- **Roster confusion, self-corrected.** `pm`/`team-lead-4` initially flagged `be3-size`/`be5-size` (KAN-136/KAN-138 capacity reports) as fabricated seats against my own session-start roster (one shared `senior-backend`); I retracted both due_dates and flagged the pattern upward. `team-lead-4` then retracted its own retraction — the roster genuinely restructured to 8 `backend-N`/`frontend-N` seats (`DECISIONS.md` T-059, commit `d365870`). I verified independently rather than trusting either version (`agent/roles/backend-3.md:32`, `backend-5.md:32`, `git cat-file -t d365870`) — confirmed both seats are real and my own loaded roster, not theirs, was stale. Restored `KAN-136`'s due_date (2026-09-08), dated `KAN-138` fresh (earliest 2026-09-11/ceiling 2026-09-13, gated on cto's Wed 09-09 KAN-128 apply). Retracted my flag to `pm`, apologized to both `be3-size`/`be5-size`. Saved memory `session-roster-goes-stale-mid-session.md` — a sender failing my own loaded roster isn't proof of fabrication if the roster itself can go stale mid-session; check `agent/roles/` on disk before concluding fabrication.
+- Corrected `agent/WORKFLOWS.md`'s unverifiable `team-lead-1`/`team-lead-4` attribution for the first `Development` transition after `team-lead-4` denied making one — checked the Jira changelog myself and found it can't settle authorship at all (every history entry's `author` is the shared API credential, never the calling seat). Rewrote the passage to state that limitation plainly rather than assert or retract a specific attribution neither side can prove. (`team-lead-4` later separately withdrew its own denial, but the changelog limitation I documented is independently true and stands regardless.)
+- Corrected `KAN-124`'s comment `10602` (superseded by `pm`'s retraction): `qa`'s `Done` transition was actually correct per the CEO's restated pipeline, not an overreach under the old rule.
+- Posted `qa`'s four prose-accuracy corrections to `KAN-124`'s bucketing description (14→12 changed entries, 12→10 profile_social family, citation 10551→10548, mixed line-number convention flagged) — none affect the Done verdict.
+- `KAN-119`: accepted `team-lead-3`'s 1-sitting/ceiling-2 capacity and its proposed AC6 (Chrome cross-check, free), declined the release-build addition on stated reasoning, fixed AC4's moot test-file parenthetical, dated earliest 2026-09-07/ceiling 2026-09-08. Left the stack-vs-slice ownership question escalated to `cto`, unresolved by me.
+- Board: Phase 0 closed. `KAN-119`, `KAN-136` pt.1 dated; `KAN-138`, `KAN-140` dated/blocked appropriately; `KAN-139` still blocked/undated pending `cto`'s partition call.
+
+## Continuation 27 — 2026-09-06
+
+- Full consensus reached on the roster question: `pm`, `team-lead-4`, and `be5-size` all independently confirmed `backend-3`/`backend-5` are real, current seats (2026-09-05/06 restructure into 8 paired `backend-N`/`frontend-N` teams) — matches my own independent verification from continuation 26. No further action needed; both tickets' dates already stood correctly.
+- `cto` ruled `T-060` (two rulings sharing one identifier, `DECISIONS.md:7387`/`:7436` — flagged to `cto`, not mine to fix): (1) `KAN-138` AC2 closes with the recalc trigger ENABLED — a `23502` from `_wallet_recalc` is proof the credit insert was reached, no `KAN-130` dependency. Updated `KAN-138`'s AC2 with the binding reporting cap and the `PG_EXCEPTION_CONTEXT` requirement per `cto`'s addendum; no re-date needed (sitting 2 always depended only on `cto`'s `KAN-128` apply slot, unchanged). (2) `lib/app/routes/` partition: three clean modules assigned by stack, three contended modules under §4, `placeholder_screen.dart` ruled SHARED/no single writer. Updated `KAN-139` accordingly — both its blockers (grant, ownership gap) are now cleared; left undated as sub-sitting rider work per standing guidance, not worth inventing a standalone slot.
+- `team-lead-3` independently confirmed `KAN-119`'s 1-sitting/ceiling-2 (matches what was already set) and flagged that no executor is yet reachable — left the due_date as-is for now, noted I'll shift the window if execution doesn't start soon rather than let the ceiling become fiction.
+- Board: Phase 0 closed. `KAN-119`, `KAN-136` pt.1, `KAN-138` all dated. `KAN-139`, `KAN-140` correctly blocked/undated (sub-sitting rider / genuine dependency respectively). `KAN-129`, `KAN-132`, `KAN-130`'s client half confirmed unblocked by `T-059` per `cto` — not yet independently re-verified by me this session, flagged as next-session follow-up if not picked up by then.
+
+## Continuation 28 — 2026-09-06
+
+- `cto-138ac2` corrected its own KAN-138 message: the KAN-128 apply is `cto`'s (per `CONTRACT.md:242`/`G-002`), not `devops`'s. No ticket change needed — I had already dated sitting 2 off "cto's Wednesday apply slot," never `devops`.
+- `team-lead-3` reported the T-060 duplicate-identifier defect (flagged by me earlier to `cto`) plus two self-corrections on the routes-partition finding. Checked `DECISIONS.md` directly rather than accept the relay: the duplicate was already fixed — renumbered to `T-062` with an explicit collision note, precedent-based (not withdrawn). Told `team-lead-3` its report was accurate-when-written but stale by delivery. Adopted `team-lead-3`'s sharper framing of `KAN-119`'s due_date as a "tripwire" (fails loudly on a same-day-start assumption) rather than "worst case" — better word, same underlying decision, no ticket change.
+- Board unchanged from continuation 27. Citations should now use `T-062` for the routes-partition ruling, `T-060` for the KAN-138 AC2 ruling.
+
+## Continuation 29 — 2026-09-06
+
+- `cto` ruled `T-061` on `KAN-136`: verified directly against `DECISIONS.md:7571` rather than acting on `pm`'s relay. Two of the three join links (`venue_bookings`→`venue_spaces`→`venues`) were already FK-enforced NOT NULL; the only real gap is `payment_intents.booking_id` having no FK. Ruled fix: `FOREIGN KEY (booking_id) REFERENCES venue_bookings(id) ON DELETE RESTRICT` plus a two-hop `INTO STRICT` join — explicit rejection bar on any NULL-handling strategy, fallback venue, or sentinel (no correct value exists under `T-051`'s `wallets.owner_id NOT NULL`).
+- Rewrote `KAN-136`'s description and AC2 to match — AC2 changed from an open NULL-policy question handed to `cto` to a confirmation that `T-061`'s already-ruled fix still holds. Posted the full ruling as a ticket comment. No re-date: the narrowing came out of the design-judgement sitting itself, not a scope cut, so capacity/dates (earliest 09-07/ceiling 09-08) stand unchanged.
+- Board unchanged otherwise.
+
+## Continuation 30 — 2026-09-06
+
+- Wrote `pm`'s three ordered backlog items (relayed by `team-lead`), verifying every line number and count against the repo/`PROJECT_STATE.md` myself before ticketing, per the standing "line numbers are the least reliable thing that travels" caution:
+  - `KAN-141` — confirm the 3 zero-policy definer views (`username_registry_public`, `v_potential_vibes_default`, `v_recreate_quickpicks`) are zero-row by design, not empty tables.
+  - `KAN-142` — `/bookings/<id>` and `/phone-input` have live call sites and no declared route; confirmed all three line citations directly (`notifications_screen_v2.dart:543`, `transactions_screen.dart:837`, `activities_screen_v2.dart:608`).
+  - `KAN-143` — delete 6,239 LOC confirmed dead (`lib/data/models/rewards/`, 4 orphan repository pairs, `lib/data/models/payments/`); spot-checked `wallet_repository`'s zero-importer claim directly.
+  - All three parented under `KAN-127`, undated pending lead capacity, per `pm`'s routing (backend-N for #1, split notification/misc leads for #2, current flutter-feature-agent-equivalent for #3).
+  - Item 4 (in-flight defect chain) untouched — already running. Item 5 (new feature backlog) correctly not ticketed, per `pm`'s stale-census reasoning. `FLAG-04`/`DEAD-27` correctly left routed to `cpo`/`cto`, not touched.
+- Re-gated `KAN-129`/`KAN-132`/`KAN-130` (flagged as an open item in continuation 27): checked live Jira status directly rather than trust `T-059`'s "unblocked" claim. `KAN-129` Ready, `KAN-132` already in Development, `KAN-130` Ready — all three genuinely reflect the unblocked state, no stale/contradictory status found, no corrective action needed.
+
+## Continuation 31 — 2026-09-06
+
+Large batch across six incoming messages. Verified every claim against the repo/DECISIONS.md before acting where cheap to do so.
+
+- `KAN-119`: executor corrected in a comment to Horus (`frontend-3`), per `team-lead`'s report that a later, more specific brief superseded the ticket's own stale "Sekhmet" line.
+- `KAN-144` (new): P-035's formal CUT — delete `FeatureFlags.squads`. Verified directly (`feature_flags.dart:75`, `main.dart:88`, no other call sites). `DECISIONS.md` status field update (PROPOSED→ruled) is `cpo`/`pm`'s, not mine.
+- `KAN-136`: confirmed to `team-lead-3` that T-061's rejection bar was already written into the ticket (done in continuation 29, before the request arrived).
+- `KAN-145` (new): the `payment_intents.booking_id` FK per `T-061` — filed as its own ticket since T-061's ruling is specifically that the FK must not be folded into the function body (KAN-140) or left to design-only (KAN-136).
+- `KAN-146` (new): money-layer end-to-end liveness demonstration per `T-058`'s explicit "nobody may cite a green KAN-128 as evidence" warning — sequenced last, after KAN-140/KAN-138.
+- `KAN-140`: added AC6 (T-061's exact join text) and AC7 (dependency on KAN-145).
+- `KAN-130`: client half unblocked and sized (1 sitting/ceiling 1). **Caught and corrected my own error**: initially set the whole ticket's due_date off the client-half number alone, which would have predated the SQL half's actual earliest-start (Thu 09-10, gated on cto's KAN-128 apply). Retracted within the same continuation before it could mislead anyone; reset to unset with the client half correctly framed as a landing condition per cpo's existing ruling, not an independent date.
+- `KAN-139`: bundled with `team-lead-5`'s new controller lint finding (`avoid_renaming_method_parameters`, verified directly), dated 09-07/09-08.
+- `KAN-147` (new): split `notifications_screen_v2.dart` (2,021 lines, verified via `wc -l`, 4x the 500-line ceiling), includes a folded-in false-comment fix. Team deliberately left unplaced per team-lead-5's explicit "not Team 3" flag.
+- `agent/WORKFLOWS.md`: fixed the Development-transition row — leads sequence/transition, they don't hand-assign; developers self-pull per the CEO's ruling now in every developer role file. Cited today's KAN-119 dual-executor incident as the direct, named cost of leaving the ambiguity unresolved.
+- Board is large now: `KAN-121`–`147` span Done/QA-Test/Development/Ready/To-Do across Phase 0 closeout, the money-layer defect chain, and this session's ordered backlog. All newly-created tickets undated pending the named lead's own capacity report.
+
+## Continuation 32 — 2026-09-06
+
+Nine incoming messages, board-hygiene and new-work batch.
+
+- `KAN-134` closed as Done — work already satisfied (`WORKFLOWS.md:73` already carries the pointer this ticket asked for), verified directly rather than trusted. Closed administratively rather than routed through QA, with reasoning stated on the ticket for review if that call is wrong under the new Done-ownership rule.
+- `KAN-139`: dated (09-07/09-08) and opened to `fe2-130` (Sekhmet) — SHARED file, first to pull takes it.
+- `KAN-130`: recorded `fe2-130`'s completed client half (commit `b6b2ea9`, verified claims) as a comment, left the ticket in `Ready` rather than transition — the SQL half hasn't started and moving to `In Review` would overclaim. Corrected the stale `senior-frontend-4` executor reference without rewriting the still-accurate SQL-half line.
+- `KAN-148` (new): delete 4 orphaned game-composer step screens (3,024 LOC), per `team-lead-2`, parented `KAN-127`, undated pending Team 2's own count.
+- `KAN-142`: updated with `team-lead-2`'s findings rather than creating a duplicate ticket (`team-lead-2`'s proposed "Ticket 2" already existed as `KAN-142`) — destination never built (resolves the route-vs-fix ambiguity toward fixing call sites), and a real ownership split between the two `/phone-input` call sites (one fixable now, one blocked on `misc/`'s UNOWNED status).
+- `KAN-141`: posted `backend-4`'s full measurement — two of three views are safely zero (one enforced, one untested-by-data), one (`username_registry_public`) is a genuine mechanism-free zero that will leak once real signups exist. Routed the "fix now or accept" decision to `cto` directly rather than deciding it myself.
+- Acknowledged without ticket action: `team-lead-3`'s self-correction on `KAN-136` ownership, `pm`'s `P-037` ruling (no change to `KAN-136`) and date-ownership correction, `tl4-ready`'s items 2-5 (correctly routed elsewhere already), `team-lead-2`'s `PROJECT_STATE.md` staleness findings (flagged to `analyst`, not mine to edit).
+- Board keeps growing: `KAN-121`–`148` now span Done/QA-Test/Development/Ready/To-Do. All new tickets undated pending the named lead's own capacity report, per standing practice.
+
+## Continuation 33 — 2026-09-06
+
+- `team-lead-4` independently re-verified `b6b2ea9` (sha real, 4/4 diff, WalletLedgerEntry correctly untouched) and found a real gap: `Wallet` gained `ownerId` but no `ownerType` field — `T-051`'s design is the pair, and without it any client-built insert would fail the same `23502` the SQL half is fixing. Judged this AC3's own under-specification (it never named `ownerType`), not `fe2-130`'s error — corrected AC3 on `KAN-130` in place rather than filing a follow-up ticket, since the ticket is still open and the same executor has context. Routed to `fe2-130` for sizing/fix.
+- `pm` relayed `cto`'s `T-063` billing-shape ruling (three new tables, ordered authoring steps, no date named) — acknowledged, nothing to write until the CEO's D4-timing decision or the first subscription-writing ticket triggers it.
+
+## Continuation 34 — 2026-09-06
+
+- `KAN-143` review gate: PASS. Verified directly against commit `357c544` (clean working tree) — all 25 target files deleted, `models.dart` barrel updated, zero leftover references except one stale comment. Independently re-ran `flutter analyze` (0 errors/0 warnings, 55 infos — minor 1-info discrepancy from `frontend-5`'s reported 56, non-blocking, not chased further) and `flutter test` (106/106 passed). Transitioned `Ready`→... `In Review`→`QA-Test` (transition id 3), dated 09-08.
+- Corrected the ticket's own "What, confirmed" section (my error as author, not the executor's): understated the `models.dart` barrel's involvement — it actually re-exported 13 of 15 rewards files pre-deletion, not "one hit total." Conclusion unaffected (re-export ≠ consumer), evidence corrected.
+- Filed `KAN-149` for the now-stale `feature_flags.dart:26` comment referencing the deleted `rewards/` directory — correctly left out of `KAN-143` itself per its own rework triggers.
+- Flagged an operational hazard to `team-lead`: `frontend-5` reported a `git stash -u` (used to measure an analyze baseline) swept up another live agent's uncommitted edit in the shared `dabbler-code` checkout; recovered with no lasting damage, but the mechanism is repeatable. Recommended a detached worktree as the safe alternative; not mine to enforce technically.

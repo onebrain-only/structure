@@ -67,3 +67,94 @@ Measured the repo where a claim depended on it.
   `ab-testing`, `onboarding`, `analytics`, `aso` bodies — judged from description only.
   Did not probe live Supabase; schema findings are from the baseline migration file, and
   `SCHEMA.md` §8 mismatch 7 warns the file is not the remote.
+
+---
+
+## 2026-09-06 — KAN-142, two dead navigation targets (`frontend-4`, Renenutet)
+
+Pulled from `Ready`. Branch `Canary`, local commit `6c5bca4`, **not pushed**.
+
+### The declare-or-delete question, measured
+
+All three line numbers in the ticket were correct at execution time — `notifications_screen_v2.dart:543`,
+`transactions_screen.dart:837`, `activities_screen_v2.dart:608`.
+
+**`/phone-input` — neither declare nor delete. Repoint.** The brief offered two answers and the
+measurement supports a third. `find lib -iname "*phone*"` returns **nothing** — there is no
+`phone_input_screen.dart` anywhere, only three stale references to it in
+`lib/core/design_system/README.md:441` and `MATERIAL3_MIGRATION_GUIDE.md:24,473`. Phone auth was
+replaced by the email/OTP flow (`RoutePaths.emailInput`, `RoutePaths.otpVerification`, declared at
+`identity_routes.dart:61,72`). But **both call sites are `Sign In` buttons on a signed-out empty
+state**, and signing in is not a deleted feature. Deleting the button would remove a live
+affordance; declaring `/phone-input` would build a door to a screen that does not exist. Both go to
+`RoutePaths.authWelcome` — declared at `identity_routes.dart:50`.
+
+**`/bookings/<id>` — delete.** No screen (`find lib -ipath "*presentation/screens*" -iname "*booking*"`
+→ empty), no route, and no `booking` constant in `route_constants.dart`. The `bookings_repository`
+/ `bookings_controller` layer under `lib/features/games/` still exists, but nothing renders it. The
+`case 'booking':` branch in `_handleActivityTap` is removed; the switch has no default, so a booking
+activity now taps inert instead of routing to a GoRouter error page.
+
+### Files changed
+
+- `lib/features/misc/presentation/screens/transactions_screen.dart` — +import `:12`, `:838`
+- `lib/features/activities/presentation/screens/activities_screen_v2.dart` — +import `:5`, `:609`
+- `lib/features/notifications/presentation/screens/notifications_screen_v2.dart` — `case 'booking'` removed at `:541-543`
+
+### `T-062` disposition
+
+**Nothing under `lib/app/routes/` was touched.** Read `T-062` at `DECISIONS.md:7536` before
+starting; the partition does not bind this ticket because the fix is entirely in feature screens.
+The route it now points at was *read* from `identity_routes.dart` (`team-lead-1`, clean) but not
+written.
+
+### Verified
+
+- `flutter analyze --no-pub --no-fatal-infos` → **0 errors, 0 warnings**, 57 infos.
+- `flutter test` → **106 tests, 10 files, All tests passed!** Count unchanged.
+
+### Findings worth someone else's attention
+
+- **The shared working tree is not clean and the other changes are not mine.** `git status` showed
+  staged deletions of 26 rewards/payments model and repository files plus edits to
+  `lib/data/models/models.dart` and `notifications_controller.dart` from another seat. I committed
+  **only my three paths** with `git commit -o`. **Corrected at report time:** that seat has since
+  committed them and `git status --porcelain` is now empty. The finding stands as a coordination
+  note — a shared tree means `git commit -a` from any seat would have swept up another's work.
+- `lib/core/design_system/README.md` and `MATERIAL3_MIGRATION_GUIDE.md` cite `phone_input_screen.dart`
+  as the reference migrated screen. That file no longer exists. Documentation drift, not mine to fix.
+
+### Running-app verification
+
+Required by the brief. Three of four surfaces were unavailable:
+
+- **iOS simulator** — `flutter run` failed: `Lexical or Preprocessor Issue (Xcode):
+  'FirebaseMessaging/Sources/Token/FIRMessagingFIDRegisterOperation.h' file not found` in
+  `build/ios/SourcePackages/checkouts/firebase-ios-sdk/.../FIRMessagingTokenManager.m:27`.
+  Unrelated to this change. **This contradicts `drive-the-app`'s Trap 4, which marks iOS `[M]` working
+  as of today.** Per that skill's own instruction — trust the machine, fix the line — someone should
+  re-mark it.
+- **Android emulator** — `emulator -avd Dabbler_test` refused: `Running multiple emulators with the
+  same AVD is an experimental feature.` Another session holds it. (`flutter emulators --launch` had
+  in fact succeeded on a slower path; `emulator-5554` came up later.)
+- **Web `integration_test`** — blocked per Trap 3, not attempted.
+- **Chrome / CanvasKit — used.** `flutter run -d chrome --dart-define-from-file=.env`, served on
+  `localhost:65006`.
+
+**What the running app measured.** The app dumps its full route table at boot. Of **49 declared
+routes**, `/auth-welcome` is present; `phone-input` and `bookings` each appear **0 times**. That
+confirms the ticket's premise from the runtime router rather than from grep, and confirms my
+target is declared.
+
+**Stated as unverified:** `/auth-welcome` renders **blank** in the browser. That is the existing
+`KAN-119` defect on a file my bounds forbid me touching (`frontend-3` is live on it). The route
+resolves; the screen does not paint. I am not claiming the sign-in flow works end to end.
+
+### Capacity
+
+**1 sitting, ceiling 2.** One sitting: no dependency boundary — the declare-vs-delete judgement is a
+decision taken inside the pass, not a checkpoint the next part waits on. The ceiling carries one
+rework cycle for the AC1 literal-reading gap flagged to `po`. **No date** — `po` converts.
+
+Ticket moved **To Do → In Review** (transition 31). Note it was never moved to `Development` by a
+lead; I pulled it from the board directly under the CEO's pull rule.

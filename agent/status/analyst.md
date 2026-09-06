@@ -637,3 +637,25 @@ amendments of mine* (`G-019`, `G-021`) as the harm. It outranks `017` (2026-08-2
 Proposed replacement text handed back to `team-lead-1` for the CEO to apply.
 
 **Nothing committed, nothing pushed, no Jira touched, no code written.** Only this file changed.
+
+## 2026-09-06 — `CONTRACT.md` §4.1 ten-file condition: measured
+
+**Task** (from `team-lead`): establish whether §4.1's *"the 10 files that reference
+`misc/data/datasources`"* is (a) stale-but-satisfied or (b) wrong when written. Read-only.
+
+**Verdict: (a).** Satisfied on 2026-09-05 by `dbfc6bb29662f22dbb3f55e8f8a202f5935f6a05`
+(`git cat-file -t` → `commit`; ancestor of HEAD `2eca71d`), which git-renamed
+`lib/features/misc/data/datasources/*` → `lib/core/data/` and rewrote 39 importers.
+
+**Key numbers, all at commit objects, never the worktree** (tree was dirty):
+`lib/data` 10 · `lib/features` 26 · `test` 1 = **39** at `dbfc6bb^`; **0** at HEAD.
+§4.1's three rows (:392, :394, :396) partition that 39 exactly — the "10" is scoped by its own
+`lib/data/**` row and was correct as written.
+
+**The ten files became themselves** — target moved, import lines edited; all ten present at HEAD.
+
+**Inferred, not measured:** that `dbfc6bb` is `P0-2`'s execution (author `dabblersport`, no seat).
+**Declined:** whether §10.6's landing test was thereby *satisfied* as construction — judgement, CEO's.
+
+**Wrote:** `Dabbler/dabbler-docs/PROJECT_STATE.md` §25. **Did not touch** `CONTRACT.md` (`G-022`),
+`DECISIONS.md`, or Jira. Reported to `po`, copied `cpo`.
