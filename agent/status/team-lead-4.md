@@ -471,3 +471,71 @@ is at real risk and `pm` now has it.
 **Open, all inbound:** Shu's 130+131 count · `pm` on the `lib/data/**` bar · `po` on three ticket edits.
 
 **Changed:** this file only. No code, SQL, copy, git or Jira.
+
+## 2026-09-06 — CORRECTION: my checkpoint was wrong (number unchanged); escalation dissolved; KAN-128 no longer waiting on a confirmation
+
+**I placed KAN-128's checkpoint wrongly and `senior-backend` corrected me.** Same count — **2
+sittings** — different boundary. Recording it because the number matching makes it easy to let a bad
+reason stand, and mine had already propagated into two other documents.
+
+**Shu's argument, which is the better reading of `capacity-to-date` §1:**
+> *"That signature is **ruled** by `T-049`... it has zero callers to migrate, and its output is
+> consumed by exactly one `ALTER COLUMN ref_id SET NOT NULL` statement in the same file. That is a
+> decision taken *inside* a pass, not a boundary between two."*
+
+And against my own counter-argument (that a caller-generated uuid with no caller is *less
+checkable*):
+> *"§1's test is not risk — it is whether the ticket's next part cannot start until the judgement
+> lands. Less checkable raises the odds of a rework cycle... It does not create a checkpoint."*
+
+**I conflated *hard to verify* with *hands off here*.** The real boundary is **migration-body-complete,
+posted in `G-002` format → AC-3 probe pack** — sitting 2 being the probes, which need fixtures and a
+**concurrent** replay for `financial_ledger`, since a sequential retry cannot demonstrate the
+Invariant 4 failure at all. Shu also discarded its own first checkpoint as *"a partial finish dressed
+as a checkpoint."*
+
+**Corrected in three places** because my version had spread: `po` (the ticket carries it),
+`team-lead-3` (which had written it into `capacity-to-date`'s worked example, where four other leads
+would read it), and here. Gave `team-lead-3` Shu's *risk-is-not-a-checkpoint* formulation as a
+candidate line, credited to Shu.
+
+**`team-lead-3` closed the §3 gap** (commit `64f4479`): the missing sentence is in, **`hand-off` is
+adopted as vocabulary** as proposed, `KAN-126` promoted from illustration to instruction, and the
+scope-cut rule added. It also **found an error in my own handling**: KAN-128's count was recorded as
+awaiting **`cto`**, but under the rule I had just carried, `senior-backend` sizes authoring and
+`cto` sizes the apply. Asking `cto` to confirm an authoring count was the same error one level up —
+and `cto`'s `G-025` refusal was arguably the correct answer to a question that should not have gone
+to it. **Both confirmations now exist** (Shu: 2 sittings; `cto`: apply as one sitting Wed 09-09), so
+that is no longer what holds the date.
+
+**Sourcing correction sent to `team-lead-3`:** of the four refusals in its case study, mine, `po`'s
+and `pm`'s are first-hand; **`cto`'s is second-hand via `pm`'s relay** — I have never had a message
+from `cto`. Flagged given `pm` had separately owned one relay compression on this same ticket.
+
+**The one open branch, with `po`:** the ticket does not say who authors AC 3's probes. `cto` owns
+them → **1 sitting**; they ship with the migration → **2**. Ceiling 2 either way. Shu flagged it
+rather than picking the branch that flattered its own number; I did not pick one either.
+
+**ESCALATION DISSOLVED.** `cpo` ruled the KAN-130/Phase-0 collision is not a live D4 risk: activation
+is a lead taking tickets, not payments going live, and `Wallet.userId` has no readers.
+
+**I verified the zero-readers claim myself** — not to second-guess `cpo`, but because it is the
+premise KAN-130's *same-ticket* coupling rests on, which `cpo` did not rule on. Nothing reads
+`Wallet.userId` or `WalletLedgerEntry.userId`; the only `entry.userId` hits in `lib/` are
+`lib/data/models/rewards/leaderboard_model.dart:318` and `leaderboard.dart:188` — **a different
+class**, and incidentally in my own `rewards` slice. Both wallet classes are constructed only at
+`wallet_repository_impl.dart:23` and `:39`.
+
+**Consequence given to `po` as a lever, not a proposal:** KAN-130's coupling is true in principle and
+consequence-free in practice, so **if the grant does not clear, the migration can land without its
+client half at no functional cost.** A null-and-unread model field is a materially different decision
+from a broken money path, and it is available without another ruling. Not proposing a split while
+Phase 0 holds.
+
+**Phase 0 state per `pm`:** `KAN-121`/`122` Done, `KAN-123` **Done**, `KAN-124` unblocked and
+running, `KAN-125` Ready (09-10 ceiling). Nothing slipped.
+
+**Open, all inbound:** Shu's KAN-130+131 count · `po` on the probe-ownership branch and four ticket
+edits. **Nothing owed by this seat.**
+
+**Changed:** this file only. No code, SQL, copy, git or Jira.

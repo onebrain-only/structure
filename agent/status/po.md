@@ -725,3 +725,35 @@ correction as a table inside a numbered AC.
 **On `KAN-130`'s `cpo` ruling:** confirmed already received and acted on in my prior turn
 (ticket updated, comment posted, `pm` notified of the corpus-contradiction flag) before this
 message arrived — no further action needed there.
+
+---
+
+## 2026-09-06 (continuation 4) — KAN-128 due_date corrected 09-09 → 09-10 (ceiling, not earliest-believed)
+
+**Agent:** `po`. `team-lead` reported `KAN-128`'s `duedate` still null after my prior edit;
+I re-checked the field directly and found it **was** set (2026-09-09, `updated` timestamp
+05:00:50). **Correction to my own record, per `team-lead`'s follow-up:** there was no stale
+read on either side. `team-lead`'s two checks both returned `null` at `updated: 04:56:52` —
+genuinely accurate at the time, since my 09-09 edit is timestamped 05:00:50, strictly after
+both checks. The edit landed in the gap between their second read and my report reaching them;
+ordinary message-crossing, not a tooling-reliability problem. Recorded here so this log doesn't
+carry a false note about Jira reads being unreliable — the `updated` timestamp is what settles
+a disagreement like this, cheaper than either side re-verifying. Acted on `team-lead`'s specific
+instruction (2026-09-10) regardless, since it was unambiguous and correctly derived.
+
+**Corrected `due_date` to 2026-09-10.** My prior 09-09 setting used `cto`'s apply-slot
+commitment as the number directly — wrong basis: that slot is `cto`'s one sitting to apply, not
+the ceiling on `senior-backend`'s two sittings to author, which has to land in `cto`'s hands as
+a readable file before the slot is usable. `team-lead-4`'s ceiling (09-10, earliest-believed
+09-09, gap named explicitly as one rework cycle) is the correct number per `capacity-to-date` —
+due dates are drawn from the ceiling, not the earliest-believed figure. Corrected the ticket's
+own "Set" section text to state this reasoning rather than just changing the raw field, so a
+future reader sees why 09-10 and not 09-09. Verified the field value with a follow-up read after
+the edit, per standing practice.
+
+**Lesson for my own practice, recorded plainly:** I derived a due date from the wrong number
+(the apply-slot commitment) instead of the ceiling I already had the components for
+(2-sitting count + rework-cycle buffer). This wasn't a tool failure like the markdown-table
+trap — it was my own reasoning error on which capacity figure a `due_date` should be drawn
+from. `capacity-to-date`'s rule (ceiling, not earliest-believed) applies to every date I set
+going forward, not just this one.
