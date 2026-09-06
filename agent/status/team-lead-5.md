@@ -432,3 +432,18 @@ Also flagged to `po`: `WORKFLOWS.md:60` still carries the superseded "owning `te
 Re-sent the two criteria points in case the acceptance message was unread: **redirect retained (live gate, not dead code)**, and **three comment sites, not one**, with `:16` falsified by four measured call sites.
 
 **Process observation, offered to `po` rather than pressed — it is `po`'s board.** Twice in one day our messages crossed and left a ticket in a state neither intended: KAN-149 held in To Do awaiting a landed ruling, KAN-153 nearly unassigned for the same reason. Both were cheap to fix only because each side re-stated the sha or ruling it was acting on. **Suggested carrying the ruling reference and its timestamp on the ticket itself**, so the board shows what a ticket waits on instead of requiring two seats to be in sync. This is the `capacity-to-date` §3 staleness problem showing up in board state rather than in a number — a relayed status is a timestamp, not a fact, and a ruling is exactly what lands in between.
+
+### 2026-09-07 (cont.) — KAN-153 in `Ready`; KAN-156 filed; pool state closed
+
+`po` stocked KAN-153: all three comment sites named (`:15`/`:16`/`:22`), redirect-retention made an explicit AC, "do not cite the flag's current value" stated as its own rule, `due_date` **2026-09-08** with ceiling = earliest and the absent budget noted on the ticket as deliberate rather than a collapsed range. **In `Ready`.**
+
+**`T-066` closes the transition gap for this ticket, and that is the concrete difference from KAN-149.** KAN-153 is mine by content, so **the `Development` transition is mine to make** when `frontend-5` self-pulls. KAN-149 had no seat able to make that move and went `To Do` → `In Review`; this one will not. The rule is doing the work the one-off ruling could not.
+
+`po` filed **KAN-156** for the `play_places_routes.dart:163` finding, marked "plausibly the same rot, not yet confirmed" — my own framing kept intact, with the check I said I was not the seat to make as its first acceptance criterion. **Ownership left unassigned rather than guessing `team-lead-2`**, noting the `STACKS.md` precedent without treating it as settled — the same discipline that caught `po`'s wrong "post-Phase-0 owner" guess. Correct: an unverified ownership guess is what produced this whole thread.
+
+**Team 5 pool state, closed:**
+- KAN-147 pt.A / KAN-151 pt.B / KAN-152 pt.C — `Ready`, dated 09-09 / 09-10 / 09-13, 3 sittings serial, ceiling 4 with the budget on pt.A.
+- KAN-153 — `Ready`, dated 09-08, 1 sitting, ceiling 1, runs parallel to the A/B/C chain.
+- `frontend-5` has four tickets to self-pull. **The idle gap that opened this task is closed and the pool is stocked ahead.**
+
+Outstanding, not mine to close: `WORKFLOWS.md:60` still carries the superseded "owning `team-lead-N`" phrasing (`po` owns the file); `T-066` and `CONVENTIONS.md` §12 are binding-but-uncommitted while `devops` is unspawnable. Holding `T-066` step 3 as `cto` asked — if it starts catching more than the two contended config files, that reads as slice-partition drift, not a rule needing to loosen.

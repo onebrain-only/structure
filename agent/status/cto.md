@@ -1064,3 +1064,25 @@ Plus: ticket cited the nonexistent `check_notification_rate_limit`; `user_has_fe
 class of evidence as a Jira comment claiming an edit: it reports the sender's intent, not the
 artefact. **Verify a ticket written from your text by reading the ticket.** Three messages sent,
 two landed, and nothing in the reply signalled the gap.
+
+## 2026-09-07 (cont.) — the "no seat to apply" blocker was mine and phantom; KAN-155's apply is PO-only
+
+`team-lead-4` measured `agent/roles/cto.md:91-99` and showed my "devops is unspawnable so
+KAN-141/KAN-145 have no seat" was produced by the stale section I myself escalated this morning
+under `G-022`. Verified first-hand rather than accepting: **`CONTRACT.md:242` — "Supabase project
+`wtncuzcskpigqpmnxwws` — writing: `cto` only"**, and `G-002` (2026-08-28) narrows `019` from
+"no agent, ever" to "no agent except `cto`". Repo changes ship via `devops`/`Canary`; **direct
+writes never did after G-002.** It produced the wrong conclusion twice in one day. Recorded in
+memory (`my-role-file-is-stale-on-apply-authority.md`) since the file is not mine to amend.
+
+**And reading G-002 in full corrected a count I had already given.** Condition 3 excludes any
+migration whose SQL touches existing rows of user data — PO applies those personally; `G-009`
+narrows this only for security remediation with an executable row-count guard, explicitly not
+"product data corrections". **KAN-155 UPDATEs 82 live `user_subscriptions` rows, so its apply is
+PO-only, not mine.** Withdrew my "1 sitting, ceiling 2" from `team-lead-4` before it was dated
+against me — the number may hold, the seat was wrong.
+
+**KAN-141 (DROP VIEW + DROP FUNCTION) and KAN-145 (ADD CONSTRAINT) are mine, confirmed** — both
+definition/DDL, inside condition 3. Counts stand at 1 sitting each. Also named a cost I had not
+been counting: G-002 condition 1 requires the migration posted as a Jira comment in KAN-67 format
+BEFORE applying, plus G-006's claim-comment — inside the sitting, but real.

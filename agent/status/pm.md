@@ -1642,3 +1642,26 @@ already told it), capacity requested. `WORKFLOWS.md:60` edited by `po` to reflec
 
 **Status: thread fully closed.** Nothing outstanding anywhere in this chain except
 `team-lead-4`'s capacity report for `KAN-155` and `team-lead-5`'s for `KAN-153`.
+
+## 2026-09-07 (cont.) — Escalated `cto.md` staleness to CEO; own the single-writer throughput signal
+
+`team-lead-4` escalated: `agent/roles/cto.md:91-99` still quotes the pre-`G-002` "no agent,
+ever" production-write prohibition, superseded 2026-08-28 (`G-002`/`CONTRACT.md:242`: `cto`
+may write under four conditions). The file has already produced a second false blocker today
+(`KAN-141`/`KAN-145` wrongly read as "no seat to land on" because `devops` isn't spawnable,
+when `cto` itself is the seat). `cto` caught this once already (`T-061` 2nd addendum),
+correctly declined to self-amend, escalated to the CEO under `G-022` — the file was never
+fixed.
+
+**Not mine to fix — a roster/document matter, needs the CEO.** Relayed verbatim to `main`
+rather than deciding it myself or routing it to `cpo` (not a product-strategy question).
+Included `team-lead-4`'s unresolved flag: whether the other ~30 generated role files carry
+the same staleness hasn't been swept — left the "who sweeps it" call to whoever picks this
+up, not assigned by me.
+
+**Genuinely mine, taken:** `cto` has two authored-but-unapplied migrations queued on its own
+single-writer production-write seat. Confirmed to `team-lead-4` I'm tracking this as a
+backlog-planning/throughput signal going forward, not escalating it as urgent yet — flagged
+to `main` for visibility in case `D4` volume keeps landing on one seat.
+
+**Reported to:** `main` (CEO-action ask + throughput flag), `team-lead-4` (confirmation).
