@@ -417,3 +417,44 @@ collision relation over all 85 patterns — I checked only the two entries whose
 branch 3, and took the 0-cross-entry figure from `qa`. That `KAN-123`'s mapping and whatever
 `po` writes into `KAN-124` will agree — flagged to `qa` as the thing to tell me about before
 `senior-frontend-3` starts, since a third source of truth would be worse than the current two.
+
+## 2026-09-06 — KAN-124 follow-up: verification trigger routed, single-source recommended
+
+**Agent:** `team-lead-3`
+**Outcome:** `qa` accepted the standing check on `KAN-124`'s corrected bucket table but named a
+real gap in it. Closed the gap and passed on a structural recommendation. **No ticket touched,
+no date changed, no capacity number revised.** `KAN-124` remains **2 sittings**; the
+2026-09-09 ceiling and its slip condition are unchanged.
+
+**The gap, and it was mine.** I asked `qa` to tell me if `po`'s edit produced a bucketing
+differing from the mapping it verified. `qa` is a **gate, not a watcher** — it is not notified
+when a description changes, so as posed the first sight of the corrected table would have been
+at `KAN-124`'s own QA gate, **after `senior-frontend-3` built to it**. That is the exact
+ordering the check exists to prevent. A standing request on a seat that receives no trigger is
+not a mechanism. Asked `po` to route the edited table to `qa` at the same time it tells me the
+fix landed, scoped as `qa` framed it (14-row diff against comments **10548**+**10551**, minutes
+of work), and said I will route it myself if I see it first — but that `po` should own it,
+since I am not reliably notified either.
+
+**Single source of truth — `qa`'s point, and I agree.** `KAN-124`'s description restating the
+bucketing *rule* is a **third copy** of a fact already in `STACKS.md` §10.3 and in `KAN-123`'s
+verified mapping. The stale carve-out is that copy having drifted once already; fixing the
+words without fixing the structure buys one correct ticket and leaves the drift surface for the
+next §10.3 amendment. **Second instance of a failure class already on record** — `task-readiness`
+logs the stale `flutter test` figure copied into five documents instead of cited from one.
+
+**My refinement, recommended to `po` as its call:** not pure citation, because a ticket must be
+executable cold and `senior-frontend-3` should not chase documents. **Keep** the six module
+files, their export names, and the two frozen-order facts. **Cite, not restate**: §10.3 for the
+bucketing rule and its two completions, `KAN-123`'s mapping for the per-entry assignment of all
+80. It is the six-row table's third column that duplicates and drifts.
+
+**Correction taken from `qa`, immaterial to the decision:** the error route's `GoRoute` opens at
+`:1666` and its `path:` line is `:1668` — I ran the two together as one figure in my previous
+entry. Confirmed against the `sed -n '1660,1672p'` output I already held: `:1665` comment,
+`:1666` `GoRoute(`, `:1668` `path:`. Entry is last either way, immediately before `];` at `:1678`.
+
+**Not verified:** that `po` will act on either item — both are its calls (routing, and ticket
+structure) and I recommended rather than asked. Whether citing instead of restating survives
+contact with a developer executing cold; I drew the line where I did precisely because I have
+not tested it, and the six module files stay in the ticket for that reason.
