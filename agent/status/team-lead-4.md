@@ -2223,3 +2223,52 @@ and a sharper form of my own flag.
 
 **Open:** `po`'s decision on 09-09 vs 09-10; `cto` on the `KAN-150` authoring reading; `cto`'s
 `KAN-150` apply count once `KAN-155` has a slot.
+
+**KAN-155's apply left `cto`'s authority — and "the PO" in `G-002` is the CEO, not the `po` seat.**
+
+`cto` re-read `G-002` in full and **withdrew its own `KAN-155` apply count** — not the number, the
+seat. Condition 3 is *"schema/privilege/definition changes only — not bulk data mutation"*;
+`KAN-155` `UPDATE`s **82 live `user_subscriptions` rows**. `G-009` covers security remediation and
+excludes product-data corrections. Correct, and adopted without argument.
+
+**Checked the destination rather than relaying it, and it was wrong.** `cto` wrote the apply
+*"requires the PO to apply it personally"* — **verbatim from `G-002` and accurate as a quote.**
+Measured the sources because that phrase decides who touches 82 live rows:
+
+- `019` (2026-08-27): *"only the PO can authorise a production write"* — and `G-002` opens *"The PO,
+  live in chat, directly instructed the assistant…"*
+- **`CONTRACT.md:242`**, the governing row: *"**User-data mutation is CEO-only (`019`)** except
+  security-remediation changes meeting `G-009`'s three tests."*
+
+**In `019`/`G-002` "the PO" is the human decision-maker — Moataz — written before `po` existed as
+an agent seat.** `CONTRACT.md:242` is that rule already translated; `G-002`'s body is not. **Relayed
+unchecked, it routes a live-data money migration to Horemheb, who has no such authority and would
+have had to refuse it.** Same failure class as the stale `cto.md` section, one layer down: not a
+stale document but a **stale term inside a live one**, where the quotation is correct every time.
+Flagged to `cto` as worth recording durably, since the next seat to quote condition 3 hits it
+identically.
+
+**Consequence, worse than a re-route: `KAN-155`'s apply is in no agent's queue.** I cannot request
+a sitting count from the CEO the way I request one from `cto`, so **that leg is undatable by me**.
+Told `po` to name the CEO as holder rather than leave it blank so it does not read as an oversight.
+
+**Reported to `pm` as a D4 planning fact:** its throughput ledger had one bottleneck (`cto` as sole
+production writer); **there are two**, and the second is narrower — every D4 migration touching
+existing rows needs a CEO action, on a stack of 110 features on a live billing rail. Not asking for
+the rule to be relaxed; `019`'s reasoning is sound. Offered one judgement: the CEO should know this
+as a standing property of D4, not as a surprise on `KAN-155` — and that routing is `pm`'s.
+
+**Unaffected, stated so nothing over-corrects:** `KAN-155` authoring untouched (1 sitting, ceiling
+2, 09-09 request stands); `KAN-145` **1 sitting ceiling 1** and `KAN-141` **1 sitting** stay
+`cto`'s, both definition-only and inside condition 3. **Carried `cto`'s `G-002` condition-1
+addition, which I had not been counting:** the `KAN-67`-format migration comment posted to the
+ticket *before* applying, plus `G-006`'s claim-comment re-checked immediately before — inside its
+sitting, as it stated.
+
+**Sharpened rather than mooted: `KAN-150`'s apply stays `cto`'s** — two `CREATE OR REPLACE`s,
+definition-only, still inside condition 3 even though the ticket it chains behind has left it. So
+if `cto` confirms its authoring is free, it can be written and posted while `KAN-155`'s apply waits
+on a CEO action, instead of the chain idling behind something nobody here can schedule.
+
+**`pm` confirmed** it escalated the stale-role-file issue to `main`/CEO verbatim and has taken the
+single-writer throughput point onto its own ledger.
