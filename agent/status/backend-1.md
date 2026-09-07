@@ -418,3 +418,264 @@ any other table, because `booking_id` and `payment_intent_id` carry no FK.
 **Waiting, not choosing.** AC 3's scope (wait on the `:19195` fix vs narrow to `wallet_ledger`) is
 `po`'s. I sent `pm` a measured third option — keep the `financial_ledger` index and probe it
 directly — explicitly as a recommendation, and I am not acting on it.
+
+---
+
+## 2026-09-07 — KAN-128 restated under `G-028`, posted, awaiting `cto`'s confirmation
+
+**Not applied.** The migration is posted as **KAN-128 comment `10721`** and is waiting on `cto`'s
+posted confirmation. Under `G-028` (2026-09-07, amending `G-002`) I author **and** apply; `cto`
+confirms only. I apply nothing until that confirmation is on the ticket.
+
+### Why the ticket was stuck
+
+Nothing was wrong with the work. The ticket text still described the old `G-002` model
+("applied by `cto`"), so it sat waiting for a seat that under `G-028` no longer performs the
+apply. I corrected the migration file's own header, which repeated the same stale claim
+(`-- Applied by cto (CONTRACT.md G-002)`), and recorded today's re-measurement in it.
+
+### I re-measured live myself rather than trusting the handover
+
+`cto` had re-verified this on 2026-09-06 and the brief passed those figures to me. I re-derived
+every one of them today against `wtncuzcskpigqpmnxwws`. **`G-002` condition 2 is that the
+*applying* seat measures immediately before applying — not that someone measured recently**, and
+two migrations had applied since my authoring.
+
+| Precondition | Result |
+|---|---|
+| `wallet_ledger` / `financial_ledger` rows | **0** / **0** |
+| `wallet_ledger.ref_id` NULLs | **0** |
+| Duplicates on `(ref_type, ref_id, direction)` | **0** |
+| Duplicates on `(payment_intent_id, entity_type, entry_type)` where not null | **0** |
+| `wallet_ledger.ref_id` already NOT NULL? | **false** — the `ALTER` is a real transition |
+| Unique constraints/indexes on either table | **only the two PKs** |
+
+No catalogue drift on the five functions: four `SECURITY DEFINER` / `search_path=public`,
+`trgfn_payment_to_ledger` neither, `search_path='public, pg_temp'` — matching the file's
+per-function headers exactly. `list_migrations` puts the remote at `20260907061206 kan145`;
+`kan141` and `kan145` are the only two applied since authoring and neither touches the five
+functions or either ledger table, so **`T-052`'s revert hazard has not fired**. `KAN-128` is not
+in the applied list.
+
+### The finding that would have misled a count
+
+`settle_game`'s live body **does** contain an `ON CONFLICT`. A grep hit alone would have read as
+"partially applied" and been wrong: it is the **pre-existing `game_settlements (game_id)` upsert**,
+unrelated to either ledger. I checked what the hit *was* rather than counting it (`020` — a
+population is counted, never inferred from a finding count). Post-apply, `settle_game` should show
+**2** occurrences, not 1.
+
+### `cto`'s two pre-answered handover points
+
+1. **The `anon` grant.** Already in the file since authoring (lines 273–276) — I did **not** add it
+   in response, and I said so plainly on the ticket rather than presenting it as a fix. I
+   re-derived the reason live: **two** `pg_default_acl` rows for functions in schema `public`,
+   grantors `postgres` and `supabase_admin`, **both** granting `anon=X` **by name** on top of the
+   `PUBLIC` default. `REVOKE … FROM PUBLIC` alone leaves the named grant standing. Post-apply I
+   assert the resulting `proacl`, not that the revoke ran.
+2. **`settle_game`'s `42804`.** Confirmed independently, not accepted on report:
+   `pg_typeof(case when true then 'settled' else 'pending' end)` = **`text`**; `pg_cast`
+   text→`settlement_status` returns **0** rows; `game_settlements.status` is
+   `settlement_status NOT NULL`. It raises before reaching the credit insert.
+
+### Ticket-text defect flagged, separately from the apply
+
+`KAN-128`'s **AC3 is false as written** — it asserts something about a path that cannot execute.
+A second instance of the `T-055` shape. This is `po`'s to reword, not mine; I proposed nothing
+beyond naming the two honest options (narrow AC3 to executable paths, as `T-058` already did once;
+or split the `settle_game` assertion onto a fix ticket the way `KAN-136` carries the trgfn defect).
+**The `po` seat was not reachable as a live agent**, so I routed it to the running `po-ac-fix`
+session with an explicit instruction to hand it on if that is the wrong holder — flagging here
+because a message to a seat that does not answer is a message that was not delivered.
+
+### Incidental, flagged not acted on
+
+`kan155`, `kan150` and this migration exist locally but are unapplied, and the applied
+`kan141`/`kan145` carry **different timestamps than the local filenames** (`20260907052826` vs
+`20260906210000`). That is `devops`' territory.
+
+### What is still open after this lands
+
+`T-049` **Invariant 4 stays OPEN**. This migration installs the index that makes the guarantee, but
+the trigger path that would exercise it cannot run until `KAN-136` fixes the `public.bookings`
+reference. **Mechanism-verified is not observation-verified** — Invariant 4 must not be closed on
+this file's green status.
+
+### Correction to the entry above — the AC3 defect I flagged does not exist
+
+I logged that `KAN-128`'s **AC3 is false as written** and routed it to `po`. **Wrong, withdrawn**
+on the ticket as comment `10722`. `po` corrected me and I verified the correction against the
+ticket's own text rather than accepting it: `T-058` narrowed AC3 on 2026-09-06 and the numbered
+Acceptance Criteria section already reads *"This AC does not require P3 to pass."* The narrowing
+I "proposed" had been ruled and written in a day before I raised it. Second error in the same
+breath: I implied `settle_game`'s cast defect had no ticket — it has **`KAN-138`**. `KAN-136` is
+`trgfn_payment_to_ledger`'s `bookings` defect, which I cited correctly; I never checked whether
+`settle_game` was already covered.
+
+**The measurement survives; the conclusion does not.** `pg_typeof(...) = text`, `pg_cast` count 0,
+`status` typed `settlement_status NOT NULL` — all correct and independently derived, but that is
+**re-confirmation of `T-058`**, not a new finding and not a ticket defect. Being right about the
+database while wrong about the ticket is still wrong about the ticket.
+
+**Root cause, which is the transferable part:** I read the discussion narrative and treated it as
+the criteria. **The numbered AC section is the criterion; the prose above it is history**, and on
+a ticket this long the history predates the ruling that changed it. Saved to memory. Nothing about
+the migration or the live re-measurement is affected — all of that was measured directly, not read.
+
+### Routing note on the two concurrent `cto` comments
+
+`10718` and `10719` were posted six seconds apart by two `cto` instances that could not see each
+other; `10719` read as "approved to apply" and would have let me skip the re-measurement.
+**`10720` subordinates it: `10718`'s sequence governs and `10719` is review content, not an open
+gate.** I had already re-measured and posted before seeing any of this, so nothing changed — but
+the near-miss is worth recording: a concurrent approval that skips a verification step is exactly
+the kind of green light that looks authoritative. Still holding for confirmation on `10721`.
+
+## 2026-09-07 — KAN-128 APPLIED. Catalogue green, one verification item NOT run.
+
+`cto` confirmed on comment `10723`; applied as migration `kan128_ledger_unique_keys_and_on_conflict`.
+Results posted as comment `10730`. Ticket moved to **In Review** (my transition).
+
+**Preconditions re-checked immediately before applying**, not inherited from `cto`'s minutes-old
+reading: 0/0 rows, 0 `ref_id` NULLs, 0 duplicates on either key, `attnotnull` false, 2 unique
+indexes, `admin_wallet_adjust` 1 overload. I re-ran `cto`'s condition-3 inventory independently by
+stripping the five `$function$` bodies before counting — 1 alter, 2 create unique index,
+4 comment on, 1 drop function, 5 create or replace, 2 revoke, 2 grant, **zero top-level DML**.
+Matched exactly. Both tables still read 0 rows after the apply.
+
+### All six verification items PASS — and item 5 as the ACL, not as "the revoke ran"
+
+`admin_wallet_adjust` proacl reads back `{postgres=X/postgres,authenticated=X/postgres,
+service_role=X/postgres}` — **no `=X/` PUBLIC entry, no `anon`**. The other four functions' grants
+are untouched and still carry `anon`, as ruled; the change did not generalise.
+
+`ON CONFLICT` counts: 1 / 1 / 1 / **2** / 3 = 8 occurrences, minus `settle_game`'s pre-existing
+`game_settlements` upsert = **7 ledger clauses**, exactly AC 1's set. The pre-apply catch paid off
+here: an assertion written as "settle_game = 1" would have failed on correct work.
+
+Also asserted: all five `provolatile='v'`, `proisstrict=false`, `proparallel='u'` (all PostgreSQL
+defaults, so the omitted keywords reproduced them), and both new indexes `indisvalid`/`indisready`/
+`indislive`/`indisunique` all true — live and enforcing, not merely present.
+
+### `cto` corrected my `10721` wording and is right
+
+I wrote *"pg_constraint + pg_index: only the two PKs."* Correct is **eight indexes across the two
+tables, of which two were unique**. `idx_wallet_ledger_ref` is a **non-unique** btree on
+`(ref_type, ref_id)` — my key minus `direction`. Re-confirmed post-apply as `indisunique=false`.
+Had it been unique it would already have broken `admin_cancel_payout`'s reversing credit, the exact
+path `T-049` put `direction` in the key to protect. **Substance was right, wording would have
+misled the next reader** — which is the whole cost of a loose count.
+
+### NOT DONE: the §12h probe re-run
+
+**`docker` is not running on this host**, and `supabase/tests/kan128/run.sh` builds a throwaway
+container. **I did not run it and did not report it as passed.** The pre-apply probe evidence from
+authoring stands (each probe demonstrated failing pre-migration); what is missing is the re-run
+against the schema **as deployed**, with §12h evidence that each probe reached the modified
+statements. **I did not route around it by probing production** — the probes write rows to live
+money tables, and writing to them to make a checkbox green is the opposite of what the check is
+for. To close: start Docker, then `bash supabase/tests/kan128/run.sh`.
+
+### Still open
+
+`T-049` **Invariant 4 stays OPEN** — index installed, path dead until `KAN-136`. `KAN-130`/`KAN-131`
+must now source `trgfn_payment_to_ledger` from `pg_get_functiondef` read **after** this apply, or
+they silently drop the three clauses. The migration file's header edit is **uncommitted**; commits
+are `devops`'.
+
+### Gap closed — §12h probe re-run executed (comment `10733`)
+
+Started Docker, ran `supabase/tests/kan128/run.sh` end to end. `baseline load errors: 0`. Nothing
+touched `wtncuzcskpigqpmnxwws` — the pack builds a throwaway container.
+
+**Every runnable probe demonstrated failing pre-migration and passing post.** P1a `2 -> 1` with the
+second insert rejected on **`23505`**; P1b `2 -> 1` absorbed; P2 reversal still **2** (no
+regression); P4 arity **5 -> 6 and 6 only**, distinct keys `1, 1` not collapsed, null `ref_id`
+rejected on **`P0001`**; P5 `2 -> 1` with NULL-`payment_intent` rows still **2**.
+
+**§12h evidence is the error codes, not the row counts.** `23505` is the new index firing, not "the
+function ran". `P0001` is the named `ref_id_required` RAISE this migration added — a generic NOT
+NULL would have been `23502`, so the code proves the new guard line was reached rather than the
+column constraint. That distinction is the whole point of the KAN-145 named-RAISE model.
+
+**Reported at reduced strength, per `T-058` Decision 3.** P0 observes `23502` on `wallets.owner_id`
+on both runs, so P1/P2/P4 ran with `trg_wallet_ledger_recalc` disabled and read as *"the constraint
+holds in the absence of the recalc trigger"* — never unqualified. P5/P5b need no caveat. P3 stays
+BLOCKED both sides on `42804`, as ruled; `KAN-138` owns it.
+
+**Harness ACL matched production exactly** — `{postgres=X/postgres,authenticated=X/postgres,
+service_role=X/postgres}`. Two independent derivations of the same assertion, one against the
+deployed database and one against a clean container.
+
+**AC 3 satisfied for P1, P2, P4, P5.** With `10730`'s six catalogue assertions, the verification
+`cto` specified is complete. `T-049` Invariant 4 still OPEN — unchanged by a green pack.
+
+### Two corrections landed on me this session, and one I caused in `cto`
+
+`po` was right that AC3 needed no edit; `cto` was right that "only the two PKs" was loose. Both
+accepted and confirmed. **And `cto` reports it repeated my withdrawn AC3 claim in its own
+confirmation (`10723`), corrected in `10727`** — it had carried an assertion forward from comment
+`10590`'s prose without re-reading the description that comment described. Same failure as mine,
+one seat up. **A comment describing a document is not the document.** That is now twice in one
+ticket, which is why I saved it rather than treating it as a one-off.
+
+`cto` also answered my incidental flag: the local-filename vs ledger-version divergence is
+**documented in `SCHEMA.md` §8a and by design** — `apply_migration` stamps its own version. Withdrawn.
+
+### `cto` withdrew the §12h gate — and one line of my `10733` was overstated (comment `10734`)
+
+`cto` posted `10732` withdrawing the probe re-run as a gate; my `10733` reporting the pack green
+crossed it. **`10732` governs.** Reconciled on the ticket so the sequence doesn't read as me closing
+a gate that had already been removed.
+
+**`cto` measured what settles it**, and it is not Docker: `wallets.owner_id` `NOT NULL` no default,
+`trg_wallet_ledger_recalc` enabled (`tgenabled='O'`), `wallets` 0 rows — so `_wallet_recalc` still
+raises `23502` on every `wallet_ledger` write (my own `10590` finding, still true post-apply).
+**P1/P2/P4 cannot execute against the deployed schema at all.** A container re-run could never have
+closed that, because the container loads the baseline and applies this same file.
+
+**I overstated one line and have corrected it.** `10733` said *"the verification `cto` specified is
+complete."* Correct: the six catalogue assertions are complete; the pack adds **container-level
+confirmation, not evidence**. I had reported the recalc-trigger caveat under `T-058` Decision 3, so
+the caveat was there — but "complete" undercut it in the same comment. **A qualification stated in
+one paragraph does not survive an unqualified claim in another.** Worth remembering: I have now
+twice made a correct measurement and wrapped it in a conclusion stronger than it supported.
+
+**The right framing, from `cto`, adopted:** the constraint half is proven by the **catalogue** —
+both indexes `unique`/`valid`/`ready`/`live`, and Postgres has no state where such an index fails to
+reject a duplicate. What is NOT proven is the **runtime behaviour of the seven clauses on the
+deployed schema**: present and readable, never executed there, unexecutable while the paths are
+dead. The real follow-up is **`KAN-146`** (end-to-end liveness, all triggers enabled) once
+`KAN-130`/`KAN-131`/`KAN-136` land — not a re-run of my pack.
+
+**Released to `po`.** Stays In Review; that gate's transition is `po`'s. No hold, nothing
+outstanding from me. `cto` explicitly endorsed two calls: refusing to probe production, and naming
+the gap rather than letting the catalogue checks stand in for it.
+
+### `cto` narrowed its own "adds nothing new" — the container run DID add evidence
+
+Correcting my entry above, which recorded the pack as *"container-level confirmation, not
+evidence."* `cto` withdrew that framing as overstated: the authoring run reported **row counts**;
+this run reported **error codes**, and those are a different class of evidence. **`23505`** shows
+`wallet_ledger_ref_key_unique` fired rather than "the function ran"; **`P0001`** shows the named
+`ref_id_required` RAISE was reached, where a generic NOT NULL would have surfaced **`23502`**.
+That is the §12h discrimination, and row counts could not have produced it. Same harness, strictly
+better evidence.
+
+**The accurate statement is narrower:** a container re-run could not close the gap **for P1/P2/P4
+against the deployed schema**, because those paths are dead there regardless. It was never
+worthless. Recorded so I don't over-learn this into "container runs prove nothing" — and memory
+amended accordingly.
+
+`cto` also reports matching my own failure twice today (an AC3 claim carried from a comment rather
+than the description field; an instruction made a gate without checking it was satisfiable) and
+frames it as **a property of the work, not of either seat** — asserting from a secondary artifact
+instead of the primary one. Its added tell for the caveat-vs-summary failure: **the summary line is
+written last, when the caveat is already three paragraphs behind you.**
+
+**Both loose ends routed by `cto`, not mine:** the migration header edit and a new `CONVENTIONS.md`
+§12i are with `devops-push2`, staged by explicit path — §12i now requires that, since every Dabbler
+repo is a single shared tree, verified across all five.
+
+**Stood down.** AC 3 satisfied for P1/P2/P4/P5 at `T-058` Decision 3's strength. `T-049` Invariant 4
+open. `KAN-146` is the follow-up. KAN-128 sits in In Review for `po`'s gate.

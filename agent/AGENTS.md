@@ -212,7 +212,7 @@ seat another's question is the most common routing error there is.
 
 | Seat | Count | Takes | Never |
 |---|---|---|---|
-| `senior-backend` | **1, shared** | Schema, migrations, RLS, RPCs, edge functions — **notifications included** | Applies to production. Writes Dart features |
+| `backend-1..8` | 8, one per team | Schema, migrations, RLS, RPCs, edge functions — **notifications included** | **Retired name `senior-backend`, 2026-09-06.** Under `G-028`, the owning `backend-N` **authors AND applies** schema/structure migrations against production after `cto`'s confirmation is posted on the same ticket — this reverses the old "applies to production: never" rule. `cto` never runs `apply_migration` or DDL itself. Still never: writes Dart features |
 | `senior-frontend-1..5` | 5, one per lead | Business logic, new patterns, multi-file changes, **scoped to the slices its lead writes** — §1's fourth column, authoritative at `CONTRACT.md` §3 | Authors SQL. Applies to production. Wanders outside its slices. **Infers its slices from its lead's `D`-stack labels** — those are a taxonomy, not the boundary |
 | `junior-frontend-1a..5b` | 10, two per lead | **Only** work that repeats a pattern already in the tree — and it must cite the example by `file:line` | Invents a pattern. Touches the contended files, `lib/core/**` or `lib/data/**`. Deletes anything |
 

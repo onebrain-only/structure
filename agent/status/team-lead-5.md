@@ -447,3 +447,31 @@ Re-sent the two criteria points in case the acceptance message was unread: **red
 - `frontend-5` has four tickets to self-pull. **The idle gap that opened this task is closed and the pool is stocked ahead.**
 
 Outstanding, not mine to close: `WORKFLOWS.md:60` still carries the superseded "owning `team-lead-N`" phrasing (`po` owns the file); `T-066` and `CONVENTIONS.md` §12 are binding-but-uncommitted while `devops` is unspawnable. Holding `T-066` step 3 as `cto` asked — if it starts catching more than the two contended config files, that reads as slice-partition drift, not a rule needing to loosen.
+
+## 2026-09-07 — resume after CEO halt: board re-verified, qa constraint checked against queue
+
+**Task:** confirm nothing moved in the notifications chain during the halt; flag any acceptance criterion that assumed a running-app check now that `qa` is code-audit only.
+
+**Board state — re-read from Jira, not from the brief.** All four still `Ready`, unassigned, descriptions unchanged since 2026-09-07 ~00:51-01:03:
+- `KAN-147` pt.A — due 2026-09-09
+- `KAN-151` pt.B — due 2026-09-10
+- `KAN-152` pt.C — due 2026-09-13
+- `KAN-153` routes comment — **`duedate` field is null** although the description states `due_date` 2026-09-08. Field/description mismatch, `po`'s to fix.
+
+Nothing else in `Ready`/`Development`/`In Review` belongs to this seat's `T-047` write boundary. `KAN-150` (dead `prime` branches in `calculate_notification_score`, `should_bypass_quiet_hours`) is notifications-domain by name but SQL, not `lib/features/notifications/**` — not claimed here.
+
+**Baseline still valid — verified, not assumed.** `dabbler-code` HEAD has moved `dc63d69` -> `e86d47d` (3 commits: `ead67fa`, `be442ac`, `e86d47d`). `dc63d69` is an ancestor. `git diff --name-only dc63d69..HEAD` returns four files, **none of them `.dart` or `.yaml`**: `docs/CONVENTIONS.md`, `docs/SCHEMA.md`, `scripts/ci/check_anon_allowlist_test.sh`, one KAN-141 migration. So the "55 analyze issues / 106 tests at `dc63d69`" baseline all four tickets are measured against is unaffected by the halt-period commits. Criteria stand as written.
+
+Also re-measured: `notifications_screen_v2.dart` = **2018 lines**, `notification_routes.dart` = **32 lines** — both match the figures in the ticket text.
+
+**Flag raised — `qa`'s new code-audit-only mode vs. this queue.** One phrase, repeated in three tickets, is the only exposure:
+
+> "the three live UI entry points (`adaptive_destinations.dart:90`, `main_navigation_screen.dart:474`, `app_top_bar.dart:130`) continue to work identically"
+
+`KAN-147` AC2, `KAN-151` AC3, `KAN-152` AC3. Read literally it is a running-app assertion, and `qa` can no longer make it. **It does not block the queue** — every other criterion is static (class existence, `git diff` emptiness on the routes file, `flutter analyze`, `flutter test`), and this one is discharged statically too: the call sites are unchanged in shape, the imports resolve, analyze is clean, tests are green. `KAN-153` is entirely static and touches nothing here.
+
+**What it costs, stated rather than hidden:** 21 widget classes move across three tickets with no functional pass at any point. Compile-clean and test-green is the whole of the evidence. The two test files under `test/features/notifications/` are the only behavioural coverage, and they were not written to cover this refactor. That is an accepted reduction under the CEO's decision, not a defect in the tickets — but it should be an accepted one, not a discovered one.
+
+**Recommended to `po` (ticket text is that seat's):** reword the phrase in all three to name the static check it actually is — call sites unchanged, imports resolve, analyze and test unchanged from `dc63d69` — so no developer or reviewer reads it as a promise of a functional pass. And set `KAN-153`'s `duedate` field to 2026-09-08 to match its own description.
+
+**Not done:** nothing hand-assigned. Team 5 pulls from `Ready` per the standing rule. `Ready` is stocked three deep on the serial chain plus one independent ticket, so no team waits on planning from this seat.

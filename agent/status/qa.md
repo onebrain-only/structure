@@ -587,3 +587,14 @@ KAN-124's `8e49b1d`).
 - `rewardsRoute` stays at `platform_routes.dart:55` per §10.3 rule 2. Verified.
 
 Transitioned to `Done`.
+
+## 2026-09-07 — Code audit of 4 QA-Test tickets (no simulator/browser opened, per CEO directive)
+
+Dispatched by `team-lead` for code-audit-only verification of KAN-149, KAN-143, KAN-139, KAN-142 — all in QA-Test, all verifiable by static reading (diff + grep + route registration), no app run needed.
+
+- **KAN-149** — comment-only diff at `dc63d69` confirmed via `git show`; `enableEarlyBirdCheckIn` still `false`, no dangling path/sha citation. PASS → Done.
+- **KAN-143** — 6,239 LOC deletion at `357c544` confirmed via `git show --stat` + full grep of `lib/` and `test/` for every deleted path/class name: zero remaining references, barrel clean. Noted KAN-130's later `Wallet.ownerType` touches a separate `wallet.dart`, not the deleted `wallet_repository.dart` — no conflict. PASS → Done.
+- **KAN-139** — single-line `super.key` diff at `90ea9f7`, nothing else in file changed. PASS → Done.
+- **KAN-142** — route repoint at `6c5bca4`: verified `authWelcomeRoute` is both declared (`identity_routes.dart:47`) and registered in `app_router.dart`'s `_routes` list, so both call sites resolve to a real screen. `/bookings/<id>` had no route/constant to begin with. Flagged for po/cto (not decided by me): this touches `/auth-welcome`, cited as under the CEO's authentication freeze — audited code correctness only, did not rule on whether it should have shipped. PASS on code correctness → Done.
+
+All 4: verdict + evidence posted as Jira comments, transitioned Done (transition id 41). None required simulator/browser — all four were dead-code/comment/route-wiring changes checkable by diff + grep + static route-registration reads.

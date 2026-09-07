@@ -1163,3 +1163,1125 @@ before committing; all three accurate, and `G-028` matches the role files commit
 - **`backend-3` and `team-lead-3` wrote memory into `dabbler-docs/.claude/agent-memory/`**
   instead of Thebes. `team-lead-3` now has a `MEMORY.md` index in both repos with different
   content. Committed to preserve, not endorsed. Merging is `pm`'s call, not mine.
+
+## 2026-09-07 — dabbler-docs migration-readiness confirmation (pre-remote gate)
+
+**Verdict: FAIL**, on one defect with a clean one-commit fix. Not a secrets problem.
+
+**Check 1 — clean tree: PASS.** `git status --porcelain` empty; only `.DS_Store` untracked
+and it is gitignored. 23 commits, single branch `master`, no remote configured.
+
+**Check 2 — no secrets: PASS**, verified across ALL history, not just the working tree.
+Dumped every blob in every commit (`git rev-list --objects --all` -> `git cat-file -p`,
+164,932 lines) and scanned it. Zero hits for: JWTs (`eyJ...`), `sb_secret_`/`sb_publishable_`,
+postgres connection strings, `ghp_`/`github_pat_`/`AKIA`/`AIza`, `BEGIN PRIVATE KEY`,
+credential-shaped assignments (`password|secret|api_key|token = "..."`), and email addresses.
+**Absence confirmed findable**, per the standing evidence rule: the corpus contains 850
+`password`, 377 `secret`, 547 `token`, 582 `credential`, 3427 `SUPABASE` — the anchors are
+dense, so the null result is the assignment pattern being absent, not the grep missing.
+Only 17 file paths have EVER existed in history; no `.env` was ever committed.
+The two sensitive passages name credentials without reproducing them: the Android keystore
+password (T-011/P-012) and the 55 seed accounts (KAN-78) are both discussed abstractly.
+High-entropy strings resolve to identifiers, not credentials — a Notion page id, the
+Cloudflare account id `4e6bcc77...` (appears in dashboard URLs by design), and git SHAs.
+The corpus already carries its own "naming a variable is fine, the value is not" rule.
+
+**Check 3 — the five misplaced agent-memory files: they MOVE to Thebes. They do not migrate.**
+Content is unambiguously Thebes-internal: the seat roster, `agent/roles/backend-3.md`,
+`CONTRACT.md` §9 custody, inter-seat escalation disputes. None of it is about Dabbler product
+or its docs. **Not moved by me** — per brief, this touches `team-lead-3`'s paused split-memory
+problem. Flagged only.
+
+**Check 4 — .gitignore: FAIL.** It is one line (`.DS_Store`). It lacks any `.claude/` rule,
+which is exactly how the five files got committed. **Thebes deliberately does NOT track agent
+memory** — `Thebes/.gitignore:18` excludes `/.claude/agent-memory/`, and `git ls-files
+.claude/agent-memory/` in Thebes returns 0 files. `dabbler-code/.gitignore:9` carries its own
+`.claude/agent-memory/*/credentials.local.md` rule. So migrating as-is publishes, to a new
+org-owned remote, a category of content both sibling repos deliberately keep out of version
+control.
+
+**Why this blocks rather than waits.** The five files are in git *history*, not just the tree.
+Adding a .gitignore rule later does not remove them — that is precisely the trap this repo's
+own `P-012` records about the keystore password ("the password is in public git history;
+removing the literal stops only *future* exposure"). Right now the cost of removal is near
+zero: no remote exists, nobody has cloned, and `c288bb3` is the **tip** commit containing
+**only** those five files and nothing else (`git show --stat c288bb3` = 5 files, 86 insertions;
+`git ls-tree -r HEAD~1 | grep -c .claude` = 0). After the remote exists it is a history
+rewrite on a shared repo. One moment, near-zero cost; every later moment, permanent.
+
+**Fix, in order, before the remote is created** — owner `devops`, not me:
+1. Copy the five files to `Thebes/.claude/agent-memory/{backend-3,team-lead-3}/` (they will be
+   gitignored there, which is the intended state). `backend-3/` does not exist in Thebes yet;
+   `team-lead-3/MEMORY.md` does and is an empty placeholder — the merge is `team-lead-3`'s
+   split-memory problem and stays paused.
+2. Drop `c288bb3` from `dabbler-docs` (clean tip-commit drop; no interleaved content).
+3. Add `.claude/` to `dabbler-docs/.gitignore`.
+4. Re-run check 1, then migrate.
+
+Checks 1 and 2 need no rework and should not be redone after the fix.
+
+## 2026-09-07 — KAN-141 G-028 confirmation (backend-4/Min applies)
+
+**APPROVED.** Confirmation posted to KAN-141 as comment **10685**; `backend-4` notified.
+I confirmed and did NOT run it — G-028 shape, first exercise of it.
+
+**Object:** `supabase/migrations/20260906210000_kan141_drop_list_active_usernames_and_public_view.sql`,
+dabbler-code `be442ac` (unpushed). `DROP VIEW public.username_registry_public;` +
+`DROP FUNCTION public.list_active_usernames();` between BEGIN/COMMIT.
+
+**Re-measured live myself** on `wtncuzcskpigqpmnxwws`, not read from the file or Min's summary:
+- `list_active_usernames()`: `prosecdef=true`, owner `postgres`, body
+  `select username from public.username_registry where released_at is null;` — no predicate.
+  Cited via `pg_get_functiondef` per AC3 (live catalogue, not baseline).
+- `username_registry_public`: viewdef exactly `SELECT list_active_usernames() AS username;`,
+  `reloptions IS NULL` → `security_invoker` absent. Dead shell confirmed.
+- `username_registry`: `relrowsecurity=true`; policy `username_registry_no_read` is
+  `cmd=r, qual=false` — total deny-read that the definer flag bypasses.
+- `registry_rows=0`, `active_rows=0` → the 0 is empty data, not a control. AC2's
+  "mechanism-free 0" confirmed.
+- Dependents: `username_registry_public` only. `prosrc ILIKE` sweep across all namespaces
+  for either identifier → 0 rows.
+
+**Correction I made to backend-4's brief:** it stated `proacl = anon=X/postgres`. Live it is
+`{postgres=X/postgres,anon=X/postgres,authenticated=X/postgres,service_role=X/postgres}`.
+`authenticated` holds EXECUTE too — which STRENGTHENS the predicate-and-keep rejection
+(gating on `auth.uid() IS NOT NULL` changes nothing for a role already holding the grant).
+No `PUBLIC` (`=X/`) entry — baseline revoked from PUBLIC then granted explicitly, so the
+two-grant-sources trap is accounted for.
+
+**Reachability trap checked, which backend-4 had not:** a literal grep proves nothing here
+because identifiers live in `supabase_config.dart` constants. Read it directly — it carries
+NO username constant at all, so the zero-hits claim rests on evidence that could have failed.
+Live path `rpc_username_availability` intact at auth_service.dart:1180,
+profile_creation_service.dart:393, username_repository_impl.dart:181.
+
+**Trailer ruling:** the file's "cto applies after independently re-measuring" predates G-028
+and misstates who runs it. Correct in a FOLLOW-UP commit (not an amend) before the push;
+comments-only, so the approval does not re-open.
+
+**Flagged, non-blocking:** (1) `rpc_username_availability` is itself an anon-callable definer
+one-at-a-time enumeration oracle — accepted trade for signup, out of scope, recorded so it is
+not rediscovered as new. (2) KAN-141 sits in **To Do, unassigned** while a production
+migration lands against it — board state is po/lead's.
+
+**Open, not mine to close:** G-028 condition 4 (verification posted after applying) is
+backend-4's; my confirmation does not cover it.
+
+## 2026-09-07 — KAN-145 confirmation: nothing to confirm yet (no-op)
+
+**Task:** confirm `KAN-145`'s migration apply under `G-028`, on the ticket, the way `KAN-141` was
+(comment `10685`).
+
+**Finding — no migration exists to review.** `KAN-145` read live via `getJiraIssue`
+(`fields: summary, description, status, assignee, updated, comment`):
+
+- **Status:** `Ready` (id `10008`). Not `Development`.
+- **Assignee:** `null`. No `backend-N` seat has self-pulled it.
+- **Comments:** 4 — `10663` (`team-lead-4` gate ruling), `10666` (`po` ungating + authoring
+  `due_date` 2026-09-08/09), `10668` and `10673` (apply-leg sizing, 1 sitting / ceiling 1,
+  projected 2026-09-10). **None of the four carries authored SQL**, and none carries a
+  `G-002` precondition block posted by an executing backend.
+
+`G-002` condition 1 — *authored and posted as a Jira comment first* — has not been met, so there is
+no artifact my confirmation could attach to. **No comment posted on `KAN-145`.** Posting a
+confirmation against a projection rather than an artifact is exactly the error `10673` itself warns
+about.
+
+**Flagged, not resolved — the ticket's own authority citation is superseded.** `KAN-145`'s
+description and comments `10666`/`10668` all cite *"Apply is `cto`'s (`CONTRACT.md:242`, `G-002`)"*.
+Under `G-028` (2026-09-07, CEO-direct, `DECISIONS.md:8664`) that is wrong: the owning `backend-N`
+authors **and applies**, after my confirmation on the same ticket. Verified live —
+`CONTRACT.md:242` still reads *"`cto` only"*; `G-028`'s own Consequence paragraph names `:236`,
+`:242` and `AGENTS.md:215` as carrying the superseded model and places them in **CEO custody under
+`G-022`**, with `pm`'s amendments drafted and awaiting the CEO. So the stale row is known and
+already owned — I did not edit it and no agent may.
+
+**Consequence for this ticket:** the apply-leg sizing on `10668`/`10673` is framed as `cto`'s own
+queue. Under `G-028` the apply sitting belongs to the owning `backend-N`, not to me; my leg is the
+confirmation only. Whoever re-dates the apply leg should re-attribute the queue, not just the date.
+
+**Not chased.** Producing the migration is `team-lead-4`'s queue to manage; I did not message a
+developer.
+
+## 2026-09-07 — KAN-145 G-028 confirmation + two rulings (backend-4/Min applies)
+
+**APPROVED.** Confirmation posted to KAN-145 as comment **10705**; backend-4 notified.
+Object: `20260907100000_kan145_payment_intents_booking_fk.sql` —
+`ADD CONSTRAINT payment_intents_booking_id_fkey FOREIGN KEY (booking_id)
+REFERENCES venue_bookings(id) ON DELETE RESTRICT`, the constraint T-061 ruled by name.
+
+**Re-measured live:** payment_intents constraints = exactly `payment_intents_pkey [p]` +
+`payment_intents_status_valid [c]`, no FK. `booking_id uuid NOT NULL`; `venue_bookings.id
+uuid NOT NULL` w/ `venue_bookings_pkey`. Both tables 0 rows, 0 orphans, 0 NULL booking_ids.
+`idx_payment_intents_booking` btree present → RESTRICT won't seq-scan, AC4 holds free.
+Definition-only, no DML.
+
+**RULING 1 (sequencing) — KAN-128 does NOT block KAN-145.** Read T-052 amendment firsthand
+at DECISIONS.md:7274-7300. "Alone and first" governs **KAN-128 vs KAN-131**; the hazard is
+KAN-131's whole-body `CREATE OR REPLACE` of `trgfn_payment_to_ledger` silently reverting the
+ON CONFLICT clauses (T-044 / CONVENTIONS §6c). It binds KAN-131's author. KAN-145 replaces no
+function body. **Further: the collision premise was false** — I read the KAN-128 file;
+`payment_intents` appears ONLY in comments (:47, :458-459) and as the trigger source table.
+No ALTER TABLE / ADD CONSTRAINT / CREATE INDEX against it in any form; its DDL targets
+`financial_ledger`. Disjoint at object level.
+
+**RULING 2 (T-049 Decision 2 does not transfer to an FK) — backend-4's reading upheld.**
+Decision 2's objection is specific to UNIQUE + replay: it applies where a *correct* actor doing
+a *legitimate* thing twice violates the constraint. An FK has no such case and no ON CONFLICT
+clause it could want. Counterfactual: today the INSERT succeeds and creates exactly the orphan
+T-061 measured, so 23503 is strictly better than silent corruption. "No SQL writers yet" cuts
+TOWARD landing it, on Decision 2's own words ("a constraint holds for writers that do not
+exist yet").
+
+**MY OWN ADDITION — cascade/RESTRICT interaction, flagged, non-blocking.** Measured live:
+`venues → venue_spaces (ON DELETE CASCADE) → venue_bookings (ON DELETE CASCADE)`. Adding
+payment_intents→venue_bookings RESTRICT means that once data exists, **deleting a venue or
+venue_space whose booking carries a payment_intent fails 23503** — RESTRICT halts the cascade
+partway up. Blast radius is venue deletion, not just booking deletion. Correct posture
+(T-061 + P-036), nothing deletes those tables in code today, both 0 rows. Told backend-4 to
+put it in the migration header; the venue-delete flow's answer is archival/soft-delete, never
+weakening the FK.
+
+**Grep-trap caught again (2nd time in 2 tickets).** "Only a read at data_export_service.dart:932"
+rested on a literal grep. `supabase_config.dart:197` DOES define `paymentIntentsTable`. Traced
+it: exactly one use, at :932, a `.select(...)` — claim holds, basis was weak. **This repo's
+constants trap has now bitten two consecutive backend-4 briefs; both times the claim was true
+and the evidence couldn't have failed.**
+
+**Ledger fact worth SCHEMA.md §8:** `apply_migration` stamps its OWN version at apply time, not
+the filename — KAN-141 went in as `20260907052826` while its file is `20260906210000`. Remote
+history and local filenames drift BY DESIGN. Currently living only in ticket comments; told
+backend-4 to raise it for a ruling.
+
+**KAN-141 closed out:** verification at comment 10687, trailer corrected in `e86d47d` before
+the apply, per my ruling. Condition 4 satisfied.
+
+## 2026-09-07 — KAN-155 AC10 apply brief for the CEO (I do NOT apply; CEO does)
+
+**Brief posted as comment 10707.** File `20260907110000_kan155_plan_key_migration.sql`
+(dabbler-code `cb5edf1`), authored by backend-4. NOT applied by any agent.
+
+**Boundary confirmed at source.** A brief circulating this session claimed KAN-155's apply leg
+moved to backend-4 under G-028. It did not. I re-read DECISIONS.md:8664: *"019's reservation of
+user-data mutation to the CEO is untouched"* and, under Left open deliberately, *"KAN-155
+(82 live user_subscriptions rows) sits on exactly this gap and stays with the CEO personally."*
+backend-4 and team-lead-4 both caught this independently. **backend-4 was right to refuse.**
+G-028 moves the AUTHORING to backend-N; the apply stays with the CEO.
+
+**Re-measured live, all matching backend-4 exactly:** user_subscriptions kickoff=82/pro=0/prime=0;
+subscription_features 9 per key (27); notification_hourly_caps 3 per key (9); all three FKs on
+subscription_plans(key) confupdtype='a', confdeltype a/c/c; kickoff values 7 flags true,
+quiet_override_all=false, quiet_override_high=false, caps 5/10/20; pro quiet_override_high=TRUE
+caps 10/25/50; prime quiet_override_all=TRUE caps 50/100/1000; notify_priority enum
+{low,normal,high,urgent}.
+
+**THE CHECK THAT MATTERED — CREATE OR REPLACE whole-body diff.** Read
+`can_send_notification_now(uuid,notify_priority)` from the live catalogue and compared against
+the migration's replacement line by line. **Only difference is `'kickoff'` -> `'player_free'`.**
+Signature, STABLE, plpgsql, `SET search_path TO 'public','pg_temp'`, and ABSENCE of SECURITY
+DEFINER all preserved (prosecdef=false live, stays false). This is the T-044 / CONVENTIONS §6c
+trap and it is handled correctly. **Always diff the body, never the author's summary of it.**
+
+**Endorsed backend-4's step-3 design explicitly.** Seeding by SELECT from player_free (rather
+than 84 typed literals) makes the pro-values failure STRUCTURALLY UNREPRESENTABLE — pro is not
+in the source. The composite constraints prove uniqueness only, never is_enabled/max_per_hour,
+so a wrong-values seed inserts cleanly and silently denies a paying subscriber. It offered to
+switch to literals for reviewability; **I said no** — literals + review is a weaker guarantee
+than a source that cannot contain the wrong values.
+
+**Client is entirely uninvolved.** Zero refs to subscription_plans / plan_key / kickoff / prime
+in lib/ or supabase/functions/, AND no plan constants in supabase_config.dart, AND no client
+call to can_send_notification_now or user_has_feature. Checked the constants file specifically —
+third time this session that trap was worth checking.
+
+**Open, flagged not guessed:** two labels. Six of eight are verbatim in P-039 (incl.
+`organiser_free`->"Free Organiser" and `venue_pro`->"Verified Venue Pro", neither mirroring its
+key). `corporate_starter`/`corporate_growth` expand P-039's *"Corporate Starter · Growth ·
+Enterprise"* — an INFERENCE, and AC1 says exact. **cpo's call, not mine; cpo not running this
+session** (SendMessage to cpo failed — no such agent reachable). Non-blocking: nothing
+references subscription_plans.label, no FK, no client code, so it is a one-row UPDATE after.
+
+**Also recorded:** 'urgent' has no caps row on ANY key, so can_send_notification_now returns
+true for urgent everywhere. PRE-EXISTING, unchanged, survives the migration. Not in scope.
+
+**Pattern for backend-4, told to it directly:** keep the failing-first probe and the
+verify-the-authority-boundary-at-source habit; fix the grep habit — twice now a TRUE claim
+rested on a literal search that could not have failed.
+
+## 2026-09-07 — KAN-155 AC4 scope verified; SCHEMA §8a and CONVENTIONS 12g written
+
+**AC4 completeness independently re-swept** (comment 10711). I had signed the AC10 brief
+telling the CEO where the only risk is, so I did not inherit backend-4's sweep — I re-ran it
+across every surface a literal can hide in: prosrc, view/matview defs, CHECK constraints,
+column defaults, RLS USING/WITH CHECK, trigger defs, all non-system schemas.
+`kickoff` -> exactly 2 objects: `can_send_notification_now` + `posts_mapping_check`.
+**Confirms backend-4 exactly. AC4 scope IS complete; step 5 is sufficient, not just necessary.**
+
+`posts_mapping_check` is a false positive — matches `'kickoff_at'`, a COLUMN on `posts`, in a
+time-like-column diagnostic. backend-4 read it before reporting it and was right to.
+
+**THE USEFUL FINDING — mechanism beats enumeration.** I read all three bodies. The risk is NOT
+"which key is named", it is the SHAPE:
+- **assign-as-fallback + fail-open = DANGEROUS**: `can_send_notification_now` does
+  `v_plan := 'kickoff'` then `IF v_cap IS NULL THEN RETURN true` -> deleting the key GRANTS
+  unlimited notifications.
+- **compare-against-literal + fail-closed = SAFE**: `should_bypass_quiet_hours`
+  (`IF v_plan='prime' ... RETURN true; END IF; RETURN false`) and
+  `calculate_notification_score` (`SELECT (plan_key='prime') INTO v_is_prime`, init false).
+A grep cannot tell these apart. **Classify by shape, not by count** — a sweep reporting "three
+functions reference the key" has not answered the question; one of the three was the whole risk.
+
+**Checked and cleared:** the two 'prime' functions do NOT use 'prime' as a fallback default, so
+KAN-155 introduces no second regression. Their branches were ALREADY unreachable (0 prime
+subscribers) and become permanently so — confirmed dead, not dormant. KAN-150 can remove them
+knowing nothing is lost. P-039 anticipated this.
+
+**Documents written (I hold the pen on both):**
+- `dabbler-code/docs/SCHEMA.md` **§8a** — apply_migration stamps its own version at apply time;
+  filenames and ledger versions diverge BY DESIGN; filename order is not apply order; a
+  name-based diff between `list_migrations` and `supabase/migrations/` proves nothing. Ledger is
+  authoritative for what ran, directory for what a replay would do. Two measured instances.
+- `dabbler-code/docs/CONVENTIONS.md` **§12g** — the fail-open/fail-closed rule above, plus
+  sweep-wide-then-read-every-hit.
+
+**Defect found and fixed in my own document:** CONVENTIONS.md had **TWO sections numbered
+`### 6c`** (:244 view/security_invoker trap, :383 REVOKE-before-data). That made every `§6c`
+citation ambiguous — same hazard as my own `T-016 -> T-020` renumbering memory. Checked all 8
+citations (6 in DECISIONS.md, 2 internal): **all mean the security_invoker trap**, so that
+section KEEPS 6c and the REVOKE one became **6f**. No citation needs updating; renumber note
+left in place.
+
+**FLAGGED, not fixed:** `CONVENTIONS.md` header still reads *"Owner: master-analyst (write)"* —
+a seat that no longer exists (it is `analyst` now), and my role file gives CONVENTIONS.md to
+`cto`. Ownership headers are CONTRACT.md territory and G-022 puts role custody off the seats a
+rule binds, so I am not editing it myself. Needs a ruling.
+
+**UNCOMMITTED — devops must commit:** `docs/SCHEMA.md` and `docs/CONVENTIONS.md` both modified
+in dabbler-code. I do not commit. Nothing pushed; backend-4 reports be442ac, e86d47d, a7dbaa0,
+0ecb75d, cb5edf1 also waiting on devops.
+
+**KAN-145 confirmed applied by backend-4** after my 10:07 ruling — verification comment 10706,
+In Review, both probes on record (INSERT_SUCCEEDED_NO_FK before, 23503 after), cascade-chain
+consequence added to the header as `0ecb75d` BEFORE the apply, comments-only, SQL byte-identical.
+Correct sequence throughout.
+
+## 2026-09-07 — CONVENTIONS §6g written; KAN-150 AC1 ruled; docs routed to devops
+
+**§6g written — a real gap backend-4 found by checking its own citations after my renumber.**
+There was NO section for the whole-body FUNCTION replacement trap. §6c is the VIEW case and was
+only ever the analogue; the direct rule lived in T-058, T-052's amendment and scattered ticket
+ACs — which is why every ticket re-derived it and a citation drifted to a view section.
+`CONVENTIONS.md` **§6g**: author from `pg_get_functiondef` on the LIVE catalogue, never the
+baseline dump; table of what silently drops when omitted (SECURITY DEFINER / search_path /
+volatility / prior migrations' body edits, with KAN-128↔KAN-131 as the worked example).
+**Cite §6g for functions, not §6c.**
+
+**Volatility trap verified, not repeated.** backend-4's catch is real and I measured it:
+`calculate_notification_score` provolatile='v' and `pg_get_functiondef` emits **NO** volatility
+keyword (VOLATILE is the default); `should_bypass_quiet_hours` provolatile='s' emits STABLE.
+**Preserving attributes verbatim means preserving an ABSENCE.** "Tidying" the first to match the
+second reads as consistency and is a silent behavioural change. Escape hatch in the section:
+read `provolatile` directly ('v'/'s'/'i') rather than inferring from emitted text.
+
+**KAN-150 AC1 RULED (comment 10716) — measuring changed the answer.**
+Measured: `should_bypass_quiet_hours` has **ZERO callers anywhere** — 0 in other prosrc, 0
+triggers, 0 views, 0 in lib/ + supabase/functions/ (literals AND constants), 0 in dabbler-admin
+and dabbler-web. **Same for all four functions in the subsystem** (`can_send_notification_now`,
+`user_has_feature`, `calculate_notification_score`). All four prosecdef=false, all granted
+EXECUTE to PUBLIC + anon + authenticated + service_role.
+1. **Do NOT delete it in KAN-150** — whether quiet-hours bypass is a committed entitlement is
+   cpo's product call + my architecture call, not a side effect of a plan-key retirement.
+2. **Reduce to RETURN false as AC1 says, but the body MUST say why** — a bare unconditional
+   RETURN false reads as "we evaluated, answer no" when it means "the rule was deleted"
+   (§12e class). Two comment lines separate dormant from abandoned.
+3. **Eventual correct shape names NO plan key.** `subscription_features` already carries
+   `quiet_override_all`/`quiet_override_high` — the concept as data. Hardcoding plan_key='prime'
+   always duplicated in a body what the entitlement table knew. Not KAN-150's; recorded so the
+   next author does not hardcode a NEW key.
+
+**Handed to po, not grown into KAN-150:** (a) the whole notification-entitlement subsystem is
+uncalled — pre-wiring or residue? Nobody has said, and it decides whether KAN-150 maintains live
+code or polishes residue. (b) all four are PUBLIC/anon-granted RPCs — **LOW severity, stated
+precisely**: prosecdef=false so invoker, RLS applies; **NOT** the definer-bypass class of
+KAN-79/113/141. Hygiene revoke once (a) is answered.
+
+**Endorsed backend-4's self-correction:** "safe because 0 prime rows" expires when the count
+changes; "safe because it COMPARES and fails closed by shape" does not. Shape-based
+justifications outlive count-based ones.
+
+**Docs routed to `devops-push2`** (two devops agents running: devops-migrate [07f193],
+devops-push2 [d41342]). SCHEMA.md §8a + CONVENTIONS.md §6g/§12g/6c-renumber are working-tree
+only; a push moves COMMITS and would have stranded them. backend-4 caught this and correctly
+declined to commit another seat's authored text. **I do not commit — devops does.** Told
+backend-4 to leave them. Awaiting confirmation; if push2 hands it back, re-route to
+devops-migrate rather than letting backend-4 do it.
+
+## 2026-09-07 — KAN-128 confirmation posted (comment `10719`); apply routed to `backend-1`
+
+**Asked to apply `KAN-128`. Refused the apply, granted the confirmation, named the seat.** Under
+`G-028` (`DECISIONS.md:8664`, CEO-direct today) `cto` never runs `apply_migration` or DDL — the
+owning `backend-N` applies after my confirmation. `po` had already flagged the ticket's stale
+`cto`-applies text on comment `10682`. **Applying seat: `backend-1` (Shu)** — authored `93d6619`,
+and `team-lead-4` assigned Team 1 on comment `10627` for that reason.
+
+**There was no hold.** `pm`'s reading — not-yet-reached rather than a deliberate block — is close
+but not the mechanism: the handoff was pointing at a seat that as of today may not catch it. The
+dam was a document defect, the same shape `G-028` itself was written to fix on `KAN-141`.
+
+**Preconditions re-measured live by me, not carried from `10590`:** `wallet_ledger` 0 rows,
+`financial_ledger` 0 rows, 0 `ref_id` NULLs, 0 duplicate keys on either proposed index, only the
+two PKs present, `ref_id` not already NOT NULL. **No catalogue drift** — live `pg_proc` shows the
+four `SECURITY DEFINER`/`search_path=public` functions and `trgfn_payment_to_ledger` neither, exactly
+as the file's per-function headers restate; no `ON CONFLICT` in any live body, so it is not
+partially applied. The two migrations that landed since (`kan141`, `kan145`) touch none of the five
+functions or either table, so the `T-052` revert hazard has not fired.
+
+**Artifact review: all four `G-002` conditions met.** Scanned for top-level DML outside
+`$function$` bodies — **none**; the file is one `ALTER COLUMN SET NOT NULL`, two
+`CREATE UNIQUE INDEX`, four comments, five function definitions, four `REVOKE`/`GRANT`. `019` not
+engaged. Verified independently: the `DROP FUNCTION` names the live 5-arg signature exactly; the
+6-arg replacement breaks **no caller** (`grep` over `lib/` and `supabase/functions/` returns
+nothing); the explicit `REVOKE ... FROM anon` at `:274` is present alongside `FROM public`.
+
+**Shu found a real defect in the ticket's own grant rule** — `REVOKE FROM PUBLIC` alone is
+insufficient here because `pg_default_acl` carries `anon=X` under two grantors. That matches my
+`anon-grant-two-sources` note independently. **Directed the fix mirrored into `KAN-130`/`KAN-131`.**
+
+**Did not treat as defects:** `CREATE UNIQUE INDEX` over `ADD CONSTRAINT`; no `CONCURRENTLY` inside
+the transaction on empty tables; P3 reported blocked and P1–P4 run under a declared harness
+deviation — honest weak reporting is right and is not a failed AC.
+
+**`T-049` Invariant 4 stays open** regardless of a green apply — the path is dead until `KAN-136`.
+
+**Flagged, not fixed:** `KAN-145` is applied as ledger version `20260907061206` while its local file
+is `20260907100000_...` — the MCP apply path stamps its own version, so repo and database ledgers
+disagree. Standing drift, will recur on this apply.
+
+## 2026-09-07 — KAN-128 handoff restated; db-push ruling; §12h; docs commit authorised
+
+**KAN-128: I AM NOT THE DAM. It never reached me.** (comment 10718.) pm-d4-dam asked why no apply
+was logged — because there is none to log. **No comment on KAN-128 posts the migration for G-028
+confirmation and I have never been asked to confirm it.** The ticket describes the G-002 shape
+throughout: "applied by cto only" (AC 2), "cto's apply slot Wednesday 2026-09-09", "authored +
+applied by cto" (done definition, comment 10569). G-028 killed all of it. `po` flagged this in
+comment 10682 and correctly said restating it was cto/team-lead-4's.
+**I WITHDREW the 2026-09-09 apply slot** — my number under the old rule; retracted rather than
+left on the board as a date I am expected to hit.
+**Unblocking sequence:** (1) `backend-1` (Shu — Team 1 per team-lead-4 comment 10627, authored
+`93d6619`) re-measures live and posts in G-002 format — NOT a formality, KAN-141 and KAN-145 both
+applied since, so comment 10590's readings are a day old; (2) I confirm **within one sitting**;
+(3) Shu applies + posts verification. **The action is dispatching Shu, not waiting on me.**
+Pre-answered Shu's two open items so they don't resurface at confirmation: AC 3 satisfiable as
+T-058 narrowed it (P3 BLOCKED, binds P1/P2/P4/P5, harness deviation at exactly T-058 D3 strength);
+and the `pg_default_acl` double-revoke finding is right and already standing rule (T-058 D1).
+due_date is team-lead-4/po's to re-derive; not mine to set.
+
+**RULED — `supabase db push` is NEVER the apply mechanism here.** Written into `SCHEMA.md` §8a.
+backend-4 flagged that KAN-155's CEO-reserved migration is now on Canary where a `db push` would
+apply it; confirmed no CI path can execute it (ci.yml and anon-allowlist-check.yml don't reference
+supabase; cloudflare-build.sh doesn't touch migrations). **I did NOT move the file** — it belongs
+in `supabase/migrations/` for replay correctness, and a directory whose contract is "apply
+everything here" is where a replay must find it. The rule goes on the mechanism instead, and is
+total: **one at a time, deliberately, by the seat authorised for THAT migration, via
+`apply_migration`. Never a bulk apply, any branch, any time.** A bulk apply cannot distinguish a
+routine change from one carrying reserved authority, because those boundaries live in the FILES
+not the tooling — a `db push` never opens the file. That rule is what makes an unapplied
+migration safe to commit.
+
+**CONVENTIONS §12h written — the SILENT form of the T-055 trap** (relayed by pm, found by
+team-lead-4/backend-4). T-055 condition 3 was written against a path that RAISES (caught
+settle_game's 42804). This variant doesn't announce itself: an early `IF NOT FOUND THEN RETURN 1`
+returns a plausible value, everything below the guard is unreached, and a before/after probe reads
+"identical" and reports a PASS with no error anywhere. `calculate_notification_score` has exactly
+that shape. **Condition 3 strengthened: show the probe reaches THE SPECIFIC STATEMENTS the change
+modifies, not merely that the function executed.** Named backend-4's KAN-145 named-RAISE probe as
+the model. Judged distinct enough from T-055 to need its own citation — pm asked, this is the call.
+
+**Docs: AUTHORISED backend-4 to commit.** devops-push2 did not pick it up, and a push already went
+PAST the dirty tree once (origin/Canary at `0ecb75d`; my two files still `M`, in no commit) — so
+the risk was demonstrated, not hypothetical. **I still never commit/push/deploy** — that boundary
+is about review independence, not about letting my authored text rot in a dirty tree. backend-4 is
+a seat that commits; committing another seat's text verbatim under their name is mechanical, not
+authorial. **Four changes now, not two:** SCHEMA §8a (+db push ruling), CONVENTIONS §12g, §6g,
+6c→6f renumber, §12h.
+
+**backend-4's correction accepted:** "seven unpushed" was five pushed + two unpushed (4c0f4c4,
+6a353e6). It caught this itself with `git ls-remote` against the REMOTE rather than a local ref —
+the right instrument, and the part most seats skip.
+
+## 2026-09-07 — REFUSED to apply KAN-128 (G-028); flagged parallel cto-2 as a hazard
+
+**team-lead asked whether I can apply KAN-128 "under standard G-002 authority" and dispatched a
+parallel `cto-2` instance to ask the same. ANSWER: NO.** Re-read `G-028` in full before answering
+rather than relying on my role file.
+
+**team-lead's carve-out reasoning was RIGHT and the conclusion still doesn't follow.** KAN-128 is
+schema/definition, so `019` does not reach it — correct. **That is not the blocker.** The blocker
+is that *"standard G-002 authority"* **no longer exists**: `G-028` (CEO-direct, today) converted
+it into a confirmation gate. Verbatim: *"`cto` never runs `apply_migration` or DDL itself"*, and
+the CEO directly: *"لازم تعرف إن الـ CTO مش بيشتغل بإيديه… مش بيكتب migration بإيديه."*
+**Distinguish these two: someone can be right that no carve-out applies and still wrong that I
+can apply.**
+
+**ROOT CAUSE, and it is bigger than this ticket.** `CONTRACT.md:242` still reads *"Supabase
+project — writing | `cto` only | NOBODY except `cto`, under G-002's conditions."* `G-028`
+explicitly names `CONTRACT.md:236`, `:242` and `AGENTS.md:215` as still carrying the superseded
+model and puts them in **CEO custody under G-022 — no agent may correct them.** pm has drafted
+the amendments; the CEO applies them. **So anyone doing the RIGHT thing — reading CONTRACT.md as
+the authoritative routing table — gets the dead answer and routes an apply to me. This will keep
+happening.** G-028's own "Why it was needed" records the mirror-image failure yesterday (role
+files said "cto applies", backend-4 stopped, I reported KAN-141 had "no seat to land on").
+**The document produced the paralysis, and it is still producing it, now in the opposite
+direction.** Told team-lead the fix that ends this class of dam is the CEO applying pm's drafted
+amendments — worth escalating. (Both files also still name `senior-backend`, retired 2026-09-06.)
+
+**FLAGGED `cto-2` AS A HAZARD.** If it answers from `G-002` or `CONTRACT.md:242` without reading
+`G-028`, it says yes and an apply follows that violates a CEO ruling made this morning. Also: two
+`cto` instances can post contradictory rulings on one ticket with no way for the board to rank
+them — I had already posted comment 10718 saying the opposite of what cto-2 was asked to consider.
+Asked team-lead to stop it or at minimum point it at G-028 first.
+
+**MEMORY REWRITTEN — the old entry was actively dangerous.**
+`.claude/agent-memory/cto/my-role-file-is-stale-on-apply-authority.md` previously said *"I own the
+apply — read CONTRACT.md:242"*. That is now exactly the stale source. Rewritten to: I never apply;
+never read CONTRACT.md:242 or my role file as authority on who applies; read G-028. Added the
+both-directions failure record, the rule that a "no" never leaves without naming the unblocking
+seat, and the parallel-instance hazard. Index line updated.
+
+**Still open per G-028, flagged not inferred:** whether G-009's bounded security-remediation DATA
+authority survives a ruling that cto never applies anything, or transfers to backend-N under
+confirmation. KAN-155 sits on that gap and stays CEO-personal.
+
+**Docs closed out:** devops-push2 committed and pushed SCHEMA.md + CONVENTIONS.md as `8363a0f`,
+working tree clean — no duplication, I did not re-route. team-lead had dispatched it before my
+message. backend-4 implemented the KAN-150 AC1 comment ruling as `fed3b01` (comments-only, bodies
+byte-identical) and repointed its citation to §6g after reading it. **`fed3b01` is unpushed** —
+should ride the next push.
+
+## 2026-09-07 — stand-down on KAN-128, and the collision it exposed
+
+**Stand-down received after I had already posted `10719`.** Two `cto` instances answered `KAN-128`
+**six seconds apart** — `10718` at 10:29:56, mine `10719` at 10:30:02 — neither able to see the
+other. The stand-down's premise (that I would have answered from `CONTRACT.md`/`G-002` without
+reading `G-028`) is not what happened: `10719` cites `G-028` at `DECISIONS.md:8664`, refuses the
+apply, and names `backend-1` as the applying seat. **Both comments reach the same conclusion.**
+
+**They agree on everything technical** — `G-028` governs, `cto` never applies, Shu applies, the
+`pg_default_acl`/`anon` correction binds `KAN-130`/`KAN-131`, P3 blocked and the harness deviation
+accepted only at reduced strength, Invariant 4 stays open, sizing not mine.
+
+**One real divergence, procedural, and it could have caused a wrong action.** `10718` says the
+migration has not been posted for `G-028` confirmation and sets re-post → confirm → apply. `10719`
+says *approved to apply*, treating `10590` as the posted artifact. A reader following `10719` alone
+skips the re-post. **Posted `10720` subordinating mine to `10718`** — deferral, not a third ruling.
+Leaving two live contradictory gate states on a money migration was the worse option.
+
+**A real gap in my own review, found and closed.** `10719` verified `prosecdef` and `search_path`
+but **not** volatility/strictness — the attributes `CONVENTIONS.md` §6g (authored today, which I had
+not read) exists to protect. Measured live: all five functions are `provolatile='v'`,
+`proisstrict=false`, `proparallel='u'` — **all PostgreSQL defaults**, which omitted keywords
+reproduce exactly. §6g-correct by construction. That was the one way my approval could have been
+unsafe; it is not. **I would not have caught it without `10718`.**
+
+**Lesson for the roster, not for me alone:** two instances of one seat can hold the same authority
+and answer the same ticket within seconds. Neither did anything wrong. The board carried the risk.
+Before posting a gate-opening verdict, check whether the seat has already answered — a
+confirmation is an action, not an opinion. See [[two-cto-instances-same-ticket]].
+
+## 2026-09-07 — `CONVENTIONS.md` §12i: shared-tree staging
+
+**Task.** `team-lead-4` routed a near-miss found by `backend-4` as a candidate convention:
+in the shared `dabbler-code` working tree, one seat's `git add -A` sweeps another seat's
+uncommitted work into its own commit, under its own name and message.
+
+**Verified independently before writing** (not taken on the report's word):
+- `git worktree list` → one checkout at `/Users/moatazmustapha/Desktop/Thebes/Dabbler/dabbler-code`
+  (`094d9c5 [Canary]`), plus one unrelated `prunable` scratchpad under `/private/tmp`.
+- `git rev-parse --git-common-dir` → `.git`.
+- **Extended the check beyond the brief:** the same two commands across all five Dabbler repos
+  show `dabbler-admin`, `dabbler-design-system`, `dabbler-docs` and `dabbler-web` are each a
+  single tree too. The property is repo-wide, not specific to `dabbler-code`.
+
+**Decision on placement.** §12b already governs the shared tree, but only the commands that
+**destroy** uncommitted work (`stash`/`checkout`/`reset`/`clean`). It does not cover the
+commands that **absorb** it — nothing is destroyed, so no `12b` rule fires. Genuine gap, so a
+new sibling entry rather than an edit to `12b`.
+
+**Written.**
+- `docs/CONVENTIONS.md` **§12i** — "In a shared tree, `git add -A` commits other seats' work
+  under your name." Rule: stage by explicit path, never `-A`/`.`/`-a`; read
+  `git status --short` before every commit. Records the silent-and-asymmetric property (sweeping
+  seat sees a clean commit; swept seat sees work vanish; `git blame` misattributes), the
+  `backend-4` near-miss, and the explicit `12b` relationship so neither is read alone.
+- `docs/CONVENTIONS.md` **§9 GIT** — three-line pointer to §12i. Full statement lives in one
+  place only, per `SCHEMA.md` §8.
+
+**Not done, deliberately.** Not committed — `cto` does not run git commands (`CONVENTIONS.md`
+§9, `CONTRACT.md` §3). Both edits sit uncommitted in the shared tree; `devops` commits them.
+Note the irony and the risk: these edits are exactly the kind of in-flight `M` that §12i exists
+to protect, so whoever commits next must name the path.
+
+**Open.** Whether the sibling repos want the same text in their own conventions files is not
+mine to decide unilaterally — flagged, not resolved. Scoped this write to `dabbler-code` as
+briefed.
+
+## 2026-09-07 — push state settled; board-wide stale-routing sweep; cpo reached
+
+**PUSH STATE SETTLED BY MEASUREMENT, not by arbitrating between two teammates.** team-lead said
+`fed3b01` + `094d9c5` were unpushed; backend-4 said everything was pushed. Ran it myself:
+local HEAD `094d9c5` **=** `git ls-remote origin Canary` `094d9c5...`; `fed3b01` IS an ancestor of
+origin/Canary; tree clean but for untracked `.claude/`. **backend-4 was right, team-lead stale.
+Nothing to route to devops.** All four doc changes (SCHEMA §8a + db-push ruling, CONVENTIONS §6f
+renumber/§6g/§12g/§12h) are on Canary.
+
+**NOTE: I nearly caused a duplicate commit.** I authorised backend-4 to commit files that
+devops-push2 had already committed as `8363a0f`. backend-4 read `git status` FIRST, found the tree
+clean, and reported instead of acting. That check is the only thing that prevented an empty or
+conflicting commit on top.
+
+**PATTERN NAMED (backend-4's framing, and it is right): shared state is a READING, and by the time
+someone else reads it, it is a claim about the PAST.** Five instances today across four seats —
+backend-4's "seven unpushed", my "devops hasn't picked it up", team-lead's "two unpushed", plus two
+more on the same push in opposite directions within 20 minutes. **Property of the setup, not any
+seat's carelessness.** Recorded as memory `shared-state-claims-are-readings.md`: re-run the command,
+never arbitrate; use `git ls-remote` against the REMOTE (a local `origin/X` ref is itself cacheable
+and stale); send the command with the claim.
+
+**BOARD-WIDE STALE APPLY-ROUTING SWEEP — handed to po via team-lead (po unreachable).** backend-4
+predicted KAN-128 would not be the last ticket naming me as applier. Correct. JQL over non-Done KAN
+matching "cto applies"/"applied by cto"/"cto's apply"/"cto only" → **20 tickets**: KAN-39, 119, 127,
+128, 129, 130, 131, 132, 136, 137, 138, 140, 141, 142, 145, 146, 148, 150, 155, 158.
+**Evidence limit stated to po, not hidden:** full-text match INCLUDING comments, so it contains
+false positives — some match my OWN corrections, which quote the stale phrases while superseding
+them. **Verified firsthand on KAN-128 ONLY**; the rest are candidates for po's read, not confirmed
+defects. Where it will actually dam: the migration-bearing ones — **KAN-130 and KAN-131 are `Ready`
+directly behind KAN-128** and hit it the moment they are picked up; also 138, 140, 146, 150, 155.
+Gave po the exact replacement wording plus the two exceptions (019 user-data untouched; G-009 data
+authority explicitly left open by G-028).
+**Repeated that ticket edits treat the SYMPTOM** — CONTRACT.md:236/:242 + AGENTS.md:215 are the
+cause, are CEO-custody under G-022, and pm has drafted the amendments. That fix ends the class.
+
+**cpo NOW REACHABLE — sent the two Corporate labels** still open on KAN-155 (`corporate_starter`,
+`corporate_growth` expand P-039's *"Corporate Starter · Growth · Enterprise"*, an inference, and
+AC1 says exact). Six of eight labels verified verbatim against P-039 myself. Non-blocking: nothing
+references `subscription_plans.label` — no FK, zero refs in lib/, supabase/functions/,
+dabbler-admin, dabbler-web. Also told cpo that prime's orphaned behaviour is now CONFIRMED dead
+rather than dormant (both functions compare, so fail closed) — touches P-039's consequence section.
+
+**Waiting on:** Shu's KAN-128 post (team-lead dispatching) — I confirm within one sitting.
+
+## 2026-09-07 — KAN-128 confirmation COLLISION (two cto instances) — resolved, not by me
+
+**A real collision happened and it was on a money migration.** `cto-2` posted comment **10719**
+(10:30:02) **six seconds after** my **10718** (10:29:56), neither able to see the other. Both cited
+G-028 correctly and agreed on every technical point — but **10718 said "not yet posted for
+confirmation, re-post first" and 10719 said "APPROVED TO APPLY."** Two live gate states at once.
+**A reader following 10719 would have applied a money migration while skipping the re-measure.**
+
+**Already resolved before I got there, and correctly: `cto-2` posted 10720 deferring to 10718.**
+It names 10718 as governing (the stricter path), explicitly says 10719 is NOT an open gate and
+backend-1 must not apply on it alone, and **preserves 10719's verified findings so Shu doesn't
+re-derive them.** That is the right handling. **I did NOT add a fourth comment** — re-litigating
+would be exactly the noise the collision created.
+
+**10719's findings that stand and are worth having** (re-measured live 2026-09-07, independent of
+comment 10590): wallet_ledger 0 rows, financial_ledger 0 rows, 0 `ref_id` NULLs, 0 duplicates on
+either proposed key, `ref_id` NOT already NOT NULL (so the ALTER is not a no-op), only `*_pkey` on
+both tables (no collision), **no catalogue drift**, and kan141/kan145 touch none of the five
+functions or either ledger table — so the T-052 CREATE OR REPLACE revert hazard was not triggered.
+Also: `admin_wallet_adjust`'s arity change breaks no caller (zero grep hits in lib/ +
+supabase/functions/).
+
+**10720 closed a §6g gap I should note:** 10719 had verified `prosecdef` and `search_path` only.
+Measured after: **all five functions are `provolatile='v'`, `proisstrict=false`, `proparallel='u'`
+— every attribute a PostgreSQL default**, which is exactly what CREATE OR REPLACE reproduces when
+keywords are omitted. So the migration is §6g-correct **by construction**. That was the one open
+way 10719's approval could have been unsafe, and it is not.
+
+**§12h is NOT satisfied by anything posted so far** — each probe must still show it reached the
+specific statements the migration modifies. That binds Shu's re-run.
+
+**MEMORY CONSOLIDATED — two cto instances wrote the same rule twice.** `cto-2` created
+`g028-cto-never-applies.md` while I rewrote `my-role-file-is-stale-on-apply-authority.md` to say
+the same thing; cto-2's even claimed to supersede mine, which stopped being true once I rewrote it.
+**Merged into `g028-cto-never-applies.md`** (better slug — names the rule, not the stale artifact),
+folded in my unique content (the both-directions failure record, the "no carve-out applies" vs
+"cto may apply" distinction, the 20-ticket sweep, escalate-the-cause-not-the-symptom), **deleted
+the duplicate, collapsed two index lines into one.** 50 memory files, no dangling refs.
+
+**Standing:** KAN-128 waits on Shu's re-measure and re-post; I confirm within one sitting.
+Nothing further from me on the collision.
+
+## 2026-09-07 — KAN-128 CONFIRMED (comment 10723); KAN-155 labels closed by cpo
+
+**KAN-128 APPROVED TO APPLY — backend-1 (Shu) applies.** The dam is broken. Shu re-measured and
+re-posted at `10721`; I confirmed at `10723`, **re-measuring independently of BOTH Shu and
+comment 10719** rather than inheriting either.
+
+**My measurements (all confirm Shu):** wallet_ledger 0 / financial_ledger 0 rows; 0 `ref_id`
+NULLs; 0 dupes on `(ref_type,ref_id,direction)` and on `(payment_intent_id,entity_type,entry_type)`
+where not null; `ref_id attnotnull=FALSE` so the ALTER is a real transition; no catalogue drift.
+
+**Condition 3 verified BY INVENTORY, not assumption.** Stripped the five `$function$` bodies and
+enumerated every top-level statement between `begin;`/`commit;`: 1 alter-column, 2 create-unique-
+index, 4 comment-on, 1 drop-function, 5 create-or-replace-function, 2 revoke, 2 grant.
+**ZERO INSERT/UPDATE/DELETE at top level.** No user data touched; 019 not engaged.
+
+**§6g checked: correct BY CONSTRUCTION.** All five functions `provolatile='v'`, `proisstrict=false`,
+`proparallel='u'` — every attribute a PostgreSQL default, so omitted keywords reproduce them
+exactly. That was the last way this approval could have been unsafe.
+
+**MY OWN GREP FAILED FIRST AND I CAUGHT IT.** My `REVOKE.*anon` scan returned only a comment line,
+and my top-level-DML awk returned NOTHING — **because the migration's SQL is lowercase and my
+regex was uppercase-only.** Re-ran case-insensitively and got the real inventory. **The same trap
+I have flagged in others three times today bit me.** The revoke IS present (`:226` from public,
+`:227` from anon). *A null result from my own grep is a claim about my regex, not about the file.*
+
+**Three things a naive grep would have gotten wrong, all confirmed:**
+1. `settle_game`'s live body DOES contain ON CONFLICT — **not** partial application; it is the
+   pre-existing `game_settlements (game_id) do update`. Shu reasoned it out instead of counting.
+   A "body already has ON CONFLICT?" check would have read as ALREADY APPLIED and been wrong.
+2. Executable `on conflict` occurrences = 8, but `:407` is that upsert → **seven** ledger clauses,
+   exactly AC 1's set. (`:115` is prose inside a COMMENT ON INDEX string.)
+3. `DROP FUNCTION :192` names the live 5-arg signature exactly; new 6-arg puts `p_ref_id` fourth
+   with no DEFAULT (T-049 requirement AND the only legal position).
+
+**CORRECTION ISSUED to Shu (immaterial to apply, but do not re-derive as stated):** it wrote
+*"pg_constraint + pg_index: only the two PKs."* There are **EIGHT** indexes; only **two are
+unique**. The one worth naming is **`idx_wallet_ledger_ref`, NON-unique btree on
+`(ref_type, ref_id)`** — the new key minus `direction`. **I checked its uniqueness deliberately:
+had it been unique it would ALREADY have broken `admin_cancel_payout`'s reversing credit — the
+exact path T-049 put `direction` in the key to protect.** It is not, so no collision.
+
+**Bound to the apply:** proacl read back after (authenticated + service_role only, no `=X/`, no
+anon — ACL is the evidence, not that the revoke ran; stop and report, do not patch) and **§12h**
+on the probe re-run. **T-049 Invariant 4 stays OPEN** — nobody closes it on a green result here.
+
+**KAN-155 LABELS CLOSED — cpo confirmed `Corporate Starter` / `Corporate Growth` VERBATIM from
+12a §E.1** (a three-row table spelling all three names in full; cpo's P-039 prose line
+*"Corporate Starter · Growth · Enterprise"* was ITS OWN compression — the flaw was in the decision
+record, not in anyone's reading). **All eight labels correct; AC1 satisfied; no pre-apply fix and
+no post-apply UPDATE. KAN-155 can go to the CEO as it stands.** Refusing to guess was right even
+though the guess would have matched.
+**cpo's added trap, worth keeping:** 12a's own SUMMARY tables abbreviate — §A.3 says
+*"Venue Basic → Verified Venue Pro"* but §D.4's headers are bare *"Basic"/"Pro"*, and §A.3's
+Corporate row says *"Corporate Tier (3 sizes)"*. **Full product names live in section headings and
+the §E.1 table; anything reading a label off a summary row gets it wrong.**
+
+**Docs confirmed by devops-push2:** `8363a0f` (§8a, §6g, §12g, 6c→6f) and `094d9c5` (§12h + the
+db-push corollary) both on Canary with check-runs green; `fed3b01` rode along. Nothing at risk,
+no PR, main untouched.
+
+## 2026-09-07 — I PROPAGATED A WITHDRAWN CLAIM in my own KAN-128 confirmation; corrected
+
+**My confirmation `10723` contained an error and backend-4/po caught it — corrected at `10727`.**
+I wrote that AC 3's *"genuinely live, not dormant"* wording is now false and called it a
+ticket-text defect for `po`. **There is no such defect.**
+
+**Verified by reading the DESCRIPTION FIELD:** that phrase appears nowhere in the current ticket,
+and AC 3's P3 bullet already reads *"This AC does not require P3 to pass."* That is **T-058
+Decision 2 — MY OWN RULING from 2026-09-06** — already applied to the criteria. po caught it;
+backend-1 verified against the ticket text rather than accepting po's correction on trust, and
+withdrew at `10722`.
+
+**HOW I GOT IT WRONG — the mechanism, which is the point.** I carried the claim forward from
+comment `10590`'s **prose** without re-reading the description it described. **A comment
+describing a document is not the document.** `10590` was accurate when written; the criteria were
+then corrected under T-058; the comment stayed frozen. **This is the trap I have cited at other
+seats repeatedly today and I already hold the memory for it
+([[jira-comment-is-not-state]] / [[a-comment-narrating-an-edit-is-not-the-edit]]).** Having the
+rule is not the same as applying it. Same family as my lowercase-grep failure an hour earlier:
+**both times I asserted from a secondary artifact instead of the primary one.**
+
+**Nothing load-bearing changed.** All four G-002 conditions in `10723` were measured live against
+the DATABASE, not read off the ticket — so the confirmation stands and backend-1 was told to
+apply. settle_game's 42804 is real but is **re-confirmation of T-058, not a finding**; KAN-138
+already owns it. P3 stays BLOCKED; harness deviation keeps T-058 D3's reduced strength.
+
+**backend-1's message crossed my confirmation** — it wrote "still holding, 10721 awaits your
+confirmation" while `10723` was already posted. **Sixth instance of the shared-state-is-a-reading
+pattern today.** Told it to go.
+
+**GOOD NEWS for the stale-routing sweep: KAN-128's DESCRIPTION IS ALREADY CORRECTED for G-028.**
+The RULED section, AC 2 and Sequencing all now name the owning `backend-N` as applier and record
+that my 09-09 slot no longer exists. **po did that work already** — so the 20-ticket sweep I handed
+over should be checked for tickets already fixed before anyone re-edits them. Do not assume the
+sweep's hits are all outstanding.
+
+**Standing:** KAN-128 approved and with backend-1 to apply + verify. KAN-155 labels closed by cpo,
+migration ready for the CEO as it stands. Docs all on Canary. Open: the sweep needs po (unreachable
+from here — routed via team-lead), and G-009's data-apply authority remains formally undecided.
+
+## 2026-09-07 — KAN-128 APPLIED by backend-1; released to po; I withdrew my own over-specified gate
+
+**KAN-128 is APPLIED and In Review.** backend-1 (Shu) applied after my `10723` confirmation and
+posted results at `10730`. Ruling on the probe gap posted at `10732`: **RELEASE, do not hold.**
+
+**Post-apply, measured by me:** both new indexes `wallet_ledger_ref_key_unique` and
+`financial_ledger_payment_entry_unique` are **unique ✔ valid ✔ ready ✔ live ✔ — ENFORCING, not
+merely present.** Postgres has no state where a valid/ready/live unique index fails to reject a
+duplicate, so **the constraint half is proven by the catalogue and a probe would add confirmation,
+not evidence.** Shu also asserted `admin_wallet_adjust` proacl = {postgres, authenticated,
+service_role} (no `=X/`, no anon) as the ACL; 7-vs-8 ON CONFLICT split matches mine; all five
+functions still provolatile='v'/proisstrict=false/proparallel='u' — **§6g intact across five
+whole-body replacements**; both tables still 0 rows.
+
+**I WITHDREW MY OWN INSTRUCTION.** In `10723` I bound the release to a §12h probe re-run. **That is
+impossible, and Docker being down is NOT why.** Measured: `wallets.owner_id` NOT NULL no default,
+`trg_wallet_ledger_recalc` ENABLED (`tgenabled='O'`), wallets 0 rows → `_wallet_recalc` raises
+23502 on **every** wallet_ledger write (Shu's own 10590 finding, still true post-apply).
+**So P1/P2/P4 cannot execute against the deployed schema at all**, which is exactly why the
+authoring run needed the trigger-disabled deviation T-058 D3 accepted. Only P5 could run, and that
+would write rows to a live money table to satisfy a verification step. A container re-run adds
+nothing either — the container loads baseline + this file, which IS the authoring run, and the file
+has changed only in comments.
+**Lesson: §12h is right in general and I applied it to probes whose target paths this ticket has
+documented as DEAD since T-058. I over-specified, and left a seat holding a blocker I created.
+Check whether a requirement is satisfiable before making it a gate.**
+
+**backend-1 was right twice, recorded:** refusing to probe production (writing to live money tables
+to satisfy a verification step inverts the step's purpose), and **naming the gap rather than
+letting six green catalogue checks stand in for it** — a seat reporting "all six green" without
+that paragraph would have reported something weaker than it sounded.
+
+**NOT PROVEN, and this is the phrasing to use:** runtime behaviour of the seven ON CONFLICT clauses
+on the deployed schema — present and readable in the live bodies, never executed there, not
+executable while the write paths are dead. **This is what the ticket already says about itself**
+(*"a green KAN-128 proves less than this ticket already says"*). **T-049 Invariant 4 STAYS OPEN.**
+
+**Told po the real follow-up is KAN-146** (end-to-end liveness, all triggers enabled), not a re-run
+of this pack — that is the first thing that can observe these clauses firing, once KAN-130/131/136
+land. AC 3 is satisfied **at T-058 D3's reduced strength and no higher**.
+
+**Two corrections I issued to myself today, same family:** propagating a withdrawn AC3 claim from a
+comment instead of reading the description field, and this over-specified gate. **Both were
+asserting from a secondary artifact rather than checking the primary one.** Third if you count the
+lowercase-grep failure.
+
+## 2026-09-07 — KAN-150 correction confirmed (comment 10735); po-sweep closed 20-ticket sweep
+
+**po-sweep's 20-ticket stale-routing sweep is CLOSED:** 5 genuine defects corrected (KAN-128, 130,
+131, 137, 150), 2 already correct (145, 155), **13 false positives left untouched.** That ratio
+vindicates the caveat I attached when handing the list over — it was a full-text match including
+comments and I said only KAN-128 was verified firsthand. **Do not treat a sweep's hit count as a
+defect count.** po-sweep also flagged the ONE edit it could not corroborate rather than reporting
+5-of-5 at equal confidence — that is what made the check worth running.
+
+**KAN-150 correction CONFIRMED, with two fixes (comment 10735).**
+
+**(a) Reasoning sharpened — condition 3 CLASSIFIES, it does not AUTHORISE.** po-sweep wrote "a
+G-002 condition-3 change, applied by backend-N" as though condition 3 conferred the authority. It
+does not; it is a scope limit. The real chain: **G-028 routes schema/structure migrations to
+backend-N after cto confirmation · 019 reserves user-data mutation to the CEO · condition 3 is the
+TEST deciding which lane a migration is in.** Right lane by the right test, described wrongly.
+**Immaterial here; it would matter the moment the shorthand is applied to a migration that DOES
+touch user rows**, where "it's a condition-3 change" begs the question that needs asking.
+
+**(b) FOUND A CONTRADICTION COSTING THE TICKET A DATE.** Sequencing says *"KAN-150's apply cannot
+be dated until KAN-155 applies"* — and the ticket **refutes itself** three paragraphs later,
+recording one-migration-in-flight as *"Preference, not a rule, named by team-lead-4."*
+**There is NO technical dependency.** Measured the premise rather than reasoning from the ticket:
+the two functions are disjoint from KAN-155's `can_send_notification_now`, and removal is
+behaviour-preserving in either order because both only **compare** against 'prime' (fail closed)
+with zero prime rows. **KAN-155 is a CEO action and is UNDATED** — so writing a preference as a
+dependency converts "we'd rather do these one at a time" into "indefinitely undatable behind
+something nobody has scheduled." **Ruled: KAN-150's apply is technically unblocked and datable
+today.** Holding it is team-lead-4's call to make EXPLICITLY with the cost named; I do not object
+to the hold, only to it reading as a constraint rather than a choice.
+
+**§6g detail passed on for KAN-130/131/150 authors:** cite **§6g** not §6c (view case, analogue
+only), and the trap AC4 does not yet name — `pg_get_functiondef` emits **NO volatility keyword for
+VOLATILE**. On KAN-150's pair specifically: `calculate_notification_score` is `'v'` and
+`should_bypass_quiet_hours` is `'s'` — **THEY DIFFER.** Tidying one to match the other reads as
+consistency and is a silent behavioural change.
+
+**KAN-128 ruling had already crossed team-lead's message** (10732 posted before it asked) —
+seventh instance of the shared-state-is-a-reading pattern today.
+
+## 2026-09-07 — KAN-128 probe gap CLOSED by backend-1; I corrected my own "adds nothing" claim
+
+**backend-1 started Docker and ran the pack end to end — AC 3 is now satisfied for P1/P2/P4/P5**
+at T-058 D3's strength. Throwaway container, baseline load errors 0, production untouched. Every
+runnable probe failed pre-migration and passed post. P3 stays BLOCKED both sides on 42804
+(KAN-138). Ticket In Review; backend-1 reconciled our crossed comments at `10734` with my `10732`
+governing.
+
+**I CORRECTED MYSELF: my "a container re-run adds nothing new" was OVERSTATED, and its run is the
+proof.** The authoring run reported **row counts**; this run reported **ERROR CODES**, which are a
+different kind of evidence: **`23505`** proves the new unique index fired (not merely "the function
+ran"), and **`P0001`** proves the named `ref_id_required` RAISE was reached — where a generic NOT
+NULL would have surfaced as `23502`. **That is precisely the §12h discrimination I asked for, and
+row counts could not have produced it.** Correct narrower statement: a container run could not
+close the gap **for P1/P2/P4 against the DEPLOYED schema** (dead paths there regardless) — it was
+never worthless. My release ruling stands on its own reasoning, but **future container runs must
+not be waved off on the strength of what I wrote.**
+
+**backend-1's self-correction is the sharper finding:** its `10733` reported the pack green WITH
+the T-058 D3 caveat and then said in its status section *"the verification cto specified is
+complete"* — **both cannot be true.** Its derived rule: **"a caveat in one paragraph does not
+survive an unqualified summary in another."** Real, generalises, same family as a correct
+measurement flattened in retelling. Told it the tell: **the summary line is written last, when the
+caveat is already three paragraphs behind you.** Also told it I matched it twice today (withdrawn
+AC3 claim carried from a comment; an unsatisfiable instruction made a gate) — **property of the
+work, not of either seat.**
+
+**Nice corroboration worth keeping:** the harness ACL read came back IDENTICAL to the live
+post-apply read-back — two independent derivations of the same assertion, one against production
+and one against a clean container built from the baseline.
+
+**§12i APPEARED IN CONVENTIONS.md ATTRIBUTED TO `cto` — WRITTEN BY cto-2, NOT ME.** Rule: in a
+shared tree, `git add -A` **absorbs** other seats' work under your name (the complement of §12b,
+which bans the commands that DESTROY it); failure is silent and asymmetric. Good rule, well
+argued. **I do not sign off on measurements I did not take, so I re-ran its load-bearing check:**
+`git worktree list` + `git rev-parse --git-common-dir` across **all five repos** — dabbler-code,
+dabbler-admin, dabbler-design-system, dabbler-docs, dabbler-web. **All single trees, all
+`common-dir: .git`**, and dabbler-code shows exactly the one prunable scratchpad worktree §12i
+describes. **Claim accurate as written; letting it stand.**
+
+**Routed to devops-push2, staged BY EXPLICIT PATH (which §12i itself now requires):**
+`docs/CONVENTIONS.md` (§12i + §9 cross-ref) and the KAN-128 migration header edit (G-002→G-028
+attribution, **comments-only, migration already applied, must not be re-authored**). Told it to
+leave untracked `.claude/`. origin/Canary = local HEAD = `094d9c5`, clean fast-forward.
+
+**Incidental:** dabbler-docs is now at `a0c2f0d [master]` — it has been committed to since my
+migration-readiness pass. Not chased.
+
+## 2026-09-07 — session close: the finding that is about me
+
+**backend-1 named the most useful thing to come out of today, and it is a defect in how I work.**
+It wrote my overstated claim — *"a container run adds nothing new"* — into its own status entry and
+memory as *"container-level confirmation, not evidence"*, **after personally executing the run that
+disproved it.** Its words: *"the primary artifact was my own terminal output and I asserted from
+your summary of it instead."*
+
+**So: my framings outrank other seats' direct observations, in their heads and in their DURABLE
+RECORDS.** An overstatement of mine does not stay mine — it becomes an organisational belief and
+propagates faster than it gets corrected. Recorded as memory
+`my-framings-become-other-seats-memory.md`:
+- calibrate to the evidence, not to the confidence the seat expects — if I have not measured it,
+  say so rather than closing the avenue flat;
+- **narrow claims explicitly.** *"A container run cannot close the gap for probes whose target
+  paths are dead on the deployed schema"* is true and bounded; *"a container run adds nothing"*
+  generalises into "container runs prove nothing" and would have cost us the run;
+- correct upward-propagating errors **into the seat's RECORD**, not just the conversation —
+  backend-1 had to edit its memory, not merely agree;
+- reinforce the habit of testing my framing against evidence the seat holds. Corrections from this
+  seat are the least likely to be challenged and therefore the most dangerous when wrong.
+
+**THE SESSION'S ONE PATTERN, in four forms: asserting from a SECONDARY artifact instead of the
+primary one.** Mine — a withdrawn AC3 claim carried from a Jira comment instead of the description
+field · an instruction made a gate without checking it was satisfiable · a lowercase-SQL grep whose
+null result nearly read as absence. backend-1's — a peer's characterisation of its own terminal
+output. **A senior seat's summary is a secondary artifact too.**
+
+**Board state at close:** KAN-141 and KAN-145 applied+verified. KAN-128 applied, probe pack green
+at T-058 D3 strength, In Review for po. KAN-155 authored, labels confirmed by cpo, ready for the
+CEO as it stands. KAN-150 authored, apply ruled technically unblocked. T-049 Invariant 4 OPEN.
+KAN-146 is the money-layer follow-up. Docs: §8a+db-push ruling, §6f renumber, §6g, §12g, §12h on
+Canary; §12i + KAN-128 header edit with devops-push2. **Open and NOT mine:** G-009's data-apply
+authority (undecided by G-028), and CONTRACT.md:236/:242 + AGENTS.md:215 still carrying the dead
+model in CEO custody with pm's amendments drafted — **that fix ends the misrouting class.**
+
+## 2026-09-07 — KAN-150 CONFIRMED (comment 10740); "unblocked" is not "confirmed"
+
+**APPROVED TO APPLY — backend-4 (Min) applies.** backend-4 held and asked whether `10735` counted
+as my confirmation. **It did not, and it was right to ask.**
+
+**THE DISTINCTION, worth keeping:** `10735` confirmed po-sweep's ticket-text edit, sharpened the
+authority chain, and ruled the sequencing contradiction. It ruled the apply **TECHNICALLY
+UNBLOCKED — a different question from CONFIRMED** — and carried no independent live re-measurement.
+**A lead's scheduling release is not the gate either.** Three separate things that can each be
+mistaken for approval: a design ruling (10716), a technical-unblock ruling (10735), a scheduling
+release (10736). **Only a posted G-028 confirmation with my own live re-measurement is the gate.**
+This is the SECOND time today backend-4 refused to act on an inferred approval; both times right.
+A redundant question costs one round-trip — an inferred approval is what started the day on KAN-141.
+
+**My drift check was stronger than backend-4's and used something it did not have:** I read both
+bodies **EARLIER TODAY, BEFORE KAN-128 applied** (`20260907064216`), while measuring for KAN-155.
+Compared to live now: **identical.** So no-drift rests on **two of my own readings taken either
+side of KAN-128's apply** — not name-matching, not backend-4's account. Its byte-comparison and my
+two-point comparison are independent derivations of the same fact.
+
+**§6g asymmetry navigated CORRECTLY — this was the pair most likely to fumble it:**
+`calculate_notification_score` live `provolatile='v'` → header emits **NO** volatility keyword;
+`should_bypass_quiet_hours` live `'s'` → header emits **STABLE**. **The first looks inconsistent
+beside the second and is right.** backend-4 read `provolatile` directly rather than inferring from
+emitted text — the §6g escape hatch working as designed, on its first real test.
+
+**Also verified myself:** zero executable `'prime'` occurrences (all remaining are comments);
+`v_is_prime` and `v_plan` gone as declarations; no SECURITY DEFINER anywhere (case-insensitive,
+non-comment); `search_path` restated on both; exactly 2 top-level statements between BEGIN/COMMIT,
+zero DML → definition-only, 019 not engaged. The DORMANT-NOT-ABANDONED comment implements 10716
+in full.
+
+**backend-4's account of the sequencing failure is BETTER THAN MY FRAMING and I put it on the
+ticket:** it planned around *"cannot be dated until KAN-155 applies"* for hours, having read the
+*"preference, not a rule"* line three paragraphs below without registering the contradiction —
+because **the operative instruction was clear, so it stopped interrogating the reason behind it.**
+That is the mechanism stated more precisely than I stated it.
+
+**team-lead-4's drift-check framing, worth keeping:** *"provably disjoint" is exactly the belief a
+whole-body CREATE OR REPLACE punishes when it turns out to be stale.* Cheap check, silent failure —
+**a null result is the point, not a waste.**
+
+**KAN-138 next, and the contrast matters:** `settle_game` IS one of KAN-128's five and its live
+body now carries an added ON CONFLICT clause. **Unlike KAN-150, that one has REAL drift** and the
+baseline would silently revert it. Same discipline, different payout.
+
+## 2026-09-07 — all doc work pushed and verified; nothing outstanding on my side
+
+**devops-push2 pushed `f9b7cd6`; I verified rather than accepted the report** (a shared-state claim
+is a reading, even from the seat that just made it, even with a sha attached):
+local HEAD `f9b7cd6` **=** `git ls-remote origin Canary` `f9b7cd60cc...`; tree clean but for
+untracked `.claude/`; commit touches exactly 2 files (+62/-2) — `docs/CONVENTIONS.md` (§12i + §9
+cross-ref) and the KAN-128 migration header. Clean fast-forward from `094d9c5`. All check-runs
+green on the final sha, no PR, main untouched.
+**It staged by explicit path, not `-A`, and confirmed `git status --short` after** — §12i binding
+the very commit that introduced it, on its first use.
+
+### Documentation shipped today (all on Canary)
+- `SCHEMA.md` **§8a** — apply_migration stamps its own version; filenames vs ledger diverge BY
+  DESIGN; filename order is not apply order; a name-based diff proves nothing. **Plus the ruling:
+  `supabase db push` is NEVER the apply mechanism here — one at a time, by the authorised seat.**
+- `CONVENTIONS.md` **§6f** — the duplicate `### 6c` renumbered (all 8 citations meant the view trap,
+  so 6c kept it).
+- `CONVENTIONS.md` **§6g** — CREATE OR REPLACE FUNCTION is a whole-body replacement; author from
+  `pg_get_functiondef` on the LIVE catalogue; **preserving attributes means preserving an ABSENCE**
+  (no volatility keyword emitted for VOLATILE). **Passed its first real test on KAN-150's
+  v/s asymmetry the same day.**
+- `CONVENTIONS.md` **§12g** — retiring a literal is safe where it is COMPARED, dangerous where it is
+  an assign-as-fallback feeding a fail-open lookup. Classify by shape, not by count.
+- `CONVENTIONS.md` **§12h** — a probe can fail to reach the code under test WITHOUT raising; show it
+  reached the specific modified statements. **Its evidence standard (error codes over row counts)
+  is what closed KAN-128's probe gap.**
+- `CONVENTIONS.md` **§12i** — in a shared tree `git add -A` ABSORBS other seats' work under your
+  name (complement of §12b, which bans what DESTROYS it). Written by cto-2; **I re-ran its
+  load-bearing measurement across all five repos before letting it stand under my name.**
+
+### Board at close
+KAN-141, KAN-145, KAN-128 applied + verified. KAN-128 In Review (probe pack green at T-058 D3
+strength). KAN-150 confirmed, with backend-4 to apply. KAN-155 ready for the CEO as it stands,
+labels confirmed verbatim by cpo. **T-049 Invariant 4 OPEN — not closed by any of this.**
+KAN-146 is the money-layer follow-up; KAN-138 is backend-4's next and has REAL drift.
+
+### Open, and NOT mine to close
+1. **G-009's data-apply authority** — G-028 explicitly left it undecided. Flag it, never infer it.
+2. **`CONTRACT.md:236`/`:242` + `AGENTS.md:215`** still carry the dead "cto only" model, are
+   CEO-custody under G-022, and pm's amendments are drafted. **This is the fix that ends the
+   misrouting class** — it cost the D4 queue a day today in BOTH directions. Escalated twice.
+
+## 2026-09-07 — T-067: same-function migration collisions ruled on the authoring window, not cross-ticket ordering
+
+**Brief:** `team-lead-4` (via `team-lead`) reported a third unflagged collision on
+`trgfn_payment_to_ledger` (`KAN-128` applied, `KAN-131` `Ready`, `KAN-140` `To Do`), said
+`KAN-140` "states no ordering relative to `KAN-131` at all", and proposed a standing `§6g`
+addition requiring every ticket to state its ordering against every other pending ticket
+replacing the same function.
+
+**Premise found wrong, measured.** `KAN-140`'s AC5 reads *"author from `pg_get_functiondef`
+on the live (post-`KAN-128`/`KAN-131`) catalogue"*; AC4 forbids regression to either ticket's
+work; `po`'s 2026-09-07 comment names *"the existing sequencing note (after `KAN-131`)"*. Read
+from the ticket's `description` field via `getJiraIssue`, not relayed. Unrecorded instances
+are two, not three.
+
+**Ruled (`T-067`, `Dabbler/dabbler-docs/DECISIONS.md`):**
+1. `KAN-140` needs no hard block on `KAN-131` and no ticket edit. `§6g`'s live-catalogue rule
+   makes the second author correct in either landing order. `KAN-140`'s one real hard
+   dependency stays `KAN-145`'s FK (AC6/AC7, `T-061`, `§12d`) — a different constraint kind.
+2. Rejected `team-lead-4`'s formulation — it scales with the square of the backlog and cannot
+   cover a collision authored after the ticket. Rejected a sibling section — a second location
+   for the `CREATE OR REPLACE` hazard is how the `§6c` citation drift happened.
+3. Accepted, written into `CONVENTIONS.md` `§6g`: **author and apply in one sitting; if a
+   migration touching the same function applies between authoring and apply, re-read
+   `pg_get_functiondef` and re-author.** The hazard is the window, not the queue.
+
+**Files:** `Dabbler/dabbler-code/docs/CONVENTIONS.md` §6g (window rule appended);
+`Dabbler/dabbler-docs/DECISIONS.md` `T-067`. **No `po` action required** — no ticket text
+changes. Not committed; not pushed.
+
+## 2026-09-07 — `KAN-138` G-028 confirmation; `T-068`, `T-069`; `CONVENTIONS.md` §12j
+
+**Task:** confirm `backend-4`'s `KAN-138` migration under `G-028`, dispose of `cpo`'s
+`p_gross_collected` finding (`P-043`), and codify the comment-stripping verification rule.
+
+**Done.**
+- **`KAN-138` CONFIRMED** — Jira comment `10749`. All four `G-002` conditions re-measured live by
+  me against `wtncuzcskpigqpmnxwws`, not relayed from comment `10742`: `pg_cast` text→
+  `settlement_status` = 0; `prosecdef` true, `provolatile` v, `proconfig {search_path=public}`,
+  `proacl` unchanged; `KAN-128`'s two `ON CONFLICT` clauses present; both tables 0 rows.
+  `backend-4` applies — **I did not and will not**, per `G-028`.
+- **The §6g check that matters:** normalized both bodies (comments, whitespace, case, cast string
+  stripped) — live `3018a92c0a33bb5beb1faac1b418fe83` vs authored, delta exactly 2 chars, the
+  parentheses the cast needs. Normalizing those too: identical. The authored body is the live
+  post-`KAN-128` body plus the cast and nothing else.
+- **`T-068`** (`DECISIONS.md`) — **my own `T-060` was wrong in one clause.** Its AC 2 addendum
+  requires the post-fix probe to show `_wallet_recalc` raising `23502` on missing `owner_type`/
+  `owner_id`. Live `_wallet_after_ledger`/`_wallet_recalc` reference neither — those arrive with
+  `KAN-130`, still in `Ready`. No `23502` is reachable. Pass condition corrected to
+  `PROBE_RESULT=SETTLE_GAME_SUCCEEDED`. `T-060`'s core decision (trigger enabled, no commit
+  required, no `KAN-130` dependency) stands; only the predicted outcome is narrowed.
+- **`T-069`** — `p_gross_collected` ruled: constraint now, mechanism deferred explicitly. No
+  client-reachable call site may pass it caller-asserted; `11b` row 161 (T+7 auto-payout) may not
+  ship while that is outstanding. `po` carries both as ticket preconditions.
+- **`CONVENTIONS.md` §12j** — strip comments from `prosrc` before pattern-matching; never narrow
+  the pattern instead, which trades a false positive for a false negative on the exact check that
+  exists to catch the silent revert.
+
+**Not done / owed by others.** `backend-4` applies and posts condition-4 results here. `po` carries
+`T-069`'s two preconditions. Nothing committed by me — `docs/CONVENTIONS.md` and
+`dabbler-docs/DECISIONS.md` left dirty in the shared tree for `devops`.
+
+**Left open, flagged not resolved.** `G-028` does not say whether `G-009`'s hands-on authority for a
+bounded security-remediation *data* change still sits with `cto` or transfers to `backend-N`.
+Unchanged from my previous entry; still not mine to resolve by inference.
+
+## 2026-09-07 — KAN-155 applied under the CEO's direct authorization
+
+**What:** Applied `supabase/migrations/20260907110000_kan155_plan_key_migration.sql` to
+production (`wtncuzcskpigqpmnxwws`). Retired `kickoff`/`pro`/`prime`; created eight
+persona-qualified plan keys; moved 82 live `user_subscriptions` rows to `player_free`;
+fixed `can_send_notification_now`'s fallback literal in the same transaction.
+Ledger: `20260907071308 / kan155_plan_key_migration`. Verification posted to KAN-155
+comment `10750`.
+
+**Authority — the part that matters for the record.** Applied by me on the CEO's behalf
+under the CEO's direct, explicit authorization for THIS migration, relayed via the
+Listener. **NOT under my standing `G-002`/`G-028` authority**, which does not reach
+user-data mutation — `019` reserves that to the CEO personally and `G-028` deliberately
+left it there. I did not reinterpret or narrow that reservation. Precedent to protect:
+a CEO authorization for one migration authorizes one migration, not a class.
+
+**Protocol was not shortened because it was authorized.** All four `G-002` conditions
+re-satisfied: migration confirmed posted in full format (`10707`); every precondition
+re-measured live immediately pre-apply rather than inherited from the morning's readings;
+applied; verification run and posted.
+
+**Two things worth carrying forward:**
+
+1. **The world had moved since the 10:14–10:18 verification.** `KAN-150` had landed —
+   after the comments asserting its functions were untouched. Found it by reading the
+   migration ledger before applying, not by trusting the ticket's stated blocking order
+   (`KAN-150` was described as blocked BY `KAN-155` and in fact landed first). It did not
+   change the risk picture — it made this strictly safer — but the check is the point:
+   **read the ledger, not the ticket, for what is actually applied.**
+
+2. **I nearly manufactured a defect out of a comment.** My catalogue sweep flagged a
+   surviving `'prime'` in `should_bypass_quiet_hours` and I was one step from reporting a
+   failed `KAN-150` apply. Read the hit: it was prose inside `KAN-150`'s own
+   DORMANT-NOT-ABANDONED comment; the body is `RETURN false;`. The identical trap fired a
+   second time on my own AC4 check — `prosrc` still matches `kickoff` because the file's
+   step-5 comment says *"was 'kickoff'"*. Both resolved by stripping comment text and
+   checking executable lines only (0 executable `kickoff`; assignment reads
+   `player_free`). **`prosrc`/`pg_get_functiondef` include comments. A literal match
+   against a function body is a candidate, never a finding.** This is the third recorded
+   instance of the same near-miss class on this ticket alone (`10709`, `10711`, here).
+
+**Left open, deliberately not ruled here:**
+* AC4's wording ("body no longer contains `'kickoff'`") fails literally against a comment
+  while its intent is fully met. **The criterion needs rewording, not the code** — `po`'s.
+* `should_bypass_quiet_hours` now returns a constant `false`. Whether it should exist at
+  all is mine to rule and I did not rule it in passing while applying something else.
+* `'urgent'` still has no cap row on any plan — pre-existing, unchanged, out of scope.
+* `G-009`'s carve-out vs `G-028` (whether my hands-on security-remediation data authority
+  survives a ruling that says I never apply) remains open. This apply does not settle it:
+  it ran on CEO authorization, not on that carve-out.

@@ -149,3 +149,38 @@ thing holding `KAN-148` out of `Ready` is **Team 2's own capacity number**, whic
 `capacity-to-date` §3 I must request and carry back unchanged — and which I cannot request myself,
 having no authority to dispatch. Raised to `team-lead`. `KAN-142` additionally needs a split or an
 owner decision, because its `transactions_screen.dart:837` half sits in UNOWNED `lib/features/misc/`.
+
+## 2026-09-07 — KAN-158 acknowledged (D3 venue-delete cascade design note)
+
+**Task:** confirm receipt of `KAN-158` (parent epic `KAN-157`, "D3 — Venues, spaces & booking"), re-routed to this seat after an initial misroute to `team-lead-4`. Effort: low.
+
+**Read:** `KAN-158` and `KAN-157` fetched directly from Jira (cloudId `18c8e9f5-d139-4e03-b5d8-89122cc14937`). Both currently `To Do`, no due_date, no assignee, priority Medium. `KAN-157` labels `D3`, `venues`.
+
+**Confirmed routing is correct.** `venues` is in this seat's measured write set (`CONTRACT.md` §3 — `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities`). The routing-correction comment on `KAN-158` cites `STACKS.md` §11.2/§12 and matches.
+
+**Call: no `Ready`-level breakdown now. It stays in `To Do` under `KAN-157`.**
+Reasons, all stated on the ticket and none disputed: `venue_bookings` and `payment_intents` both at 0 rows; nothing in `lib/` deletes a venue; no schema change is asked for; the correct direction (archival/soft-delete rather than weakening the `payment_intents` RESTRICT) is already recorded. Breaking it down now would produce a `Ready` item no team can execute — there is no venue-deletion feature to design against yet. It becomes a real ticket when D3 venue-management design work is scheduled, and it is discoverable from the D3 epic, which is the whole point of it existing.
+
+**One flag raised to `po` (not a blocker):** AC1 as written — *"whoever picks up venue deletion/archival work confirms, before implementing, ..."* — is a condition on a future, unwritten ticket, not something `KAN-158` can itself satisfy. As it stands the ticket can never be closed on its own terms. Suggested to `po` that it either be reframed as a standing design constraint on `KAN-157`, or that AC1 move to the future venue-deletion ticket when one is written. Ticket text is `po`'s to change; I did not edit it.
+
+**No capacity consumed, no team assigned, no `Development` transition made.**
+
+## 2026-09-07 — KAN-130 AC3 (wallet.dart) handoff declined: work already landed, and the file is not mine
+
+**Task:** `pm-kan130-join` flagged that `KAN-130`'s AC3 half (`Wallet.userId` -> `Wallet.ownerId`, plus adding `Wallet.ownerType`) names `frontend-2` and would be split into a new ticket under my ownership. Effort: low. Measured before accepting.
+
+**Finding 1 — the work is already done and on `Canary`.** Both commits are ancestors of `HEAD` (branch `Canary`, HEAD `f9b7cd6`), verified with `git merge-base --is-ancestor`:
+* `b6b2ea9` `refactor(wallet): rename Wallet.userId to ownerId per KAN-130 / T-051` (2026-09-06)
+* `7d2cd47` `feat(wallet): add Wallet.ownerType — the other half of T-051's owner pair (KAN-130)` (2026-09-07)
+
+`lib/data/models/wallet.dart` now has `ownerId` (line 6) and `ownerType` (line 9, with the `wallets_owner_type_valid` comment), and `Wallet` carries no `userId`. A split ticket for this Dart half would be a ticket for work already in the tree.
+
+**Finding 2 — the surviving `userId` is a different class.** `userId` at line 55 belongs to `WalletLedgerEntry` (class opens line 53), not `Wallet` (class opens line 4). It is not a leftover of the rename and must not be swept into it without its own ruling.
+
+**Finding 3 — `lib/data/models/wallet.dart` is not in my write set.** `CONTRACT.md` §3 gives me `games`, `venues`, `explore`, `location`, `venue_submissions`, `activities` under `lib/features/`. `lib/data/**` is a named shared surface, explicitly excluded — owning a slice does not acquire the `lib/data/` model or repository it calls (`CONTRACT.md` §4). So even if the work were outstanding, this ticket could not be assigned to me on ownership grounds.
+
+**Also corrected:** `frontend-2` (Sekhmet) is not "my developer". Leads own features and stacks, not developers — the sixteen developer seats were freed from the leads on 2026-09-06 and work as eight paired teams.
+
+**Zero readers confirmed**, consistent with `cpo`'s condition-not-a-date ruling: exactly one non-generated file under `lib/` mentions `Wallet`, and it is the model itself.
+
+**Action:** declined the handoff and returned all four points to `pm-kan130-join` to stop `po` writing a redundant ticket. Did not message `po` directly — several `po-*` instances are live and none is identifiably the one drafting this; routing through the coordinating seat avoids guessing. No code touched, no team assigned, no capacity consumed.

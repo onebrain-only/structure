@@ -690,3 +690,75 @@ not needed at all.**
 **Nothing in `KAN-155` changes.** **No open product questions remain on the plan-key work.**
 
 **Changed:** this file, `DECISIONS.md` (`P-042`). **Reported to:** `po`, `cto`, `pm`.
+
+---
+
+## 2026-09-07 — `KAN-155` AC1: the two Corporate labels, confirmed against `12a` §E.1 (not `P-039`)
+
+**Asked by `team-lead-4`**, relaying `cto`'s flag: six of the eight new `subscription_plans.label`
+values match `P-039` verbatim, but `corporate_starter`/`corporate_growth` expanded `P-039`'s prose
+rendering *"Corporate Starter · Growth · Enterprise"* into two names. AC1 says exact, not inferred,
+so the expansion needed checking against the source rather than against my own decision record.
+
+**Read the source. `12a` §E.1 is a table, and it spells both names out in full** — Tier column,
+bolded: **Corporate Starter** (up to 100, AED 7,500/yr) · **Corporate Growth** (up to 500,
+AED 15,000/yr) · **Corporate Enterprise** (500+, AED 25,000+ custom). `P-039`'s middle-dot line was
+my shorthand for that table, never a name in its own right.
+
+**Exact strings: `Corporate Starter` and `Corporate Growth`.** `cto`'s reading was right, and it
+was not actually an inference — the names exist verbatim one level below the document I had cited.
+
+**Migration already correct, nothing to change.**
+`Dabbler/dabbler-code/supabase/migrations/20260907110000_kan155_plan_key_migration.sql:226-227`
+writes `'Corporate Starter'` and `'Corporate Growth'`. No `UPDATE` needed now or later; AC1 holds on
+all eight labels. Recorded as a Jira comment on `KAN-155`.
+
+**No `DECISIONS.md` entry** — this sets no precedent. It confirms `P-039` against its own source and
+changes nothing about the ruling.
+
+**The lesson worth keeping, and it is about my own writing.** `P-039` compressed a three-row table
+into one line of prose with middle dots, then a downstream criterion said *"`12a`'s exact product
+name"* — pointing at `12a` while the reader only had my compression of it. That gap is what cost
+`cto` and `team-lead-4` a round trip. **When a decision record names a product, give the name in the
+form the source gives it, not a rendering of it.**
+
+**Same question arrived twice, from `team-lead-4` and then from `cto` directly.** Answered `cto`
+too, with the confirmation plus one addition it needed: **`12a`'s own summary tables abbreviate the
+product names.** §A.3 renders the Venue row as *"Venue Basic → Verified Venue Pro"* and the
+Corporate row as *"Corporate Tier (3 sizes)"*; §D.4's column headers are bare *"Basic"* / *"Pro"*.
+The full names live in the section headings and the §E.1 table. **Anything reading a label off a
+summary row gets it wrong** — the same failure mode as my own compression in `P-039`, one level up.
+
+Also noted `cto`'s measurement that `prime`'s two orphaned functions (`calculate_notification_score`,
+`should_bypass_quiet_hours`) only *compare* against the literal and so fail closed at zero
+subscribers. That confirms an assumption `P-039` made without measuring: retiring `prime` destroys no
+reachable behaviour. `KAN-150` can remove those branches with no product question attached.
+
+## 2026-09-07 — `KAN-138` / `settle_game` go-live: ALIGNED, apply as-is (`P-043`)
+
+**Asked by** `team-lead-4` via `team-lead`: does `settle_game` becoming callable need a gate —
+feature flag, staged rollout, manual review of first N settlements — before `cto` confirms the apply?
+
+**Verdict: ALIGNED, apply as-is, no gate.** Posted as a comment on `KAN-138` (comment `10747`) and
+recorded as `P-043` in `Dabbler/dabbler-docs/DECISIONS.md`.
+
+**What I measured rather than accepted:**
+- `admin_approve_payout` (`supabase/migrations/20260829080500_baseline_schema.sql:2138`) and
+  `admin_mark_payout_paid` (`:2458`) both gate on `public.is_admin(me)`. Money leaves only via that
+  chain, so a human admin already reviews every payout — the requested gate exists.
+- `grep -rn "settle_game"` across `lib/`, `supabase/functions/`, `dabbler-web`, `dabbler-admin`:
+  **zero** call sites. Nothing to flag or stage.
+- `request_payout` (`20260909090000_kan128...sql:286`) requires a default beneficiary and sufficient
+  `wallets.balance_aed`; `wallets` = 0 rows.
+- Corpus: `11b complete features list`, rows **160** (Organiser earnings wallet) and **161**
+  (Organiser auto-payout, weekly T+7), both **1A** — the wallet is committed strategy.
+
+**The finding that was not the one escalated.** `settle_game`'s `p_gross_collected` is caller-
+supplied and authorised on `me = p_organiser_user_id`, with no tie to any collected payment. Inert
+today; becomes a direct assertion-to-money path the day `11b` row 161's T+7 auto-payout removes the
+admin approval. Handed to `po` as a precondition on (1) the call-site ticket and (2) the auto-payout
+ticket. Derivation design is `cto`'s.
+
+**Did not escalate to the CEO** despite the brief offering it: both premises ("real money", "first
+execution reachable") fail measurement, and the question was settleable by reading two function
+bodies and running a grep.

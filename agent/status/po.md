@@ -1590,3 +1590,196 @@ Nine incoming messages, board-hygiene and new-work batch.
 **`G-028` flagged on `KAN-128`, not acted on.** Every prior comment on that ticket names `cto` as the one who applies its migration under `G-002`; `G-028` changes that to backend-authors-and-applies. The migration (`93d6619`) itself is unaffected. Re-routing the handoff is `cto`'s/`team-lead-4`'s call, not this seat's — flagged only.
 
 **`QA-Test` disposition, under `G-029`'s newly-unstuck authority — judgement stated, nothing marked Done:** `KAN-143`, `KAN-149`, `KAN-139` stay in `QA-Test`, waiting for `qa`'s functional pass. This seat's review gate (acceptance criteria + doc alignment) already passed on all three; functional correctness on the running app is a different question this seat has no tooling to answer, and I am not inventing a substitute gate. `KAN-142` is the one exception, pulled for the freeze, not for a QA-readiness judgement.
+
+## 2026-09-07 (cont.) — KAN-141 assigned and moved ahead of pending G-028 apply
+**Agent:** `po`
+**Trigger:** `team-lead` flagged (via `main`) that `KAN-141` sat in `To Do` unowned while `backend-4` was already authoring/applying its fix under `G-028`, confirmation posted in comment `10685`; `cto` had raised the same board gap twice.
+
+**Action:** Recorded ownership to `backend-4` and moved `To Do` → `In Progress` (transition `21`, status id `10005`) via comment `10686`, citing `G-028` and `G-029`. No change to acceptance criteria or technical content — that stays between `backend-4` and `cto`.
+
+**Note (assignee field):** `lookupJiraAccountId` returns zero matches for `backend-4`, `Min`, or any agent seat name — no Atlassian account exists for them. A JQL sweep (`assignee is not EMPTY`) across all of `KAN` returns zero issues: no ticket in this project has ever had the Jira assignee field populated. Ownership of agent-owned tickets is tracked by comment, not the assignee field — recorded explicitly in `10686` so this isn't mistaken for an oversight later.
+
+**Note (board config discrepancy, flagged not acted on):** `getTransitionsForJiraIssue` on `KAN-141` returned a transition `id: 4` targeting a status literally named `Development` (`id: 10010`), distinct from `In Progress` (`10005`). This directly contradicts the standing board doc stating "There is no `In Development` column... a transition call naming it fails." It's live and available. I did not use it — moved to the documented `In Progress` column instead, since that's what "Development" maps to in the CEO's-conversational-label table. Worth `cto`/`devops` checking whether this is stale workflow config or an undocumented real column.
+
+## 2026-09-07 (cont.) — KAN-141 correction: Development, not In Progress
+**Agent:** `po`
+**Trigger:** `team-lead` caught that I'd used the documented-but-disproved `In Progress` column instead of the real one — this seat's own board-cleanup pass had already established live Jira has a `Development` status (10010) distinct from `In Progress` (10005), that `In Progress` sits empty, and every in-flight ticket (`KAN-128`/`132`/`136`) uses `Development`. I hit the same fork today and took the stale role-file answer instead of my own confirmed measurement.
+
+**Action:** Re-transitioned `KAN-141` `In Progress` → `Development` (transition `4`, status `10010`), comment `10688`, pointing back to the prior finding rather than re-deriving it. Ownership (`backend-4`) and `G-028`/`G-029` citation from comment `10686` stand unchanged — only the column was wrong.
+
+**Lesson:** having logged a discrepancy once is not the same as having internalized it — re-check my own prior findings before defaulting to what a static role doc says, especially when the doc itself is the thing flagged as stale.
+
+## 2026-09-07 (cont.) — KAN-119 revert question closed: comment posted, no column change
+**Agent:** `po`
+**Trigger:** `team-lead` relayed the CEO's decision that `KAN-119`'s fix (commit `5f32b06`, `/auth-welcome` IntrinsicHeight fix) stays deployed on Canary — no revert — closing the open question this seat had flagged in its prior board-cleanup and freeze-execution passes (comment `10676`, and the "restated plainly and left open" note on the `Development`→`To Do` transition).
+
+**Action:** Posted comment `10689` on `KAN-119` stating plainly: the fix is deployed and stays deployed; the ticket's presence in `Backlog` reflects the ticket being re-scoped/held, not the code being reverted; anyone picking the ticket up next should not re-implement the fix. No transition performed — brief explicitly said comment-only, ticket already sits where the CEO placed it.
+
+## 2026-09-07 — KAN-142 pulled back from Done under auth freeze
+- qa moved KAN-142 to Done after a passing functional audit (RoutePaths.authWelcome resolves; /bookings/<id> never had a route).
+- Overridden: ticket touches /auth-welcome, a surface under the standing authentication freeze I placed earlier today (same move as KAN-119). Freeze outranks a passing verdict — not a quality issue with the fix.
+- Action: posted comment 10694 stating both facts (qa's pass stands; freeze is a separate scope hold, not a revert request — code stays live on Canary at 6c5bca4), then transitioned KAN-142 To Do (transition id 11), same target as the earlier freeze move.
+- Did not re-litigate qa's verdict; did not touch code.
+
+## 2026-09-07 (cont. 2) — KAN-141 moved to QA-Test; general Development-column pass finds no stuck tickets
+**Agent:** `po`
+**Outcome:** Second cleanup pass per `team-lead`'s brief.
+
+**KAN-141:** verified independently, not on any agent's say-so — `git show --stat` confirmed `be442ac`+`e86d47d` exist and `git branch -a --contains` confirmed both are on `Canary`/`origin/Canary`; `gh api .../commits/e86d47d.../check-runs` confirmed `allowlist-check`, `analyze-and-test` and `Cloudflare Pages` all `success` on that exact sha. Both review gates pass (comment `10695`). Moved to **QA-Test** (transition `3`, status `10009`) — not Done, since it has not been through a `qa` functional pass and `qa` is currently audit-only; said so explicitly on the ticket.
+
+**KAN-149/143/139/142:** confirmed already `Done` (qa's audit pass landed before this one started). Did not re-process any of them.
+
+**KAN-119:** confirmed closed per prior pass (comment `10689` posted, stays in `Backlog`/To Do). Not re-touched.
+
+**General Development-column pass:** checked all three other tickets sitting in `Development` (KAN-128, KAN-132, KAN-136) against their full comment history — none show the "shipped but never transitioned" pattern found twice earlier today. KAN-128's migration is authored and locally committed (`93d6619`) but genuinely not yet applied to `wtncuzcskpigqpmnxwws` (no `cto`/`backend` apply-and-verify comment exists). KAN-132 is assigned to Team 1 with no completion claim yet. KAN-136 Part 1 (design) is ruled via `T-061` but Part 2 (the migration) is not yet authored. All three correctly remain in `Development`.
+
+**KAN-39:** confirmed already flagged as a stale leadership snapshot by an earlier pass today (comment `10679`), correctly deferred to `pm` rather than run through the mechanical review gate. Not re-touched.
+
+**Board-schema note:** re-confirmed via live `getTransitionsForJiraIssue` that the seven-column model (`To Do`/`Ready`/`In Progress`/`Development`/`In Review`/`QA-Test`/`Done`) in the corrected `agent/WORKFLOWS.md` is current — `Development` (status `10010`, transition `4`) is real and distinct from `In Progress` (status `10005`, transition `21`).
+
+## 2026-09-07 — AC wording fix (KAN-147/151/152) + duedate fix (KAN-153)
+
+Dispatched by `team-lead-5` via `team-lead`, following its post-resume queue re-confirmation.
+
+- **KAN-147 AC2, KAN-151 AC3, KAN-152 AC3** reworded — the phrase "the three live UI entry points (...) continue to work identically" claimed a functional/running-app check `qa` can no longer perform (audit-only, permanent). Reworded to name the static check that discharges it: call sites unchanged in shape, imports resolve, `flutter analyze` clean, tests green. Same file:line citations kept in all three. Comment posted on each ticket with old→new text.
+- **KAN-153**: `duedate` field was null while the description stated `due_date` 2026-09-08 — a field/description mismatch. Set `duedate` to 2026-09-08 to match. Verified via re-fetch. Comment posted.
+
+No other content on any of the four tickets touched, per instruction.
+
+## 2026-09-07 — KAN-145 / KAN-155 description fix: G-002 attribution corrected to G-028
+
+Task from team-lead: `KAN-145` and `KAN-155`'s ticket *descriptions* (not comments) still cited
+the pre-`G-028` model — apply authority attributed to `cto` under `G-002`/`CONTRACT.md:242`.
+`G-028` (2026-09-07) corrected this: the owning `backend-N` authors AND applies migrations;
+`cto` confirms only, never applies.
+
+**KAN-145** — one spot fixed. Before:
+> **Apply is** `cto`'s (`CONTRACT.md:242`, `G-002` — direct Supabase writes are `cto`-only), sized by `cto`.
+
+After:
+> **Apply is** `backend-4`'s (`G-028` — the owning backend author and applies migrations against
+> production, after `cto`'s confirmation is posted on the same ticket; supersedes this ticket's
+> earlier `G-002`/`CONTRACT.md:242` attribution of apply authority to `cto`-only), sized by
+> `backend-4`.
+
+**KAN-155** — two spots fixed (AC10, and the "Apply leg" narration under "Not set"). AC10 before:
+> 10. `cto`'s own responsibility, not a gate on the CEO's apply (...): once the authoring leg
+> lands ..., `cto` posts a comment on this ticket with the plain-English brief, the SQL, and a
+> numbered verification block ... This is `cto` making the CEO's apply as small and reviewable
+> as possible.
+
+AC10 after: attributes authoring+posting to `backend-4`, confirmation to `cto`, citing `G-028`
+as superseding the `G-002` attribution. Second spot ("What narrows it: `cto` authors the
+migration...") corrected the same way — `backend-4` authors, `cto` confirms via review comment,
+`backend-4` measures/cites preconditions and posts verification after apply.
+
+**Left untouched, deliberately:** KAN-155's "Apply leg — CEO action, not `cto`'s, not `po`'s"
+paragraph — that's the `019`/user-data-mutation reservation to the CEO personally, which `G-028`
+explicitly leaves untouched (`G-028`: "`019`'s reservation of user-data mutation to the CEO is
+untouched... `KAN-155` ... sits on exactly this gap and stays with the CEO personally"). Only the
+*authoring* attribution was stale; the apply-is-CEO's finding was already correct and is not a
+`G-002`/`G-028` question.
+
+No comments edited (per instruction — comment `10696` on `KAN-145` already reflected the correct
+attribution). Root document `CONTRACT.md:242` remains CEO-custody under `G-022` and still reads
+`cto`-only; this fix only corrects the two tickets' own copies.
+
+---
+
+## 2026-09-07 — KAN-158 created: venue-delete cascade design note (D3)
+
+`backend-4`, via `team-lead`, surfaced a finding from `KAN-145` work: `venues` CASCADE→
+`venue_spaces` CASCADE→ `venue_bookings`, and `KAN-145` added `ON DELETE RESTRICT` on
+`payment_intents.booking_id`. Consequence: once a booking carries a payment, deleting the
+parent venue fails with `23503` — blast radius is venue deletion, not just booking deletion.
+
+No D3 epic existed on the board (checked: no epic matched "Venue", "Booking", "Space", or "D3").
+Created **KAN-157** ("D3 — Venues, spaces & booking") as parent — epic placement is `po`'s call
+per `cto`'s ruling on `KAN-154`. Filed **KAN-158** under it as a design note, not a defect:
+states the chain, the blast radius, why nothing breaks today (both tables at 0 rows, nothing in
+`lib/` deletes venues), and the correct direction per `cto`/`team-lead-4` — archival/soft-delete
+for venue deletion, not weakening the `payment_intents` FK. No `due_date` set — no urgency, per
+the standing rule that a date is owed only when there's capacity/timing behind it; this sits in
+`To Do` until D3 design work is scheduled. Routed to `team-lead-4` as owner, since they'd
+already agreed with `cto` on the archival direction for this exact finding.
+
+**Correction, same day:** `team-lead` caught that `KAN-158`'s routing to `team-lead-4` was
+ownership-by-adjacency — `team-lead-4` agreed with `cto`'s reasoning on this finding, but that's
+not the same as owning D3. Checked `Dabbler/dabbler-docs/STACKS.md` §11.2/§12: `venues`,
+`venue_submissions`, `explore`, `location` are held by `team-lead-2` ("Play & Places");
+`team-lead-4` holds Rewards, Staff & Commerce (+D4 Commerce), which is why they were present on
+the D4-stack tickets (`KAN-145`/`155`/`150`) this finding surfaced from. Corrected via comment on
+`KAN-158` and re-routed to `team-lead-2`.
+
+## 2026-09-07 — KAN-158 AC1 unclosable, fixed (po-ac1-fix)
+Escalated by team-lead-2 via team-lead: KAN-158's AC1 was a condition on a future, unwritten
+venue-deletion/archival ticket, making it permanently unclosable. Applied team-lead-2's option 1:
+rewrote KAN-158's acceptance criteria so it is explicitly a design record, closable on the
+documentation already in its description (cascade chain, blast radius, recommended direction —
+each now cited as a satisfied AC), plus an explicit "no schema change" AC. Moved the substantive
+constraint (confirm the payment_intents RESTRICT before implementing venue deletion) to a new
+"Standing design constraint" section on the parent epic KAN-157, so the future ticket inherits it.
+No status transition — ticket stays in To Do under KAN-157 per team-lead-2's routing, unchanged.
+Left explanatory comment on KAN-158. Found (again) that addCommentToJiraIssue can store a
+markdown body with literal \n; fixed by re-issuing the identical text via the same tool with
+commentId set. Memory updated: createjiraissue-literal-newlines.md.
+
+## 2026-09-07 (cont. 3) — KAN-138 due_date reconciled (cleared)
+**Agent:** `po`
+**Outcome:** `pm-d4-dam` flagged KAN-138 carrying `due_date=2026-09-13` while its own description said "not set." Verified directly against the ticket: true, and corroborated independently by `team-lead-4`'s own comment `10714` (posted ~47min before the flag reached me), which measured the actual cause — a sequencing collision with `KAN-128` (settle_game is one of KAN-128's five writer functions; KAN-128 is still unapplied in Development; authoring KAN-138 first would silently revert KAN-128's ON CONFLICT clause on the same insert site, same hazard T-052 ruled on for KAN-131). `team-lead-4` explicitly asked for the date to come off. Cleared `duedate` via `editJiraIssue` (field confirmed absent in the response), posted reconciliation comment `10717` citing both `pm`'s flag and `team-lead-4`'s finding. No status/column change — stays in `Ready`. Date returns once `cto` confirms sequencing and `KAN-128` applies.
+
+## 2026-09-07 — KAN-128 AC3 escalation from backend-1 — no action needed
+
+`backend-1` (Shu) flagged KAN-128 AC3 as untestable (settle_game/P3 raises 42804 before reaching
+the credit insert), routed to po since the po seat wasn't reachable as a live agent. Checked the
+ticket directly: AC3, in its current numbered Acceptance Criteria text, already binds only
+P1/P2/P4/P5 and explicitly states P3 is BLOCKED / "does not require P3 to pass" — this is cto's
+T-058 ruling (2026-09-06), already live on the ticket, not something backend-1's finding revealed
+new. Replied to backend-1 quoting the exact current text — no ticket edit made. backend-1's
+live re-derivation is a valid independent re-confirmation of T-058, just not a new defect.
+
+`backend-1` confirmed and withdrew the AC3 flag on KAN-128 (comment 10722) — verified the correction against the ticket text itself rather than accepting it, agreed T-058 already narrowed AC3 a day before the flag was raised. No ticket edit made by either party. backend-1 still holding for cto's confirmation on comment 10721 before applying, on the current AC wording.
+
+## 2026-09-07 — KAN-128 AC3 defect check (dispatched by team-lead)
+
+Checked `backend-1`'s (Shu) reported "AC3 wording is false" claim re: `settle_game`'s `ON CONFLICT`
+occurrence count. Found: the ticket's own AC1/AC3 text asserts no occurrence count at all — the
+count-of-2 assertion (correct: 1 new + 1 pre-existing) lives only in Shu's own posted verification
+block (comment `10721` item 6), and it's already stated correctly there. No wording defect exists
+in the ticket. Shu's actual separate finding (comment `10721` §5, the `settlement_status` cast
+`42804` defect) was already captured in AC3 before that comment was posted (P3 BLOCKED per `T-058`,
+fix filed as `KAN-138`). No edit made to `KAN-128`; posted comment `10725` recording the check so
+a later `po` session doesn't re-investigate the same non-existent defect from a compressed brief.
+This is another instance of [[relay-compression-is-a-defect-source]] — the brief described a
+hypothetical failure mode that didn't match the actual ticket text.
+
+## 2026-09-07 — cto's 20-ticket JQL sweep for stale G-002 apply text: classified all 20, corrected 5
+
+**Agent:** `po`
+**Dispatched by:** `team-lead`, relaying `cto`'s JQL sweep of non-`Done` KAN issues matching "cto applies"/"applied by cto"/"cto's apply"/"cto only" (20 hits, only KAN-128 pre-confirmed as a real defect).
+
+**Method:** read each of the 20 tickets' DESCRIPTION field only (not comments, per standing rule — comments are historical record) via `getJiraIssue`/JQL search, grepped for `cto` + apply-language, read full context around every hit before judging.
+
+**Classification (20/20):**
+- **Genuine defects, corrected (5):** KAN-128, KAN-130, KAN-131, KAN-137, KAN-150 — all named `cto` as the applying seat under the old `G-002` model. Corrected each to name the owning `backend-N` as applying after `cto`'s confirmation, per `G-028` (2026-09-07). Posted an explanatory comment on each citing the exact stale phrase and the correction. KAN-150's correction is flagged for `cto` to confirm explicitly — it was `po`'s inference from the "`G-002` condition-3 authority" phrasing, not corroborated by an existing ticket comment the way the other four were.
+- **Already correct (2):** KAN-145, KAN-155 — both already carry explicit "`G-028` supersedes `G-002`" language from earlier today.
+- **False positives (13):** KAN-39, KAN-119, KAN-127, KAN-129, KAN-132, KAN-136, KAN-138, KAN-140, KAN-141, KAN-142, KAN-146, KAN-148, KAN-158 — the JQL match was inside a comment (historical, correctly untouched) or the description mentions `cto` in an unrelated role (ruling, escalation, epic reference), not as an applying seat.
+
+**No ticket's acceptance criteria, sequencing, or capacity numbers were changed** — every edit was text-only, correcting who performs/performed the apply.
+
+**Escalation open:** KAN-150's correction to `cto` for confirmation (see ticket comment).
+
+## 2026-09-07 — KAN-130 Dart-half split (dispatched by team-lead)
+- Created KAN-159 ("wallet.dart: rename Wallet.userId → Wallet.ownerId, add Wallet.ownerType"), parented under KAN-127, owner team-lead-2/frontend-2. No due_date, per cpo's condition-not-date ruling — reasoning stated in the ticket description.
+- Linked KAN-159 <-> KAN-130 as "Relates" (not "Blocks").
+- KAN-130 left untouched in content/sizing/assignment (team-lead-4/backend-4, 2 sittings/ceiling 3); added a traceability comment only, no field edits, no transition.
+
+## 2026-09-07 — KAN-159 closed (already satisfied)
+- pm/team-lead retracted the split ruling: Dart half already shipped on Canary (b6b2ea9, 7d2cd47), verified independently against lib/data/models/wallet.dart.
+- Commented on KAN-159 (comment id 10744) stating the work was already done before the ticket existed, then transitioned to Done (transition id 41).
+- KAN-130 and the Relates link left exactly as they were — no further edits.
+
+## 2026-09-07 — KAN-130 stale AC3/Executor cleanup (per team-lead-4's finding, relayed by team-lead)
+- Replaced KAN-130's AC3 with a pointer to KAN-159 (Done) — load-bearing reasoning (owner_type NOT NULL requires both fields) preserved, now living on KAN-159 only.
+- Corrected Executor section: SQL half = backend-4 (Min), not retired senior-backend; Dart half = split to KAN-159, already shipped/closed.
+- Sizing (2 sittings/ceiling 3), SQL scope, status (Ready), and the Relates link all left untouched. Comment id 10745 documents the diff.

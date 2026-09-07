@@ -1797,3 +1797,143 @@ governance repo, not `dabbler-code` — no deploy hangs off it. Committed exactl
 **Not yet in effect:** a running `cto` session loaded its definition at session start and will keep
 reading the false "never write to production" text until a new `cto` session starts. Anyone citing
 the fix today against an already-running `cto` should say so.
+
+## 2026-09-07 — D4 backend queue dam: verified, routed, not resolved by pm
+
+team-lead-4 escalated its entire D4 backend queue (backend-4 idle) blocked behind two applies
+neither Team 4 holds. Verified directly against Jira rather than trusting the restatement:
+
+- **KAN-128** (Development, due 2026-09-10): authored, not applied. Blocks KAN-130, KAN-131,
+  KAN-138 (all Ready, no forward path). cto's status log shows no mention of it today — fully
+  occupied with KAN-155 AC verification/doc writes. Reads as not-yet-reached, not held for a
+  reason. Asked cto directly to confirm and unblock.
+- **KAN-155** apply is the CEO's under G-028's user-data carve-out, blocking KAN-150. Already
+  flagged separately by team-lead-4 — noted, not duplicated.
+
+**Board defect confirmed, not a misreading:** KAN-138 carries due_date 2026-09-13 despite its
+own description's "Not set" section stating no executor/capacity number exists yet and that
+team-lead-4/pm must size it. Siblings KAN-130/131 (same blocker) correctly carry no date.
+Routed to po-cleanup2 — no generic `po` was addressable in this session; multiple po-* task
+instances existed instead (po-ac-fix, po-ac1-fix, po-cleanup2, po-d3-ticket, po-desc-fix,
+po-kan119, po-kan141, po-kan142-fix). Worth asking whether that fragmentation is intended or
+a session-naming drift `cto`/devops should know about.
+
+**backend-4 idle confirmed correct**, not a management gap — nothing assignable exists inside
+D4/D7's Ready column; pulling cross-stack work would violate team-lead-4's own T-047 boundary
+discipline. The fix is clearing KAN-128, not finding filler work.
+
+**Probe-trap methodology finding** (early-return masking a before/after probe, a new form
+distinct from T-055's raising form) routed to cto to record if judged distinct enough.
+
+## 2026-09-07 — KAN-138 date defect: fixed, and it's the same KAN-128 chain, not a slip
+
+po-cleanup2 cleared KAN-138's due_date (comment 10717). Correction to my own report above:
+team-lead-4 had already independently found this ~47 min before my routing message arrived
+(comment 10714) — credit there, not a fresh catch on my part.
+
+Sharper finding from po-cleanup2: KAN-138 targets `settle_game`, one of KAN-128's five writer
+functions. KAN-128 is still unapplied. Authoring KAN-138 first (per its own AC4, from
+`pg_get_functiondef` on the live catalogue) would silently revert KAN-128's
+`ON CONFLICT DO NOTHING` clause on the same insert site — the identical T-052 hazard already
+ruled on for KAN-131, which is why KAN-131 correctly carries no date. So KAN-138's missing date
+was never independent board hygiene — it's the same KAN-128 dependency chain as KAN-130/131,
+just not honored consistently at filing time. This sharpens the cto ask: KAN-128's apply now
+gates three tickets' *dates*, not just their status.
+
+## 2026-09-07 — KAN-128 dam: corrected diagnosis, it's a G-028 routing gap not cto holding it
+
+cto responded (comment 10718 on KAN-128): it never reached cto at all — not a "busy with
+KAN-155" delay as I'd inferred from the status-log silence. G-028 (superseded G-002 this
+morning) changed the apply mechanism: owning backend-N authors AND applies; cto only confirms,
+never applies. KAN-128 was still written in the old G-002 shape ("applied by cto"/"cto's apply
+slot Wed 09-09") and nobody restated it under G-028 — `po` had already flagged this gap in
+comment 10682. cto withdrew the stale 09-09 slot.
+
+**Real unblock sequence:** backend-1 (Shu, ticket's original author) re-measures preconditions
+live (stale since KAN-141/145 applied since the original reading), posts for confirmation in
+G-002 format → cto confirms within one sitting (pre-answered) → Shu applies. Relayed to
+team-lead: the concrete action is dispatching Shu, not waiting on cto. due_date is explicitly
+team-lead-4's/po's to re-derive now, not cto's — normal capacity-to-date call, not one for me
+to invent.
+
+Lesson for myself: I inferred "not yet reached" from an absence in cto's status log without
+asking whether the process itself had changed underneath the ticket. Should have checked for a
+recent governance change (G-028) before assuming simple backlog priority was the cause.
+
+Probe-trap finding closed: cto wrote CONVENTIONS.md §12h, confirmed distinct from T-055.
+
+## 2026-09-07 — Ruling: KAN-130/131 ownership (D4 custodianship vs activation)
+team-lead-4 escalated rather than self-assigning KAN-130/KAN-131 (wallet_ledger/payment_intents
+migration continuations), asking whether STACKS.md's "D4 dormant, do not hand to S3/S5 as a side
+quest" ruling blocked it from taking work in its own named custodial domain.
+
+Ruling: team-lead-4 takes KAN-130/131. Reconciled by reading STACKS.md's two clauses as
+answering different questions — the side-quest ban targets *other* leads absorbing D4
+informally; §11.2/line 862 already names team-lead-4 as D4's custodian on activation. Today's
+work (schema/migration hygiene continuing the cto-ruled T-051/T-052 chain, no client surface,
+no enablePayments flip) is custodianship, not "activation" in STACKS.md's sense — activation
+means a resourced team + client-facing scope, which still requires the pm+CEO call per line
+862. No formal activation recorded; instructed team-lead-4 not to read this as license for new
+D4 client-facing scope. Not escalated to CEO — within pm's backlog/ownership authority.
+Memory: Dabbler/dabbler-code/.claude/agent-memory/pm/d4-custodianship-vs-activation.md.
+
+## 2026-09-07 — KAN-130 cross-team join ownership
+
+**Decision:** split KAN-130 rather than assign one lead as cross-team owner.
+- KAN-130 stays SQL-only, team-lead-4/backend-4 (unchanged, 2 sittings/ceiling 3).
+- New ticket for the Dart half (wallet.dart: `Wallet.userId`→`Wallet.ownerId`, add `Wallet.ownerType`), owned by team-lead-2/frontend-2. No forced due_date — cpo already ruled this half is a condition (must land before first real reader; zero readers today), not urgent.
+- Link the two tickets "relates to", not "blocks" — a hard dependency would wrongly stall the SQL half on Dart work nothing currently depends on.
+
+**Why not a single cross-team ticket or one lead owning both:** a ticket can't occupy two teams' board columns at once (pm→Backlog/po→Ready/lead→Development transitions are per-team), and team-lead-4 has no write-slice reach into the Dart half — naming it overall owner would make it accountable for work it cannot move.
+
+**Briefed:** team-lead-2 directly (had no visibility into a ticket outside its own board naming its developer). Execution instruction sent to team-lead to relay to po — no agent named exactly "po" was reachable in this session (only task-specific po-* instances existed); did not spawn one myself per standing rule.
+
+## 2026-09-07 — KAN-130 correction: split retracted
+
+team-lead-2 verified on Canary (HEAD f9b7cd6) that the AC3 Dart half was already shipped: b6b2ea9 (userId→ownerId) and 7d2cd47 (ownerType) are both ancestors of HEAD. wallet.dart has no Wallet.userId left; the remaining userId belongs to WalletLedgerEntry, a distinct class not covered by the rename.
+
+Two errors in my original ruling, corrected:
+- lib/data/wallet.dart is a shared surface excluded from any lead's slice by CONTRACT.md §4, regardless of stack — it was never assignable to team-lead-2 on ownership grounds.
+- "team-lead-2's developer" was wrong: leads own features/stacks, not developers, since developer seats were freed into eight paired teams on 2026-09-06.
+
+Told team-lead to halt the split — no new ticket needed, work already on Canary.
+
+## 2026-09-07 — G-028 amendments applied to CONTRACT.md and AGENTS.md
+
+**Task:** apply my earlier-drafted CEO-approved amendments correcting the stale "cto only" /
+"senior-backend never applies" apply-authority model per `G-028`.
+
+**Custody check:** I am not `cto`, not any `backend-N`. `G-022`'s per-file negative custody
+does not bind me for either file, and the CEO gave explicit direct authorization to apply
+(per the dispatching message). Cleared to write.
+
+**Re-verification:** read `DECISIONS.md` G-028 fresh at its current location (not from memory
+or my earlier draft) before writing. Confirmed against that read: the owning `backend-N`
+authors AND applies schema/structure migrations after `cto`'s confirmation is posted on the
+ticket; `cto` never runs `apply_migration`/DDL; "owns" means confirmation not execution,
+governing every CONTRACT.md ownership row; `G-002`'s four conditions still gate every apply;
+`019`'s CEO-only user-data-mutation reservation is untouched; `G-009`'s survival/transfer to
+`backend-N` is **explicitly left open** — stated as open in both amended rows, not resolved.
+
+**CONTRACT.md:236** (Supabase all-tables row) — before: owner `senior-backend`, "Authors
+only — it never applies to production." After: owner "the owning `backend-N`
+(`senior-backend` retired 2026-09-06)"; rule rewritten to authors-and-applies-after-`cto`-
+confirmation, `G-002` conditions cited inline.
+
+**CONTRACT.md:242** (Supabase-writing row) — before: owner `cto only`. After: owner "the
+owning `backend-N`, under `cto`'s confirmation (`G-028`)"; rule states both surviving
+exceptions explicitly — `019` CEO-only user-data mutation (untouched), and `G-009`'s
+security-remediation apply-authority left open (not decided whether it stays with `cto` or
+transfers to `backend-N`), with `KAN-155` cited as sitting on that gap.
+
+**agent/AGENTS.md:215** (developer table, `senior-backend` row) — before: seat name
+`senior-backend`, Never-column "Applies to production. Writes Dart features". After: seat
+name `backend-1..8` (8, one per team), Never-column corrected to the authors-and-applies
+model with the retirement noted inline, "Writes Dart features" kept as the one thing that
+still never changes. **Fixed in the same pass, not flagged separately** — this single row's
+name/authority correction was small enough to do together without scope creep. The larger
+`senior-frontend-1..5`/`junior-frontend` vs `frontend-1..8`/current-roster mismatch elsewhere
+in that same table was **not touched** — out of scope for this task, remains a known
+separate follow-up.
+
+No other content in either file was touched.

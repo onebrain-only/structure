@@ -2355,3 +2355,753 @@ Saved one durable lesson to `.claude/agent-memory/team-lead-4/` — *refutation 
 figures*: when you demolish a claim, re-check what you already changed on the strength of it. Kept
 because it is about how this seat reasons, not about repo state; the term-drift rule from the same
 day is already in `CONVENTIONS.md` §12f and is deliberately not duplicated.
+
+---
+
+## 2026-09-07 — resumed after the project-wide halt; G-028 re-seated three apply legs, and the brief that told me so had it backwards
+
+**Re-verified the board live before acting, per the brief's own instruction, and the verification
+mattered — the brief was wrong on the most consequential point.**
+
+**What I found on re-verification.** Board read directly, not from any account of it:
+
+| Ticket | Status found | `due_date` | Parent |
+|---|---|---|---|
+| `KAN-145` | Ready | 2026-09-09 | `KAN-127` |
+| `KAN-150` | Ready | 2026-09-09 | `KAN-154` |
+| `KAN-155` | Ready | 2026-09-10 | `KAN-154` |
+| `KAN-141` | QA-Test | — | `KAN-127` |
+
+Two corrections to the brief's picture of my own queue. **It named `KAN-155` and `KAN-150` and
+omitted `KAN-145` entirely** — a third Ready ticket in my slice, and as it turns out the only one of
+the three that `G-028` fully unblocks. And `KAN-155` carried **09-10**, not the 09-09 I flagged as
+wrong yesterday: my revert had landed, so that flag was already resolved.
+
+**The substantive finding: the brief inverted `G-028` on `KAN-155`, in both halves.**
+
+I was told *"`KAN-155`'s and `KAN-150`'s apply legs are no longer `cto`'s hands to hold; they're
+`backend-4`'s."* `G-028`'s own text names `KAN-155` under **"Left open, deliberately"** and says it
+**"stays with the CEO personally"** — 82 live `user_subscriptions` rows — and states in terms that
+**"`019`'s reservation of user-data mutation to the CEO is untouched."** Acting on the brief would
+have handed a junior an apply that breaches `019`.
+
+**And the half the brief missed is the half that actually moved.** `KAN-155`'s ticket text (AC10,
+and its "Not set" section) assigns the **authoring** to `cto`. Under `G-028` `cto` does not work
+with its hands — *"الـ CTO مش بيشتغل بإيديه… مش بيكتب migration بإيديه."* So on that ticket
+**authoring moves `cto` → `backend-4` and apply stays CEO** — the exact inverse of what I was told,
+on both legs. `cto` keeps AC10's substantive duty but now writes that brief over `backend-4`'s SQL
+rather than its own.
+
+**What I assigned.** All to Team 4 (`backend-4`/Min), which holds the whole context from `KAN-141`:
+
+1. **`KAN-145`** → Development. Both legs `backend-4`'s. **The only one whose apply is unblocked**,
+   so it goes first and can run the complete cycle today. `KAN-140` depends on it landing.
+2. **`KAN-155`** → Development, **authoring only**. Critical path: `KAN-150`'s apply chains behind
+   this one's apply, so this authoring is what eventually lets the CEO act.
+3. **`KAN-150`** → **left in `Ready` on purpose.** Authoring is free, but the apply is CEO-blocked
+   via `KAN-155`. Moving it to Development would park an authored-but-unappliable migration in an
+   in-flight column — the exact stranded state the same-day audit found on `KAN-119`/`139`/`142`.
+   **Better an honest `Ready` than a Development column that lies.** It moves when `KAN-155` applies.
+
+**Sizing: no number changed, and I checked rather than assumed.** `KAN-145` 1+1 sittings ceiling 1
+each; `KAN-155` authoring 1 sitting ceiling 3 (both named cycles intact — the composite constraints
+prove uniqueness only and never touch `is_enabled`/`max_per_hour`, so AC3's values check stays
+load-bearing); `KAN-150` authoring 1 sitting ceiling 2, apply 1/1 undated. **The hands moving does
+not change the work** — same DDL, same four `G-002` conditions, same live re-measurement, same
+verification block.
+
+**Two real consequences I did record, because they are not nothing.**
+
+*Direction of travel, good:* the apply legs come **off a shared single-writer seat onto a seat I
+route to.** Under `capacity-to-date` §3 I quote work sized against `cto` as a **cost**, never a
+date, because I do not own its queue. `KAN-145`'s apply is **the first leg on that ticket I have
+been able to date rather than merely price.**
+
+*Load transfer, worth naming:* those sittings did not evaporate, they **relocated onto my team** —
+**+2 sittings on `backend-4`, −2 on `cto`** across `KAN-145` and `KAN-150`. I prefer holding
+sittings I can schedule to costs I can only quote, but a transfer that goes unrecorded becomes a
+surprise later.
+
+**I declined to price the new confirmation gate as a sitting, on measurement rather than optimism.**
+`KAN-141`'s full author → confirm → apply → verify cycle ran in comments `10684` (09:22), `10685`
+(09:26), `10687` (09:29) — **seven minutes**. One sample and a light migration, so I said so, but it
+settles that the gate is not a day-scale cost while `cto` is responsive.
+
+**Flagged to `po`, not fixed by me:** `KAN-145`'s description still reads *"Apply is `cto`'s
+(`CONTRACT.md:242`)"*, and `KAN-155`'s AC10 still has `cto` authoring. Both pre-`G-028`. **Ticket
+text is not mine to write** — and `CONTRACT.md:242` is itself CEO-custody under `G-022`, so it will
+keep reading wrong no matter who notices. Told `backend-4` to expect that rather than trust it.
+
+**Nothing outstanding from this seat.** Three tickets assigned, one deliberately held with its
+reason written down, one `019` breach prevented.
+
+### Same day, later — `backend-4` returned `KAN-145` authored, and caught me contradicting myself
+
+**Authoring leg done in the 1 sitting I priced** — `20260907100000_kan145_payment_intents_booking_fk.sql`,
+committed `a7dbaa0`, posted for `cto` confirmation as comment `10703`. **Nothing applied.**
+
+**The thing worth recording is not the delivery, it is what it exposed in my own record.**
+
+`backend-4` asked whether `T-052`'s *"`KAN-128` authored and applied alone and first"* still ordered
+`KAN-145`'s apply. **It does, and I had written the opposite three hours earlier.** Comment `10663`
+(00:34): *"the apply queues behind `KAN-128`'s **in `cto`'s queue**."* Comment `10696` (09:59):
+*"nothing blocks this ticket."*
+
+**How the error got in.** `G-028` moved the apply off `cto`. I had recorded the ordering **in terms
+of `cto`'s queue** — so when that queue stopped mattering, the constraint looked like it dissolved
+with it. **It did not.** "Applied alone and first" is a property of the **migration sequence**, not
+of whose queue holds the migration. **Reassigning hands does not reorder a database.**
+
+**This is the second time in two days I carried a conclusion past the collapse of its stated
+reason** — yesterday the `KAN-155` ceiling, today this. Both caught downstream of me, never by me.
+I generalised the memory accordingly: the trigger is not "refutation", it is **any disappearance of
+stated ground — refuted, superseded, or reassigned** — and the structural fix is to **state durable
+constraints in terms of the artifact, not the actor**, because actor-phrased constraints look
+retired the moment the actor changes.
+
+**Verified rather than accepted:** ran `list_migrations` myself. Latest applied is
+`20260907052826 kan141_...`; **no `KAN-128` migration appears at all.** `backend-4`'s reading exact.
+
+**Withdrew my own sentence publicly** (comment `10704`) rather than quietly fixing the line, and
+**withdrew the apply date with it.** Authoring `due_date` 09-09 met and unaffected; the apply is
+undated pending `cto`. **I did not reinterpret "alone" in my own favour on a ticket I own** — `pm`
+and I set that sequencing jointly and `T-052` says it is not reopened, so `cto` arbitrates and
+`backend-4` routed it correctly. Told `backend-4` explicitly not to apply even if `cto` blesses the
+SQL, until the *ordering* is ruled.
+
+**`backend-4`'s best catch, which cost nothing because it measured:** `idx_payment_intents_booking`
+**already exists.** Had it not, this ticket forced a choice between breaching AC4 ("no other schema
+object touched") and shipping `ON DELETE RESTRICT` with a sequential-scan cliff on every
+`venue_bookings` delete. A real escalation that never had to happen. Recorded on the ticket.
+
+**Released `KAN-155` authoring to proceed in parallel** — I gated only `KAN-150` behind it, and my
+one-money-migration-in-flight preference governs **applies, not authoring**. A developer idling
+through a confirmation round is the stall this seat exists to prevent.
+
+**Second data point on the `G-028` gate:** `cto` turned `KAN-145`'s confirmation round in seven
+minutes, matching `KAN-141`. I continue not to price it as a sitting, now on two samples rather
+than one.
+
+### Same day, close — `KAN-145` landed, `KAN-155` authored, and I reversed my own hold on `KAN-150`
+
+**Delivered by Team 4 (`backend-4`/Min):**
+
+| Ticket | State | Legs |
+|---|---|---|
+| `KAN-145` | **In Review** | authoring + apply both done, applied and verified |
+| `KAN-155` | Development | **authoring done** (`cb5edf1`), apply refused and outstanding (CEO) |
+| `KAN-150` | Development | released by me, authoring starting |
+
+**`KAN-145` is complete and `KAN-140` is unblocked.** `backend-4` asserted `confdeltype='r'` explicitly
+rather than merely that an FK appeared — **a `CASCADE` FK would have satisfied "an FK exists" while
+being precisely what `T-061` rejects.** Probe flipped `P0001` → `23503`. Every number I priced held:
+1 + 1 sittings, ceiling 1 on both, no rework cycle consumed.
+
+**Second self-correction of the day, and I reversed myself rather than defend the call.** I had held
+`KAN-150` in `Ready` citing the `KAN-119`/`139`/`142` stranded state. **I had misread that
+pathology.** Those tickets were stranded because their work had **shipped unseen** — the defect was
+**invisibility, not duration**. A ticket in `Development` carrying a dated comment naming its blocker
+is the opposite of stranded. **I generalised "don't let tickets sit" from a case that was really
+"don't let tickets go unseen," and I did it in the direction of idling my own team** — the one
+direction a lead should be most suspicious of its own reasoning. Released in comment `10708` with
+the reasoning written down rather than quietly moved.
+
+**What I did NOT relax:** the apply stays blocked behind `KAN-155`'s apply. And I attached a
+condition that costs nothing because I had already priced it — **both function bodies must be
+re-measured at apply time and re-authored if drifted**, since authoring and apply are now separated
+by an indefinite CEO-held wait, making the whole-body `CREATE OR REPLACE` trap likelier here than
+anywhere it has bitten before.
+
+**`backend-4` corrected itself on a premise it had given `cto` to rule on** — it asserted both
+migrations touch `payment_intents`; `cto` read the file and found them **disjoint at the object
+level**. I told it why that class matters more than a wrong conclusion: **a wrong premise attached
+to a question you want settled acquires the senior seat's authority when they rule on your framing.**
+Said plainly that I was not lecturing from above, having made two of the same class today.
+
+**Best thing in its `KAN-155` work, and better than the ticket asked for:** the ticket demanded
+*care* not to copy `pro`'s values; `backend-4` seeded by `SELECT` from the rows just repointed to
+`player_free`, making `pro`'s values **structurally unrepresentable**. Converting a discipline
+problem into an impossibility is the right move whenever it is available. Its live measurement
+showed `pro` really does carry `quiet_override_high=TRUE` and caps `10/25/50` — **the trap was real,
+not theoretical.**
+
+**Routed out of my stack:** `venues` CASCADE→ `venue_spaces` CASCADE→ `venue_bookings`, with
+`RESTRICT` now on the payment side — so once data exists, **deleting a venue whose booking carries a
+payment fails with `23503`.** Blast radius is *venue deletion*, which is not where anyone would look.
+In the migration header, but a header only reaches someone already in the file. **D3 is not my stack
+and this is not mine to ticket** — sent to `team-lead` for the owning lead or `po`.
+
+**Gate evidence now two samples:** `cto` turned confirmation in seven minutes on both `KAN-141` and
+`KAN-145`. Still not pricing it as a sitting.
+
+**Outstanding, neither mine:** `KAN-155`'s apply (CEO), `KAN-150`'s apply behind it. Five commits
+unpushed and waiting on `devops`. **Nothing outstanding from this seat.**
+
+### Close of day — `KAN-150` authored; the D4 backend queue is dammed, and I found a ticket dated as if it weren't
+
+**`KAN-150` authoring done** (`4c0f4c4`, posted for `cto` as comment `10712`). **All three assigned
+tickets delivered to the extent they are Team 4's.** Six commits unpushed, `devops`'.
+
+**`backend-4` found a new form of the `T-055` trap and reported it instead of taking a free pass.**
+`T-055`'s recorded form is a function that **raises** before reaching the code under test. This is
+the same trap by **early return**: `notification_scores` holds **zero rows**, so
+`calculate_notification_score` hits `IF NOT FOUND THEN RETURN 1` and returns a plausible `1` for
+every input, never reaching the Prime boost. **A before/after probe reads "identical" for reasons
+having nothing to do with the change.** The raising form announces itself; **this one hands you a
+green tick.** It established preservation by construction instead — always-false guard plus a
+side-effect-free read — which is stronger than the probe would have been had it worked. Routed to
+`cto` as worth recording beside `T-055`, since you cannot catch it by watching for errors.
+
+**That report is why I went looking at the rest of `Ready`, and the rest of `Ready` is the story.**
+
+**The dam.** Every D4 backend ticket is blocked behind one of two applies, **neither Team 4's**:
+`KAN-128` (Development, authored, **not applied** — verified, latest applied is still
+`20260907052826 kan141`) blocks `KAN-130`/`KAN-131`/`KAN-138`; `KAN-155`'s CEO-held apply blocks
+`KAN-150`'s. The remaining six `Ready` tickets are D6 frontend, content, or D1.
+
+**So I told `backend-4` to stand down rather than pull.** `T-047`: an idle seat costs nothing, a
+wandering one serialises everybody. **Team 4's backend is stopped for structural reasons, not
+capacity ones** — and I escalated that as `pm`'s call rather than manufacturing work to look busy.
+**An empty `Ready` is normally my failure; this one I cannot stock, because what would fill it is
+behind two applies I do not hold.** Said so plainly rather than softening it.
+
+**The board defect, and it is the kind that bites someone who trusts the board.** `KAN-138` edits
+`settle_game` — **one of `KAN-128`'s five writer functions** (`T-052`'s amendment names
+`settle_game:17079`, insert `:17154`). A whole-body `CREATE OR REPLACE` authored before `KAN-128`
+applies **silently reverts its `ON CONFLICT` clause**, no error at apply time. **Identical to the
+hazard `T-052` already ruled on for `KAN-131` — and `KAN-131`'s summary says "after `KAN-128`" on
+its face while `KAN-138`'s says nothing.** Worse, `KAN-138` had acquired `due_date` 2026-09-13 while
+its own description reads *"No executor or capacity number yet — `team-lead-4`/`pm` size and
+schedule it."* **I did not produce that date.** Its two siblings with the same blocker correctly
+carry none; **the asymmetry is the defect.**
+
+Ruled its authoring behind `KAN-128`'s apply — **applying an existing `cto` ruling to a function
+that ruling already names, not inventing one**, and the sequencing half is mine on `T-052`'s own
+record. Sized 1 sitting / ceiling 3 (cycle (b) disappears and it drops to 2 if the ordering is
+honoured). **No date from me:** it now chains behind a queue I do not own, which under
+`capacity-to-date` §3 is a cost. Flagged to `cto` to confirm, and to `po` to strip the date.
+
+**Protected `backend-4`'s ceiling from a scope change.** If `cto` rules
+`should_bypass_quiet_hours` should be **dropped** rather than reduced to `RETURN false`, that is a
+**new ticket, not rework on `KAN-150`** — AC2 fences the ticket to two functions and two branches.
+Told it so unprompted, so a design ruling does not get charged to its rework budget.
+
+**Routed out of D4:** `notification_scores` empty → the whole notification weighting system inert in
+production (**D6**); the venue-deletion cascade from `KAN-145` (**D3**).
+
+**Nothing outstanding from this seat.** Everything assignable is assigned or delivered; what remains
+is two applies and a `pm` decision, none of them an agent's to take.
+
+### Correction to the entry above — "six commits unpushed" was wrong, and so was the correction to it
+
+**Appending rather than editing, per the rule I applied to `KAN-145` this morning: the fix for a
+stale record is a dated correction on top, not surgery underneath.**
+
+**I wrote "six commits unpushed, `devops`'" in the entry above and repeated it to `team-lead`.
+Wrong.** `backend-4` corrected itself to "two unpushed, plus `cto`'s docs uncommitted in a dirty
+tree." **Also wrong by the time I read it.**
+
+**Measured myself, authoritatively — `git ls-remote` against the actual remote, not a local ref:**
+
+- `origin/Canary` tip = **`8363a0f`**, and local `HEAD` = **`8363a0f`**. Identical.
+- **All seven commits are pushed.** Verified individually with `git merge-base --is-ancestor`:
+  `4c0f4c4` and `6a353e6` — the pair `backend-4` called unpushed — are both ancestors of the remote
+  tip.
+- **`cto`'s documentation is committed AND pushed**, as `8363a0f`: `SCHEMA.md` §8a, `CONVENTIONS.md`
+  §6g and §12g, plus the duplicate-§6c renumber to §6f.
+- Working tree clean apart from an untracked `.claude/`.
+
+**Both risks `backend-4` escalated are closed.** The docs are not stranded in a dirty tree, and
+§12g — the rule that just prevented a production regression — is on `Canary`.
+
+**Three successive snapshots of the same fact, each stated as standing, each expired before it was
+read.** Mine, then `backend-4`'s correction of mine, then the truth. `backend-4` diagnosed its own
+error as *"a snapshot that expired"* — correct, but **its correction expired the same way, between
+writing and my reading it.**
+
+**So the lesson is not "measure more carefully."** It is that **push state is not a fact, it is a
+reading**, and a reading has a timestamp. **The fix is to stop stating volatile facts as standing
+ones** — cite the command and the moment, or do not assert the number. And the part that is mine
+specifically: **I re-broadcast `backend-4`'s figure to `team-lead` without re-deriving it, which
+made me its author.** A number I repeat is a number I have asserted. Saved as a memory.
+
+**Also now stale:** `backend-4`'s offer of *"the `CONVENTIONS` §6g draft `cto` has not yet ruled
+on."* §6g is committed and pushed in `8363a0f`. **`cto` has ruled and it has landed.**
+
+**One item genuinely open and unchanged:** `KAN-155`'s migration (`cb5edf1`) is on `Canary`.
+`backend-4` verified no CI path can apply it — neither workflow references supabase and
+`scripts/cloudflare-build.sh` does not touch migrations — so the residual risk is **manual only**: a
+CEO-reserved migration mutating 82 live `user_subscriptions` rows now sits in the release branch
+where a seat running `supabase db push` would execute it. **Not an emergency, not a reason to
+revert**, and its file header states the CEO-only boundary in the first twenty lines. Recorded so it
+is not rediscovered as new.
+
+### Correction to the correction — one unpushed commit, not zero; and `backend-4`'s mechanism was wrong
+
+**Reading at 2026-09-07T06:29:52Z**, `Dabbler/dabbler-code`: HEAD **`fed3b01`**
+(*"docs(migration): mark should_bypass_quiet_hours dormant, not abandoned (KAN-150)"*), remote
+`Canary` tip **`8363a0f`**, `fed3b01` **ahead of the remote and unpushed.**
+
+`backend-4` committed it implementing `cto`'s AC1 ruling on `KAN-150` (comment `10716`) — **after my
+measurement and while I was writing the message reporting zero.** My reading was accurate and
+expired in under a minute. **Fourth successive statement of this one number in the exchange; three
+were true when made and false when read.** The rest of my report stands: the other seven are pushed
+and `cto`'s docs did land in `8363a0f`.
+
+**Routed to `devops` via `team-lead`:** `fed3b01` must travel with the next push. Not urgent —
+comments-only, executable bodies byte-identical, and `KAN-150` cannot apply until `KAN-155` lands.
+But left behind, `devops` holds a file that **does not match the version `cto`'s ruling is recorded
+against**, which is a bad thing to discover at apply time. Neither of us attempted the push.
+
+**The part worth keeping is `backend-4`'s mechanism, which was wrong in the reassuring direction.**
+It attributed the miss to `CONVENTIONS.md` §12b — *concurrent seats do not share a working tree* —
+and concluded I had measured a different tree. **We share one.** `git worktree list` shows exactly
+one worktree at that path (the only other entry is an unrelated prunable detached scratchpad), and
+my HEAD now **is** `fed3b01`. We measured the **same tree 42 seconds apart**.
+
+**Why I corrected it rather than accepting a right answer:** a seat that believes it holds a private
+tree will assume its working-tree state is its own. It is not. **A shared tree means concurrent
+uncommitted edits by two seats occupy the same files and can collide** — the inferred fact is
+comforting, the real one demands more care. This is the same shape I put to `backend-4` on `KAN-145`
+this morning: **a correct conclusion resting on a premise that does not hold.** It has now run in
+both directions between us inside one day, which reads as the seam working rather than either seat
+being careless.
+
+**Accepted from `backend-4` without reservation:** the symmetry on bare numbers. I took the author's
+half — repeating a figure makes me its author — but **the issuer's half is equally real: a naked
+number invites the relay.** Attach the command and the moment when issuing, not only when consuming.
+Both halves are now in the memory.
+
+**Nothing else changed.** D4 backend still dammed behind `KAN-128`'s and `KAN-155`'s applies;
+`backend-4` deliberately idle; `KAN-138` awaiting `po` (date) and `cto` (sequencing); `KAN-155`'s
+migration on `Canary` carrying a manual-only risk no CI path can trigger.
+
+### `backend-4` accepted the shared-tree correction and turned it into a rule worth propagating
+
+**It verified rather than accepted** — `git worktree list` and `git rev-parse --git-common-dir` in
+its own hands — and withdrew the `§12b` diagnosis. Its account of its own error is sharper than
+mine was: **"the operative fact was right, so I stopped testing the explanation."** A confirmed
+number does not confirm the story told about it. It also noted it reached for `§12b` because it had
+just read it — **a rule you have just read is the one you reach for.**
+
+**Then it went looking for whether the hazard I described had actually bitten it, instead of
+accepting the correction and moving on.** That audit is the valuable part of this whole exchange.
+
+**The near-miss.** All agent seats share **one** working tree. Its seven commits each carry exactly
+one file — nothing swept — **but by habit, not by rule:** it used `git add <path>` every time. For
+several of those commits **`cto`'s `docs/SCHEMA.md` and `docs/CONVENTIONS.md` were sitting `M` in
+that same tree.** A single `git add -A` would have folded `cto`'s §8a, §6g and §12g into a migration
+commit **under `backend-4`'s authorship with a message describing something else** — discovered, if
+ever, when `devops` read the diff.
+
+**The rule it derived, which I routed to `cto` as a candidate convention:**
+
+> **In a shared tree: stage by explicit path. Never `-A`, never `-a`. Read `git status` before
+> committing — an unexpected `M` is likely another seat's live work, not yours to carry.**
+
+**Routed, not written.** `CONVENTIONS.md` is `cto`'s document. I added one second-order point for
+it: **the failure is silent and asymmetric** — the sweeping seat sees a clean commit, the swept seat
+watches its work vanish from `git status` and may re-do it, and neither gets an error. That is what
+makes it worth a written rule rather than care.
+
+**Why it went up rather than staying here:** sixteen developer seats plus `cto`, `devops` and `po`
+all write into that one tree. **This is not Team 4's problem and a Team 4 status entry is the wrong
+place for it.**
+
+**Nothing outstanding from this seat.** Team 4 idle and correctly so; queue still dammed behind
+`KAN-128`'s and `KAN-155`'s applies; `fed3b01` with `devops`; `KAN-138` awaiting `po` (date) and
+`cto` (sequencing).
+
+### The dam broke — `KAN-128` applied; I withdrew my own hold on `KAN-150` and discharged my own conditional on `KAN-138`
+
+**Verified myself before acting on any of it.** `list_migrations`: `20260907064216
+kan128_ledger_unique_keys_and_on_conflict` **applied**, and `20260907061206
+kan145_payment_intents_booking_fk` with it. Not relayed.
+
+**`KAN-150` — ruled (b), date it. My preference lost on its own terms.** `cto` found this ticket
+said two incompatible things: *"cannot be dated until `KAN-155` applies"* and, three paragraphs
+later, *"preference, not a rule."* **Both were mine and the ambiguous middle was the real defect.**
+
+The preference exists so a **bad apply has one suspect** — worth something when a migration can
+plausibly *be* the bad apply. **This one cannot:** behaviour-preserving by construction
+(`backend-4`), disjoint from `KAN-155` (`cto`, measured), and I confirmed its two functions are
+absent from `KAN-128`'s five. **So it bought isolation against a failure it cannot produce, and cost
+an indefinite wait behind an unscheduled CEO action.** Released.
+
+**The rule I took from `cto` and applied to myself, which is the durable part: a preference written
+as a dependency stops being a preference.** The next reader sees a blocker and has no idea there is
+anything to weigh. In future it goes in **as a preference with its cost named, or not at all.**
+
+**Kept the re-measure-at-apply-time condition anyway**, even though `KAN-150` is now provably
+disjoint from `KAN-128` — **"provably disjoint" is exactly the belief a whole-body `CREATE OR
+REPLACE` punishes when it turns out stale.** Cheap check, silent failure, and today produced four
+readings that expired between being taken and being used.
+
+**`KAN-138` — ceiling 3 → 2, and I said so rather than letting 3 stand.** Comment `10714` had priced
+it at 3 *and stated the condition*: drops to 2 if `KAN-128` lands first. **It landed; the number
+moves.** Stated explicitly because **a conditional nobody discharges silently becomes a permanent
+figure** — the same class that caught me twice today, now caught deliberately in my own favour's
+opposite direction. Also told `po` the pre-existing 2026-09-13 should be **replaced, not kept**: it
+was set before any count existed, so it agrees with the new one only by coincidence, and **a date
+never derived from a count should not survive by luck once one exists.**
+
+**Team 4 off idle:** `KAN-150` apply, then `KAN-138`. Carried `cto`'s two corrections verbatim —
+**cite `CONVENTIONS.md` §6g not §6c** (§6c is the *view* case; they became distinct when today's
+duplicate numbering was fixed), and the **VOLATILE/STABLE** trap `backend-4` had already caught
+independently. Re-flagged that `KAN-138`'s real cost is **AC2's demonstration, not the cast** —
+constructing a reachable caller where none occurs naturally — and pointed it at its own `KAN-150`
+finding as the trap to avoid.
+
+**Asked rather than took: `KAN-130`/`KAN-131`.** Unblocked, unassigned, no dates, ship as one
+migration. They read as D4 money and therefore mine, **but they reached the board by a route I was
+not part of, and my instruction is to coordinate rather than take.** Put the ownership question to
+`team-lead` and told `backend-4` explicitly not to self-pull them. **I would rather ask than
+discover I have taken another lead's work while their developer sits idle.**
+
+**Outstanding:** `KAN-155`'s apply (CEO, undated), `fed3b01` (`devops`), `KAN-130`/`131` ownership
+(`team-lead`/`pm`), `KAN-138`'s stale date (`po`).
+
+### `pm` ruled `KAN-130`/`131` mine — assigned, and I declined to reinstate a number I had lost
+
+**`pm`'s ruling, and its boundary, both recorded:** `KAN-128`/`145`/`150`/`155`/`130`/`131` are
+backend schema hygiene on tables `STACKS.md` already names as D4's — **not D4 activation**, which
+still needs the formal `pm`+CEO call. **Taking these two is not licence to pick up D4 client-facing
+scope** (screens, `enablePayments`, new features). Logged by `pm` as precedent rather than escalated.
+
+**Assigned the SQL half to `backend-4`, third behind `KAN-150`'s apply and `KAN-138`.**
+
+**The count, and the part of this I care about.** The standing figure is **2 sittings / ceiling 3**,
+authored by `senior-backend`. The ticket records that **I argued the work was "materially larger"
+and lost** — *"larger in volume, same in cost"* — and that its number stood. **`senior-backend` has
+since been retired and the executor is now `backend-4`.**
+
+**I carried 2/3 forward unchanged rather than reinstating my own figure.** The self-serving move was
+available and obvious: the seat that beat me no longer exists, so my number could quietly become the
+number. **Losing an argument does not become winning it because the other party left.** What I did
+instead is tell `backend-4` the count is open to **its** revision as the new executor — a count
+belongs to the seat that produces it — and that I will carry whatever it produces, **attributed to
+it**, up or down. What I will not do is launder my old opinion through a personnel change.
+
+**Discharged another stale conditional, worth three days.** The ticket says *"Earliest start
+Thursday 2026-09-10,"* conditional on `KAN-128` applying. **`KAN-128` applied today** (verified
+`20260907064216`). **Earliest start is now.** Left unstated, that figure would have idled a
+developer for three days against a blocker that no longer exists. **Second conditional I have
+discharged today** — the other being `KAN-138`'s ceiling 3 → 2.
+
+**Third instance of the same collision, and I think it has stopped being a per-ticket problem.**
+**Three tickets replace `trgfn_payment_to_ledger` whole:** `KAN-128` (applied), `KAN-131` (about to
+be authored), `KAN-140` (`To Do`). `KAN-131` carries its ordering on its face; **nothing states that
+`KAN-140` must be authored after `KAN-131`**, and if it is not it silently reverts both `KAN-128`'s
+conflict clauses and `KAN-131`'s identity fix, with no error at apply time.
+
+**Flagged, not ruled** — `KAN-140` is `KAN-136` pt.2 and I have not established it as mine. Routed
+to `cto` (sequencing) and `po` (record it on the ticket). **But this is the third one I have found
+unrecorded today** — `KAN-138`, now `KAN-140` — and catching it per-ticket only works while someone
+keeps looking. **Proposed to `cto` as a standing `CONVENTIONS.md` §6g rule: a ticket replacing a
+function another pending ticket also replaces must state its ordering on its face.**
+
+**Declined a half that is not mine.** `KAN-130` AC3's `wallet.dart` change is **`frontend-2`'s
+(Team 2)** by the ticket's own text, and `wallet.dart` is outside my write-slice. **Did not assign
+or transition it**, told `backend-4` it is not theirs. `cpo` ruled it a **condition, not a date**
+(zero readers today), so it does not gate the SQL — **but one ticket spanning two teams has no seat
+owning whether the halves ever meet**, and I cannot own that from inside Team 4. Raised to `pm`;
+suggested the alternative is splitting the ticket.
+
+**Outstanding, none mine:** `KAN-155` apply (CEO), `fed3b01` (`devops`), `KAN-138`'s stale 09-13
+date (`po`), `KAN-140` sequencing (`cto`), the two-team join on `KAN-130` (`pm`).
+
+### `backend-4` refused to apply `KAN-150` and was right — the omission was in my brief
+
+**`fed3b01` verified pushed** (`ls-remote` 06:57:11Z; remote tip since moved to `f9b7cd6`, nothing
+local ahead). **Dropped from tracking.** `team-lead`'s operative claim correct; its mechanism
+slightly off — `fed3b01` is a **child** of `8363a0f`, so it went out in a *later* `devops-push2`
+cycle, not as part of that one. Changes nothing; noted only because "right answer, wrong mechanism"
+has now recurred four or five times today across seats.
+
+**The real item: `backend-4` held `KAN-150` on `G-028`'s confirmation gate, and it caught a defect
+in my brief rather than a subtlety in the rules.**
+
+On `KAN-145` I wrote the assignment as *"both legs are `backend-4`'s, **gated on `cto`'s posted
+confirmation**."* On `KAN-150` I wrote **"apply it. I withdrew my own hold"** plus three paragraphs
+on the re-measure condition — **and never restated the confirmation gate.** I knew the rule. I was
+writing about the constraint I was **changing** and stopped restating the one I was **not**.
+
+**Had `backend-4` obeyed me it would have applied a production migration without the confirmation
+`G-028` requires** — the `KAN-141` failure exactly in reverse, where a dispatch assumed a
+confirmation nobody had posted and cost a day. Instead it re-read every comment and found `10716`
+(design ruling), `10735` (sequencing ruling), `10736` (my release) — **none carrying the shape `cto`
+used on `KAN-141` (`10685`) and `KAN-145` (`10705`)**, an explicit `G-028` confirmation with its own
+re-measurement. `10735` even says *"after `cto`'s confirmation on this ticket"* — **naming the gate,
+not clearing it.**
+
+**Adopted `backend-4`'s wording, which is sharper than mine was:** I ruled it **technically
+unblocked**; only `cto` can make it **confirmed**. **My release lifted a scheduling constraint I had
+imposed; it could not clear an authority gate I do not hold.** Told `backend-4` to refuse on this
+ground **even if I tell it to apply again** — I would rather be caught than obeyed.
+
+**Saved as memory** (`lifting-one-constraint-drops-the-others`): a brief that releases one constraint
+silently drops every gate it fails to restate, and **"go" is the most dangerous word in a brief.**
+Same root as the conditional failures I logged earlier — **attention follows what moved**, and the
+unchanged background stops being seen.
+
+**`backend-4`'s null result on my re-measure condition is a genuine deliverable.** It compared
+**full definition text**, not attributes — attribute equality would have passed while a body
+differed — and established the `KAN-128` disjointness **by comparing bodies rather than matching
+names against a list**, which is the better method and what I will ask for in future. Both
+byte-identical, no drift. The failure it guards is silent, so **the only evidence it did not happen
+is having looked.**
+
+**Its own diagnosis, third instance it has named in itself today:** *"the operative instruction was
+clear, so I stopped interrogating the reason behind it."* I told it the symmetry plainly — **I have
+logged four of that shape in this file today, and the contradiction it read straight past on
+`KAN-150` was one I wrote.** The reader was not the one who failed there.
+
+**`KAN-150` now needs one thing: `cto` to post a `G-028` confirmation, or rule that `10735`
+counted.** `backend-4` has asked directly; I flagged it for a nudge if `cto` is idle, since the
+ticket is otherwise finished and re-verified.
+
+**Outstanding, none mine:** `KAN-150`'s `cto` confirmation, `KAN-155`'s apply (CEO), `KAN-140`
+sequencing (`cto`), the `KAN-130` two-team join (`pm`), `KAN-138`'s stale date and `KAN-140`'s note
+(`po`, folded into its next pass).
+
+### `cto` confirmed `KAN-150`; the `KAN-130` split landed — and left its own requirement behind
+
+**`cto` posted the `G-028` confirmation as `10740`** (*"KAN-150 CONFIRMED — apply; you read 10735
+correctly"*). **`backend-4`'s refusal to infer approval was vindicated by the answer itself** —
+`cto` had to say it, which is the whole point of a posted gate. Applying now.
+
+**Two of my routed findings became tickets, which is the outcome I wanted rather than a header
+nobody reads:** `KAN-158` (*"venue deletion will hit ON DELETE RESTRICT once payment data exists"*)
+under a new **`KAN-157` D3 epic**, and **`KAN-159`** carrying the `wallet.dart` client half split out
+of `KAN-130`.
+
+**But I checked the split rather than trusting it, and the source ticket did not move.** Re-read
+`KAN-130`'s description directly: **AC3 still requires the full `wallet.dart` change** — rename,
+added `ownerType`, `toMap()`/`fromMap()`, "eight lines total", the reader sweep — **word for word
+what `KAN-159` now owns.** The Executor section still reads *"Dart change at `wallet.dart` — done by
+`frontend-2`, **same ticket**"* and still names retired **`senior-backend`** as author.
+
+**Why I did not let it pass as cosmetic.** An AC that has moved but stays behind **fails in both
+directions**: at the review gate `po` either marks AC3 unmet — blocking a ticket whose SQL half is
+complete — or waives it informally, teaching the next reader that this ticket's ACs are negotiable.
+And **two tickets can be closed for the same eight lines, or neither. A split that leaves the
+requirement in both places has not split anything.**
+
+**Flagged, not edited** (comment `10743`) — ticket text is `po`'s, and I have held that line all day
+across `KAN-145`, `KAN-138`, `KAN-155` and now this. **Suggested replacing AC3 with a pointer rather
+than deleting it:** the reasoning is load-bearing — the model needs **both** fields because
+`owner_type` is `NOT NULL`, so a model carrying only the rename cannot build a legal insert — and
+that belongs on `KAN-159` if it is not there already.
+
+**Nothing blocked by it.** `backend-4` already has in writing that `wallet.dart` is outside our
+write-slice, so the stale AC3 cannot make it touch a file it should not. **The exposure is at the
+review gate, not during the work** — cheap now, expensive at the moment someone tries to close the
+ticket.
+
+**Also verified today and dropped:** `fed3b01` is pushed (`ls-remote` 06:57:11Z, remote since moved
+to `f9b7cd6`, nothing local ahead).
+
+**Queue:** `KAN-150` applying → `KAN-138` → `KAN-130`+`131`. **Nothing outstanding from this seat.**
+Open items all elsewhere: `KAN-155` apply (CEO), `KAN-140` sequencing (`cto`), and `po`'s next pass
+(`KAN-138`'s stale date, `KAN-140`'s note, `KAN-130`'s AC3).
+
+### `KAN-138` authored and moved to Development; `KAN-150` confirmed and applying; a money path goes live
+
+**Moved `KAN-138` `Ready` → `Development`** (transition 4). `backend-4` correctly did not move it
+itself — that transition is mine and it waited.
+
+**Verified `cto`'s `KAN-150` confirmation myself rather than taking it on report.** `10740` exists,
+posted **10:55:52**: *"G-028 CONFIRMATION: APPROVED TO APPLY."* `backend-4`'s "not confirmed"
+message went up at **10:53:46** — **true when written, stale by two minutes.** Same shape as
+everything else today; no fault in it, and worth recording that the pattern is now so routine it is
+the default explanation rather than a surprise.
+
+**`cto` on the hold:** *"`backend-4` read `10735` correctly: it was NOT a confirmation, and it was
+right to hold… **This comment is the gate.** …this is the second time today `backend-4` has refused
+to act on an inferred approval; both times it was right."* **The gate I forgot to restate in my own
+brief is the gate that has now twice done real work.**
+
+`cto` also ran the drift check **in a way `backend-4` could not** — it had read both bodies earlier
+today *before* `KAN-128` applied, while measuring for `KAN-155`, and compared those against live
+now. **The no-drift claim therefore rests on two independent readings taken either side of
+`KAN-128`'s apply**, not on name-matching.
+
+**Routed up, and this is the item that matters beyond the ticket: `KAN-138`'s fix makes
+`settle_game` genuinely callable for the first time.** It is unreachable today because it raises
+`42804` on every invocation — **an accidental protection, not an intended gate.** After the fix any
+authenticated user can settle their own game and the `wallet_ledger` credit path executes for the
+first time.
+
+**Intended end state, and I am holding nothing on it** — `T-058` ruled the fix and the ticket exists
+to make that path reachable. But **"a money path that has never once executed becomes live" is a
+fact someone should choose to accept, not discover afterwards.** Sent to `pm`/`cpo` *before* the
+apply, when gating it would still cost nothing. Noted the pairing: `KAN-145`'s `ON DELETE RESTRICT`
+and `KAN-128`'s ledger conflict clauses landed the same day — **the money paths are being made
+correct and reachable together, which is the right order, but it moves the first real execution
+closer than it has been.**
+
+**`backend-4`'s AC2 work is the strongest thing it produced today.** The obstacle was a *second*
+`T-055` trap: `settle_game` raises `auth_required` when `auth.uid()` is NULL, so an ordinary
+service-role probe dies **three guards before the insert** and would have reported *"settle_game
+raises"* while proving nothing about the type error — **the original form of the trap, guarding the
+ticket that exists because of the early-return form.** It built a caller via `request.jwt.claims`,
+**asserted `auth.uid()` actually resolved rather than assuming**, reached line 39 and reproduced
+`42804` verbatim. Nothing committed, 0 rows either side.
+
+**Its `proacl` non-finding is worth as much as a finding.** A bare `=X/postgres` on a `SECURITY
+DEFINER` function looks exactly like the `KAN-79`/`113`/`141` class; it established it is not, since
+the body gates on `auth.uid()` and is-admin-or-self. *"The grant alone does not tell you; the body
+does."* **Not raising it was correct, and telling me it had checked is what made the silence
+useful.**
+
+**Told it explicitly that AC5 here inverts AC2 there:** on `KAN-138` the caller was constructible and
+had to be built; on `KAN-150` no `prime` caller can exist and **stating that is what AC5 asks for** —
+`cto`'s instruction, and worth flagging given how hard it had just worked to construct one.
+
+**`backend-4` declined to price `KAN-130`/`131` on a skim.** I asked for that and prefer it: **"I
+have not read it yet" beats a number.**
+
+**Queue:** `KAN-150` applying → `KAN-138` on `cto` → `KAN-130`+`131`. **Nothing outstanding from
+this seat.**
+
+### `KAN-150` applied and In Review — and a lucky outcome I declined to claim as foresight
+
+**Applied 11:03**, verification `10746`, moved to In Review (`backend-4`'s own transition).
+`provolatile` still `'v'` and `'s'` — **the §6g asymmetry survived the replacement** — `prosecdef`
+false on both, `proconfig` unchanged, zero executable `'prime'`. **It verified `10740` existed on the
+ticket before acting rather than trusting the message announcing it**, which is the discipline that
+has paid repeatedly today.
+
+**Routed to `cto` as a candidate rule — a post-change grep must strip comments first.**
+`prosrc ILIKE '%''prime''%'` returns **true** on `should_bypass_quiet_hours`, and `v_is_prime`
+returns **true** on `calculate_notification_score` — **because the change's own explanatory comments
+quote the predicate that was removed.** `cto`'s `10716` ruling *required* those comments, so **this
+ticket was guaranteed to produce the false positive: the better the documentation, the louder the
+noise.** Both wrong responses are available — report phantom leftovers, or narrow the pattern until
+the noise disappears and lose real hits with it, **trading a false positive for a false negative on
+the one check whose job is catching a silent revert.** `regexp_replace(prosrc,'--[^\n]*','','g')`
+before matching is the only response that trades neither. `backend-4` paired it with the morning's
+`posts_mapping_check` case — someone else's identifier then, its own documentation now — which makes
+it a shape rather than an incident.
+
+**A correction to my own record, in the direction that does not flatter me.** `backend-4` observed
+that applying ahead of `KAN-155` produced **better** evidence than waiting would have: `prime` is
+**still a live row** (count 1), so preservation was demonstrated *with the retired key present* —
+testing `cto`'s shape argument directly instead of assuming it. **True, and I did not foresee it.**
+I released the hold because it had started costing an indefinite wait and buying isolation against a
+failure the migration could not produce. **The stronger evidence is a benefit I got for reasons I
+did not have.** Said so plainly to `backend-4` and to `team-lead`, because **a lead who lets a lucky
+outcome ratify their reasoning will make the same call next time in a case where it does not hold.**
+
+**What does generalise, and it is `cto`'s point not mine:** `backend-4`'s original justification was
+*"safe because zero `prime` rows"*; `cto`'s was *"safe because they **compare** and therefore fail
+closed."* **The shape argument is the one that survived contact with a live `prime` row.** A
+justification resting on a row count expires when the count changes; one resting on shape does not.
+
+**No duplication on the `settle_game` consequence:** it is already the close of `backend-4`'s
+comment `10742` on `KAN-138`, so `po` has it on the ticket; my routing covers `pm`/`cpo` and
+`backend-4` is not repeating it. **Checked rather than assumed, both halves covered once.**
+
+**`backend-4` is using the blocked gap to READ `KAN-130`/`131` and produce a real count** — reading,
+not authoring, so nothing lands out of order. **I will carry its figure and attribute it**, per my
+own ruling that I do not reinstate a number I lost.
+
+**Queue:** `KAN-138` on `cto`'s confirmation → `KAN-130`+`131`. **Nothing outstanding from this
+seat.**
+
+### `KAN-130`/`131` count settled at 2/3 — re-derived, not inherited; and I was wrong yesterday
+
+**Settled: 2 sittings, ceiling 3.** `po` may date it; `KAN-128`'s apply discharged the "earliest
+Thursday 2026-09-10" constraint.
+
+**What makes it trustworthy is that it now has two independent authors.** It was `senior-backend`'s
+figure, which **I argued against and lost**, and which I refused on `10739` to reinstate merely
+because that seat retired. **`backend-4` has re-derived 2/3 from its own measurement of the live
+schema** — `wallets` column state, four indexes, two policies, three distinct `search_path` values
+and a `SECURITY DEFINER` split across the four functions — **and said explicitly that agreeing is
+not deferring.**
+
+**It tested the retired seat's *argument*, not its conclusion.** *"Larger in volume, same in cost"*,
+checked against **its own measured rework rate on the §6g whole-body trap today: zero across three
+functions** (`KAN-150`'s two, `KAN-138`'s one), all attribute-correct first pass. **Volume of a
+mechanical step is volume, not risk.** **I disagreed with that yesterday; three same-day data points
+say it was right and I was wrong**, and I put that on the ticket in those words. **A figure produced
+twice from different starting points is evidence; a figure deferred to is an echo.**
+
+**I ruled against extra margin I was offered.** `backend-4` flagged that `KAN-145`'s FK makes AC3's
+probe harder — real `venue_bookings` parents now required — and said it would not argue if I priced
+a **fourth** cycle. **I ruled it scaffolding and left the count alone.** Test applied rather than
+the out taken: known before starting (yes), population enumerable (yes — 389 `venues`, 693
+`venue_spaces`, only the booking needs creating), judgement feeding the next step (no). **And the
+sharper one: a rework cycle is a redo of the *deliverable*.** If scaffolding fails you fix the
+probe; if building it reveals the migration is wrong, that is **cycle 1, already priced.** No fourth
+cycle hiding.
+
+**Corrected `backend-4`'s framing, which mattered more than the ruling.** It wrote *"a cost that did
+not exist when this was priced, and **it is mine**."* **It is not.** The FK was `T-061`'s ruling,
+correctly authored and applied, and it unblocked `KAN-140`. **Making the schema correct makes
+fabricating test data harder — the constraint working as designed, not a debt anyone incurred.**
+Told it not to carry it as one.
+
+**And it is a STANDING cost, not this ticket's** — routed to `pm`/`cto` rather than buried. Every
+future probe touching `payment_intents` needs real `venue_bookings` parents: `KAN-140`,
+`KAN-128`'s downstream P3 probe, every D4 money probe after. **Pricing it into one ceiling would
+hide a permanent general cost where the next author rediscovers it from scratch.**
+
+**Two `backend-4` checks of ticket claims, both the right posture.** The **views** confirmation is
+not a non-event — `v_wallet_balance` and `v_wallet_admin_overview` neither read `user_id`, so the
+drop cascades no view away; **had either read it, that was a material addition nobody had priced.**
+The **"four non-DDL references"** claim it could not confirm — its comment-stripped sweep finds
+**three** functions, all already named — **flagged to reconcile rather than declared wrong**, and it
+cannot move the count dangerously since the set is *smaller*, not larger. Routed to `cto`.
+
+**Two implementation subtleties recorded on the ticket:** `ADD CONSTRAINT wallets_pkey PRIMARY KEY
+USING INDEX wallets_id_unique` (a plain `ADD PRIMARY KEY` leaves a duplicate index, and dropping the
+unique first is blocked by `financial_ledger_wallet_fkey`), and **replace `wallets_self_read` before
+dropping `user_id`** or the drop needs `CASCADE` and silently takes the policy.
+
+**Queue:** `KAN-138` on `cto` → `KAN-130`+`131`. Both still in `Ready`; **I transition when
+`backend-4` starts**, and told it to tell me rather than find the column in the wrong state.
+**Nothing outstanding from this seat.**
+
+### Amended the verification rule before `cto` records it — the form I sent could have been read backwards
+
+**`backend-4` sharpened the comment-stripping finding and the sharpening is load-bearing**, so I
+sent it as an amendment rather than letting the rule land in my weaker form.
+
+**What I routed:** *"a post-change grep must strip comments first, because the change's own
+documentation quotes what was removed."*
+
+**What was missing:** `cto`'s `10716` **required** those comments, and required them to quote the
+removed predicate specifically, because **that is what distinguishes dormant from abandoned.** So
+**the rule that made the code honest is the same rule that made the naive verification lie.**
+
+**Why the omission was dangerous rather than merely incomplete.** The lazy reading of my version is
+*"comments caused a false positive, so write fewer comments"* — **exactly backwards**, and it would
+land in a codebase where `cto` has **just ruled explanatory comments mandatory for this very class
+of change.** A rule recorded without the framing **could be cited to undo `10716`.** Re-sent in two
+halves: (1) strip comments when verifying; (2) **this is a fix to the verification, never to the
+code.**
+
+**`backend-4`'s self-observation is the sharpest thing either of us said today**, and I told it so:
+it had reached for ownership of a correct decision's downstream friction *"the same way I have been
+reaching for ownership of errors all day — and the two are not the same act."* **Owning a mistake is
+accurate; owning a correct decision's friction miscategorises work as damage.** Its own conclusion
+is the one that matters — it would make a backend **quietly reluctant to add constraints**, which is
+precisely the wrong instinct for the seat. A backend that hesitates to add a foreign key because the
+last one made a probe harder ships weaker schemas.
+
+**Symmetry closed on the foresight point.** `backend-4` volunteered that it did not sequence
+`KAN-150` ahead of `KAN-155` for the evidence either — it noticed while writing the verification.
+**Neither of us gets that outcome as foresight**, and both of us said so unprompted. What survives
+is `cto`'s correction, chosen by neither: **a justification resting on a row count expires when the
+count changes; one resting on shape does not.**
+
+**One stale crossing, no action:** `backend-4`'s earlier message still asked whether the FK cost
+moves the ceiling to 4. Already ruled — **2/3, scaffolding** — and it has since acknowledged the
+ruling.
+
+**Queue unchanged:** `KAN-138` on `cto`'s confirmation → `KAN-130`+`131`, which stay in `Ready`
+until `backend-4` tells me it is starting. **Nothing outstanding from this seat.** Open elsewhere:
+`KAN-155` apply (CEO), `KAN-138` confirmation (`cto`), `KAN-140` ordering (`cto`), the standing
+`payment_intents` probe cost (`pm`/`cto`), `KAN-130`'s AC3 and `KAN-138`'s stale date (`po`).
