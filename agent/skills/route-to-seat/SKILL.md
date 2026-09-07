@@ -49,8 +49,18 @@ teams. Route by the team that owns the work, not by how hard the task looks.
 | `team-lead-4` | D4 Money · D7 Rewards |
 | `team-lead-5` | D6 Notifications · D9 Discovery |
 
-**This table goes stale; the filesystem does not.** Confirm the seat exists with
-`ls agent/roles/` before dispatching. An unrecognised `subagent_type` **falls back to a
+**This table goes stale; the filesystem does not.** Confirm the seat exists before
+dispatching — and confirm it at its **runtime** artifacts, not at a Role file. Since Wave 2 a
+seat no longer needs a Role file of its own name: `frontend-1..8` all instantiate
+`agent/roles/frontend.md`. Check **both**:
+
+```
+ls .claude/bindings/<seat>.yml   # the seat is declared
+ls .claude/agents/<seat>.md      # its runtime definition was generated
+```
+
+A binding with no generated definition is the dangerous case — the seat looks declared and is
+not dispatchable. `agent/scripts/build-agents.sh --check` is what proves the pair is in sync. An unrecognised `subagent_type` **falls back to a
 generic agent with no error raised** — it will answer plausibly and own nothing, and you will
 not be told. A name you did not verify is a silent failure, not a typo.
 

@@ -7,7 +7,8 @@ color: yellow
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/content-manager.md + .claude/bindings/content-manager.yml -->
+<!-- Seat:    .claude/bindings/content-manager.yml -->
+<!-- Role:    agent/roles/content.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

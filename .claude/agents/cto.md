@@ -6,7 +6,8 @@ effort: low
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/cto.md + .claude/bindings/cto.yml -->
+<!-- Seat:    .claude/bindings/cto.yml -->
+<!-- Role:    agent/roles/cto.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

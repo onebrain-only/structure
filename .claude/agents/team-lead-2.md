@@ -7,7 +7,8 @@ color: purple
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/team-lead-2.md + .claude/bindings/team-lead-2.yml -->
+<!-- Seat:    .claude/bindings/team-lead-2.yml -->
+<!-- Role:    agent/roles/team-lead-2.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

@@ -6,7 +6,8 @@ effort: low
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/devops.md + .claude/bindings/devops.yml -->
+<!-- Seat:    .claude/bindings/devops.yml -->
+<!-- Role:    agent/roles/devops.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

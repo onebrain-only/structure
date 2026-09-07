@@ -4,3 +4,4 @@ model: sonnet
 effort: medium
 color: teal
 memory: project
+role: qa

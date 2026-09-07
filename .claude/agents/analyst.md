@@ -6,7 +6,8 @@ effort: medium
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/analyst.md + .claude/bindings/analyst.yml -->
+<!-- Seat:    .claude/bindings/analyst.yml -->
+<!-- Role:    agent/roles/analyst.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

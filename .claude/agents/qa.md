@@ -7,7 +7,8 @@ color: teal
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/qa.md + .claude/bindings/qa.yml -->
+<!-- Seat:    .claude/bindings/qa.yml -->
+<!-- Role:    agent/roles/qa.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

@@ -4,3 +4,5 @@ model: opus
 effort: low
 color: blue
 memory: project
+role: backend
+seat_context: agent/seats/backend-6.md

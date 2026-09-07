@@ -182,9 +182,24 @@ slices.
 
 ## 2. THE AGENTS THAT EXIST
 
-**Thirty seats.** Each has a role at `agent/roles/<name>.md`, a binding at
-`.claude/bindings/<name>.yml`, a generated definition at `.claude/agents/<name>.md`, a memory
-directory and a status file. **A seat missing any of those is not a seat.**
+**Thirty seats, and thirteen Roles.** **A Role is not a seat** (Wave 2, 2026-09-07). A seat is
+its **binding** plus its **generated definition**; the binding names the Role it instantiates.
+
+| Layer | Path | What it is |
+|---|---|---|
+| **Seat** | `.claude/bindings/<seat>.yml` | Declares the seat and the Role it instantiates: `role: <role-id>`, optionally `seat_context: <path>` |
+| **Role contract** | `agent/roles/<role-id>.md` | Durable behaviour, authority and execution contract. **Shared by every seat of that Role** |
+| **Seat context** | `agent/seats/<seat>.md` | *Temporary.* Current per-seat runtime context — identity, team, pair, status path. **Persistent State absorbs it in Wave 4** |
+| **Runtime definition** | `.claude/agents/<seat>.md` | Generated. Never hand-edited |
+
+**`frontend-1..8` are eight seats instantiating one Role, `frontend`.** `backend-1..8`
+instantiate `backend`. `content-manager` is the seat; `content` is the Role. Every other seat
+currently maps one-to-one to a Role of the same name.
+
+**A seat missing its binding or its generated definition is not a seat** — and that is what to
+check before dispatching, not whether a Role file of its own name exists. `role:` and
+`seat_context:` are generator metadata and are stripped before the runtime frontmatter is
+emitted.
 
 ### Company level — One Brain
 
@@ -193,7 +208,7 @@ directory and a status file. **A seat missing any of those is not a seat.**
 | `cto` | Decides technical direction and holds the standard. Architecture, schema shape, stack, build-vs-buy | `ARCHITECTURE.md` · `CONVENTIONS.md` · `SCHEMA.md` §11 · `T-` decisions | Writes feature code. Writes to production |
 | `cpo` | Vision, scope, PRDs. Judges every proposal against the committed business strategy | `BRIEF.md` · `ROADMAP.md` · `P-` decisions · **sole writer to the Notion business corpus** | Decides technical shape. Touches production |
 | `cxo` | **Chief Experience Officer.** Judges whether work matches the design system, the product's own logic, and the company's goals | The design system's standards and instruction · `D-` decisions | Writes code. Edits what it judges |
-| `analyst` | Establishes what is *true* about the codebase, so every decision starts from reality. Finds problems; does not fix them | `Dabbler/dabbler-docs/**` · `agent/**` · `.claude/agents/**` | Writes any code. Grades anyone's work |
+| `analyst` | Establishes what is *true* about the codebase, so every decision starts from reality. Finds problems; does not fix them | `PROJECT_STATE.md` · `LEARN.md` · `G-` decisions · `agent/roles/**` · `.claude/bindings/**` · `agent/STATUS.md` | Writes any code. Grades anyone's work. **Writes `MANIFESTO.md`, `CONTRACT.md` or `AGENTS.md`** — custody moved to the CEO on 2026-09-06 (`G-022`), because the writer of a rule must not be a seat the rule binds. `.claude/agents/**` is GENERATED, not authored |
 
 **`cto` decides what should be true; `analyst` measures what is true; `cxo` judges how it
 feels; `cpo` decides whether it should exist at all.** Four different questions. Sending one
@@ -213,6 +228,28 @@ seat another's question is the most common routing error there is.
 |---|---|---|---|
 | `po` | **The only seat that writes Jira tickets.** Creates, audits, arranges, tracks — and runs the acceptance-criteria review gate before QA | The board · every ticket · the review verdict | Writes code. Reviews work it executed |
 | `team-lead-1..5` | Hold stacks, plan, split, assign, report capacity. **One active stack each** | The In Progress transition · the capacity number | **Writes any code, SQL or copy** |
+
+> **`team-lead-1..5` — FINAL TARGET STATUS: REMOVED. CURRENT MIGRATION STATUS: TEMPORARY
+> COMPATIBILITY SEATS.**
+>
+> **Team Leads do not exist in the target architecture.** They survive only because current
+> mechanisms still name them and have no replacement yet. Their behaviour is unchanged, their
+> bindings and generated definitions are active, and they must be dispatched normally until
+> they are deleted.
+>
+> **Named final deletion wave: WAVE 6**, atomically with the last dependency:
+>
+> - **Wave 3** removes the routing, escalation and developer-contact dependency — `route-to-seat`'s
+>   assignment row and stack table, and "the lead who owns the feature" in every developer contract.
+> - **Wave 5** removes the Jira transition, lifecycle, review-gate and planning/capacity duties —
+>   `WORKFLOWS.md` §1's transition table, W1, and the capacity number `po` turns into a `due_date`.
+> - **Wave 6** moves shared-file and contention coordination into queue-claim rules — the last
+>   thing a lead still does that nothing else can — **and deletes the five seats in that same change.**
+>
+> Deleting them earlier would leave `CONTRACT.md`'s permission matrix and `WORKFLOWS.md`
+> pointing at seats that do not resolve, and an unrecognised `subagent_type` **falls back to a
+> generic agent with no error raised** (§4). **Do not read their survival as a reversal of the
+> target.**
 | `qa` | Drives the **running** app and tests whether it works. Files bugs | Testing stories · bug reports | **Fixes anything** |
 
 ### Developers — eight paired teams
@@ -455,13 +492,20 @@ is a much smaller job than it was at v0.1.
 
 ## 9. PER-AGENT DETAIL FILES
 
-`agent/roles/<agent-name>.md` — the long-form definition each agent is dispatched with. All
-**thirty** exist. §2 above is the roster view: charter, ownership and escalation, in the third person.
+`agent/roles/<role-id>.md` — the long-form contract each agent is dispatched with. **Thirteen
+Role contracts serve thirty seats**: `frontend` (8 seats), `backend` (8), and one each for
+`cto`, `cpo`, `cxo`, `analyst`, `pm`, `devops`, `content`, `po`, `qa`, plus the five
+`team-lead-N` compatibility seats. Two further contracts exist with **no seat** —
+`ux-engineer` (defined, not yet instantiated; activates Wave 6) and `product-designer`
+(defined, inactive: the CEO is the design source). §2 above is the roster view: charter, ownership and escalation, in the third person.
 `agent/roles/` is the instruction the agent itself reads, in the second person. The two are
 complementary, not duplicates — §2 says what a seat *is*, the role file says how it *works*.
 
-`agent/roles/` is tool-neutral. `.claude/agents/<name>.md` is generated from it plus
-`.claude/bindings/<name>.yml` by `agent/scripts/build-agents.sh`. **Never hand-edit
+`agent/roles/` is tool-neutral. `.claude/agents/<seat>.md` is generated from the Role the
+binding names, plus `.claude/bindings/<seat>.yml`, plus that seat's context block where one is
+declared, by `agent/scripts/build-agents.sh`. **The generator errors rather than guessing** if a
+binding declares no `role:`, names a Role that does not exist, or points at a `seat_context:`
+that is missing. **Never hand-edit
 `.claude/agents/`** — it is regenerated, and `build-agents.sh --check` fails if it has drifted.
 
 ---
@@ -472,6 +516,15 @@ complementary, not duplicates — §2 says what a seat *is*, the role file says 
 **CEO ruling.** Every dispatch is chosen deliberately, not defaulted. The rule of thumb
 remains: **judgment costs Opus; execution costs Sonnet** — with one deliberate exception
 noted below.
+
+> **`model:` and `effort:` in a binding are TEMPORARY COMPATIBILITY EXECUTION DEFAULTS, not
+> permanent Role properties.** The target architecture derives both per task from Execution
+> Profile policy rather than fixing them per seat, and treats Work Effort and Reasoning Effort
+> as independent concepts — `effort:` is today a single conflated field. The Execution Profile
+> **schema** arrives in Wave 4 and its **per-task policy becomes effective in Wave 6**; these
+> defaults are removed only once that runtime replacement is proven. Until then they are what
+> the Agent tool actually uses, and their values are unchanged. **Do not read this table as a
+> statement about what a Role is.**
 
 | Seat | Model | Effort | Why |
 |---|---|---|---|

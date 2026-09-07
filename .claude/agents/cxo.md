@@ -7,7 +7,8 @@ color: pink
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/cxo.md + .claude/bindings/cxo.yml -->
+<!-- Seat:    .claude/bindings/cxo.yml -->
+<!-- Role:    agent/roles/cxo.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

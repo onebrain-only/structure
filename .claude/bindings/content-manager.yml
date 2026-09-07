@@ -4,3 +4,4 @@ model: sonnet
 effort: low
 color: yellow
 memory: project
+role: content

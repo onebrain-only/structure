@@ -4,3 +4,4 @@ model: sonnet
 effort: medium
 color: cyan
 memory: project
+role: pm

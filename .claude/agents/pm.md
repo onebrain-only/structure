@@ -7,7 +7,8 @@ color: cyan
 memory: project
 ---
 <!-- GENERATED FILE — do not edit. -->
-<!-- Source: agent/roles/pm.md + .claude/bindings/pm.yml -->
+<!-- Seat:    .claude/bindings/pm.yml -->
+<!-- Role:    agent/roles/pm.md -->
 <!-- Rebuild: agent/scripts/build-agents.sh -->
 
 ## MODEL AND EFFORT — READ THE TASK BRIEF FIRST

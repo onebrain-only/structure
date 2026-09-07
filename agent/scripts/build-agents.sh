@@ -1,11 +1,24 @@
 #!/bin/sh
-# Build .claude/agents/<name>.md from a tool-neutral role + a Claude-specific binding.
+# Build .claude/agents/<seat>.md from a Role contract + a Claude-specific binding.
 #
-#   agent/roles/<name>.md            neutral markdown, no frontmatter — the ROLE
-#   .claude/bindings/<name>.yml      YAML frontmatter body           — the BINDING
-#   .claude/agents/<name>.md         generated: fence + binding + fence + banner + role
+#   .claude/bindings/<seat>.yml      YAML frontmatter body        — the SEAT
+#   agent/roles/<role>.md            neutral markdown, no frontmatter — the ROLE
+#   agent/seats/<seat>.md            optional temporary seat context
+#   .claude/agents/<seat>.md         generated: fence + binding + fence + banner
+#                                    + role + seat context
 #
-# Only agents that have a binding are generated; every other file in
+# ROLE ≠ SEAT. A binding names the Role it instantiates, so many seats may share
+# one Role contract — frontend-1..8 all resolve to agent/roles/frontend.md. The
+# mapping is explicit, never inferred from the seat's filename.
+#
+#   role: <role-id>            REQUIRED. Resolves agent/roles/<role-id>.md
+#   seat_context: <path>       OPTIONAL. Appended after the Role contract
+#
+# Both are generator metadata and are stripped before the frontmatter is
+# emitted: the generated file is what Claude Code parses, and implementation-only
+# keys do not belong in it. Every other binding key passes through untouched.
+#
+# Only seats that have a binding are generated; every other file in
 # .claude/agents/ is left untouched.
 #
 # Usage:
@@ -24,42 +37,72 @@ CHECK=0
 [ -d "$BINDINGS" ] || { echo "ERROR: no $BINDINGS"; exit 1; }
 mkdir -p "$AGENTS"
 
+# value of a top-level key in a binding, empty if absent
+field() {
+  sed -n "s/^$2:[[:space:]]*//p" "$1" | head -1 | sed 's/[[:space:]]*$//' | tr -d '"'"'"''
+}
+
 status=0
 found=0
 for binding in "$BINDINGS"/*.yml; do
   [ -e "$binding" ] || continue
   found=$((found + 1))
-  name=$(basename "$binding" .yml)
-  role="$ROLES/$name.md"
-  out="$AGENTS/$name.md"
+  seat=$(basename "$binding" .yml)
+  out="$AGENTS/$seat.md"
 
-  if [ ! -f "$role" ]; then
-    echo "ERROR: binding $name has no role at $role"
+  role_id=$(field "$binding" role)
+  if [ -z "$role_id" ]; then
+    echo "ERROR: binding $seat declares no role:"
     status=1
     continue
   fi
 
+  role="$ROLES/$role_id.md"
+  if [ ! -f "$role" ]; then
+    echo "ERROR: binding $seat declares role '$role_id' but $role does not exist"
+    status=1
+    continue
+  fi
+
+  ctx_rel=$(field "$binding" seat_context)
+  ctx=""
+  if [ -n "$ctx_rel" ]; then
+    ctx="$ROOT/$ctx_rel"
+    if [ ! -f "$ctx" ]; then
+      echo "ERROR: binding $seat declares seat_context '$ctx_rel' which does not exist"
+      status=1
+      continue
+    fi
+  fi
+
   tmp=$(mktemp)
-  printf -- '---\n'  >  "$tmp"
-  cat "$binding"     >> "$tmp"
-  printf -- '---\n'  >> "$tmp"
-  printf -- '<!-- GENERATED FILE — do not edit. -->\n'                                       >> "$tmp"
-  printf -- '<!-- Source: agent/roles/%s.md + .claude/bindings/%s.yml -->\n' "$name" "$name" >> "$tmp"
-  printf -- '<!-- Rebuild: agent/scripts/build-agents.sh -->\n'                              >> "$tmp"
-  printf -- '\n'                                                                >> "$tmp"
-  cat "$role"        >> "$tmp"
+  printf -- '---\n' > "$tmp"
+  # generator metadata is consumed here, never emitted
+  grep -v '^role:' "$binding" | grep -v '^seat_context:' >> "$tmp"
+  printf -- '---\n' >> "$tmp"
+  printf -- '<!-- GENERATED FILE — do not edit. -->\n'                                 >> "$tmp"
+  printf -- '<!-- Seat:    .claude/bindings/%s.yml -->\n' "$seat"                      >> "$tmp"
+  printf -- '<!-- Role:    agent/roles/%s.md -->\n' "$role_id"                         >> "$tmp"
+  [ -n "$ctx_rel" ] && printf -- '<!-- Context: %s -->\n' "$ctx_rel"                   >> "$tmp"
+  printf -- '<!-- Rebuild: agent/scripts/build-agents.sh -->\n'                        >> "$tmp"
+  printf -- '\n'                                                                       >> "$tmp"
+  cat "$role" >> "$tmp"
+  if [ -n "$ctx" ]; then
+    printf -- '\n' >> "$tmp"
+    cat "$ctx" >> "$tmp"
+  fi
 
   if [ "$CHECK" -eq 1 ]; then
     if [ -f "$out" ] && cmp -s "$tmp" "$out"; then
-      echo "ok      $name"
+      echo "ok      $seat"
     else
-      echo "STALE   $name  ($out differs from generated output)"
+      echo "STALE   $seat  ($out differs from generated output)"
       status=1
     fi
     rm -f "$tmp"
   else
     mv "$tmp" "$out"
-    echo "built   $name"
+    echo "built   $seat"
   fi
 done
 
