@@ -232,6 +232,29 @@ Repo: `dabblersport/webapp`. Hosting: Cloudflare Pages, project `webapp`. Build 
 
 - **Named subagents only resolve when the session's working directory is this repo.** `.claude/agents/` is registry-scoped to the working directory, and the Agent tool silently falls back to a generic agent for an unrecognised `subagent_type` — no error is raised. A session opened against a different project will appear to use `devops` and will not be using it. To verify, ask the subagent to state the git author email it must commit as; that value exists only in its own definition, while the build command and the never-push-main rule are also in this file and therefore prove nothing.
 
+### Governance Repository
+
+**The Dabbler governance corpus is not owned by this repository.** `CONTRACT.md`, `DECISIONS.md`, `MANIFESTO.md`, `LEARN.md`, `STACKS.md`, `PROJECT_STATE.md`, `BRIEF.md`, `ROADMAP.md` and `MIGRATION.md` live in a separate Git repository that happens to sit inside this workspace. `CONTRACT.md` is authoritative for current write and permission boundaries — `AGENTS.md` defers to it.
+
+| | |
+|---|---|
+| Canonical repository | `https://github.com/dabblersport/dabbler-docs.git` |
+| Expected local path | `Dabbler/dabbler-docs/` (relative to this workspace root) |
+| Branch | `master` |
+| **Compatible governance baseline** | **`9edafb7cf292f989988516a504ee2d48250fed14`** |
+
+A fresh workspace must clone it separately — this repository's `.gitignore` excludes it, and nothing here reconstructs it:
+
+```bash
+git clone <this repository> thebes && cd thebes
+git clone https://github.com/dabblersport/dabbler-docs.git Dabbler/dabbler-docs
+git -C Dabbler/dabbler-docs checkout 9edafb7cf292f989988516a504ee2d48250fed14
+```
+
+**Branch versus baseline.** `master` says where governance development continues; the pinned commit says what *this* Thebes revision was verified against. **Cloning `master` is not guaranteed to reconstruct a historical Thebes architecture** — the two repositories advance independently, so a later `master` may carry authority rules this Thebes commit was never designed against. To reproduce exactly, check out the baseline above; to check you are on it, `git -C Dabbler/dabbler-docs rev-parse HEAD` must return it.
+
+**When Thebes deliberately adopts a later governance revision, updating this pointer is part of that change**, in the same System Maintenance commit. A baseline that drifts silently is the defect this pin exists to prevent.
+
 ### Branches
 
 - **`main`** is the Cloudflare Pages production branch and deploys straight to https://app.dabbler.pro. Pushing to main ships to real users immediately. **Never push directly to main** — always open a PR from `Canary`.

@@ -2,9 +2,13 @@
 !/.claude/
 !/agent/
 
-# dabbler-docs moved to Dabbler/ and is deliberately NOT tracked here
-# (CEO ruling 2026-09-05). Its history up to 67cf424 remains in this repo's
-# past commits; changes after that point are not version-controlled anywhere.
+# Dabbler/dabbler-docs is deliberately NOT tracked here (CEO ruling 2026-09-05,
+# commit b6c3747). It is NOT unversioned: it is an independent Git repository,
+# canonical remote dabblersport/dabbler-docs, branch master. Its history up to
+# 67cf424 also remains in this repo's past commits, at the old dabbler-docs/ path.
+# The exact governance commit this Thebes architecture was verified against is
+# pinned in CLAUDE.md under "Governance Repository". Do not re-track it here —
+# a second copy of CONTRACT.md is a second authority.
 !/CLAUDE.md
 !/.gitignore
 !/*.md
