@@ -286,8 +286,13 @@ Neither could settle it; `CONTRACT.md:378` did. **That is the shape of it, and i
 
 ## 4.1 STRUCTURED ROUTING REQUEST — TEMPORARY, WAVE 3
 
-> **TEMPORARY. Exit: Wave 6.** Capability queues replace this. It is prose and prompt context
-> — **there is no queue, no store and no state directory.**
+> **TEMPORARY. Exit: Wave 6.** Capability queues replace this.
+>
+> **Wave 4 made these records durable.** A routing request is written through
+> `agent/state/store.py` and gets an `rr-<uuid>` id; an exception gets `exc-<uuid>`. They survive
+> session loss, which prompt text did not. **They are still not a queue** — nothing claims from
+> them, nothing pulls from them, nothing orders them, and `selected_seat` stays null until MODEL C
+> evidence determines one.
 
 **A worker that discovers work for another capability does not hand it over.** Direct
 execution delegation is prohibited (§4). Instead it returns a structured request:
@@ -307,9 +312,17 @@ Dispatcher's job, and only on evidence (`route-to-seat`).
 **Jira authority is unchanged.** If genuinely new work must be authored, the request goes to
 **`po`**, which writes it. **A developer does not create or edit tickets.**
 
-**Blockers, until the Dependency Graph exists (Wave 4):** record them the way §1 rule 2
-already requires — a comment on the ticket naming the blocker. **Do not invent `BLOCKS` /
-`IS BLOCKED BY` structure.**
+**Blockers, since Wave 4:** a structural blocker may become a **dependency record** —
+`source BLOCKS target`, one canonical direction, `IS_BLOCKED_BY` derived by query and never
+stored as a second record. Written through `store.py` under the Product graph lock, which is
+what rejects cycles and duplicate edges. Continue to name the blocker in a ticket comment where
+the current workflow already requires one, citing the `dep-<id>`.
+
+**Satisfaction is not something you write.** An edge carries `completion_condition: DONE`, so a
+prerequisite sitting in review has satisfied nothing. Whether it is satisfied is derived once
+canonical lifecycle exists (Wave 5). **Blockers recorded before Wave 4 stay as ticket comments —
+there is no backfill**, because inferring past relationships from comment prose would be
+fabrication.
 
 ### The result comes back directly
 

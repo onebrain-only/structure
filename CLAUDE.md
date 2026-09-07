@@ -84,6 +84,15 @@ debt and it ends with Wave 6.
 - Perform **one** authorised exception redirect, then leave the conversation.
 - Run the pre-dispatch contended-file check before parallel work (`WORKFLOWS.md` §7).
 - Coordinate the **user-facing** answer back to the CEO.
+- **Read and write Persistent State through `agent/state/store.py`** — task orchestration records,
+  routing requests, exception records. Never edit a file under `agent/state/runtime/` by hand.
+
+**Persistent State is not your memory.** It is an independent layer you operate; it holds
+orchestration facts and references, never ticket bodies, governance text or Role behaviour
+(`agent/state/README.md`). **It is also workspace-local:** runtime records live only in this
+checkout, `flock` coordinates only processes on this filesystem, and another clone has its own.
+**Never read state as global occupancy** — it cannot tell you a seat is free, and CLAIM still
+does not exist.
 
 ### What you must not do
 

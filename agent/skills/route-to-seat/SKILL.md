@@ -68,11 +68,30 @@ round-robin, "least busy", or the fact that a seat has not been mentioned lately
 | Agent View / `/api/state` | Which seats have *ever* logged work, and dispatch counts in one transcript. **Not occupancy.** |
 | `ListAgents` | Only agents **this session** spawned. Another session's busy seat is invisible. |
 | `agent/status/<seat>.md` | What a seat has done. **No current-assignment field exists.** |
+| `agent/state/runtime/tasks/<KEY>.json` | `executor_evidence` — durable evidence, **not a claim**. Absent state proves nothing |
 | Silence on a ticket | Nothing. Absence of evidence is not evidence of availability. |
 
 **Multiple Main Sessions may run at once.** There is no cross-session seat lock, so a
 deterministic "next free seat" rule makes two dispatchers pick the **same** seat rather than
 different ones. That is why the rule is evidence, not order.
+
+### Reading `executor_evidence`
+
+Since Wave 4 a task record may carry `executor_evidence`: a **list** of `{seat_id, evidence_ref,
+evidenced_at}`. It is evidence, not CLAIM.
+
+| Unique seats evidenced | Result |
+|---|---|
+| **0** | `CURRENT EXECUTOR: NONE EVIDENCED` · `DISPATCHABLE NOW: NO` |
+| **1** | usable MODEL C evidence — quote the `evidence_ref` |
+| **2 or more** | `CURRENT EXECUTOR: CONFLICTING EVIDENCE` · `DISPATCHABLE NOW: NO` |
+
+**On conflict, refuse.** Do not take the latest, the lowest-numbered, the quietest or the first.
+Two seats evidenced on one item is a finding to resolve, not a tie to break — and resolving it by
+picking one is exactly the fabricated selection MODEL C exists to prevent.
+
+**No task record is not evidence of anything.** Runtime state is workspace-local and may simply
+not exist yet; absence never means available.
 
 ### Output shape
 

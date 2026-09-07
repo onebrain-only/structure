@@ -171,6 +171,13 @@ capability, discovered scope, dependency/blocker, `RAISED_BY`, `RETURN_TO`. **Na
 capability, not the seat.** If new Jira work is needed, it goes to `po` — **you do not create or
 edit tickets.**
 
+**Since Wave 4 the request is durable state, not prompt text.** It is written through
+`agent/state/store.py` and gets an `rr-<uuid>` id that survives session loss. An exception you
+raise likewise becomes an `exc-<uuid>` record. **Never edit a file under `agent/state/runtime/`
+by hand** — the concurrency guarantee lives in the write path. A structural blocker you discover
+may also become a dependency record; it is `source BLOCKS target`, one direction, and
+satisfaction is never something you write.
+
 When another capability finishes work you raised, its result comes **back to you directly**
 where you are still addressable.
 

@@ -185,6 +185,13 @@ capability, discovered scope, dependency/blocker, `RAISED_BY`, `RETURN_TO`. **Na
 capability, not the seat.** If new Jira work is needed, it goes to `po` — **you do not create or
 edit tickets.**
 
+**Since Wave 4 the request is durable state, not prompt text.** It is written through
+`agent/state/store.py` and gets an `rr-<uuid>` id that survives session loss. An exception you
+raise likewise becomes an `exc-<uuid>` record. **Never edit a file under `agent/state/runtime/`
+by hand** — the concurrency guarantee lives in the write path. A structural blocker you discover
+may also become a dependency record; it is `source BLOCKS target`, one direction, and
+satisfaction is never something you write.
+
 When another capability finishes work you raised, its result comes **back to you directly**
 where you are still addressable.
 
@@ -199,10 +206,16 @@ one.
 
 ## SEAT CONTEXT — TEMPORARY WAVE 2 COMPATIBILITY
 
-**This block is temporary.** It carries the current runtime context of one seat, which the
-Role contract above deliberately does not hold. **Persistent State absorbs it in Wave 4**, and
-this block is removed then. Nothing durable belongs here: no Backend behaviour, no project
-knowledge, no learning.
+**This block is temporary — generator-only seat context. Exit: Wave 6.** It carries the current
+runtime context of one seat, which the Role contract above deliberately does not hold.
+
+*Corrected 2026-09-07 (Wave 4). This said Persistent State would absorb it in Wave 4. That was
+too broad: the generator concatenates markdown, and teaching it to render JSON would make it the
+template engine Wave 2 refused. Team and pair are **temporary compatibility**, not target
+architecture, so they were not moved into state either. The file goes when Wave 6's dynamic seats
+change how definitions are produced.*
+
+Nothing durable belongs here: no Backend behaviour, no project knowledge, no learning.
 
 | | |
 |---|---|

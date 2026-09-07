@@ -28,3 +28,11 @@
 # Local telemetry, not knowledge: it holds commands and file paths from every
 # session and would grow without bound in git.
 /agent/.flow/
+
+# Wave 4 Persistent State — runtime records. Mutable orchestration state written
+# during execution: tasks, routing requests, exceptions, dependency edges, locks.
+# Durable on disk and across sessions, deliberately outside source history —
+# tracking them would keep the working tree dirty during normal Product execution
+# and make Git responsible for a live orchestration database. The state doctrine,
+# tooling and Company/Product/Project registry above it ARE tracked.
+/agent/state/runtime/

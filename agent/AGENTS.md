@@ -171,7 +171,9 @@ and **unstaffed**. It is recorded so it stops being invisible, not so someone pi
 ### The other three projects are declared and unstaffed
 
 Dabbler has four projects: **the app** (staffed), the **design system**, the **admin
-dashboard** and the **website** (all three declared, none staffed). Seats are shared across
+dashboard** and the **website** (all three declared, none staffed). **The canonical
+machine-readable registry is `agent/state/registry/products/dabbler/projects/`** (§3b) — this
+paragraph describes it and must not be maintained as a second source. Seats are shared across
 projects and must be told which project they are working in. **Do not invent an owner for a
 project that has no code** — that is the failure `CONTRACT.md` records for the 23 unowned
 slices.
@@ -187,7 +189,7 @@ its **binding** plus its **generated definition**; the binding names the Role it
 |---|---|---|
 | **Seat** | `.claude/bindings/<seat>.yml` | Declares the seat and the Role it instantiates: `role: <role-id>`, optionally `seat_context: <path>` |
 | **Role contract** | `agent/roles/<role-id>.md` | Durable behaviour, authority and execution contract. **Shared by every seat of that Role** |
-| **Seat context** | `agent/seats/<seat>.md` | *Temporary.* Current per-seat runtime context — identity, team, pair, status path. **Persistent State absorbs it in Wave 4** |
+| **Seat context** | `agent/seats/<seat>.md` | *Temporary, generator-only.* Current per-seat runtime context — identity, team, pair. **Exit: Wave 6.** *(Corrected 2026-09-07: this said Wave 4 would absorb it. Wave 4 took only the PO's Project binding; the generator concatenates markdown, and team/pair are compatibility rather than target state.)* |
 | **Runtime definition** | `.claude/agents/<seat>.md` | Generated. Never hand-edited |
 
 **`frontend-1..8` are eight seats instantiating one Role, `frontend`.** `backend-1..8`
@@ -350,6 +352,57 @@ memory-sourced claim before recommending it.
 wrappers, `SupabaseConfig`) appear **only** in notifications-specialist's definition. They
 are project-wide and now live in `CONVENTIONS.md`; new agent definitions should reference
 that file rather than restating a partial copy, which is how the copies diverge.
+
+---
+
+## 3b. PERSISTENT STATE — the orchestration layer
+
+**Added Wave 4, 2026-09-07.** `agent/state/` is an independent system layer: **not an agent, not
+a seat, not a Role, not Orchestrator memory, not Main Session memory.** Full doctrine is in
+`agent/state/README.md`; what matters here is where the boundaries fall.
+
+| Layer | Holds | Canonical source |
+|---|---|---|
+| **Role contract** | behaviour, authority, execution contract | `agent/roles/<role>.md` |
+| **Seat instance** | which seat exists, which Role it instantiates | `.claude/bindings/<seat>.yml` |
+| **Seat identity** | deity, glyph, lore | `agent/NAMING.csv` |
+| **Seat team/pair** | temporary compatibility context | `agent/seats/<seat>.md` — **exit Wave 6** |
+| **Project registry** | which Projects exist, and each one's current PO seat | **`agent/state/registry/`** |
+| **Runtime state** | tasks, routing requests, exceptions, dependency edges | `agent/state/runtime/` |
+| **Role learning** | execution optimisation | Wave 8 — does not exist yet |
+
+**There is no Seat Registry in Persistent State.** A global roster copy would duplicate three
+canonical sources at once. Runtime records reference a seat by **slug**, and the validator checks
+it against `.claude/bindings/`.
+
+**The Project registry is canonical.** `agent/state/registry/products/dabbler/projects/` is the
+machine-readable source for which Dabbler Projects are registered and which PO seat serves each.
+**§1's prose describes that structure; it is not a second registry.** Dabbler has four registered
+Projects — `app`, `admin`, `design-system`, `web` — and only `app` has a `current_po_seat_id`
+(`po`). A `null` means registered with no PO seat, which is a valid state, not a gap; no
+`po-admin`, `po-design-system` or `po-web` seat exists. **Registration is not activity**, and
+repository presence never implies registration — `dabbler-docs` is a repository, not a Project.
+
+**Tracked vs runtime.** Doctrine, tooling and the registry are tracked. Task, routing, exception
+and dependency records are **git-ignored and local-durable**: tracking them would keep the working
+tree dirty during normal execution and make Git responsible for a live orchestration database.
+
+**Every operational write goes through `agent/state/store.py`.** No seat edits runtime JSON
+directly. The check-then-write must happen inside one lock, or it is not compare-and-swap — two
+writers can otherwise both read revision 5 and both write 6, the second silently destroying the
+first. Dependency mutations take a **Product graph lock**, because per-edge locks cannot protect a
+graph invariant. **Nothing technically enforces this**; like the no-delegation rule, it is
+constitutional, and `validate.py` cannot prove a valid-looking record went through the store.
+
+**Runtime state is workspace-local, not global truth.** `fcntl.flock` coordinates processes
+sharing this filesystem. It is not distributed locking, and a different clone, worktree or cloud
+checkout has entirely independent runtime state. **Never read state as global occupancy.**
+Compatibility debt; revisited in Wave 6.
+
+**CLAIM still does not exist.** A task's `executor_evidence` is a **list** of observations, not an
+owner: zero entries means no evidenced executor, one unique seat is usable MODEL C evidence, and
+**two or more is conflicting evidence that routing must refuse** rather than break by picking one.
+Wave 6 introduces a real claim structure.
 
 ---
 
