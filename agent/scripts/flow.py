@@ -11,7 +11,7 @@ Standard library only. No install step.
     python3 agent/scripts/flow.py            # then open http://localhost:7373
     python3 agent/scripts/flow.py --port 8080
 """
-import argparse, json, os, re, sys, time, collections
+import argparse, csv, json, os, re, sys, time, collections
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -35,9 +35,43 @@ def project_dir():
 
 # ---------------------------------------------------------------- roster
 
+def naming():
+    """Seat -> identity, read from agent/NAMING.csv.
+
+    The CSV is the single source for the Egyptian name, glyph and lore. This
+    file used to carry a second copy of that data inside the page, keyed to
+    seat slugs that no longer exist; two maps of the same thing is how they
+    came to disagree.
+    """
+    out = {}
+    path = os.path.join(ROOT, "agent", "NAMING.csv")
+    if not os.path.exists(path):
+        return out
+    try:
+        with open(path, encoding="utf-8", errors="replace", newline="") as fh:
+            for row in csv.DictReader(fh):
+                seat = (row.get("Seat") or "").strip()
+                if not seat or seat == "\u2014":
+                    continue
+                out[seat] = {
+                    "deity": re.sub(r"^[^(]*\(|\)$", "", (row.get("Given Name (Arabic)") or "").strip()).strip()
+                             or (row.get("Code Name") or seat).strip(),
+                    "glyph": (row.get("Hieroglyphs") or "").strip(),
+                    "lore": (row.get("Ancient Pharaonic Lore") or "").strip(),
+                }
+    except Exception:
+        return {}
+    return out
+
+
 def roster():
-    """The 30 seats, their tier, and whether they have ever logged work."""
+    """Every seat with a binding: tier, identity, and whether it has logged work.
+
+    The binding directory is the roster. Nothing here is a fixed list, so a
+    seat added or renamed in .claude/bindings/ appears without editing code.
+    """
     seats = {}
+    ident = naming()
     bind = os.path.join(ROOT, ".claude", "bindings")
     if not os.path.isdir(bind):
         return seats
@@ -55,9 +89,17 @@ def roster():
         logged = False
         if os.path.exists(st):
             logged = "_No entries yet._" not in open(st, encoding="utf-8", errors="replace").read()
+        lvl = level_of(name)
+        idn = ident.get(name, {})
         seats[name] = {"name": name, "model": model, "effort": effort, "logged": logged,
-                       "level": level_of(name)}
+                       "level": lvl, "group": GROUP_OF.get(lvl, "DEVELOPERS"),
+                       "deity": idn.get("deity", name), "glyph": idn.get("glyph", ""),
+                       "lore": idn.get("lore", "")}
     return seats
+
+
+GROUP_OF = {"company": "COMPANY", "product": "PRODUCT",
+            "project": "PROJECT", "developer": "DEVELOPERS"}
 
 
 def level_of(n):
@@ -458,7 +500,7 @@ PAGE = r"""<!doctype html><html lang="en"><head>
     <div class="mono" style="display:flex;align-items:center;gap:9px;font-size:12px;color:rgba(236,244,248,.52)">
       <span><strong id="hdRuns" style="color:rgba(236,244,248,.95);font-weight:500">0</strong> runs</span>
       <span style="opacity:.28">&middot;</span>
-      <span><strong id="hdWoken" style="color:rgba(236,244,248,.95);font-weight:500">0/30</strong> seats woken</span>
+      <span><strong id="hdWoken" style="color:rgba(236,244,248,.95);font-weight:500">—</strong> seats woken</span>
       <span style="opacity:.28">&middot;</span>
       <span><strong id="hdOut" style="color:rgba(236,244,248,.95);font-weight:500">0</strong> out</span>
     </div>
@@ -469,7 +511,7 @@ PAGE = r"""<!doctype html><html lang="en"><head>
     <div style="position:relative;display:flex;flex-direction:column;min-height:0;border:1px solid rgba(255,255,255,.06);border-radius:13px;background:linear-gradient(180deg,rgba(255,255,255,.036),rgba(255,255,255,.01));backdrop-filter:blur(24px);box-shadow:0 26px 64px -32px rgba(0,0,0,.92),inset 0 1px 0 rgba(255,255,255,.045)">
       <div style="display:flex;align-items:baseline;justify-content:space-between;padding:13px 14px 10px;border-bottom:1px solid rgba(255,255,255,.05)">
         <div class="mono" style="font-size:10px;letter-spacing:.2em;color:rgba(236,244,248,.5)">SEATS</div>
-        <div class="mono" id="awakeLabel" style="font-size:10px;color:rgba(236,244,248,.5)">0/30 awake</div>
+        <div class="mono" id="awakeLabel" style="font-size:10px;color:rgba(236,244,248,.5)">— awake</div>
       </div>
       <div id="seatList" style="flex:1;min-height:0;overflow-y:auto;padding:8px 8px 12px"></div>
       <div style="padding:11px 13px 12px;border-top:1px solid rgba(255,255,255,.05)">
@@ -517,7 +559,7 @@ PAGE = r"""<!doctype html><html lang="en"><head>
 
       <div style="position:absolute;left:14px;top:13px;display:flex;flex-direction:column;gap:5px;pointer-events:none">
         <div class="mono" id="viewLabel" style="font-size:9.5px;letter-spacing:.2em;color:rgba(236,244,248,.38)">FLOW &middot; THEBES TOPOLOGY</div>
-        <div class="mono" id="viewSub" style="font-size:9.5px;color:rgba(236,244,248,.3)">30 seats persistent &middot; 0 runs</div>
+        <div class="mono" id="viewSub" style="font-size:9.5px;color:rgba(236,244,248,.3)">&mdash;</div>
       </div>
 
       <div style="position:absolute;right:13px;top:12px;display:flex;align-items:center;gap:8px;z-index:12">
@@ -606,6 +648,7 @@ PAGE = r"""<!doctype html><html lang="en"><head>
 </div>
 
 <script>
+const SEATS_DATA = __SEATS_JSON__;
 /* ================================================================
    One Brain — Command Center
    Presentation layer implemented from the Claude Design handoff
@@ -628,7 +671,7 @@ const RANK = { idle: 0, done: 1, waiting: 2, thinking: 3, exec: 4 };
 const HUE = {
   cto: 300, cpo: 95, cxo: 175, analyst: 250,
   "content-manager": 330, devops: 265, pm: 145,
-  po: 60, qa: 115, "senior-backend": 160
+  po: 60, qa: 115
 };
 const TIER_LABEL = [
   ["Thebes", 200], ["CTO", 300], ["CPO", 95], ["CXO", 175],
@@ -638,83 +681,33 @@ const TIER_LABEL = [
 function hueFor(slug) {
   if (HUE[slug] != null) return HUE[slug];
   if (slug.indexOf("team-lead") === 0) return 285;
+  if (slug.indexOf("backend") === 0) return 160;
   return 210;
 }
 function ident(h, a) { return "oklch(0.78 0.085 " + h + (a == null ? "" : " / " + a) + ")"; }
 
-const LORE = {
-  "cto": "The Great Potter: Fashioned the primordial repository The One Brain on his divine wheel, moulding the core architecture from silt.",
-  "cpo": "Scribe of the Divine: Keeper of the 26 Sacred Scrolls of Notion. He measures time, records strategies, and writes the future of the realm.",
-  "cxo": "Lady of Beauty: Sovereign over aesthetics and the universal Design System. She infuses harmony and sight into every digital monument.",
-  "analyst": "Scale of Truth: Anchored to PROJECT_STATE.md. Weigher of truth and system balance who speaks only in unalterable data.",
-  "pm": "Guide of the Way: Guider of paths who weighs the backlog against business priorities and unlocks the sacred stacks.",
-  "devops": "Master Craftsman: Lord of the sacred forge who speaks code into existence and safely installs builds into production.",
-  "content-manager": "The Dual Linguist: Master scribe fluently carving the divine glyphs across both English and Arabic scrolls for the app stores.",
-  "po": "The Lawgiver: High Steward who holds the sole reed pen of Jira; no feature advances without his seal of Acceptance Criteria.",
-  "qa": "Devourer of Flaws: Devourer of unyielding judgment who sits at the release gate, consuming broken builds and rejecting flawed code.",
-  "team-lead-1": "Lord of Foundations: Ruler of user identity, social circles, and compliance lattice\u2014the bedrock upon which souls are registered.",
-  "senior-frontend-1": "Guardian of the Inner Shrine: Master of core layout composition and personal identity structures.",
-  "junior-frontend-1a": "Scribe of Identity Forms: Apprentice crafting raw profile components and validation states.",
-  "junior-frontend-1b": "Weaver of Social Threads: Assists in assembling social feed layouts and platform compliance views.",
-  "team-lead-2": "Lord of Chaos & Order: Commands the arenas of competition and games while taming disorder through strict moderation and safety.",
-  "senior-frontend-2": "Vanguard of Combat UI: Crafts real-time matchmaking interfaces, scoreboards, and moderation controls.",
-  "junior-frontend-2a": "Blade of Safety: Builds user report widgets, moderation prompts, and trust badges.",
-  "junior-frontend-2b": "Shield of the Arena: Constructs leaderboard listings and game session cards.",
-  "team-lead-3": "The Path Finder: God of navigation and time who governs spatial venue bookings and temporal sports references for active phases.",
-  "senior-frontend-3": "The Falcon Blade: The sole active executor of Phase 0, soaring through ticket KAN-121 while the rest of the vanguard waits in reserve.",
-  "junior-frontend-3a": "The Navigator's Apprentice: Assists in building calendar schedules and venue booking step-flow UI.",
-  "junior-frontend-3b": "Keeper of Sports Directories: Crafts responsive cards for sport categories and facility listings.",
-  "team-lead-4": "Guardian of Wealth: Mighty protector of the Nile's riches who commands payment flows, subscriptions, and reward bounties.",
-  "senior-frontend-4": "Weaver of Fortunes: Directs high-converting checkout flows, tier subscription cards, and wallet UI.",
-  "junior-frontend-4a": "Spark of Rewards: Builds gamification badge modals and reward streak progress bars.",
-  "junior-frontend-4b": "Keeper of Receipts: Constructs transaction histories and payment status banners.",
-  "team-lead-5": "Opener of Ways: The royal herald who directs real-time notification signals, geographic discovery, and swift messaging dispatches.",
-  "senior-frontend-5": "Huntress of Signals: Master of swift interactive maps, location popups, and instant messaging drawers.",
-  "junior-frontend-5a": "Courier of Alerts: Assembles notification drop-downs, badge counters, and toast popups.",
-  "junior-frontend-5b": "Scout of Discovery: Builds geographic search filters, map pins, and distance radius sliders.",
-  "senior-backend": "Pillar of the Sky: The sole titan holding up the heavens of the database schema, RLS policies, and edge functions for all five guilds."
-};
-
-const SEATS = [
-  ["COMPANY", "analyst", "opus", "Ma'at", "𓌡𓂝𓏏𓁦"],
-  ["COMPANY", "cpo", "opus", "Thoth", "𓏏𓅤𓀭"],
-  ["COMPANY", "cto", "opus", "Khnum", "𓎛𓈖𓈟𓀭"],
-  ["COMPANY", "cxo", "opus", "Hathor", "𓉡𓏏𓁐"],
-  ["PRODUCT", "content-manager", "sonn", "Scribe of Karnak", "𓏞𓀀𓉐𓏤𓇋𓏏𓠠𓈖𓏌𓏲"],
-  ["PRODUCT", "devops", "opus", "Ptah", "𓏪𓏏𓎛𓀭"],
-  ["PRODUCT", "pm", "opus", "Anubis", "𓇋𓏎𓊪𓏲𓃣"],
-  ["PROJECT", "po", "opus", "Horemheb", "𓅃𓅓𓎛𓎛𓃀𓀭"],
-  ["PROJECT", "qa", "sonn", "Ammut", "𓉻𓅓𓅓𓏏𓆌"],
-  ["PROJECT", "team-lead-1", "opus", "Osiris", "𓏲𓊃𓇋𓁹𓀭"],
-  ["PROJECT", "team-lead-2", "opus", "Seth", "𓃩𓏏𓄡𓀭"],
-  ["PROJECT", "team-lead-3", "opus", "Khonsu", "𓈖𓂧𓏲𓀭"],
-  ["PROJECT", "team-lead-4", "opus", "Sobek", "𓆋𓏌𓎡𓀭"],
-  ["PROJECT", "team-lead-5", "opus", "Wepwawet", "𓃧𓏲𓄿𓏲𓏏𓀭"],
-  ["DEVELOPERS", "junior-frontend-1a", "opus", "Isdes", "𓇋𓂧𓏲𓀭"],
-  ["DEVELOPERS", "junior-frontend-1b", "opus", "Hapi", "𓎛𓂝𓪂𓏭𓈘"],
-  ["DEVELOPERS", "junior-frontend-2a", "opus", "Mafdet", "𓏠𓏏𓆌"],
-  ["DEVELOPERS", "junior-frontend-2b", "opus", "Nekhbet", "𓅑𓏏𓁐"],
-  ["DEVELOPERS", "junior-frontend-3a", "opus", "Shed", "𓌢𓂧𓀭"],
-  ["DEVELOPERS", "junior-frontend-3b", "opus", "Min", "𓏠𓈖𓏲𓀭"],
-  ["DEVELOPERS", "junior-frontend-4a", "opus", "Heka", "𓎛𓎡𓄿𓀭"],
-  ["DEVELOPERS", "junior-frontend-4b", "opus", "Shai", "𓏭𓀭"],
-  ["DEVELOPERS", "junior-frontend-5a", "opus", "Ashat", "𓂝𓏏𓁐"],
-  ["DEVELOPERS", "junior-frontend-5b", "opus", "Saa", "𓊃𓄿𓀭"],
-  ["DEVELOPERS", "senior-backend", "sonn", "Shu", "𓏲𓀭"],
-  ["DEVELOPERS", "senior-frontend-1", "opus", "Nephthys", "𓉠𓏏𓁐"],
-  ["DEVELOPERS", "senior-frontend-2", "opus", "Sekhmet", "𓌃𓐍𓏏𓁐"],
-  ["DEVELOPERS", "senior-frontend-3", "opus", "Horus", "𓅃𓀭"],
-  ["DEVELOPERS", "senior-frontend-4", "opus", "Renenutet", "𓂋𓈖𓈖𓏏𓏏𓁐"],
-  ["DEVELOPERS", "senior-frontend-5", "opus", "Pakhet", "𓪪𓐍𓏏𓁐"]
-].map(function (r) {
-  const slug = r[1];
-  const short = slug
-    .replace("junior-frontend-", "jf-")
-    .replace("senior-frontend-", "sf-")
-    .replace("senior-backend", "backend")
-    .replace("team-lead-", "tl-")
-    .replace("content-manager", "content");
-  return { group: r[0], slug: slug, short: short, name: slug, model: r[2], deity: r[3], glyph: r[4], hue: hueFor(slug) };
+/* The roster is injected by the server from .claude/bindings/ and
+   agent/NAMING.csv. It is never written here: a second copy of the roster
+   inside this page is what let it drift a whole restructure behind. */
+function shortName(slug) {
+  return slug
+    .replace(/^team-lead-/, "tl-")
+    .replace(/^frontend-/, "fe-")
+    .replace(/^backend-/, "be-")
+    .replace(/^content-manager$/, "content");
+}
+const SEATS = (SEATS_DATA || []).map(function (r) {
+  return {
+    group: r.group || "DEVELOPERS",
+    slug:  r.name,
+    short: shortName(r.name),
+    name:  r.name,
+    model: String(r.model || "\u2014").slice(0, 4),
+    deity: r.deity || r.name,
+    glyph: r.glyph || "\u25cb",
+    lore:  r.lore || "",
+    hue:   hueFor(r.name)
+  };
 });
 const BY_SLUG = {};
 SEATS.forEach(s => { BY_SLUG[s.slug] = s; });
@@ -1309,12 +1302,12 @@ function render() {
   document.getElementById("coreName").style.fontSize = inv(13);
   document.getElementById("corePad").style.padding = (11 * f).toFixed(1) + "px";
 
-  document.getElementById("awakeLabel").textContent = awake + "/30 awake";
+  document.getElementById("awakeLabel").textContent = awake + "/" + SEATS.length + " awake";
   document.getElementById("hdRuns").textContent = RUNS.length;
-  document.getElementById("hdWoken").textContent = new Set(RUNS.map(function (r) { return r.seat; })).size + "/30";
+  document.getElementById("hdWoken").textContent = new Set(RUNS.map(function (r) { return r.seat; })).size + "/" + SEATS.length;
   document.getElementById("hdOut").textContent = fmt(USAGE.out);
   document.getElementById("viewLabel").textContent = org ? "ORG · REPORTING LINES" : "FLOW · THEBES TOPOLOGY";
-  document.getElementById("viewSub").textContent = "30 seats persistent · " + RUNS.length + " runs";
+  document.getElementById("viewSub").textContent = SEATS.length + " seats persistent · " + RUNS.length + " runs";
 
   var mins = Math.floor(t * SPAN_MIN);
   document.getElementById("elapsed").textContent =
@@ -1390,7 +1383,7 @@ function renderDetail(live, t) {
   ds.textContent = st === "exec" ? "executing" : st === "idle" ? "standby" : st;
   ds.style.color = PAL[st];
   document.getElementById("dMeta").textContent = s.group + " · " + (s.model || "—");
-  document.getElementById("dLore").textContent = LORE[s.slug] || "";
+  document.getElementById("dLore").textContent = s.lore || "";
   var mine = [];
   RUNS.forEach(function (r, i) { if (r.seat === s.slug) mine.push({ r: r, i: i }); });
   document.getElementById("dRunCount").textContent =
@@ -1497,7 +1490,12 @@ class Handler(BaseHTTPRequestHandler):
             except Exception as e:
                 self._send(json.dumps({"error": str(e), "sessions": []}), "application/json")
         else:
-            self._send(PAGE, "text/html; charset=utf-8")
+            try:
+                seats = sorted(roster().values(), key=lambda x: (x["name"]))
+            except Exception:
+                seats = []
+            page = PAGE.replace("__SEATS_JSON__", json.dumps(seats))
+            self._send(page, "text/html; charset=utf-8")
 
 
 def main():

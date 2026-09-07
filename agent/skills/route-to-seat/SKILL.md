@@ -31,10 +31,13 @@ answer flatten the other's.
 | EN/AR copy, notification text, store listing content | `content-manager` |
 | Jira — creating, auditing, reviewing, arranging, tracking tickets; the acceptance-criteria check before QA | `po` |
 | which stack, which feature, who takes it, capacity and assignment | the owning `team-lead-N` |
-| backend code — schema, migrations, RLS, RPCs, edge functions | `senior-backend` |
-| app code — screens, widgets, controllers, providers, repositories | `senior-frontend` |
-| repeating an existing pattern, copy, constants, a single-file edit | `junior-frontend` |
+| backend code — schema, migrations, RLS, RPCs, edge functions | the team's `backend-N` |
+| app code — screens, widgets, controllers, providers, repositories | the team's `frontend-N` |
 | testing a running build, writing a testing story, filing bugs | `qa` |
+
+**There is no seniority tier.** `senior-frontend`, `junior-frontend` and `senior-backend` were
+retired on 2026-09-06 and replaced by `frontend-1..8` and `backend-1..8`, paired into eight
+teams. Route by the team that owns the work, not by how hard the task looks.
 
 **Stacks belong to leads:**
 
