@@ -135,15 +135,33 @@ A money ticket is not done until every line is true and demonstrated:
 
 ## WHO MAY DO THIS WORK
 
-**No `junior-frontend-*` seat takes a money write.** Not because the seat is weak, but
-because its rule — *repeat the existing pattern in a single file* — cannot be executed
-safely here: the pattern does not carry its own safety, and the seat is explicitly not asked
-to open the database to find out. A money write is `senior-backend` (the RPC, the schema)
-plus `senior-frontend-4` (the call site and the controller).
+**A money write is split across the two authorities, and neither crosses into the other.**
 
-A junior may take **read-only** money work — a balance display, a ledger list, a payout
-history — provided the ticket says so and no `.insert()`, `.update()`, `.upsert()`, `.rpc()`
-or edge-function call appears in the change.
+- **Backend side** — the `backend-N` executing the work item writes the RPC, the schema, the
+  constraint and the migration, under `G-028`: it authors **and** applies, after `cto`'s
+  confirmation is posted on the same ticket.
+- **Frontend side** — the `frontend-N` executing the work item writes the call site and the
+  controller. **It gets no database authority from this.** No `.rpc()` it did not go through
+  the RPC contract for, no schema, no policy, no migration.
 
-Once the call-site rule above holds everywhere in D4, this bar is worth revisiting. It is a
-consequence of the guarantee being invisible, not a permanent judgement about the seat.
+**The authority boundary is the safety mechanism.** A frontend seat that reaches past the RPC
+into the database, or a backend seat that writes the controller, has removed the second pair of
+eyes the split exists to provide.
+
+**Read-only money work** — a balance display, a ledger list, a payout history — is ordinary
+frontend work, provided the ticket says so and no `.insert()`, `.update()`, `.upsert()`,
+`.rpc()` or edge-function call appears in the change.
+
+**The bar is the checklist above, not the seat.** Every invariant in this file must be
+demonstrated on the ticket by whichever seat holds the work item — the replay test **run**, the
+`UNIQUE` index shown, the in-flight guard present, the RPC named by a `SupabaseConfig` constant.
+Passing that bar is what qualifies a money write. **Do not substitute a judgement about which
+seat is trusted for evidence that the invariants hold.**
+
+**Superseded 2026-09-06/07.** This section previously barred `junior-frontend-*` seats from
+money writes and assigned the work to `senior-backend` plus `senior-frontend-4`. Those seat
+classes were retired with the seniority tier, and the permanent slice ownership that made
+`senior-frontend-4` the D4 writer was retired with it (`CONTRACT.md` §3). The reasoning is kept
+because it still explains the risk: *the pattern does not carry its own safety, and a seat that
+does not open the database cannot discover that.* **The answer is now evidence on the ticket
+rather than a rank.**

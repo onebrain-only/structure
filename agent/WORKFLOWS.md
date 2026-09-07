@@ -278,11 +278,20 @@ and it is rare.**
 
 1. **`po`** writes the ticket with testable acceptance criteria and a `due_date` taken from
    the owning lead's capacity. It moves it to **Ready**.
-2. **`team-lead-N`** pulls it from Ready, confirms the slice's state with **`analyst`** rather
-   than assuming it from the stack name, splits it into subtasks, and routes each by **task
-   shape**: `junior-frontend` for repeating an existing pattern in a single file,
-   `senior-frontend` for business logic and multi-file work, `senior-backend` for anything
-   schema-shaped. Moves it to **In Progress**.
+2. **`team-lead-N`** confirms the ticket is genuinely ready to start — the slice's state with
+   **`analyst`** rather than assuming it from the stack name, and sequencing against any
+   contended or shared file per §7 — and splits it into subtasks along the **frontend /
+   backend** line, which is what the pairs are: Dart and the app to a `frontend-N`, schema,
+   migrations, RLS, RPCs and edge functions to a `backend-N`.
+
+   **The lead does not choose which developer takes it.** Per §1's `Development` row and the
+   CEO's `YOU PULL, YOU DO NOT WAIT` ruling of 2026-09-06, a developer pulls its own next
+   ticket from `Ready` when free, and the lead makes the transition once one has. **There is no
+   task-shape routing by seniority** — `senior-frontend`, `junior-frontend` and `senior-backend`
+   were retired the same day, and no `frontend-N` is senior to another.
+
+   *(Corrected 2026-09-07. This step previously had the lead hand-assign each subtask by task
+   shape, which contradicted §1's own correction inside this file.)*
 3. **The developer** implements, following the build order (`MANIFESTO.md` §2): database →
    constants → repository → providers → screen → route. Writes tests for what it built, runs
    `flutter analyze` and `flutter test`, and **pastes the output rather than summarising it.**

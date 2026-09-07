@@ -412,6 +412,23 @@ def sessions():
     return sorted(out, key=lambda s: s["mtime"], reverse=True)
 
 
+def embed_json(obj):
+    r"""Serialise for embedding inside a <script> element.
+
+    json.dumps does not escape "<", so a "</script>" sequence arriving from
+    NAMING.csv would close the element early and everything after it would be
+    parsed as markup. Escaping the three HTML-significant characters as \uXXXX
+    escapes keeps the value a valid JSON string and inert to the HTML parser.
+    U+2028 and U+2029 are escaped too: legal in JSON, historically illegal in a
+    JavaScript string literal.
+    """
+    out = json.dumps(obj)
+    for ch, esc in ((chr(0x3c), "u003c"), (chr(0x3e), "u003e"), (chr(0x26), "u0026"),
+                    (chr(0x2028), "u2028"), (chr(0x2029), "u2029")):
+        out = out.replace(ch, chr(0x5c) + esc)
+    return out
+
+
 def state(session_id=None):
     ses = sessions()
     if not ses:
@@ -1494,7 +1511,7 @@ class Handler(BaseHTTPRequestHandler):
                 seats = sorted(roster().values(), key=lambda x: (x["name"]))
             except Exception:
                 seats = []
-            page = PAGE.replace("__SEATS_JSON__", json.dumps(seats))
+            page = PAGE.replace("__SEATS_JSON__", embed_json(seats))
             self._send(page, "text/html; charset=utf-8")
 
 

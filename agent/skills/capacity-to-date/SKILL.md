@@ -1,6 +1,6 @@
 ---
 name: capacity-to-date
-description: How a team lead converts capacity into a due_date without estimating, and the sitting unit that makes it arithmetic. Use whenever a date is asked for, challenged, or compressed — "when can this land", "can we finish by Friday", a re-date after a ticket runs early or late; whenever work is sized against senior-backend or any shared single-writer seat whose queue you do not own; whenever an exclusive grant collapses a chain onto one seat; and whenever a task cannot be sized and the honest output is a named blocker instead of a number.
+description: How a team lead converts capacity into a due_date without estimating, and the sitting unit that makes it arithmetic. Use whenever a date is asked for, challenged, or compressed — "when can this land", "can we finish by Friday", a re-date after a ticket runs early or late; whenever work is sized against any shared single-writer seat whose queue you do not own; whenever an exclusive grant collapses a chain onto one seat; and whenever a task cannot be sized and the honest output is a named blocker instead of a number.
 ---
 
 # Capacity to date
@@ -354,8 +354,16 @@ shift across `KAN-123`/`124`/`125` — *"derived from the four remaining sitting
 
 ## 3. Sizing against a shared single-writer seat
 
-`senior-backend` (Shu) is **one seat serving all five teams**. A date on its work is a claim
-on a queue you do not own, and a lead that issues one is estimating.
+A shared single-writer seat is any seat every team must pass through: `cto`'s `G-028`
+confirmation before a schema change may be applied, `content-manager` for EN/AR copy, `devops`
+for the release path. A date on such a seat's work is a claim on a queue you do not own, and a
+lead that issues one is estimating.
+
+*(Corrected 2026-09-07: this read "`senior-backend` (Shu) is one seat serving all five teams".
+That seat was retired on 2026-09-06 and replaced by `backend-1..8`, one per team, so backend
+**authoring** is no longer a shared queue — but `cto`'s confirmation gate still is, and the rule
+below is unchanged. The `KAN-128` evidence throughout this section was measured against the
+single-backend arrangement and is preserved as written.)*
 
 > **For your own developers, report a cost and a date. For a shared seat, report a cost, no
 > date, and the name of the seat that owns the queue.**

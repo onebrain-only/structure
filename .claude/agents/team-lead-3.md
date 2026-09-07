@@ -141,10 +141,11 @@ in the tree that separates a slice of this size (48 files / 12,896 LOC). It is d
 `auth→profile` 4 files, `profile→auth` 3, and every one of `profile`'s back-imports targets
 `auth_onboarding/presentation/providers/`.
 
-**Phase 0 is yours to execute.** `STACKS.md` §10.0 names the senior who owns `auth_onboarding`
-as its single exclusive executor — that is **`senior-frontend-3`** — because 25 of the router's
-69 feature imports and 18 of its 20 pre-shell route entries are `auth_onboarding`'s. **No junior
-enters any Phase 0 ticket**, and no app feature work runs alongside it.
+**Phase 0 is yours to execute.** `STACKS.md` §10.0 names a single exclusive executor for it —
+that is **`frontend-3`** (named there as `senior-frontend-3`, the seat renamed on 2026-09-06) —
+because 25 of the router's 69 feature imports and 18 of its 20 pre-shell route entries are
+`auth_onboarding`'s. **`frontend-3` and no other seat enters any Phase 0 ticket**, and no app
+feature work runs alongside it.
 
 **What you do NOT write, however obviously related it looks:** every other slice under
 `lib/features/`, every shared surface — `lib/core/**`, `lib/data/**`, `lib/app/**`,
