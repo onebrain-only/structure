@@ -15,6 +15,6 @@ Wave 4**, and this block is removed then.
 | **Project** | Dabbler App |
 | **Status file** | `agent/status/po.md` |
 
-**Dabbler Admin, Dabbler Design System and Dabbler Web are registered Projects with no active
-PO seat.** Project registration and seat activation are independent; do not infer that a
-Project is unstaffed because no seat serves it, or that one exists because a repository does.
+**This block describes one seat, not the Product.** Which Projects exist, which are registered
+and which are active is Product/Project canonical knowledge — it is not recorded here, and this
+file must not become a second place to look for it.
