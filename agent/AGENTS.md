@@ -22,16 +22,14 @@ edit a file, read `CONTRACT.md`.
                                     CEO
                                      │  human language
                                      ▼
-                              ┌─────────────┐
-                              │  LISTENER   │  ← the main session. Not an agent.
-                              │  (session)  │    Thinks, then either answers the CEO
-                              └──────┬──────┘    in human language, or writes a PROMPT
-                                     │
-                          ═══════════▼═══════════
-                           DISTRIBUTION LAYER
-                        a behaviour, NOT a seat
-                     the Listener writes DIRECTLY to
-                       whichever seat is concerned
+                          ┌───────────────────────┐
+                          │ TEMPORARY COMPATIBILITY│ ← the main session. Not an agent.
+                          │      DISPATCHER        │   TEMPORARY: exit Wave 6.
+                          │       (session)        │   NOT the Orchestrator.
+                          └───────────┬────────────┘
+                                      │
+                       ROUTE ─► SELECT (evidence only) ─► WAKE
+                              CLAIM does not exist
                           ═══════╤═══════╤═══════
               ┌───────────────────┘       └──────────────┐
               │                   │                      │
@@ -376,12 +374,52 @@ work.
 
 ---
 
-## 5. THE NESTING CONSTRAINT
+## 5. DELEGATION IS A CONTRACT, NOT A WALL
 
-**Subagents cannot spawn subagents.** Nesting is off by default and version-dependent.
+**Corrected 2026-09-07 (Wave 3).** This section said *"Subagents cannot spawn subagents."*
+**That is false**, and a rule justified by a mechanism that does not exist is a rule that
+breaks the first time someone tests it. What the runtime actually shows:
 
-**Parallelism comes from the Listener fanning out**, never from a worker recruiting. Do
-not write a prompt that asks an agent to delegate — it will either error or silently degrade.
+- **Named teammate → named teammate is blocked** by the harness: *"Teammates cannot spawn other
+  teammates — the team roster is flat."*
+- **That same error advises spawning an unnamed subagent instead** — so the block is on the
+  teammate form, not on subagent creation.
+- **`fork` from inside a subagent has succeeded.**
+- **No binding restricts tools.** There is no `tools:` key in any of the 30 bindings and no
+  `permissions` block in `settings.json`. Every seat can technically call `Agent`, `fork` and
+  `SendMessage`.
+
+**Therefore: no direct agent-to-agent execution delegation is a CONSTITUTIONAL RULE, enforced
+by contract.** No seat may call `Agent` or `fork` to create an executor, or use `SendMessage`
+to hand its work to another seat. Nothing will stop it; that is exactly why it is written here.
+
+**Parallelism comes from the Temporary Compatibility Dispatcher**, never from a worker
+recruiting. Do not write a prompt that asks an agent to delegate.
+
+### How a seat is woken — and what `YOU PULL` actually means
+
+**There is no autonomous wake.** No Ready-ticket watcher, no seat scheduler, no polling
+developer process. Every one of the 165 recorded seat invocations came from a Main Session
+calling the Agent tool; the four configured hooks are telemetry only.
+
+**`YOU PULL, YOU DO NOT WAIT` governs what a seat does once running** — choose your own next
+Ready work rather than waiting for a lead to hand-select it. **It does not wake anything.** The
+rule is undiminished; it simply is not a scheduler. Wave 6's capability queues are what finally
+make a seat claim its own work.
+
+### A seat is a persistent identity, not a running worker
+
+A named seat is a durable, addressable identity **within its spawning session** — resumable,
+and reachable by `SendMessage`. It is **not** a process sitting and waiting for work.
+
+**Occupancy is not knowable.** `ListAgents` shows only agents *this* session spawned; Agent View
+shows what has *ever* logged work and dispatch counts within one transcript; status files carry
+no current-assignment field. **None of the three is authoritative global busy/free state.**
+
+**Multiple Main Sessions may run against this repository at once**, and there is no cross-session
+seat lock. No document may claim that one dispatcher controls occupancy, and no rule may select a
+seat by "next free", lowest number or round-robin — two dispatchers applying the same
+deterministic rule pick the **same** seat.
 
 The practical ceiling on concurrency is not the agent count, it is file contention:
 **as many agents as have disjoint file sets**, and only one inside a contended file at a time

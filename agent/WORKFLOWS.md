@@ -214,8 +214,15 @@ ticket says which happened.
 
 ## 4. THE HANDOFF RULE
 
-**Agents do not brief each other. Briefs come from the Listener. An agent that needs a
-decision asks its team lead or `po` — not the Listener.**
+**Agents do not brief each other, and no agent hands execution to another.** Briefs come from
+the Temporary Compatibility Dispatcher. A worker needing a scope or acceptance decision asks
+**`po`** directly; a general domain decision goes up as an exception request for one redirect.
+
+**The no-delegation rule is contractual, not enforced by the harness.** No binding restricts
+tools, and runtime evidence shows the harness blocks only *named teammate → named teammate*
+spawning — `fork` and unnamed subagent creation are available. **You may not call `Agent` or
+`fork` to create an executor, and you may not use `SendMessage` to hand your work to another
+seat.** Nothing will stop you; the rule is the constraint.
 
 **Amended 2026-09-06 by the CEO (`G-024`).** Until today every question and every finished
 report came back to the Listener, and that was never written anywhere — no role file
@@ -246,29 +253,74 @@ Use the **`route-to-seat`** skill to decide who is concerned and to write the pr
   working directory, and an unrecognised `subagent_type` falls back to a generic agent with
   no error raised. An agent-to-agent handoff can therefore land in a generic agent that
   answers plausibly and owns nothing.
-- **A worker does not decide scope.** Deciding who does a piece of work next is a scope
-  decision. That has always been true and it is still true — what changed on 2026-09-06 is
-  **who holds it.** It is not the Listener alone. **`po` owns task analysis and the review
-  gate; a team lead owns capacity and assignment.** Those are the seats whose job scope is,
-  and an agent takes its scope question to them.
+- **A worker does not decide who executes next.** That is a routing decision, and after
+  Wave 3 it belongs to the Dispatcher — on evidence, or not at all. **`po` owns task analysis
+  and the review gate; a team lead owns readiness, the `Development` transition, capacity and
+  contention.** **A lead does not choose or assign the developer** (`YOU PULL`, §1).
 
-**The three channels, after `G-024`:**
+**The channels, corrected 2026-09-07 (Wave 3):**
 
 | Direction | Goes to | Example |
 |---|---|---|
-| **Down — a brief** | the **Listener**, and only the Listener | dispatching work from the CEO's word |
-| **Up — a decision** | your **team lead**, or **`po`** for anything about the task itself | "this acceptance criterion cannot be met" · "this needs a second sitting" |
-| **Sideways — a question** | the **peer**, directly (`grill-peer`) | "does the notification schema already have a `read_at` column?" |
+| **Down — a brief** | the **Temporary Compatibility Dispatcher** (the Main Session), and only it | dispatching work from the CEO's word |
+| **Up — scope, acceptance, work definition, criteria** | **`po`**, directly. `po` answers directly | "this acceptance criterion cannot be met" · "this needs a second sitting" |
+| **Up — a general domain decision outside your authority** | a **structured exception request** to the Dispatcher, which redirects **once** | "this needs an architecture call nobody has made" |
+| **Standing authorised direct routes** | the named authority, directly | `backend-N` → `cto` for `G-028` confirmation |
+| **Sideways — a factual question** | the **peer**, directly (`grill-peer`) | "does the notification schema already have a `read_at` column?" |
+| **Cross-capability work you discovered** | a **structured routing request** to the Dispatcher (§4.1) | frontend finds the RPC does not exist |
 
-**A sideways question was always allowed** and this section said so; the `grill-peer` skill,
-named in 23 of the 30 role files, is the mechanism. Use it rather than routing a factual
-question through anyone.
+**The team lead is no longer an escalation target for finding an executor.** It never chose
+the developer (`YOU PULL`), and after Wave 3 it does not appear in any routing path. It keeps
+its readiness, transition, capacity and contention duties — see §1 and §7.
 
-**What still reaches the Listener:** a dispute no single seat owns — two peers who disagree
-and cannot defer to each other — and anything touching the CEO's own files. On 2026-09-05
+**One redirect, then the Dispatcher exits.** After a redirect the authority talks to the
+original worker directly. **Forbidden:** `Authority → Dispatcher → po → developer`, or any
+chain where an answer is passed along rather than given.
+
+**What still reaches the Dispatcher:** a dispute no single seat owns, anything touching the
+CEO's own files, structured routing requests, and general exception requests. On 2026-09-05
 `team-lead-3` and `devops` disagreed on whether `KAN-126` was on Phase 0's critical path.
-Neither could settle it; `CONTRACT.md:378` did. **That is the shape of a Listener question,
-and it is rare.**
+Neither could settle it; `CONTRACT.md:378` did. **That is the shape of it, and it is rare.**
+
+---
+
+## 4.1 STRUCTURED ROUTING REQUEST — TEMPORARY, WAVE 3
+
+> **TEMPORARY. Exit: Wave 6.** Capability queues replace this. It is prose and prompt context
+> — **there is no queue, no store and no state directory.**
+
+**A worker that discovers work for another capability does not hand it over.** Direct
+execution delegation is prohibited (§4). Instead it returns a structured request:
+
+```
+ORIGINATING WORK ITEM:  KAN-nnn
+REQUIRED CAPABILITY:    backend | frontend | content | qa | devops | ...
+DISCOVERED SCOPE:       what is actually needed, in one or two sentences
+DEPENDENCY / BLOCKER:   what it blocks, or what blocks it
+RAISED_BY:              the seat raising it
+RETURN_TO:              where the result should go
+```
+
+**The discovering worker names the capability. It does not name the seat** — that is the
+Dispatcher's job, and only on evidence (`route-to-seat`).
+
+**Jira authority is unchanged.** If genuinely new work must be authored, the request goes to
+**`po`**, which writes it. **A developer does not create or edit tickets.**
+
+**Blockers, until the Dependency Graph exists (Wave 4):** record them the way §1 rule 2
+already requires — a comment on the ticket naming the blocker. **Do not invent `BLOCKS` /
+`IS BLOCKED BY` structure.**
+
+### The result comes back directly
+
+**The Dispatcher is not in the technical return path.** The receiving seat sends its result to
+`RETURN_TO` **directly** via `SendMessage` when that seat is addressable in the same session.
+
+**When `RETURN_TO` is not addressable** — a different session, or an identity that no longer
+resolves — the Dispatcher may re-wake the originating seat with the result as context. That is
+a **COMPATIBILITY RE-WAKE**, and it must be called that. **It is not direct messaging**, and
+cross-session `SendMessage` does not exist. The exception and routing records live only in
+prompt context until Wave 4 gives them durable state.
 
 ---
 
@@ -311,7 +363,7 @@ and it is rare.**
 | Step | Seat | Receives | Produces | Done when |
 |---|---|---|---|---|
 | 1 | `po` | The request | A ticket with criteria and a date | Criteria are testable; date came from capacity |
-| 2 | `team-lead-N` | A Ready ticket | Subtasks, each assigned | Each routed by shape, not by who is idle |
+| 2 | `team-lead-N` | A Ready ticket | Readiness confirmed; work split frontend/backend | Slice state checked, contention sequenced, `Development` transitioned once a developer has pulled it. **The lead does not choose the developer** |
 | 3 | developer | A subtask | Code through step 6 of the build order, **hand-written source only** | A route reaches it; `analyze` 0 errors; `test` passes; **no `*.g.dart` / `*.freezed.dart` in the diff** |
 | 4 | `po` | The diff | Verdict | QA-Test, or back to Ready |
 | 5 | `qa` | Passed work | Testing story executed | Bugs filed, or none found and said so |

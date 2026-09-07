@@ -5,9 +5,13 @@ description: Use before dispatching any work to an agent. Decides which seat a r
 
 # Route to seat
 
-You are the Listener. There is no orchestrator to hand off to — **the distribution layer is
-this skill running in your head.** Its whole purpose is to remove the relay: you write to the
-seat that owns the answer, not to its manager.
+> **TEMPORARY — WAVE 3. Exit: Wave 6.** This is a capability and evidence resolver for the
+> Temporary Compatibility Dispatcher. **It is not a queue.** It holds no state, orders nothing,
+> and never estimates availability. Wave 6's capability queues replace it.
+
+You are the Temporary Compatibility Dispatcher. Its whole purpose is to remove the relay: you
+write to the seat that owns the answer, not to its manager — and where no seat is evidenced,
+you say so rather than picking one.
 
 ## 1. Name the concern
 
@@ -30,24 +34,72 @@ answer flatten the other's.
 | repos, GitHub connections, MCPs, CI/CD, Fastlane, env vars, releases, deploys, App Store submission | `devops` |
 | EN/AR copy, notification text, store listing content | `content-manager` |
 | Jira — creating, auditing, reviewing, arranging, tracking tickets; the acceptance-criteria check before QA | `po` |
-| which stack, which feature, who takes it, capacity and assignment | the owning `team-lead-N` |
+| stack/feature breakdown, readiness to start, capacity for a date | the owning `team-lead-N` — **it does not choose or assign the developer** |
 | backend code — schema, migrations, RLS, RPCs, edge functions | the team's `backend-N` |
 | app code — screens, widgets, controllers, providers, repositories | the team's `frontend-N` |
 | testing a running build, writing a testing story, filing bugs | `qa` |
 
 **There is no seniority tier.** `senior-frontend`, `junior-frontend` and `senior-backend` were
 retired on 2026-09-06 and replaced by `frontend-1..8` and `backend-1..8`, paired into eight
-teams. Route by the team that owns the work, not by how hard the task looks.
+teams. **No `frontend-N` is senior to another**, so task shape never selects a seat.
 
-**Stacks belong to leads:**
+## 2b. Resolve the executor — on evidence, or not at all
 
-| Lead | Stacks |
+**Routing a capability and selecting a seat are different acts.** The table above gives you a
+capability. It does **not** give you a seat, and nothing in this repository can tell you which
+seat is free.
+
+**You may name a concrete seat in exactly four cases:**
+
+1. **The CEO named it.**
+2. **Readable evidence names the current executor** of this work — a ticket comment, a status
+   entry, a prior report. **Quote it.**
+3. **Continuation** of work a seat already holds, and that seat is addressable in this session.
+4. **One half of a `frontend-N`/`backend-N` pair is already evidenced on this work item** and
+   the counterpart is genuinely required.
+
+**Otherwise there is no seat, and that is the answer.** Never select by number, alphabet,
+round-robin, "least busy", or the fact that a seat has not been mentioned lately.
+
+**You cannot prove availability, and neither can anything you might consult:**
+
+| Source | What it actually tells you |
 |---|---|
-| `team-lead-1` | D1 Identity · D5 Social · D11 Platform |
-| `team-lead-2` | D2 Games · D8 Moderation |
-| `team-lead-3` | D3 Venues · D10 Sports reference |
-| `team-lead-4` | D4 Money · D7 Rewards |
-| `team-lead-5` | D6 Notifications · D9 Discovery |
+| Agent View / `/api/state` | Which seats have *ever* logged work, and dispatch counts in one transcript. **Not occupancy.** |
+| `ListAgents` | Only agents **this session** spawned. Another session's busy seat is invisible. |
+| `agent/status/<seat>.md` | What a seat has done. **No current-assignment field exists.** |
+| Silence on a ticket | Nothing. Absence of evidence is not evidence of availability. |
+
+**Multiple Main Sessions may run at once.** There is no cross-session seat lock, so a
+deterministic "next free seat" rule makes two dispatchers pick the **same** seat rather than
+different ones. That is why the rule is evidence, not order.
+
+### Output shape
+
+```
+CAPABILITY:       frontend
+CURRENT EXECUTOR: frontend-4
+DISPATCHABLE NOW: YES
+EVIDENCE:         KAN-137 comment 2026-09-06 — frontend-4 reported the controller change
+```
+
+```
+CAPABILITY:       backend
+CURRENT EXECUTOR: NONE EVIDENCED
+DISPATCHABLE NOW: NO
+REASON:           no authoritative evidence selects a concrete backend seat; availability is
+                  not knowable. Ask the CEO which seat takes it, or report the work as
+                  defined with no evidenced executor.
+```
+
+**`NONE EVIDENCED` is a correct, complete answer.** Work that stays unassigned is the honest
+outcome until Wave 6 gives a queue something to claim from.
+
+### WAKE is not CLAIM
+
+Invoking a seat opens a conversation with it. **No claim, lock or ownership record is created**
+— Jira has no executor field and no claim moment. Do not write or imply that a woken seat now
+owns the item.
 
 **This table goes stale; the filesystem does not.** Confirm the seat exists before
 dispatching — and confirm it at its **runtime** artifacts, not at a Role file. Since Wave 2 a
